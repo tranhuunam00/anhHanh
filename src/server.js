@@ -149,6 +149,119 @@ function sendJson(response, statusCode, payload) {
   response.end(JSON.stringify(payload));
 }
 
+function sendHtml(response, statusCode, html) {
+  response.writeHead(statusCode, { "Content-Type": "text/html; charset=utf-8" });
+  response.end(html);
+}
+
+function renderPrivacyPolicyPage() {
+  const updatedAt = "08/07/2026";
+
+  return `<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chinh sach quyen rieng tu</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      background: #f8fafc;
+    }
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #ffffff;
+      min-height: 100vh;
+    }
+    h1, h2 {
+      color: #0f172a;
+      line-height: 1.25;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 30px;
+    }
+    h2 {
+      margin-top: 28px;
+      font-size: 20px;
+    }
+    p, li {
+      font-size: 16px;
+    }
+    .muted {
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Ch&iacute;nh s&aacute;ch quy&#7873;n ri&ecirc;ng t&#432;</h1>
+    <p class="muted">C&#7853;p nh&#7853;t l&#7847;n cu&#7889;i: ${updatedAt}</p>
+
+    <p>
+      Ch&iacute;nh s&aacute;ch n&agrave;y m&ocirc; t&#7843; c&aacute;ch chatbot Fanpage c&#7911;a ${AGENCY_NAME}
+      ti&#7871;p nh&#7853;n, s&#7917; d&#7909;ng v&agrave; b&#7843;o v&#7879; th&ocirc;ng tin khi ng&#432;&#7901;i d&ugrave;ng
+      nh&#7855;n tin qua Facebook Messenger.
+    </p>
+
+    <h2>1. Th&ocirc;ng tin &#273;&#432;&#7907;c ti&#7871;p nh&#7853;n</h2>
+    <p>Khi ng&#432;&#7901;i d&ugrave;ng nh&#7855;n tin cho Fanpage, h&#7879; th&#7889;ng c&oacute; th&#7875; ti&#7871;p nh&#7853;n:</p>
+    <ul>
+      <li>N&#7897;i dung tin nh&#7855;n ng&#432;&#7901;i d&ugrave;ng g&#7917;i.</li>
+      <li>M&atilde; &#273;&#7883;nh danh ng&#432;&#7901;i g&#7917;i do Facebook cung c&#7845;p &#273;&#7875; ph&#7843;n h&#7891;i &#273;&uacute;ng cu&#7897;c tr&ograve; chuy&#7879;n.</li>
+      <li>Th&#7901;i &#273;i&#7875;m g&#7917;i tin nh&#7855;n v&agrave; tr&#7841;ng th&aacute;i x&#7917; l&yacute; k&#7929; thu&#7853;t.</li>
+    </ul>
+
+    <h2>2. M&#7909;c &#273;&iacute;ch s&#7917; d&#7909;ng th&ocirc;ng tin</h2>
+    <p>Th&ocirc;ng tin &#273;&#432;&#7907;c s&#7917; d&#7909;ng &#273;&#7875;:</p>
+    <ul>
+      <li>Tr&#7843; l&#7901;i t&#7921; &#273;&#7897;ng c&aacute;c c&acirc;u h&#7887;i v&#7873; th&#7911; t&#7909;c h&agrave;nh ch&iacute;nh, th&ocirc;ng tin li&ecirc;n h&#7879; v&agrave; h&#432;&#7899;ng d&#7851;n n&#7897;p h&#7891; s&#417;.</li>
+      <li>Ghi nh&#7853;n l&#7895;i k&#7929; thu&#7853;t v&agrave; c&#7843;i thi&#7879;n ch&#7845;t l&#432;&#7907;ng h&#7895; tr&#7907;.</li>
+      <li>Chuy&#7875;n ti&#7871;p n&#7897;i dung cho c&aacute;n b&#7897; ph&#7909; tr&aacute;ch khi c&acirc;u h&#7887;i c&#7847;n x&#7917; l&yacute; th&#7911; c&ocirc;ng.</li>
+    </ul>
+
+    <h2>3. Kh&ocirc;ng thu th&#7853;p th&ocirc;ng tin kh&ocirc;ng c&#7847;n thi&#7871;t</h2>
+    <p>
+      Chatbot kh&ocirc;ng y&ecirc;u c&#7847;u ng&#432;&#7901;i d&ugrave;ng cung c&#7845;p m&#7853;t kh&#7849;u, m&atilde; OTP,
+      th&ocirc;ng tin th&#7867; ng&acirc;n h&agrave;ng ho&#7863;c d&#7919; li&#7879;u nh&#7841;y c&#7843;m kh&ocirc;ng c&#7847;n thi&#7871;t.
+    </p>
+
+    <h2>4. Chia s&#7867; th&ocirc;ng tin</h2>
+    <p>
+      Th&ocirc;ng tin tin nh&#7855;n ch&#7881; &#273;&#432;&#7907;c s&#7917; d&#7909;ng cho m&#7909;c &#273;&iacute;ch h&#7895; tr&#7907; h&agrave;nh ch&iacute;nh c&ocirc;ng
+      v&agrave; v&#7853;n h&agrave;nh h&#7879; th&#7889;ng. Ch&uacute;ng t&ocirc;i kh&ocirc;ng b&aacute;n, trao &#273;&#7893;i ho&#7863;c chia s&#7867;
+      th&ocirc;ng tin c&aacute; nh&acirc;n cho b&ecirc;n th&#7913; ba v&igrave; m&#7909;c &#273;&iacute;ch th&#432;&#417;ng m&#7841;i.
+    </p>
+
+    <h2>5. L&#432;u tr&#7919; v&agrave; b&#7843;o m&#7853;t</h2>
+    <p>
+      D&#7919; li&#7879;u k&#7929; thu&#7853;t v&agrave; n&#7897;i dung h&#7897;i tho&#7841;i, n&#7871;u &#273;&#432;&#7907;c l&#432;u, s&#7869; &#273;&#432;&#7907;c gi&#7899;i h&#7841;n
+      quy&#7873;n truy c&#7853;p cho ng&#432;&#7901;i c&oacute; tr&aacute;ch nhi&#7879;m v&#7853;n h&agrave;nh ho&#7863;c x&#7917; l&yacute; y&ecirc;u c&#7847;u.
+    </p>
+
+    <h2>6. Quy&#7873;n c&#7911;a ng&#432;&#7901;i d&ugrave;ng</h2>
+    <p>
+      Ng&#432;&#7901;i d&ugrave;ng c&oacute; th&#7875; y&ecirc;u c&#7847;u ki&#7875;m tra, &#273;i&#7873;u ch&#7881;nh ho&#7863;c x&oacute;a th&ocirc;ng tin &#273;&atilde; g&#7917;i
+      qua Fanpage b&#7857;ng c&aacute;ch li&ecirc;n h&#7879; v&#7899;i ${AGENCY_NAME}.
+    </p>
+
+    <h2>7. Th&ocirc;ng tin li&ecirc;n h&#7879;</h2>
+    <p>
+      C&#417; quan ph&#7909; tr&aacute;ch: ${AGENCY_NAME}<br>
+      &#272;&#7883;a ch&#7881;: ${AGENCY_ADDRESS}<br>
+      &#272;i&#7879;n tho&#7841;i: ${AGENCY_PHONE}<br>
+      C&#7893;ng d&#7883;ch v&#7909; c&ocirc;ng: <a href="${PUBLIC_SERVICE_PORTAL_URL}">${PUBLIC_SERVICE_PORTAL_URL}</a>
+    </p>
+  </main>
+</body>
+</html>`;
+}
+
 async function sendFacebookMessage(recipientId, text) {
   if (!PAGE_ACCESS_TOKEN) {
     logApi("facebook_message_dry_run", {
@@ -242,7 +355,14 @@ async function handleRequest(request, response) {
       service: "hanh-chinh-cong-fanpage-bot",
       health: "/health",
       webhook: "/webhook",
+      privacyPolicy: "/privacy-policy",
     });
+    return;
+  }
+
+  if (request.method === "GET" && requestUrl.pathname === "/privacy-policy") {
+    logApi("privacy_policy");
+    sendHtml(response, 200, renderPrivacyPolicyPage());
     return;
   }
 
