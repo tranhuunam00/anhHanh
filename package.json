@@ -1,0 +1,14 @@
+{
+  "name": "hanh-chinh-cong-fanpage-bot",
+  "version": "0.1.0",
+  "description": "Chatbot FAQ giai doan 1 cho Fanpage Facebook linh vuc hanh chinh cong.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

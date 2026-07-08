@@ -1,0 +1,120 @@
+{
+  "procedures": [
+    {
+      "id": "birth-registration",
+      "title": "Đăng ký khai sinh",
+      "keywords": ["khai sinh", "giay khai sinh", "dang ky khai sinh", "lam khai sinh", "tre moi sinh"],
+      "receiver": "UBND cấp xã nơi cư trú của cha hoặc mẹ",
+      "processingTime": "Thường trong ngày làm việc nếu hồ sơ hợp lệ; trường hợp cần xác minh có thể kéo dài theo quy định.",
+      "fee": "Thường miễn lệ phí đúng hạn; đăng ký quá hạn hoặc yêu cầu bản sao có thể phát sinh lệ phí theo địa phương.",
+      "documents": [
+        "Tờ khai đăng ký khai sinh theo mẫu",
+        "Giấy chứng sinh",
+        "Giấy tờ tùy thân của cha, mẹ",
+        "Giấy chứng nhận kết hôn của cha mẹ nếu có"
+      ],
+      "howToApply": "Nộp trực tiếp tại Bộ phận Một cửa hoặc nộp trực tuyến trên Cổng dịch vụ công nếu địa phương hỗ trợ.",
+      "note": "Nếu không có giấy chứng sinh, người dân cần liên hệ UBND cấp xã để được hướng dẫn giấy tờ thay thế.",
+      "link": "https://dichvucong.gov.vn"
+    },
+    {
+      "id": "copy-certification",
+      "title": "Chứng thực bản sao từ bản chính",
+      "keywords": ["chung thuc", "sao y", "cong chung", "ban sao", "chung thuc ban sao"],
+      "receiver": "UBND cấp xã, Phòng Tư pháp hoặc tổ chức hành nghề công chứng tùy loại giấy tờ",
+      "processingTime": "Thường giải quyết trong ngày tiếp nhận; hồ sơ số lượng lớn có thể hẹn trả kết quả.",
+      "fee": "Thu theo số trang/bản theo quy định phí chứng thực hiện hành.",
+      "documents": [
+        "Bản chính giấy tờ cần chứng thực",
+        "Bản sao cần chứng thực",
+        "Giấy tờ tùy thân khi được yêu cầu"
+      ],
+      "howToApply": "Mang bản chính và bản sao đến cơ quan có thẩm quyền để đối chiếu và chứng thực.",
+      "note": "Cơ quan tiếp nhận có thể từ chối chứng thực nếu bản chính bị tẩy xóa, hư hỏng hoặc không xác định được nội dung.",
+      "link": "https://dichvucong.gov.vn"
+    },
+    {
+      "id": "temporary-residence",
+      "title": "Đăng ký tạm trú",
+      "keywords": ["tam tru", "dang ky tam tru", "cu tru", "noi o hien tai", "cong an"],
+      "receiver": "Cơ quan đăng ký cư trú nơi người dân dự kiến tạm trú",
+      "processingTime": "Thường trong 03 ngày làm việc kể từ khi nhận đủ hồ sơ hợp lệ.",
+      "fee": "Theo mức thu lệ phí cư trú của địa phương hoặc theo quy định hiện hành.",
+      "documents": [
+        "Tờ khai thay đổi thông tin cư trú",
+        "Giấy tờ, tài liệu chứng minh chỗ ở hợp pháp",
+        "Văn bản đồng ý của chủ hộ/chủ sở hữu chỗ ở nếu thuộc trường hợp cần có"
+      ],
+      "howToApply": "Nộp tại cơ quan công an có thẩm quyền hoặc thực hiện trực tuyến qua Cổng dịch vụ công.",
+      "note": "Thông tin cư trú hiện được quản lý điện tử; người dân nên kiểm tra tình trạng hồ sơ trên cổng dịch vụ công.",
+      "link": "https://dichvucong.dancuquocgia.gov.vn"
+    },
+    {
+      "id": "household-business",
+      "title": "Đăng ký hộ kinh doanh",
+      "keywords": ["ho kinh doanh", "dang ky kinh doanh", "kinh doanh ca the", "giay phep kinh doanh"],
+      "receiver": "Cơ quan đăng ký kinh doanh cấp huyện",
+      "processingTime": "Thường trong 03 ngày làm việc nếu hồ sơ hợp lệ.",
+      "fee": "Theo mức lệ phí đăng ký kinh doanh do địa phương quy định.",
+      "documents": [
+        "Giấy đề nghị đăng ký hộ kinh doanh",
+        "Giấy tờ pháp lý của cá nhân đối với chủ hộ kinh doanh",
+        "Biên bản họp thành viên hộ gia đình nếu nhiều thành viên cùng đăng ký",
+        "Văn bản ủy quyền cho một thành viên làm chủ hộ kinh doanh nếu có"
+      ],
+      "howToApply": "Nộp trực tiếp tại Bộ phận Một cửa cấp huyện hoặc nộp trực tuyến nếu địa phương hỗ trợ.",
+      "note": "Tên hộ kinh doanh, địa điểm, ngành nghề và thông tin thuế cần kê khai chính xác trước khi nộp.",
+      "link": "https://dichvucong.gov.vn"
+    },
+    {
+      "id": "construction-permit",
+      "title": "Cấp giấy phép xây dựng nhà ở riêng lẻ",
+      "keywords": ["xay dung", "giay phep xay dung", "xay nha", "cap phep xay dung", "nha o rieng le"],
+      "receiver": "UBND cấp huyện hoặc cơ quan được phân cấp cấp phép xây dựng",
+      "processingTime": "Thường khoảng 15 ngày làm việc đối với nhà ở riêng lẻ, tùy quy định địa phương.",
+      "fee": "Theo mức lệ phí cấp giấy phép xây dựng của địa phương.",
+      "documents": [
+        "Đơn đề nghị cấp giấy phép xây dựng",
+        "Giấy tờ chứng minh quyền sử dụng đất",
+        "Bản vẽ thiết kế xây dựng",
+        "Cam kết bảo đảm an toàn đối với công trình liền kề nếu có"
+      ],
+      "howToApply": "Nộp hồ sơ tại Bộ phận Một cửa cấp huyện hoặc qua Cổng dịch vụ công của địa phương.",
+      "note": "Khu vực quy hoạch, di tích, hẻm giới hoặc công trình đặc thù có thể cần thêm điều kiện.",
+      "link": "https://dichvucong.gov.vn"
+    },
+    {
+      "id": "land-certificate",
+      "title": "Cấp đổi/cấp lại giấy chứng nhận quyền sử dụng đất",
+      "keywords": ["dat dai", "so do", "giay chung nhan quyen su dung dat", "cap lai so do", "cap doi so do"],
+      "receiver": "Văn phòng đăng ký đất đai hoặc Chi nhánh Văn phòng đăng ký đất đai",
+      "processingTime": "Thời hạn phụ thuộc từng trường hợp và địa bàn; thường được ghi trên phiếu tiếp nhận hồ sơ.",
+      "fee": "Gồm lệ phí cấp giấy chứng nhận và các khoản nghĩa vụ tài chính nếu phát sinh.",
+      "documents": [
+        "Đơn đề nghị cấp đổi/cấp lại giấy chứng nhận",
+        "Bản gốc giấy chứng nhận nếu cấp đổi",
+        "Giấy tờ tùy thân của người sử dụng đất",
+        "Giấy xác nhận mất giấy chứng nhận hoặc thông tin công khai theo yêu cầu nếu cấp lại do mất"
+      ],
+      "howToApply": "Nộp tại Bộ phận Một cửa, Văn phòng đăng ký đất đai hoặc nộp trực tuyến nếu địa phương hỗ trợ.",
+      "note": "Thủ tục đất đai phụ thuộc nhiều vào tình trạng pháp lý thửa đất; nên mang giấy tờ hiện có để được kiểm tra.",
+      "link": "https://dichvucong.gov.vn"
+    },
+    {
+      "id": "feedback",
+      "title": "Gửi phản ánh, kiến nghị",
+      "keywords": ["phan anh", "kien nghi", "gop y", "khieu nai", "to cao", "phan nan"],
+      "receiver": "Cơ quan, đơn vị có thẩm quyền xử lý nội dung phản ánh",
+      "processingTime": "Theo quy trình tiếp nhận và xử lý phản ánh/kiến nghị của từng cơ quan.",
+      "fee": "Không thu phí khi gửi phản ánh, kiến nghị.",
+      "documents": [
+        "Nội dung phản ánh/kiến nghị rõ ràng",
+        "Thông tin liên hệ của người gửi",
+        "Tài liệu, hình ảnh, mã hồ sơ hoặc chứng cứ liên quan nếu có"
+      ],
+      "howToApply": "Gửi qua Fanpage, Cổng dịch vụ công, đường dây nóng hoặc trực tiếp tại cơ quan có thẩm quyền.",
+      "note": "Không gửi thông tin nhạy cảm công khai trên bình luận; hãy nhắn riêng hoặc dùng kênh chính thức.",
+      "link": "https://dichvucong.gov.vn"
+    }
+  ]
+}
