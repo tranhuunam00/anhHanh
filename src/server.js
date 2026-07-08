@@ -1,13 +1,16 @@
 const http = require("node:http");
+
 const { URL } = require("node:url");
 const data = require("./procedures.json");
-
+require("dotenv").config();
 const PORT = Number(process.env.PORT || 3000);
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN || "doi_token_xac_minh_webhook";
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN || "";
 const AGENCY_NAME = process.env.AGENCY_NAME || "Bộ phận Một cửa";
-const AGENCY_ADDRESS = process.env.AGENCY_ADDRESS || "Vui lòng cập nhật địa chỉ cơ quan";
-const AGENCY_PHONE = process.env.AGENCY_PHONE || "Vui lòng cập nhật số điện thoại";
+const AGENCY_ADDRESS =
+  process.env.AGENCY_ADDRESS || "Vui lòng cập nhật địa chỉ cơ quan";
+const AGENCY_PHONE =
+  process.env.AGENCY_PHONE || "Vui lòng cập nhật số điện thoại";
 const PUBLIC_SERVICE_PORTAL_URL =
   process.env.PUBLIC_SERVICE_PORTAL_URL || "https://dichvucong.gov.vn";
 
@@ -19,8 +22,8 @@ function logApi(event, details = {}) {
     JSON.stringify({
       time: new Date().toISOString(),
       event,
-      ...details
-    })
+      ...details,
+    }),
   );
 }
 
@@ -52,7 +55,7 @@ function renderProcedure(procedure) {
     "",
     `Nộp trực tuyến/tham khảo: ${procedure.link || PUBLIC_SERVICE_PORTAL_URL}`,
     "",
-    "Thông tin có thể thay đổi theo địa phương. Nếu bạn cần hồ sơ chính xác cho trường hợp cụ thể, hãy nhắn thêm xã/phường/quận/huyện hoặc gọi bộ phận tiếp nhận."
+    "Thông tin có thể thay đổi theo địa phương. Nếu bạn cần hồ sơ chính xác cho trường hợp cụ thể, hãy nhắn thêm xã/phường/quận/huyện hoặc gọi bộ phận tiếp nhận.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -65,7 +68,7 @@ function renderOfficeInfo() {
     `Điện thoại: ${AGENCY_PHONE}`,
     `Cổng dịch vụ công: ${PUBLIC_SERVICE_PORTAL_URL}`,
     "",
-    "Thời gian làm việc thường áp dụng: giờ hành chính từ thứ 2 đến thứ 6. Vui lòng cập nhật lịch cụ thể của địa phương trong biến môi trường hoặc dữ liệu FAQ."
+    "Thời gian làm việc thường áp dụng: giờ hành chính từ thứ 2 đến thứ 6. Vui lòng cập nhật lịch cụ thể của địa phương trong biến môi trường hoặc dữ liệu FAQ.",
   ].join("\n");
 }
 
@@ -73,8 +76,8 @@ function findProcedure(message) {
   const normalizedMessage = normalizeText(message);
   return data.procedures.find((procedure) =>
     procedure.keywords.some((keyword) =>
-      normalizedMessage.includes(normalizeText(keyword))
-    )
+      normalizedMessage.includes(normalizeText(keyword)),
+    ),
   );
 }
 
@@ -85,13 +88,17 @@ function buildReply(message) {
     return helpText;
   }
 
-  if (["bat dau", "start", "menu", "tro giup", "help"].some((item) => normalizedMessage.includes(item))) {
+  if (
+    ["bat dau", "start", "menu", "tro giup", "help"].some((item) =>
+      normalizedMessage.includes(item),
+    )
+  ) {
     return `${helpText}\n\n${renderOfficeInfo()}`;
   }
 
   if (
-    ["gio lam viec", "dia chi", "so dien thoai", "lien he", "mot cua"].some((item) =>
-      normalizedMessage.includes(item)
+    ["gio lam viec", "dia chi", "so dien thoai", "lien he", "mot cua"].some(
+      (item) => normalizedMessage.includes(item),
     )
   ) {
     return renderOfficeInfo();
@@ -106,7 +113,7 @@ function buildReply(message) {
     "Tôi chưa tìm thấy thủ tục phù hợp trong kho FAQ hiện tại.",
     helpText,
     "",
-    "Bạn có thể mô tả rõ hơn nhu cầu, ví dụ: “xin cấp giấy khai sinh”, “chứng thực bản sao”, “đăng ký tạm trú”. Nếu vẫn chưa có kết quả, cán bộ phụ trách sẽ cần kiểm tra và phản hồi."
+    "Bạn có thể mô tả rõ hơn nhu cầu, ví dụ: “xin cấp giấy khai sinh”, “chứng thực bản sao”, “đăng ký tạm trú”. Nếu vẫn chưa có kết quả, cán bộ phụ trách sẽ cần kiểm tra và phản hồi.",
   ].join("\n");
 }
 
@@ -136,7 +143,9 @@ function readJsonBody(request) {
 }
 
 function sendJson(response, statusCode, payload) {
-  response.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });
+  response.writeHead(statusCode, {
+    "Content-Type": "application/json; charset=utf-8",
+  });
   response.end(JSON.stringify(payload));
 }
 
@@ -145,14 +154,14 @@ async function sendFacebookMessage(recipientId, text) {
     logApi("facebook_message_dry_run", {
       recipientId,
       textLength: text.length,
-      preview: text.slice(0, 120)
+      preview: text.slice(0, 120),
     });
     return;
   }
 
   logApi("facebook_message_send", {
     recipientId,
-    textLength: text.length
+    textLength: text.length,
   });
 
   const facebookResponse = await fetch(
@@ -162,9 +171,9 @@ async function sendFacebookMessage(recipientId, text) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         recipient: { id: recipientId },
-        message: { text }
-      })
-    }
+        message: { text },
+      }),
+    },
   );
 
   if (!facebookResponse.ok) {
@@ -172,14 +181,16 @@ async function sendFacebookMessage(recipientId, text) {
     logApi("facebook_message_error", {
       recipientId,
       status: facebookResponse.status,
-      error: errorText.slice(0, 500)
+      error: errorText.slice(0, 500),
     });
-    throw new Error(`Facebook API error ${facebookResponse.status}: ${errorText}`);
+    throw new Error(
+      `Facebook API error ${facebookResponse.status}: ${errorText}`,
+    );
   }
 
   logApi("facebook_message_sent", {
     recipientId,
-    status: facebookResponse.status
+    status: facebookResponse.status,
   });
 }
 
@@ -190,7 +201,7 @@ async function handleWebhookEvent(event) {
   if (!senderId || !text) {
     logApi("webhook_event_ignored", {
       hasSenderId: Boolean(senderId),
-      hasText: Boolean(text)
+      hasText: Boolean(text),
     });
     return;
   }
@@ -198,7 +209,7 @@ async function handleWebhookEvent(event) {
   logApi("webhook_message_received", {
     senderId,
     textLength: text.length,
-    preview: text.slice(0, 120)
+    preview: text.slice(0, 120),
   });
 
   await sendFacebookMessage(senderId, buildReply(text));
@@ -212,7 +223,7 @@ async function handleRequest(request, response) {
     method: request.method,
     path: requestUrl.pathname,
     query: Object.fromEntries(requestUrl.searchParams.entries()),
-    remoteAddress: request.socket.remoteAddress
+    remoteAddress: request.socket.remoteAddress,
   });
 
   response.on("finish", () => {
@@ -220,13 +231,34 @@ async function handleRequest(request, response) {
       method: request.method,
       path: requestUrl.pathname,
       statusCode: response.statusCode,
-      durationMs: Date.now() - startedAt
+      durationMs: Date.now() - startedAt,
     });
   });
 
+  if (request.method === "GET" && requestUrl.pathname === "/") {
+    logApi("root_check");
+    sendJson(response, 200, {
+      ok: true,
+      service: "hanh-chinh-cong-fanpage-bot",
+      health: "/health",
+      webhook: "/webhook",
+    });
+    return;
+  }
+
+  if (request.method === "GET" && requestUrl.pathname === "/favicon.ico") {
+    logApi("favicon_ignored");
+    response.writeHead(204);
+    response.end();
+    return;
+  }
+
   if (request.method === "GET" && requestUrl.pathname === "/health") {
     logApi("health_check");
-    sendJson(response, 200, { ok: true, service: "hanh-chinh-cong-fanpage-bot" });
+    sendJson(response, 200, {
+      ok: true,
+      service: "hanh-chinh-cong-fanpage-bot",
+    });
     return;
   }
 
@@ -238,7 +270,7 @@ async function handleRequest(request, response) {
     if (mode === "subscribe" && token === VERIFY_TOKEN) {
       logApi("webhook_verify_success", {
         mode,
-        hasChallenge: Boolean(challenge)
+        hasChallenge: Boolean(challenge),
       });
       response.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
       response.end(challenge || "");
@@ -247,7 +279,7 @@ async function handleRequest(request, response) {
 
     logApi("webhook_verify_failed", {
       mode,
-      hasToken: Boolean(token)
+      hasToken: Boolean(token),
     });
     response.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
     response.end("Forbidden");
@@ -259,7 +291,7 @@ async function handleRequest(request, response) {
 
     if (body.object !== "page") {
       logApi("webhook_post_ignored", {
-        object: body.object || null
+        object: body.object || null,
       });
       sendJson(response, 404, { ok: false });
       return;
@@ -271,7 +303,7 @@ async function handleRequest(request, response) {
 
     logApi("webhook_post_received", {
       entryCount: Array.isArray(body.entry) ? body.entry.length : 0,
-      eventCount: events.length
+      eventCount: events.length,
     });
 
     await Promise.all(events.map(handleWebhookEvent));
@@ -287,7 +319,7 @@ async function handleRequest(request, response) {
       messageLength: message.length,
       messagePreview: message.slice(0, 120),
       replyLength: reply.length,
-      replyPreview: reply.slice(0, 120)
+      replyPreview: reply.slice(0, 120),
     });
     sendJson(response, 200, { reply });
     return;
@@ -295,7 +327,7 @@ async function handleRequest(request, response) {
 
   logApi("api_not_found", {
     method: request.method,
-    path: requestUrl.pathname
+    path: requestUrl.pathname,
   });
   sendJson(response, 404, { ok: false, message: "Not found" });
 }
@@ -304,7 +336,7 @@ const server = http.createServer((request, response) => {
   handleRequest(request, response).catch((error) => {
     logApi("api_error", {
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
     sendJson(response, 500, { ok: false, message: "Internal server error" });
   });
