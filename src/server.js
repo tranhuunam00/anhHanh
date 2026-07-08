@@ -14,6 +14,16 @@ const PUBLIC_SERVICE_PORTAL_URL =
 const helpText =
   "Tôi có thể hỗ trợ tra cứu thủ tục hành chính phổ biến. Bạn có thể hỏi: khai sinh, chứng thực, cư trú, hộ kinh doanh, xây dựng, đất đai, phản ánh kiến nghị, giờ làm việc.";
 
+function logApi(event, details = {}) {
+  console.log(
+    JSON.stringify({
+      time: new Date().toISOString(),
+      event,
+      ...details
+    })
+  );
+}
+
 function normalizeText(value) {
   return String(value || "")
     .toLowerCase()
@@ -132,9 +142,18 @@ function sendJson(response, statusCode, payload) {
 
 async function sendFacebookMessage(recipientId, text) {
   if (!PAGE_ACCESS_TOKEN) {
-    console.log("[dry-run] Reply to", recipientId, text);
+    logApi("facebook_message_dry_run", {
+      recipientId,
+      textLength: text.length,
+      preview: text.slice(0, 120)
+    });
     return;
   }
+
+  logApi("facebook_message_send", {
+    recipientId,
+    textLength: text.length
+  });
 
   const facebookResponse = await fetch(
     `https://graph.facebook.com/v20.0/me/messages?access_token=${encodeURIComponent(PAGE_ACCESS_TOKEN)}`,
@@ -150,8 +169,18 @@ async function sendFacebookMessage(recipientId, text) {
 
   if (!facebookResponse.ok) {
     const errorText = await facebookResponse.text();
+    logApi("facebook_message_error", {
+      recipientId,
+      status: facebookResponse.status,
+      error: errorText.slice(0, 500)
+    });
     throw new Error(`Facebook API error ${facebookResponse.status}: ${errorText}`);
   }
+
+  logApi("facebook_message_sent", {
+    recipientId,
+    status: facebookResponse.status
+  });
 }
 
 async function handleWebhookEvent(event) {
@@ -159,16 +188,44 @@ async function handleWebhookEvent(event) {
   const text = event.message && event.message.text;
 
   if (!senderId || !text) {
+    logApi("webhook_event_ignored", {
+      hasSenderId: Boolean(senderId),
+      hasText: Boolean(text)
+    });
     return;
   }
+
+  logApi("webhook_message_received", {
+    senderId,
+    textLength: text.length,
+    preview: text.slice(0, 120)
+  });
 
   await sendFacebookMessage(senderId, buildReply(text));
 }
 
 async function handleRequest(request, response) {
   const requestUrl = new URL(request.url, `http://${request.headers.host}`);
+  const startedAt = Date.now();
+
+  logApi("api_request_start", {
+    method: request.method,
+    path: requestUrl.pathname,
+    query: Object.fromEntries(requestUrl.searchParams.entries()),
+    remoteAddress: request.socket.remoteAddress
+  });
+
+  response.on("finish", () => {
+    logApi("api_request_finish", {
+      method: request.method,
+      path: requestUrl.pathname,
+      statusCode: response.statusCode,
+      durationMs: Date.now() - startedAt
+    });
+  });
 
   if (request.method === "GET" && requestUrl.pathname === "/health") {
+    logApi("health_check");
     sendJson(response, 200, { ok: true, service: "hanh-chinh-cong-fanpage-bot" });
     return;
   }
@@ -179,11 +236,19 @@ async function handleRequest(request, response) {
     const challenge = requestUrl.searchParams.get("hub.challenge");
 
     if (mode === "subscribe" && token === VERIFY_TOKEN) {
+      logApi("webhook_verify_success", {
+        mode,
+        hasChallenge: Boolean(challenge)
+      });
       response.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
       response.end(challenge || "");
       return;
     }
 
+    logApi("webhook_verify_failed", {
+      mode,
+      hasToken: Boolean(token)
+    });
     response.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
     response.end("Forbidden");
     return;
@@ -193,6 +258,9 @@ async function handleRequest(request, response) {
     const body = await readJsonBody(request);
 
     if (body.object !== "page") {
+      logApi("webhook_post_ignored", {
+        object: body.object || null
+      });
       sendJson(response, 404, { ok: false });
       return;
     }
@@ -201,6 +269,11 @@ async function handleRequest(request, response) {
       .flatMap((entry) => entry.messaging || [])
       .filter((event) => event.message && !event.message.is_echo);
 
+    logApi("webhook_post_received", {
+      entryCount: Array.isArray(body.entry) ? body.entry.length : 0,
+      eventCount: events.length
+    });
+
     await Promise.all(events.map(handleWebhookEvent));
     sendJson(response, 200, { ok: true });
     return;
@@ -208,16 +281,31 @@ async function handleRequest(request, response) {
 
   if (request.method === "POST" && requestUrl.pathname === "/test-reply") {
     const body = await readJsonBody(request);
-    sendJson(response, 200, { reply: buildReply(body.message || "") });
+    const message = body.message || "";
+    const reply = buildReply(message);
+    logApi("test_reply", {
+      messageLength: message.length,
+      messagePreview: message.slice(0, 120),
+      replyLength: reply.length,
+      replyPreview: reply.slice(0, 120)
+    });
+    sendJson(response, 200, { reply });
     return;
   }
 
+  logApi("api_not_found", {
+    method: request.method,
+    path: requestUrl.pathname
+  });
   sendJson(response, 404, { ok: false, message: "Not found" });
 }
 
 const server = http.createServer((request, response) => {
   handleRequest(request, response).catch((error) => {
-    console.error(error);
+    logApi("api_error", {
+      message: error.message,
+      stack: error.stack
+    });
     sendJson(response, 500, { ok: false, message: "Internal server error" });
   });
 });
@@ -226,4 +314,3 @@ server.listen(PORT, () => {
   console.log(`Fanpage bot đang chạy tại http://localhost:${PORT}`);
   console.log(`Webhook URL: http://localhost:${PORT}/webhook`);
 });
-
