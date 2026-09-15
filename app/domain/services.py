@@ -230,23 +230,53 @@ class SentenceGrouperService:
                 if is_too_short and next_is_close:
                     # Keep accumulating with the next snippet instead of creating a 1-second fragment
                     continue
-                else:
-                    self._commit_challenge(
-                        challenges, current_texts, start_time, last_end_time, translations
-                    )
-                    current_texts = []
-                    start_time = None
-            elif reached_duration or reached_words:
-                self._commit_challenge(
-                    challenges, current_texts, start_time, last_end_time, translations
-                )
-                current_texts = []
-                start_time = None
-
         if current_texts and start_time is not None and last_end_time is not None:
-            self._commit_challenge(
-                challenges, current_texts, start_time, last_end_time, translations
-            )
+            self._commit_challenge(challenges, current_texts, start_time, last_end_time)
+
+        # Clean and attach translations without credits and without cross-challenge duplication
+        if translations and challenges:
+            cleaned_translations: List[SubtitleSnippet] = []
+            for t in translations:
+                raw_lines = t.text.split("\n")
+                good_lines = []
+                for line in raw_lines:
+                    cleaned_line = re.sub(r"\[.*?\]|\(.*?\)", "", line).strip()
+                    # Filter out subtitle credits (Translator:, Reviewer:, etc.)
+                    if re.search(
+                        r"\b(translator|reviewer|subtitles?\s+by|phụ\s+đề\s+bởi|dịch\s+bởi|biên\s+dịch|hiệu\s+đính)\b",
+                        cleaned_line,
+                        re.IGNORECASE,
+                    ):
+                        continue
+                    if cleaned_line:
+                        good_lines.append(cleaned_line)
+                if good_lines:
+                    cleaned_translations.append(
+                        SubtitleSnippet(
+                            text=" ".join(good_lines), start=t.start, duration=t.duration
+                        )
+                    )
+
+            # Assign each translation snippet exclusively to the challenge with maximum time overlap
+            challenge_trans_map = {c.id: [] for c in challenges}
+            for t in cleaned_translations:
+                best_c = None
+                best_overlap = 0.0
+                for c in challenges:
+                    overlap = min(c.time_end, t.end) - max(c.time_start, t.start)
+                    if overlap > best_overlap:
+                        best_overlap = overlap
+                        best_c = c
+                if best_c and best_overlap > 0:
+                    challenge_trans_map[best_c.id].append(t.text)
+
+            for c in challenges:
+                t_texts = challenge_trans_map.get(c.id, [])
+                if t_texts:
+                    clean_combined = re.sub(r"\s+", " ", " ".join(t_texts)).strip()
+                    c.translation = clean_combined if clean_combined else None
+                else:
+                    c.translation = None
 
         return challenges
 
@@ -256,7 +286,6 @@ class SentenceGrouperService:
         texts: List[str],
         start: Optional[float],
         end: Optional[float],
-        translations: Optional[List[SubtitleSnippet]],
     ) -> None:
         if start is None or end is None or not texts:
             return
@@ -268,20 +297,6 @@ class SentenceGrouperService:
 
         pos = len(challenges) + 1
 
-        # Match translation snippet within overlapping time window
-        translation_text = None
-        if translations:
-            overlapping = [
-                t.text
-                for t in translations
-                if max(start, t.start) < min(end, t.end)
-            ]
-            if overlapping:
-                raw_trans = " ".join(overlapping).replace("\n", " ")
-                # Also clean annotations in translation if present
-                clean_trans = re.sub(r"\[.*?\]|\(.*?\)", "", raw_trans)
-                translation_text = re.sub(r"\s+", " ", clean_trans).strip()
-
         challenges.append(
             Challenge(
                 id=pos,
@@ -289,6 +304,6 @@ class SentenceGrouperService:
                 text=combined_text,
                 time_start=round(start, 2),
                 time_end=round(end, 2),
-                translation=translation_text,
+                translation=None,
             )
         )
