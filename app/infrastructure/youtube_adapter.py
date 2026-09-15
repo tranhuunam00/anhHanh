@@ -78,14 +78,31 @@ class YouTubeTranscriptAdapter(ITranscriptService):
             api = YouTubeTranscriptApi()
             transcript_list = api.list(video_id)
 
-            # Try directly finding Vietnamese or translating
+            # 1. Try finding native Vietnamese transcript
             vi_t = None
             try:
-                vi_t = transcript_list.find_transcript(["vi"])
+                vi_t = transcript_list.find_transcript(["vi", "vi-VN"])
             except Exception:
-                # Try translating English transcript to Vietnamese
-                en_t = transcript_list.find_transcript(["en"])
-                vi_t = en_t.translate("vi")
+                pass
+
+            # 2. If not found, try translating English (en, en-US, en-GB) to Vietnamese
+            if not vi_t:
+                try:
+                    en_t = transcript_list.find_transcript(["en", "en-US", "en-GB"])
+                    if en_t and en_t.is_translatable:
+                        vi_t = en_t.translate("vi")
+                except Exception:
+                    pass
+
+            # 3. If still not found, try translating any first available translatable transcript
+            if not vi_t:
+                try:
+                    for t in transcript_list:
+                        if t.is_translatable:
+                            vi_t = t.translate("vi")
+                            break
+                except Exception:
+                    pass
 
             if vi_t:
                 raw_data = vi_t.fetch()

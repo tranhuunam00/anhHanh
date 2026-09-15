@@ -147,6 +147,30 @@ class SentenceGrouperService:
         self.min_sentence_duration = min_sentence_duration
         self.min_words_per_challenge = min_words_per_challenge
 
+    @staticmethod
+    def clean_credits(text: str) -> str:
+        """Thoroughly remove TED / subtitle credits from Vietnamese translation."""
+        if not text:
+            return ""
+        cleaned = re.sub(r"\[.*?\]|\(.*?\)", "", text).strip()
+        starters = r"(?:Khi|Tôi|Chúng|Bạn|Hôm|Đó|Và|Năm|Trong|Một|Chào|Cảm|Nếu|Tại|Để|Mỗi|Có|Sau|Trước|Theo|Với|Là|Đây|Ở|[0-9]|\"|“)"
+        cleaned = re.sub(
+            rf"(?i)^.*?(?:reviewer|translator|subtitles?\s+by|phụ\s+đề\s+bởi|dịch\s+bởi|biên\s+dịch|hiệu\s+đính)[:\s].*?(?=\s+{starters})",
+            "",
+            cleaned,
+        ).strip()
+        cleaned = re.sub(
+            rf"(?i)^.*?(?:reviewer|translator)[:\s].*?(?=\s+{starters})",
+            "",
+            cleaned,
+        ).strip()
+        if re.match(
+            r"(?i)^(?:translator|reviewer|subtitles?\s+by|phụ\s+đề\s+bởi|dịch\s+bởi|biên\s+dịch|hiệu\s+đính)\b",
+            cleaned,
+        ):
+            return ""
+        return cleaned
+
     def group_into_challenges(
         self,
         snippets: List[SubtitleSnippet],
@@ -196,7 +220,7 @@ class SentenceGrouperService:
                 and current_texts
             ):
                 self._commit_challenge(
-                    challenges, current_texts, start_time, last_end_time, translations
+                    challenges, current_texts, start_time, last_end_time
                 )
                 current_texts = []
                 start_time = None
@@ -226,10 +250,13 @@ class SentenceGrouperService:
                 and (cleaned_snippets[i + 1].start - last_end_time) <= self.max_pause_seconds
             )
 
-            if ends_with_terminal:
-                if is_too_short and next_is_close:
-                    # Keep accumulating with the next snippet instead of creating a 1-second fragment
+            if ends_with_terminal or reached_duration or reached_words:
+                if ends_with_terminal and is_too_short and next_is_close and not (reached_duration or reached_words):
                     continue
+                self._commit_challenge(challenges, current_texts, start_time, last_end_time)
+                current_texts = []
+                start_time = None
+
         if current_texts and start_time is not None and last_end_time is not None:
             self._commit_challenge(challenges, current_texts, start_time, last_end_time)
 
@@ -240,14 +267,7 @@ class SentenceGrouperService:
                 raw_lines = t.text.split("\n")
                 good_lines = []
                 for line in raw_lines:
-                    cleaned_line = re.sub(r"\[.*?\]|\(.*?\)", "", line).strip()
-                    # Filter out subtitle credits (Translator:, Reviewer:, etc.)
-                    if re.search(
-                        r"\b(translator|reviewer|subtitles?\s+by|phụ\s+đề\s+bởi|dịch\s+bởi|biên\s+dịch|hiệu\s+đính)\b",
-                        cleaned_line,
-                        re.IGNORECASE,
-                    ):
-                        continue
+                    cleaned_line = self.clean_credits(line)
                     if cleaned_line:
                         good_lines.append(cleaned_line)
                 if good_lines:
@@ -274,7 +294,7 @@ class SentenceGrouperService:
                 t_texts = challenge_trans_map.get(c.id, [])
                 if t_texts:
                     clean_combined = re.sub(r"\s+", " ", " ".join(t_texts)).strip()
-                    c.translation = clean_combined if clean_combined else None
+                    c.translation = self.clean_credits(clean_combined) if clean_combined else None
                 else:
                     c.translation = None
 

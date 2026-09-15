@@ -78,6 +78,20 @@ def evaluate_submission(body: EvaluateApiRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+class TranslateApiRequest(BaseModel):
+    text: str = Field(..., description="Câu tiếng Anh cần dịch sang tiếng Việt")
+
+
+@api_router.post("/translate")
+def translate_text(body: TranslateApiRequest):
+    """Dịch câu tiếng Anh sang tiếng Việt chuẩn nghĩa và lưu cache."""
+    from app.infrastructure.translation_service import TranslationService
+
+    service = TranslationService()
+    translation = service.translate_to_vietnamese(body.text)
+    return {"original": body.text, "translation": translation}
+
+
 @api_router.get("/presets")
 def get_preset_lessons():
     """Danh sách các video mẫu sẵn có để người dùng chọn nhanh."""

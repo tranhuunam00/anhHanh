@@ -15,6 +15,9 @@ from app.application.dtos import (
 )
 
 
+from app.infrastructure.translation_service import TranslationService
+
+
 def extract_youtube_id(url_or_id: str) -> str:
     """Extract YouTube 11-char video ID from various URL formats."""
     text = url_or_id.strip()
@@ -41,10 +44,12 @@ class GetLessonUseCase:
         transcript_service: ITranscriptService,
         cache_repo: Optional[ICacheRepository] = None,
         sentence_grouper: Optional[SentenceGrouperService] = None,
+        translation_service: Optional[TranslationService] = None,
     ):
         self.transcript_service = transcript_service
         self.cache_repo = cache_repo
         self.sentence_grouper = sentence_grouper or SentenceGrouperService()
+        self.translation_service = translation_service or TranslationService()
 
     def execute(self, request: GetLessonRequest) -> LessonResponse:
         video_id = extract_youtube_id(request.url_or_id)
@@ -53,6 +58,9 @@ class GetLessonUseCase:
         if self.cache_repo:
             cached_lesson = self.cache_repo.get(video_id)
             if cached_lesson:
+                for c in cached_lesson.challenges:
+                    if c.translation:
+                        c.translation = SentenceGrouperService.clean_credits(c.translation)
                 return self._to_response(cached_lesson)
 
         # Fetch from transcript service
@@ -77,6 +85,11 @@ class GetLessonUseCase:
             challenges = self.sentence_grouper.group_into_challenges(
                 snippets=en_snippets, translations=vi_snippets
             )
+
+        # Ensure all translations are clean of credits
+        for c in challenges:
+            if c.translation:
+                c.translation = SentenceGrouperService.clean_credits(c.translation)
 
         lesson = Lesson(video_id=video_id, title=title, challenges=challenges)
 
