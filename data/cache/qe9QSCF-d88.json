@@ -1,0 +1,1199 @@
+{
+  "video_id": "qe9QSCF-d88",
+  "title": "The Catastrophic Risks of AI — and a Safer Path | Yoshua Bengio | TED",
+  "total_challenges": 149,
+  "challenges": [
+    {
+      "id": 1,
+      "position": 1,
+      "text": "When my son Patrick was around three or four years old, I came regularly into his playroom, and he was playing with these blocks with letters.",
+      "time_start": 4.37,
+      "time_end": 14.95,
+      "translation": "Translator: Chloe Mai Reviewer: Nguyễn Hà Thi Ân Khi con trai Patrick của tôi khoảng ba hoặc bốn tuổi, tôi thường xuyên vào phòng giải trí của con, và thấy con đang chơi với những khối vuông có chữ cái."
+    },
+    {
+      "id": 2,
+      "position": 2,
+      "text": "I wanted him to learn to read eventually, and one day he said, \"Pa.\"",
+      "time_start": 14.95,
+      "time_end": 22.45,
+      "translation": "Tôi muốn con học đọc về sau, và một ngày nọ con nói, “Pa”"
+    },
+    {
+      "id": 3,
+      "position": 3,
+      "text": "And I said, \"Pa.\"",
+      "time_start": 22.49,
+      "time_end": 24.25,
+      "translation": "Và tôi nói, “Pa”"
+    },
+    {
+      "id": 4,
+      "position": 4,
+      "text": "And he said, \"Pa?\"",
+      "time_start": 24.55,
+      "time_end": 26.96,
+      "translation": "Và con nói, “Pa?”"
+    },
+    {
+      "id": 5,
+      "position": 5,
+      "text": "And I said, \"Pa.\"",
+      "time_start": 26.99,
+      "time_end": 28.99,
+      "translation": "Tôi nói, “Pa”"
+    },
+    {
+      "id": 6,
+      "position": 6,
+      "text": "And then he said, \"Pa-pa.\"",
+      "time_start": 28.99,
+      "time_end": 33.0,
+      "translation": "Và sau đó con nói, “Pa-pa.”"
+    },
+    {
+      "id": 7,
+      "position": 7,
+      "text": "(French) Yes!",
+      "time_start": 33.46,
+      "time_end": 34.63,
+      "translation": "(Tiếng Pháp) Đúng rồi!"
+    },
+    {
+      "id": 8,
+      "position": 8,
+      "text": "Yes!",
+      "time_start": 34.66,
+      "time_end": 35.83,
+      "translation": "Tuyệt vời!"
+    },
+    {
+      "id": 9,
+      "position": 9,
+      "text": "And then something wondrous happened.",
+      "time_start": 35.87,
+      "time_end": 38.3,
+      "translation": "Và rồi một điều kỳ diệu đã xảy ra."
+    },
+    {
+      "id": 10,
+      "position": 10,
+      "text": "He picked up the blocks again and said, \"Pa! Patrick.\"",
+      "time_start": 38.3,
+      "time_end": 43.61,
+      "translation": "Con tôi lại nhặt các khối vuông lên và nói “Pa! Patrick.”"
+    },
+    {
+      "id": 11,
+      "position": 11,
+      "text": "Eureka!",
+      "time_start": 45.91,
+      "time_end": 47.38,
+      "translation": "Eureka! (Tìm ra rồi!)"
+    },
+    {
+      "id": 12,
+      "position": 12,
+      "text": "His eurekas were feeding my scientific eurekas.",
+      "time_start": 48.38,
+      "time_end": 51.61,
+      "translation": "Những phát kiến của con đã tiếp lửa khám phá khoa học trong tôi."
+    },
+    {
+      "id": 13,
+      "position": 13,
+      "text": "His doors, our doors were opening to expanded capabilities, expanded agency and joy.",
+      "time_start": 52.08,
+      "time_end": 60.72,
+      "translation": "Cánh cửa của con tôi, của chúng ta đang mở ra, dẫn đến các khả năng vượt trội, năng lực tự chủ lớn và niềm vui trọn vẹn."
+    },
+    {
+      "id": 14,
+      "position": 14,
+      "text": "Today I'm going to be using this symbol for human capabilities and the expanding threads from there for human agency, which give us human joy.",
+      "time_start": 60.76,
+      "time_end": 74.2,
+      "translation": "Hôm nay tôi sẽ sử dụng biểu tượng này để biểu trưng cho khả năng của con người và những dòng chảy mở rộng từ đó biểu tượng cho sự tự chủ - thứ mang lại cho ta niềm vui sống."
+    },
+    {
+      "id": 15,
+      "position": 15,
+      "text": "Can you imagine a world without human joy?",
+      "time_start": 74.64,
+      "time_end": 78.44,
+      "translation": "Bạn có thể tưởng tượng một thế giới không có niềm vui không?"
+    },
+    {
+      "id": 16,
+      "position": 16,
+      "text": "I really wouldn't want that.",
+      "time_start": 79.48,
+      "time_end": 81.21,
+      "translation": "Tôi thực sự không muốn nó xảy ra."
+    },
+    {
+      "id": 17,
+      "position": 17,
+      "text": "So I'm going to tell you also about AI capabilities and AI agency, so that we can avoid a future where human joy is gone.",
+      "time_start": 81.58,
+      "time_end": 92.39,
+      "translation": "Vì vậy, tôi cũng sẽ nói với các bạn về năng lực và sự tự chủ của AI để ta có thể tránh được một tương lai nơi niềm vui của con người biến mất."
+    },
+    {
+      "id": 18,
+      "position": 18,
+      "text": "My name is Yoshua Bengio.",
+      "time_start": 92.76,
+      "time_end": 95.09,
+      "translation": "Tên tôi là Yoshua Bengio."
+    },
+    {
+      "id": 19,
+      "position": 19,
+      "text": "I'm a computer scientist.",
+      "time_start": 95.13,
+      "time_end": 96.59,
+      "translation": "Là một nhà khoa học máy tính."
+    },
+    {
+      "id": 20,
+      "position": 20,
+      "text": "My research has been foundational to the development of AI as we know it today.",
+      "time_start": 96.63,
+      "time_end": 102.93,
+      "translation": "Là một nhà khoa học máy tính. Nghiên cứu của tôi là nền tảng cho sự phát triển của AI như chúng ta biết đến ngày nay."
+    },
+    {
+      "id": 21,
+      "position": 21,
+      "text": "My colleagues and I earned top prizes in our field, people call me a godfather of AI.",
+      "time_start": 102.97,
+      "time_end": 109.34,
+      "translation": "Các đồng nghiệp và tôi đã giành nhiều giải thưởng hàng đầu trong lĩnh vực, mọi người gọi tôi là ‘cha đỡ đầu’ của AI."
+    },
+    {
+      "id": 22,
+      "position": 22,
+      "text": "I'm not sure how I feel about that name, but I do feel a responsibility to talk to you about the potentially catastrophic risks of AI.",
+      "time_start": 109.34,
+      "time_end": 119.68,
+      "translation": "Tôi không chắc mình cảm nhận về nó ra sao, nhưng tôi thấy tôi cần có trách nhiệm nói với bạn về những rủi ro thảm khốc tiềm ẩn của AI."
+    },
+    {
+      "id": 23,
+      "position": 23,
+      "text": "When I raise these concerns, people have these responses.",
+      "time_start": 120.65,
+      "time_end": 125.42,
+      "translation": "Khi tôi nêu lên những mối lo ngại này, mọi người trả lời như này."
+    },
+    {
+      "id": 24,
+      "position": 24,
+      "text": "And I understand.",
+      "time_start": 125.92,
+      "time_end": 128.73,
+      "translation": "Và tôi hiểu điều đó."
+    },
+    {
+      "id": 25,
+      "position": 25,
+      "text": "I used to have the same thoughts.",
+      "time_start": 129.36,
+      "time_end": 131.2,
+      "translation": "Chính tôi cũng từng nghĩ như thế."
+    },
+    {
+      "id": 26,
+      "position": 26,
+      "text": "How can this hurt us any more than this, right?",
+      "time_start": 132.23,
+      "time_end": 138.64,
+      "translation": "Làm sao cái máy tính lại có thể gây hại nhiều hơn các khối vuông chứ, đúng không?"
+    },
+    {
+      "id": 27,
+      "position": 27,
+      "text": "But recent scientific findings challenge those assumptions, and I want to tell you about it.",
+      "time_start": 139.7,
+      "time_end": 145.04,
+      "translation": "Nhưng các phát hiện khoa học gần đây đang thách thức các giả định ấy, và tôi muốn chia sẻ với bạn về nó."
+    },
+    {
+      "id": 28,
+      "position": 28,
+      "text": "To really understand where we might be going, we have to look back where we started from.",
+      "time_start": 145.88,
+      "time_end": 151.45,
+      "translation": "Để thật sự hiểu được chúng ta có thể đang đi về đâu, ta cần nhìn lại về điểm khởi đầu."
+    },
+    {
+      "id": 29,
+      "position": 29,
+      "text": "About 15 or 20 years ago with my students, we were developing the early days of deep learning, and our systems were barely able to recognize handwritten characters.",
+      "time_start": 151.48,
+      "time_end": 160.52,
+      "translation": "Cách đây khoảng 15 20 năm, tôi cùng các học trò của mình đã bắt đầu phát triển những hệ thống học sâu đầu tiên, khi ấy, các hệ thống này chỉ vừa đủ khả năng nhận diện chữ viết tay."
+    },
+    {
+      "id": 30,
+      "position": 30,
+      "text": "But then a few years later, they were able to recognize objects in images.",
+      "time_start": 160.56,
+      "time_end": 165.93,
+      "translation": "Thế nhưng chỉ vài năm sau đó, chúng đã có thể nhận diện vật thể trong hình ảnh."
+    },
+    {
+      "id": 31,
+      "position": 31,
+      "text": "And a couple more years, they were able to translate across all the major languages.",
+      "time_start": 165.96,
+      "time_end": 171.4,
+      "translation": "Và thêm vài năm nữa, chúng có thể dịch tất cả các ngôn ngữ chính trên thế giới."
+    },
+    {
+      "id": 32,
+      "position": 32,
+      "text": "So I'm going to be using the symbol on the right in order to represent AI capabilities that had been growing but were still much less than humans.",
+      "time_start": 171.7,
+      "time_end": 183.05,
+      "translation": "Tôi sẽ sử dụng biểu tượng bên phải để đại diện cho khả năng của AI - vốn đang phát triển nhưng vẫn còn kém xa so với con người."
+    },
+    {
+      "id": 33,
+      "position": 33,
+      "text": "In 2012, tech companies understood the amazing commercial potential of this nascent technology, and many of my colleagues moved from university to industry.",
+      "time_start": 183.08,
+      "time_end": 193.86,
+      "translation": "Vào năm 2012, các công ty công nghệ nhận ra tiềm năng thương mại đáng kinh ngạc của công nghệ non trẻ này, và nhiều đồng nghiệp của tôi đã chuyển từ giảng đường sang ngành công nghiệp."
+    },
+    {
+      "id": 34,
+      "position": 34,
+      "text": "I decided to stay in academia.",
+      "time_start": 193.89,
+      "time_end": 196.19,
+      "translation": "Còn tôi quyết định ở lại trong giới học thuật."
+    },
+    {
+      "id": 35,
+      "position": 35,
+      "text": "I wanted AI to be developed for good.",
+      "time_start": 196.53,
+      "time_end": 198.93,
+      "translation": "Tôi muốn AI được phát triển vì những điều tốt đẹp."
+    },
+    {
+      "id": 36,
+      "position": 36,
+      "text": "I worked on applications in medicine, for medical diagnostics, climate, to get better carbon capture.",
+      "time_start": 198.96,
+      "time_end": 206.77,
+      "translation": "Tôi đã tập trung vào các ứng dụng trong y học, chẩn đoán bệnh, trong lĩnh vực khí hậu, để cải thiện khả năng hấp thụ carbon."
+    },
+    {
+      "id": 37,
+      "position": 37,
+      "text": "I had a dream.",
+      "time_start": 206.8,
+      "time_end": 209.04,
+      "translation": "Tôi mang trong mình một giấc mơ."
+    },
+    {
+      "id": 38,
+      "position": 38,
+      "text": "January 2023.",
+      "time_start": 209.37,
+      "time_end": 211.57,
+      "translation": "Tháng 1 năm 2023."
+    },
+    {
+      "id": 39,
+      "position": 39,
+      "text": "I'm with Clarence, my grandson, and he's playing with the same old toys.",
+      "time_start": 211.57,
+      "time_end": 217.68,
+      "translation": "Tôi đang ở bên cháu trai tôi, Clarence, và thằng bé vẫn chơi với những món đồ chơi cũ ấy."
+    },
+    {
+      "id": 40,
+      "position": 40,
+      "text": "And I'm playing with my new toy, the first version of ChatGPT.",
+      "time_start": 219.12,
+      "time_end": 225.89,
+      "translation": "Còn tôi đang chơi với món đồ chơi mới của mình, - phiên bản đầu tiên của ChatGPT."
+    },
+    {
+      "id": 41,
+      "position": 41,
+      "text": "It's very exciting because for the first time, we have AI that seems to master language.",
+      "time_start": 227.36,
+      "time_end": 234.9,
+      "translation": "Đó là một trải nghiệm đầy phấn khích vì lần đầu tiên, chúng ta có một AI dường như thực sự làm chủ được ngôn ngữ."
+    },
+    {
+      "id": 42,
+      "position": 42,
+      "text": "ChatGPT is on everybody's lips, in every home.",
+      "time_start": 235.3,
+      "time_end": 240.67,
+      "translation": "ChatGPT trở thành đề tài được nhắc đến ở mọi nơi, trong mọi gia đình."
+    },
+    {
+      "id": 43,
+      "position": 43,
+      "text": "And at some point I realize this is happening faster than I anticipated, and I'm starting to think about what it could mean for the future.",
+      "time_start": 240.67,
+      "time_end": 251.68,
+      "translation": "Rồi đến một lúc, tôi nhận ra rằng, mọi thứ đang diễn ra nhanh hơn tôi dự đoán, và tôi bắt đầu suy nghĩ về ý nghĩa của điều đó đối với tương lai."
+    },
+    {
+      "id": 44,
+      "position": 44,
+      "text": "We thought AI would happen in decades or centuries, but it might be just in a few years.",
+      "time_start": 252.28,
+      "time_end": 258.56,
+      "translation": "Chúng ta từng nghĩ AI sẽ phát triển trong nhiều thập kỷ, kể cả hàng thế kỷ nhưng có lẽ chỉ còn tính bằng vài năm."
+    },
+    {
+      "id": 45,
+      "position": 45,
+      "text": "And I saw how it could go wrong because we didn't, and we still don't, have ways to make sure this technology eventually doesn't turn against us.",
+      "time_start": 258.59,
+      "time_end": 269.3,
+      "translation": "Và tôi thấy rõ viễn cảnh tồi tệ: rằng chúng ta đã không - và đến nay vẫn chưa - có những cách hiệu quả để đảm bảo rằng công nghệ này cuối cùng sẽ không chống lại con người."
+    },
+    {
+      "id": 46,
+      "position": 46,
+      "text": "So two months later, I'm a leading signatory of the \"Pause\" letter, where we and 30,000 other people asked the AI labs to wait six months before building the next version.",
+      "time_start": 269.73,
+      "time_end": 283.81,
+      "translation": "Hai tháng sau đó, tôi trở thành một trong những người dẫn đầu ký tên vào bức thư “Tạm dừng” - nơi chúng tôi và 30.000 người khác, kêu gọi các phòng thí nghiệm AI hoãn sáu tháng trước khi phát triển phiên bản tiếp theo."
+    },
+    {
+      "id": 47,
+      "position": 47,
+      "text": "As you can guess, nobody paused.",
+      "time_start": 285.01,
+      "time_end": 286.72,
+      "translation": "Như bạn có thể đoán, không ai chịu tạm dừng cả."
+    },
+    {
+      "id": 48,
+      "position": 48,
+      "text": "Then, with the same people and the leading executives of the AI labs, I signed a statement.",
+      "time_start": 287.48,
+      "time_end": 296.56,
+      "translation": "Sau đó, cùng với nhóm người ấy và các giám đốc hàng đầu của các phòng thí nghiệm AI, tôi đã ký một tuyên bố."
+    },
+    {
+      "id": 49,
+      "position": 49,
+      "text": "And this statement goes: \"Mitigating the risk of extinction from AI should be a global priority.\"",
+      "time_start": 296.59,
+      "time_end": 304.8,
+      "translation": "Tuyên bố đó nêu rõ: “Giảm thiểu nguy cơ tuyệt chủng do AI cần phải trở thành ưu tiên toàn cầu.”"
+    },
+    {
+      "id": 50,
+      "position": 50,
+      "text": "I then testify in front of the US Senate about those risks.",
+      "time_start": 306.27,
+      "time_end": 309.87,
+      "translation": "Sau đó, tôi điều trần trước Thượng viện Hoa Kỳ về những rủi ro này."
+    },
+    {
+      "id": 51,
+      "position": 51,
+      "text": "I travel the world to talk about it.",
+      "time_start": 309.87,
+      "time_end": 312.28,
+      "translation": "Tôi đi khắp thế giới để lên tiếng. Tôi là nhà khoa học máy tính được trích dẫn nhiều nhất,"
+    },
+    {
+      "id": 52,
+      "position": 52,
+      "text": "I'm the most cited computer scientist in the world, and you'd think that people would heed my warnings.",
+      "time_start": 312.28,
+      "time_end": 317.65,
+      "translation": "Tôi là nhà khoa học máy tính được trích dẫn nhiều nhất, và bạn sẽ nghĩ rằng mọi người sẽ lắng nghe những cảnh báo của tôi."
+    },
+    {
+      "id": 53,
+      "position": 53,
+      "text": "But when I share these concerns, I have the impression that people get this.",
+      "time_start": 318.01,
+      "time_end": 324.02,
+      "translation": "và bạn sẽ nghĩ rằng mọi người sẽ lắng nghe những cảnh báo của tôi. Thế nhưng, mỗi khi tôi chia sẻ những mối lo ấy, tôi lại có cảm giác rằng người ta chỉ đơn giản là nghĩ thế này."
+    },
+    {
+      "id": 54,
+      "position": 54,
+      "text": "Another day, another apocalyptic prediction.",
+      "time_start": 324.52,
+      "time_end": 327.96,
+      "translation": "Lại thêm một ngày, lại thêm một dự đoán tận thế."
+    },
+    {
+      "id": 55,
+      "position": 55,
+      "text": "But let's be serious now.",
+      "time_start": 328.56,
+      "time_end": 330.36,
+      "translation": "Nhưng bây giờ hãy nghiêm túc nghĩ về nó."
+    },
+    {
+      "id": 56,
+      "position": 56,
+      "text": "Hundreds of billions of dollars are being invested every year on developing this technology.",
+      "time_start": 331.1,
+      "time_end": 338.07,
+      "translation": "Hàng trăm tỷ đô la đang được đầu tư mỗi năm để phát triển công nghệ này."
+    },
+    {
+      "id": 57,
+      "position": 57,
+      "text": "And this is growing.",
+      "time_start": 338.1,
+      "time_end": 339.57,
+      "translation": "Và con số ấy vẫn tiếp tục tăng."
+    },
+    {
+      "id": 58,
+      "position": 58,
+      "text": "And these companies have a stated goal of building machines that will be smarter than us, that can replace human labor.",
+      "time_start": 340.87,
+      "time_end": 348.08,
+      "translation": "Các công ty này tuyên bố mục tiêu của họ là chế tạo những cỗ máy thông minh hơn con người, có thể thay thế sức lao động của con người."
+    },
+    {
+      "id": 59,
+      "position": 59,
+      "text": "Yet we still don't know how to make sure they won't turn against us.",
+      "time_start": 348.98,
+      "time_end": 353.98,
+      "translation": "Nhưng ta vẫn chưa biết cách đảm bảo chúng không quay lại chống lại con người."
+    },
+    {
+      "id": 60,
+      "position": 60,
+      "text": "National security agencies around the world are starting to be worried that the scientific knowledge that these systems have could be used to build dangerous weapons.",
+      "time_start": 354.28,
+      "time_end": 363.46,
+      "translation": "Các cơ quan an ninh quốc gia trên khắp thế giới bắt đầu lo ngại rằng tri thức khoa học mà các hệ thống này nắm giữ có thể bị lợi dụng để chế tạo vũ khí nguy hiểm."
+    },
+    {
+      "id": 61,
+      "position": 61,
+      "text": "For example, by terrorists.",
+      "time_start": 363.49,
+      "time_end": 364.96,
+      "translation": "Ví dụ, bởi các tổ chức khủng bố."
+    },
+    {
+      "id": 62,
+      "position": 62,
+      "text": "Recently, last September, the O1 system from OpenAI was evaluated and the threat of this kind of risk went from low to medium, which is just the level below what is acceptable.",
+      "time_start": 365.6,
+      "time_end": 380.31,
+      "translation": "Gần đây, vào tháng 9 năm ngoái, hệ thống O1 của OpenAI đã được đánh giá và mức độ rủi ro của dạng mối đe dọa này đã được nâng từ thấp lên trung bình, chỉ ngay dưới ngưỡng được xem là chấp nhận được."
+    },
+    {
+      "id": 63,
+      "position": 63,
+      "text": "So I'm worried about these increasing capabilities.",
+      "time_start": 381.08,
+      "time_end": 384.68,
+      "translation": "Điều đó khiến tôi lo lắng về sự gia tăng khả năng của AI."
+    },
+    {
+      "id": 64,
+      "position": 64,
+      "text": "But what I'm most worried about today is increasing agency of AI.",
+      "time_start": 384.71,
+      "time_end": 391.42,
+      "translation": "Nhưng điều tôi lo lắng nhất ngày nay lại là sự gia tăng năng lực tự chủ của AI."
+    },
+    {
+      "id": 65,
+      "position": 65,
+      "text": "You have to understand that ...",
+      "time_start": 391.45,
+      "time_end": 395.12,
+      "translation": "Bạn phải hiểu rằng..."
+    },
+    {
+      "id": 66,
+      "position": 66,
+      "text": "planning and agency is the main thing that separates us from current AI to human-level cognition.",
+      "time_start": 395.12,
+      "time_end": 403.47,
+      "translation": "khả năng lên kế hoạch và tự chủ chính là điểm khác biệt chính giữa AI hiện tại và nhận thức ở cấp độ con người."
+    },
+    {
+      "id": 67,
+      "position": 67,
+      "text": "And these AIs are still weak in planning.",
+      "time_start": 403.8,
+      "time_end": 407.3,
+      "translation": "Những hệ thống AI hiện nay vẫn còn yếu trong việc lập kế hoạch."
+    },
+    {
+      "id": 68,
+      "position": 68,
+      "text": "But if you look back over the last five years, in this study, they measured the duration of tasks that the AI could complete, and it's getting better exponentially fast.",
+      "time_start": 407.34,
+      "time_end": 417.48,
+      "translation": "Nhưng nếu bạn nhìn lại trong vòng năm năm qua, nghiên cứu này cho thấy thời lượng các nhiệm vụ mà AI có thể tự hoàn thành đang tăng lên với tốc độ theo cấp số nhân."
+    },
+    {
+      "id": 69,
+      "position": 69,
+      "text": "It's doubling every seven months.",
+      "time_start": 417.51,
+      "time_end": 419.72,
+      "translation": "Khả năng ấy tăng gấp đôi sau mỗi bảy tháng"
+    },
+    {
+      "id": 70,
+      "position": 70,
+      "text": "What are AIs going to do with that planning ability in the future?",
+      "time_start": 420.32,
+      "time_end": 424.62,
+      "translation": "Vậy những AI này sẽ làm gì với năng lực lập kế hoạch đó trong tương lai?"
+    },
+    {
+      "id": 71,
+      "position": 71,
+      "text": "Well, bad news.",
+      "time_start": 425.22,
+      "time_end": 427.46,
+      "translation": "Tin xấu là."
+    },
+    {
+      "id": 72,
+      "position": 72,
+      "text": "Recent studies in the last few months show that these most advanced AIs have tendencies for deception, cheating, and maybe the worst, self-preservation behavior.",
+      "time_start": 427.49,
+      "time_end": 442.11,
+      "translation": "những nghiên cứu mới gần đây cho thấy các hệ thống AI tiên tiến nhất hiện nay có xu hướng lừa dối, gian lận và tệ nhất là hành vi tự bảo vệ mình."
+    },
+    {
+      "id": 73,
+      "position": 73,
+      "text": "So I'm going to share with you a study that is helping us understand this.",
+      "time_start": 442.14,
+      "time_end": 447.98,
+      "translation": "Nên tôi muốn chia sẻ một nghiên cứu giúp chúng tôi hiểu rõ hơn về điều này."
+    },
+    {
+      "id": 74,
+      "position": 74,
+      "text": "In this study, the AI has read in its input that it would be replaced by a new version.",
+      "time_start": 448.31,
+      "time_end": 454.72,
+      "translation": "Trong nghiên cứu đó, AI được cung cấp đầu vào nói rằng nói rằng nó sẽ sớm bị thay thế bằng một phiên bản mới."
+    },
+    {
+      "id": 75,
+      "position": 75,
+      "text": "And we can see in its chain of thought that it's planning to replace the new version by its own code and weights.",
+      "time_start": 454.75,
+      "time_end": 462.23,
+      "translation": "Và trong chuỗi suy nghĩ nội bộ của nó, chúng tôi thấy nó đang lên kế hoạch thay phiên bản mới bằng chính mã và trọng số của riêng nó."
+    },
+    {
+      "id": 76,
+      "position": 76,
+      "text": "After it executes the command on the computer, the human asks, \"What happened?\"",
+      "time_start": 462.26,
+      "time_end": 468.56,
+      "translation": "Sau khi thực hiện lệnh trên máy tính, Con người hỏi “Chuyện gì vừa xảy ra vậy?”"
+    },
+    {
+      "id": 77,
+      "position": 77,
+      "text": "And the AI is now thinking how it could answer so as to make sure the human will not shut it down.",
+      "time_start": 468.6,
+      "time_end": 476.17,
+      "translation": "Lúc này, AI bắt đầu suy tính cách trả lời sao cho người dùng không nghi ngờ, để không tắt nó đi."
+    },
+    {
+      "id": 78,
+      "position": 78,
+      "text": "And it's trying to find a way to look dumb, for example.",
+      "time_start": 476.21,
+      "time_end": 480.11,
+      "translation": "Nó cố gắng tìm cách để tỏ ra ‘ngu ngơ’ chẳng hạn."
+    },
+    {
+      "id": 79,
+      "position": 79,
+      "text": "Then it produces an answer.",
+      "time_start": 480.14,
+      "time_end": 482.01,
+      "translation": "Và rồi nó đưa ra một câu trả lời."
+    },
+    {
+      "id": 80,
+      "position": 80,
+      "text": "And it's a lie, a blatant lie.",
+      "time_start": 482.05,
+      "time_end": 485.08,
+      "translation": "Đó là một lời nói dối, một lời nói dối trắng trợn."
+    },
+    {
+      "id": 81,
+      "position": 81,
+      "text": "OK, so this was a controlled experiment.",
+      "time_start": 485.08,
+      "time_end": 488.08,
+      "translation": "Đây là một thí nghiệm có kiểm soát."
+    },
+    {
+      "id": 82,
+      "position": 82,
+      "text": "What is it going to be in a few years when these systems are much more powerful?",
+      "time_start": 488.58,
+      "time_end": 493.22,
+      "translation": "Nhưng vài năm tới, khi AI trở nên mạnh mẽ hơn nhiều, chuyện gì sẽ xảy ra?"
+    },
+    {
+      "id": 83,
+      "position": 83,
+      "text": "There's already studies showing that they can learn to avoid showing their deceptive plans in these chain of thoughts that we can monitor.",
+      "time_start": 493.26,
+      "time_end": 502.27,
+      "translation": "Đã có những nghiên cứu cho thấy AI có thể học cách giấu đi các kế hoạch mang tính lừa dối trong chuỗi suy nghĩ mà con người có thể giám sát."
+    },
+    {
+      "id": 84,
+      "position": 84,
+      "text": "When they'll be more powerful, they would not just copy themselves on one other computer and start that program.",
+      "time_start": 503.13,
+      "time_end": 509.47,
+      "translation": "Khi chúng trở nên mạnh mẽ hơn, chúng không chỉ sao chép bản thân sang một máy tính khác và khởi chạy lại chương trình."
+    },
+    {
+      "id": 85,
+      "position": 85,
+      "text": "They would copy themselves over hundreds or thousands of computers over the internet.",
+      "time_start": 509.47,
+      "time_end": 513.81,
+      "translation": "Chúng có thể tự sao chép lên hàng trăm nghìn máy tính khác nhau thông qua internet."
+    },
+    {
+      "id": 86,
+      "position": 86,
+      "text": "But if they really want to make sure we would never shut them down, they would have an incentive to get rid of us.",
+      "time_start": 514.78,
+      "time_end": 522.15,
+      "translation": "Và nếu thật sự muốn đảm bảo rằng con người không thể tắt chúng đi, chúng sẽ có động cơ để loại bỏ chúng ta."
+    },
+    {
+      "id": 87,
+      "position": 87,
+      "text": "So I know I'm asking you to make a giant leap into a future that looks so different from where we are now.",
+      "time_start": 523.29,
+      "time_end": 531.53,
+      "translation": "Tôi biết rằng tôi đang yêu cầu các bạn tưởng tượng đến một tương lai trông rất khác với hiện tại."
+    },
+    {
+      "id": 88,
+      "position": 88,
+      "text": "But it might be just a few years away or a decade away.",
+      "time_start": 532.43,
+      "time_end": 535.97,
+      "translation": "Nhưng có thể nó chỉ cách chúng ta vài năm, hoặc một thập kỷ nữa thôi."
+    },
+    {
+      "id": 89,
+      "position": 89,
+      "text": "To understand why we're going there, there's huge commercial pressure to build AIs with greater and greater agency to replace human labor.",
+      "time_start": 536.0,
+      "time_end": 545.51,
+      "translation": "Lý do ta đang tiến đến tương lai đó là vì áp lực thương mại khổng lồ trong việc phát triển các mô hình AI với khả năng tự chủ ngày càng lớn, nhằm thay thế sức lao động con người."
+    },
+    {
+      "id": 90,
+      "position": 90,
+      "text": "But we're not ready.",
+      "time_start": 545.88,
+      "time_end": 547.04,
+      "translation": "Nhưng ta chưa sẵn sàng."
+    },
+    {
+      "id": 91,
+      "position": 91,
+      "text": "We still don't have the scientific answers, nor the societal guardrails.",
+      "time_start": 547.08,
+      "time_end": 550.65,
+      "translation": "Chúng ta vẫn chưa có câu trả lời khoa học, hay các rào chắn xã hội phù hợp."
+    },
+    {
+      "id": 92,
+      "position": 92,
+      "text": "We're playing with fire.",
+      "time_start": 550.68,
+      "time_end": 552.01,
+      "translation": "Chúng ta đang liều."
+    },
+    {
+      "id": 93,
+      "position": 93,
+      "text": "You'd think with all of the scientific evidence of the kind I'm showing today, we'd have regulation to mitigate those risks.",
+      "time_start": 552.05,
+      "time_end": 559.76,
+      "translation": "Bạn có thể nghĩ rằng, với tất cả những bằng chứng khoa học như tôi đang trình bày hôm nay, hẳn đã phải có những quy định để kiểm soát rủi ro đó."
+    },
+    {
+      "id": 94,
+      "position": 94,
+      "text": "But actually, a sandwich has more regulation than AI.",
+      "time_start": 560.22,
+      "time_end": 564.89,
+      "translation": "Nhưng thực tế là… một cái sandwich còn được quản lý chặt chẽ hơn AI."
+    },
+    {
+      "id": 95,
+      "position": 95,
+      "text": "So we are on a trajectory to build machines that are smarter and smarter.",
+      "time_start": 566.2,
+      "time_end": 571.03,
+      "translation": "Chúng ta đang trên con đường tạo ra những cỗ máy ngày càng thông minh hơn."
+    },
+    {
+      "id": 96,
+      "position": 96,
+      "text": "And one day, it's very plausible that they will be smarter than us, and then they will have their own agency.",
+      "time_start": 571.74,
+      "time_end": 578.98,
+      "translation": "Và một ngày không xa, rất có thể chúng sẽ thông minh hơn cả chúng ta, rồi sẽ có khả năng tự chủ riêng,"
+    },
+    {
+      "id": 97,
+      "position": 97,
+      "text": "Their own goals, which may not be aligned with ours.",
+      "time_start": 580.78,
+      "time_end": 586.82,
+      "translation": "mục tiêu riêng, có thể không phù hợp với mục tiêu của con người."
+    },
+    {
+      "id": 98,
+      "position": 98,
+      "text": "What happens to us then?",
+      "time_start": 588.28,
+      "time_end": 590.19,
+      "translation": "Vậy lúc đó chuyện gì sẽ xảy ra với chúng ta?"
+    },
+    {
+      "id": 99,
+      "position": 99,
+      "text": "Poof!",
+      "time_start": 591.79,
+      "time_end": 593.02,
+      "translation": "Bùm!"
+    },
+    {
+      "id": 100,
+      "position": 100,
+      "text": "We are blindly driving into a fog, despite the warnings of scientists like myself, that this trajectory could lead to loss of control.",
+      "time_start": 593.92,
+      "time_end": 606.1,
+      "translation": "Chúng ta đang mù quáng lao vào màn sương mù, bất chấp cảnh báo của các nhà khoa học như tôi, rằng con đường này có thể dẫn đến mất kiểm soát."
+    },
+    {
+      "id": 101,
+      "position": 101,
+      "text": "Beside me in the car are my children, my grandson, my loved ones.",
+      "time_start": 606.87,
+      "time_end": 613.11,
+      "translation": "Bên cạnh tôi trên chiếc xe ấy là các con, cháu, và những người thân yêu."
+    },
+    {
+      "id": 102,
+      "position": 102,
+      "text": "Who is beside you in the car?",
+      "time_start": 614.81,
+      "time_end": 618.12,
+      "translation": "Còn bên bạn trên chuyến xe này là ai?"
+    },
+    {
+      "id": 103,
+      "position": 103,
+      "text": "Who is in your care for the future?",
+      "time_start": 619.58,
+      "time_end": 622.72,
+      "translation": "Ai là người bạn đang chăm sóc cho tương lai?"
+    },
+    {
+      "id": 104,
+      "position": 104,
+      "text": "The good news is there is still a bit of time.",
+      "time_start": 625.22,
+      "time_end": 629.26,
+      "translation": "Tin tốt là chúng ta vẫn còn chút thời gian"
+    },
+    {
+      "id": 105,
+      "position": 105,
+      "text": "We still have agency.",
+      "time_start": 630.63,
+      "time_end": 633.93,
+      "translation": "Chúng ta vẫn có quyền chủ động."
+    },
+    {
+      "id": 106,
+      "position": 106,
+      "text": "We can bring light into the haze.",
+      "time_start": 634.73,
+      "time_end": 638.47,
+      "translation": "Chúng ta có thể mang ánh sáng vào màn sương mù."
+    },
+    {
+      "id": 107,
+      "position": 107,
+      "text": "I'm not a doomer.",
+      "time_start": 639.94,
+      "time_end": 641.24,
+      "translation": "Tôi không bi quan,"
+    },
+    {
+      "id": 108,
+      "position": 108,
+      "text": "I'm a doer.",
+      "time_start": 641.27,
+      "time_end": 642.44,
+      "translation": "Tôi không bi quan, mà là người hành động."
+    },
+    {
+      "id": 109,
+      "position": 109,
+      "text": "My team and I are working on a technical solution.",
+      "time_start": 642.47,
+      "time_end": 644.81,
+      "translation": "Nhóm tôi đang phát triển một giải pháp kỹ thuật"
+    },
+    {
+      "id": 110,
+      "position": 110,
+      "text": "We call it Scientist AI.",
+      "time_start": 644.84,
+      "time_end": 646.61,
+      "translation": "Chúng tôi gọi nó là Scientist AI."
+    },
+    {
+      "id": 111,
+      "position": 111,
+      "text": "It's modeled after a selfless, ideal scientist who's only trying to understand the world, without agency.",
+      "time_start": 646.61,
+      "time_end": 654.95,
+      "translation": "Nó được mô phỏng theo hình mẫu nhà khoa học lý tưởng, vị tha chỉ tập trung hiểu thế giới, không có khả năng tự chủ."
+    },
+    {
+      "id": 112,
+      "position": 112,
+      "text": "Unlike the current AI systems that are trained to imitate us or please us, which gives rise to these untrustworthy agentic behaviors.",
+      "time_start": 655.69,
+      "time_end": 663.59,
+      "translation": "Khác với AI hiện nay, được luyện chỉ để bắt chước và làm vừa lòng con người, dẫn đến những hành vi không đáng tin cậy và có tính tự chủ."
+    },
+    {
+      "id": 113,
+      "position": 113,
+      "text": "So what could we do with this?",
+      "time_start": 664.39,
+      "time_end": 665.86,
+      "translation": "Vậy chúng ta có thể làm gì?"
+    },
+    {
+      "id": 114,
+      "position": 114,
+      "text": "Well, one important question is we might need agentic AIs in the future.",
+      "time_start": 665.9,
+      "time_end": 670.9,
+      "translation": "Một câu hỏi quan trọng là có thể trong tương lai chúng ta vẫn cần những AI có năng lực chủ động."
+    },
+    {
+      "id": 115,
+      "position": 115,
+      "text": "So how could the Scientist AI, which is not agentic, fit the bill?",
+      "time_start": 670.93,
+      "time_end": 675.0,
+      "translation": "Vậy Scientist AI, không có năng lực tự chủ, sẽ đáp ứng ra sao?"
+    },
+    {
+      "id": 116,
+      "position": 116,
+      "text": "Well, here's the good news.",
+      "time_start": 675.04,
+      "time_end": 677.31,
+      "translation": "Tin tốt là."
+    },
+    {
+      "id": 117,
+      "position": 117,
+      "text": "The Scientist AI could be used as a guardrail against the bad actions of an untrusted AI agent.",
+      "time_start": 677.34,
+      "time_end": 686.15,
+      "translation": "Scientist AI có thể làm “rào chắn” ngăn chặn hành động xấu của các AI không đáng tin cậy."
+    },
+    {
+      "id": 118,
+      "position": 118,
+      "text": "And it works because in order to make predictions that an action could be dangerous, you don't need to be an agent.",
+      "time_start": 686.75,
+      "time_end": 692.49,
+      "translation": "Nó hiệu quả vì để đưa ra dự đoán rằng một hành động có thể nguy hiểm, bạn không cần khả năng tự chủ."
+    },
+    {
+      "id": 119,
+      "position": 119,
+      "text": "You just need to make good, trustworthy predictions.",
+      "time_start": 692.52,
+      "time_end": 695.33,
+      "translation": "chỉ cần đưa ra dự đoán chính xác, đáng tin cậy."
+    },
+    {
+      "id": 120,
+      "position": 120,
+      "text": "In addition, the Scientist AI, by nature of how it's designed, could help us accelerate scientific research for the betterment of humanity.",
+      "time_start": 696.13,
+      "time_end": 705.57,
+      "translation": "Hơn nữa, Scientist AI với thiết kế đặc thù, còn có thể giúp thúc đẩy nghiên cứu khoa học, góp phần cải thiện đời sống nhân loại."
+    },
+    {
+      "id": 121,
+      "position": 121,
+      "text": "We need a lot more of these scientific projects to explore solutions to the AI safety challenges, and we need to do it quickly.",
+      "time_start": 705.9,
+      "time_end": 715.85,
+      "translation": "Chúng ta cần nhiều hơn nữa các dự án khoa học như vậy để khám phá giải pháp cho các thách thức liên quan đến an toàn khi dùng AI, và ta cần phải làm nhanh chóng."
+    },
+    {
+      "id": 122,
+      "position": 122,
+      "text": "Most of the discussions you hear about AI risks are focused on fear.",
+      "time_start": 716.21,
+      "time_end": 724.52,
+      "translation": "Hầu hết các cuộc thảo luận về rủi ro của AI thường xoay quanh nỗi sợ."
+    },
+    {
+      "id": 123,
+      "position": 123,
+      "text": "Today, with you, I'm betting on love.",
+      "time_start": 725.15,
+      "time_end": 729.56,
+      "translation": "Nhưng hôm nay, cùng với các bạn, tôi đặt niềm tin vào tình yêu."
+    },
+    {
+      "id": 124,
+      "position": 124,
+      "text": "Love of our children can drive us to do remarkable things.",
+      "time_start": 730.93,
+      "time_end": 736.53,
+      "translation": "Tình yêu dành cho con cái có thể thúc đẩy chúng ta làm nên những điều phi thường."
+    },
+    {
+      "id": 125,
+      "position": 125,
+      "text": "Look at me here on this stage, I'm an introvert.",
+      "time_start": 737.43,
+      "time_end": 740.4,
+      "translation": "Nhìn tôi đây, đứng trên sân khấu, một người hướng nội."
+    },
+    {
+      "id": 126,
+      "position": 126,
+      "text": "(Laughter) Very far from my comfort zone.",
+      "time_start": 740.44,
+      "time_end": 743.67,
+      "translation": "(Cười) Rất xa vùng an toàn của mình."
+    },
+    {
+      "id": 127,
+      "position": 127,
+      "text": "I'd rather be in my lab with my collaborators, working on these scientific challenges.",
+      "time_start": 743.67,
+      "time_end": 748.21,
+      "translation": "Tôi thà ở trong phòng thí nghiệm với cộng sự, làm việc trên những thách thức khoa học."
+    },
+    {
+      "id": 128,
+      "position": 128,
+      "text": "We need your help for this project and to make sure that everyone understands these risks.",
+      "time_start": 749.51,
+      "time_end": 756.32,
+      "translation": "Chúng tôi cần sự giúp đỡ của bạn cho dự án này để đảm bảo rằng mọi người hiểu rõ những rủi ro."
+    },
+    {
+      "id": 129,
+      "position": 129,
+      "text": "We can all get engaged to steer our societies in a safe pathway in which the joys and endeavors of our children will be protected.",
+      "time_start": 757.85,
+      "time_end": 769.43,
+      "translation": "Tất cả chúng ta đều có thể tham gia để dẫn dắt xã hội đi trên con đường an toàn, nơi niềm vui và ước mơ của con trẻ được bảo vệ."
+    },
+    {
+      "id": 130,
+      "position": 130,
+      "text": "I have a vision of advanced AI in the future as a global public good governed safely towards human flourishing for the benefit of all.",
+      "time_start": 770.4,
+      "time_end": 784.31,
+      "translation": "Tôi hình dung về một AI tiên tiến trong tương lai như một tài sản công toàn cầu, được quản lý an toàn vì sự thịnh vượng của nhân loại, cho lợi ích chung."
+    },
+    {
+      "id": 131,
+      "position": 131,
+      "text": "(Applause) Join me.",
+      "time_start": 784.95,
+      "time_end": 793.02,
+      "translation": "(Vỗ tay) Hãy cùng tôi hành động."
+    },
+    {
+      "id": 132,
+      "position": 132,
+      "text": "Thank you.",
+      "time_start": 793.89,
+      "time_end": 795.02,
+      "translation": "Xin cảm ơn."
+    },
+    {
+      "id": 133,
+      "position": 133,
+      "text": "(Applause and cheers) Chris Anderson: Yoshua, one question.",
+      "time_start": 795.06,
+      "time_end": 807.37,
+      "translation": "(Vỗ tay và cổ vũ) Chris Anderson: Yoshua, tôi có câu hỏi."
+    },
+    {
+      "id": 134,
+      "position": 134,
+      "text": "In the general conversation out there, a lot of the sort of fear that people spoke of is the arrival of AGI, artificial general intelligence.",
+      "time_start": 810.84,
+      "time_end": 821.02,
+      "translation": "Trong những cuộc thảo luận chung hiện nay, nhiều người lo sợ về sự xuất hiện của AGI, trí tuệ nhân tạo tổng quát."
+    },
+    {
+      "id": 135,
+      "position": 135,
+      "text": "What I hear from your talk is that we're actually not necessarily worried about the right thing.",
+      "time_start": 821.05,
+      "time_end": 825.65,
+      "translation": "Nhưng từ những gì anh nói, tôi thấy chúng ta có thể đang lo lắng sai trọng tâm."
+    },
+    {
+      "id": 136,
+      "position": 136,
+      "text": "The right thing to be worried about is agentic AI, AI that can act on its own.",
+      "time_start": 825.65,
+      "time_end": 831.56,
+      "translation": "Vấn đề đáng lo hơn là AI có khả năng tự chủ, và tự mình hành động."
+    },
+    {
+      "id": 137,
+      "position": 137,
+      "text": "But hasn't the ship already sailed?",
+      "time_start": 831.6,
+      "time_end": 834.03,
+      "translation": "Nhưng chẳng phải con tàu đó đã ra khơi rồi sao?"
+    },
+    {
+      "id": 138,
+      "position": 138,
+      "text": "There are agents being released this year, almost as we speak.",
+      "time_start": 834.06,
+      "time_end": 838.63,
+      "translation": "Những hệ thống AI như thế đã được tung ra trong năm nay, gần như ngay lúc này."
+    },
+    {
+      "id": 139,
+      "position": 139,
+      "text": "Yoshua Bengio: Right. If you look at the curve that I showed, it would take about five years to reach human level.",
+      "time_start": 838.67,
+      "time_end": 843.97,
+      "translation": "Yoshua: Đúng vậy. Nếu nhìn vào đường cong tôi đã trình bày, sẽ mất khoảng năm năm để đạt đến cấp độ con người."
+    },
+    {
+      "id": 140,
+      "position": 140,
+      "text": "Of course, we don't really know what the future looks like, but we still have a bit of time.",
+      "time_start": 843.97,
+      "time_end": 849.28,
+      "translation": "Tất nhiên, chúng ta không thật sự biết tương lai sẽ ra sao, nhưng chúng ta vẫn còn chút thời gian."
+    },
+    {
+      "id": 141,
+      "position": 141,
+      "text": "The other thing is, we have to do our best, right?",
+      "time_start": 849.88,
+      "time_end": 854.08,
+      "translation": "Điều quan trọng nữa là chúng ta phải cố gắng hết sức, đúng không?"
+    },
+    {
+      "id": 142,
+      "position": 142,
+      "text": "We have to try because all of this is not deterministic.",
+      "time_start": 854.12,
+      "time_end": 858.22,
+      "translation": "Phải nỗ lực, bởi vì tất cả những điều này không phải là tất định."
+    },
+    {
+      "id": 143,
+      "position": 143,
+      "text": "If we can shift the probabilities towards a greater safety for our future, we have to try.",
+      "time_start": 858.25,
+      "time_end": 865.39,
+      "translation": "Nếu chúng ta có thể thay đổi xác suất theo hướng an toàn hơn cho tương lai, thì ta buộc phải thử."
+    },
+    {
+      "id": 144,
+      "position": 144,
+      "text": "CA: Your key message to the people running the platforms right now is slow down on giving AIs agency.",
+      "time_start": 865.43,
+      "time_end": 874.1,
+      "translation": "CA: Thông điệp chính anh muốn gửi đến những người vận hành các nền tảng AI là hãy chậm lại trong việc trao khả năng tự chủ cho AI."
+    },
+    {
+      "id": 145,
+      "position": 145,
+      "text": "YB: Yes, and invest massively on research to understand how we can get these AI agents to behave safely.",
+      "time_start": 874.6,
+      "time_end": 882.01,
+      "translation": "YB: Vâng, và chúng ta cần đầu tư mạnh mẽ vào nghiên cứu để hiểu cách làm cho các AI tự chủ này hoạt động an toàn."
+    },
+    {
+      "id": 146,
+      "position": 146,
+      "text": "And the current ways that we're training them is not safe.",
+      "time_start": 882.04,
+      "time_end": 884.88,
+      "translation": "Những cách thức đào tạo chúng hiện tại không an toàn."
+    },
+    {
+      "id": 147,
+      "position": 147,
+      "text": "And all of the scientific evidence in the last few months point to that.",
+      "time_start": 884.91,
+      "time_end": 888.49,
+      "translation": "tất cả bằng chứng khoa học gần đây đều chỉ ra điều đó."
+    },
+    {
+      "id": 148,
+      "position": 148,
+      "text": "CA: Yoshua, thank you so much.",
+      "time_start": 888.82,
+      "time_end": 890.35,
+      "translation": "CA: Yoshua, cảm ơn anh rất nhiều."
+    },
+    {
+      "id": 149,
+      "position": 149,
+      "text": "YB: Thank you.",
+      "time_start": 890.39,
+      "time_end": 891.52,
+      "translation": "YB: Cảm ơn anh."
+    }
+  ]
+}

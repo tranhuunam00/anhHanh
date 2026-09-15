@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DailyDictation Studio - Luyện Nghe Chép Chính Tả YouTube</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/modal.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="/" class="brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+        <span>DailyDictation <strong>Studio</strong></span>
+      </a>
+
+      <!-- URL Input Form -->
+      <div class="url-input-form">
+        <input
+          type="text"
+          id="url-input"
+          class="url-input"
+          placeholder="Dán link YouTube tại đây (ví dụ: https://www.youtube.com/watch?v=qe9QSCF-d88)..."
+          value="https://www.youtube.com/watch?v=qe9QSCF-d88"
+        />
+        <button id="load-btn" class="btn btn-primary">🚀 Tải bài tập</button>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button id="theme-toggle-btn" class="btn btn-secondary btn-icon" title="Chuyển chế độ Sáng / Tối">
+        🌙 Tối
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- Preset Lessons Quick Bar -->
+    <div class="presets-bar">
+      <span class="presets-label">Bài nghe mẫu:</span>
+      <button class="preset-pill active" data-url="https://www.youtube.com/watch?v=qe9QSCF-d88">
+        🧠 Rủi ro của AI (Yoshua Bengio - TED)
+      </button>
+      <button class="preset-pill" data-url="https://www.youtube.com/watch?v=h6fcK_fRYaI">
+        🥚 The Egg - Short Story (Kurzgesagt)
+      </button>
+      <button class="preset-pill" data-url="https://www.youtube.com/watch?v=UF8uR6Z6KLc">
+        🎓 Steve Jobs Stanford Speech
+      </button>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; gap: 8px;">
+        <button class="tab-btn active" data-target="tab-dictation">
+          ✍️ Luyện chép chính tả (Dictation)
+        </button>
+        <button class="tab-btn" data-target="tab-transcript">
+          📜 Toàn bộ Transcript & Dịch
+        </button>
+        <button class="tab-btn" data-target="tab-shortcuts">
+          ⌨️ Phím tắt
+        </button>
+      </div>
+      <button id="open-settings-btn" class="btn btn-secondary" style="font-size: 0.85rem; padding: 6px 12px;">
+        ⚙️ Settings
+      </button>
+    </div>
+
+    <!-- TAB 1: Dictation Practice -->
+    <div id="tab-dictation" class="tab-content">
+      <div class="exercise-grid">
+
+        <!-- LEFT COLUMN: Video Player & Custom Controls -->
+        <section class="card player-card">
+          <!-- Embed Restriction Fallback Banner -->
+          <div id="embed-warning-banner" style="display: none; background: var(--warning-bg); border: 1px solid var(--warning); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <div style="font-weight: 600; color: var(--warning); display: flex; align-items: center; gap: 6px;">
+              <span>⚠️ Chủ kênh tắt quyền nhúng video ngoài trang web (Mã lỗi YouTube 150)</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px;">
+              Bạn vẫn có thể luyện nghe chép chính tả đầy đủ bằng 2 cách bên dưới:
+            </div>
+            <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <button id="tts-speak-btn" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">
+                🔊 Nghe phát âm giọng mẫu (TTS Audio)
+              </button>
+              <a id="external-yt-link" href="#" target="_blank" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; text-decoration: none;">
+                🔗 Mở video trên YouTube tại đúng mốc giây này ↗
+              </a>
+            </div>
+          </div>
+
+          <div class="video-wrapper">
+            <div id="youtube-player"></div>
+          </div>
+
+          <div class="playback-controls">
+            <div class="loop-banner">
+              <span id="loop-info">Đang lặp câu 1 [00:04 - 00:14]</span>
+              <button id="loop-toggle-btn" class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;">
+                🔄 Lặp câu: Bật
+              </button>
+            </div>
+
+            <div class="controls-row">
+              <button id="replay-btn" class="btn btn-primary" title="Phát lại câu này (R / Ctrl+Space)">
+                🔁 Lặp lại câu (Ctrl+Space)
+              </button>
+              <button id="backward-btn" class="btn btn-secondary" title="Lùi 3 giây">
+                ⏪ -3s
+              </button>
+              <button id="play-pause-btn" class="btn btn-secondary" title="Tạm dừng / Phát (Esc)">
+                ⏯️ Play/Pause
+              </button>
+              <button id="forward-btn" class="btn btn-secondary" title="Tiến 3 giây">
+                +3s ⏩
+              </button>
+
+              <!-- Speed Presets -->
+              <div class="speed-group">
+                <button class="speed-btn" data-speed="0.75">0.75x</button>
+                <button class="speed-btn" data-speed="0.9">0.9x</button>
+                <button class="speed-btn active" data-speed="1.0">1.0x</button>
+                <button class="speed-btn" data-speed="1.25">1.25x</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Dictation Studio -->
+        <section class="card dictation-card">
+          <div class="challenge-header">
+            <div>
+              <h2 class="challenge-title" id="challenge-title">Câu 1 / ...</h2>
+              <div class="challenge-time" id="challenge-time">[00:00 - 00:00]</div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button id="prev-btn" class="btn btn-secondary btn-icon" title="Câu trước (Alt+←)">◀</button>
+              <button id="next-btn" class="btn btn-secondary btn-icon" title="Câu sau (Alt+→)">▶</button>
+              <button id="open-drawer-btn" class="btn btn-secondary" title="Danh sách tất cả các câu">
+                📑 Danh sách câu
+              </button>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-bar-container">
+            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+          </div>
+
+          <!-- Live Visual Diff Feedback -->
+          <div id="diff-preview" class="diff-preview-container" title="Kết quả so khớp từ theo thời gian thực">
+            <span class="token-missing">Gõ những gì bạn nghe được vào ô bên dưới...</span>
+          </div>
+
+          <!-- Input Textarea with Mic -->
+          <div class="input-wrapper">
+            <textarea
+              id="dictation-input"
+              class="dictation-input"
+              placeholder="Type what you hear..."
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+            ></textarea>
+            <button id="mic-btn" class="mic-btn" title="Nói để chuyển giọng nói thành chữ (Speech to text)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Action Buttons Toolbar -->
+          <div class="dictation-actions">
+            <button id="check-btn" class="btn btn-primary" style="padding: 8px 18px;">
+              Check
+            </button>
+            <button id="skip-btn" class="btn btn-secondary">
+              Skip
+            </button>
+            <button id="speak-sentence-btn" class="btn btn-secondary" title="Nghe phát âm giọng mẫu câu này">
+              🔊 Nghe câu
+            </button>
+            <button id="hint-letter-btn" class="btn btn-secondary" title="Mở 1 ký tự tiếp theo">
+              💡 Gợi ý chữ cái
+            </button>
+            <button id="hint-word-btn" class="btn btn-secondary" title="Mở 1 từ tiếp theo">
+              🔍 Gợi ý từ
+            </button>
+            <button id="show-answer-btn" class="btn btn-warning" title="Hiện câu đáp án">
+              👁️ Xem đáp án
+            </button>
+          </div>
+
+          <!-- Sentence Completion Box -->
+          <div id="completion-card" class="completion-card">
+            <div class="completion-header">
+              <span>🎉 Chính xác 100%! Tuyệt vời!</span>
+            </div>
+            <div class="original-sentence" id="original-sentence"></div>
+            <div class="translation-sentence" id="translation-sentence"></div>
+            <div class="read-aloud-tip">
+              🗣️ <em>Mẹo: Hãy đọc to câu trên theo giọng người bản xứ để luyện phát âm!</em>
+            </div>
+            <div>
+              <button id="next-challenge-btn" class="btn btn-primary">
+                ⏩ Sang câu tiếp theo
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: Full Transcript -->
+    <div id="tab-transcript" class="tab-content" style="display: none;">
+      <div class="card">
+        <h3 style="margin-bottom: 14px;">📜 Toàn bộ bản ghi âm & Dịch nghĩa song ngữ</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+          Bấm vào bất kỳ câu nào để nhảy ngay đến mốc thời gian của câu đó trên video và luyện nghe.
+        </p>
+        <div id="transcript-list" class="transcript-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Keyboard Shortcuts Guide -->
+    <div id="tab-shortcuts" class="tab-content" style="display: none;">
+      <div class="card" style="max-width: 700px; margin: 0 auto;">
+        <h3 style="margin-bottom: 16px;">⌨️ Bảng Phím Tắt Luyện Nghe Tiện Lợi</h3>
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+          <tr style="border-bottom: 1px solid var(--border-color); padding: 8px 0;">
+            <th style="padding: 10px;">Phím tắt</th>
+            <th style="padding: 10px;">Chức năng</th>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 10px;"><kbd>Ctrl</kbd> + <kbd>Space</kbd></td>
+            <td style="padding: 10px;">Tua lại từ đầu câu hiện tại</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 10px;"><kbd>Esc</kbd></td>
+            <td style="padding: 10px;">Tạm dừng / Phát tiếp video</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 10px;"><kbd>Ctrl</kbd> + <kbd>H</kbd></td>
+            <td style="padding: 10px;">Mở thêm 1 ký tự gợi ý tiếp theo</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 10px;"><kbd>Alt</kbd> + <kbd>→</kbd></td>
+            <td style="padding: 10px;">Chuyển sang câu tiếp theo</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 10px;"><kbd>Alt</kbd> + <kbd>←</kbd></td>
+            <td style="padding: 10px;">Quay lại câu trước</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Questions Sidebar Drawer -->
+  <div id="drawer-overlay" class="drawer-overlay"></div>
+  <aside id="drawer" class="drawer">
+    <div class="drawer-header">
+      <h3>📑 Danh sách câu hỏi</h3>
+      <button id="close-drawer-btn" class="btn btn-secondary btn-icon">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div style="margin-bottom: 12px; font-size: 0.85rem; color: var(--text-muted);">
+        <span style="color: var(--success); font-weight: bold;">●</span> Xanh lá: Đã xong &nbsp;|&nbsp;
+        <span style="color: var(--primary); font-weight: bold;">●</span> Xanh dương: Đang làm
+      </div>
+      <div id="question-grid" class="question-grid"></div>
+    </div>
+  </aside>
+
+  <!-- Settings Modal (DailyDictation Style) -->
+  <div id="settings-modal-overlay" class="modal-overlay">
+    <div class="settings-modal">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ Settings</h3>
+        <button id="close-settings-btn" class="btn btn-secondary btn-icon">✕</button>
+      </div>
+      <div class="modal-body">
+        <table class="settings-table">
+          <tbody>
+            <tr>
+              <td class="settings-label">Replay Key</td>
+              <td>
+                <select id="setting-replay-key" class="settings-select">
+                  <option value="Control" selected>Ctrl</option>
+                  <option value="Tab">Tab</option>
+                  <option value="Alt">Alt</option>
+                  <option value="KeyR">R</option>
+                  <option value="Space">Space</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="settings-label">Play/Pause Key</td>
+              <td>
+                <select id="setting-playpause-key" class="settings-select">
+                  <option value="Backquote" selected>` (backtick)</option>
+                  <option value="Escape">Escape</option>
+                  <option value="Space">Alt + Space</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="settings-label">Auto Replay</td>
+              <td>
+                <select id="setting-auto-replay" class="settings-select">
+                  <option value="yes" selected>Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="settings-label">Seconds between replays</td>
+              <td>
+                <select id="setting-replay-interval" class="settings-select">
+                  <option value="0.5">0.5</option>
+                  <option value="1.0" selected>1.0</option>
+                  <option value="1.5">1.5</option>
+                  <option value="2.0">2.0</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="settings-label">Word suggestions (for smartphones)</td>
+              <td>
+                <select id="setting-word-suggestions" class="settings-select">
+                  <option value="enabled" selected>Enabled</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="settings-label">Shortcut Key Tips</td>
+              <td>
+                <select id="setting-shortcut-tips" class="settings-select">
+                  <option value="show" selected>Show</option>
+                  <option value="hide">Hide</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="settings-label">Strict Punctuation</td>
+              <td>
+                <select id="setting-strict-punct" class="settings-select">
+                  <option value="no" selected>No (Ignore commas, periods)</option>
+                  <option value="yes">Yes (Strict)</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="/static/js/settings.js"></script>
+  <script src="/static/js/player.js"></script>
+  <script src="/static/js/dictation.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
