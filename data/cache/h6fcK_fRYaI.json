@@ -1,44 +1,44 @@
 {
   "video_id": "h6fcK_fRYaI",
   "title": "The Egg - A Short Story",
-  "total_challenges": 40,
+  "total_challenges": 38,
   "challenges": [
     {
       "id": 1,
       "position": 1,
       "text": "you were on your way home when you died it was a car accident nothing particularly remarkable but fatal nonetheless it was a painless",
       "time_start": 3.08,
-      "time_end": 17.44,
-      "translation": "Bạn đang trên đường trở về nhà thì bạn chết. Đó là một vụ tai nạn giao thông. Không có gì đặc biệt đáng chú ý ...ngoài cái chết của bạn. Đó là một cái chết không đau đớn. Dù nhân viên y tế đã cố gắng hết sức để cứu lấy bạn,"
+      "time_end": 14.8,
+      "translation": "Bạn đang trên đường trở về nhà thì bạn chết. Đó là một vụ tai nạn giao thông. Không có gì đặc biệt đáng chú ý ...ngoài cái chết của bạn. Đó là một cái chết không đau đớn."
     },
     {
       "id": 2,
       "position": 2,
-      "text": "death the Medics tried their best to save you but to no avail your body was so utterly shattered you were better off trust me and that's when you met",
+      "text": "death the Medics tried their best to save you but to no avail your body was so utterly shattered you were better off",
       "time_start": 14.8,
-      "time_end": 30.48,
-      "translation": "Đó là một cái chết không đau đớn. Dù nhân viên y tế đã cố gắng hết sức để cứu lấy bạn, ...nhưng không có kết quả. Cơ thể của bạn gần như không còn nguyên vẹn, ...tốt hơn hết bạn không cần tỉnh lại, tin tôi đi. Và đó cũng là khoảnh khắc bạn gặp tôi. \"Chuyện gì thế?\" \"Tôi đang ở đâu?'"
+      "time_end": 23.96,
+      "translation": "Đó là một cái chết không đau đớn. Dù nhân viên y tế đã cố gắng hết sức để cứu lấy bạn, ...nhưng không có kết quả. Cơ thể của bạn gần như không còn nguyên vẹn, ...tốt hơn hết bạn không cần tỉnh lại, tin tôi đi."
     },
     {
       "id": 3,
       "position": 3,
-      "text": "me what happened where am I you died I said matter of factly no point in mincing words there was there was a truck and it",
-      "time_start": 27.56,
-      "time_end": 42.36,
-      "translation": "\"Chuyện gì thế?\" \"Tôi đang ở đâu?' \"Cậu đã chết\" - tôi trả lời thẳng vào vấn đề Chẳng cần gì phải nói tránh cả. \"Có... có một chiếc xe tải... ...và nó đã trượt bánh.\""
+      "text": "trust me and that's when you met me what happened where am I you died I said matter of factly no point in mincing",
+      "time_start": 23.96,
+      "time_end": 37.16,
+      "translation": "...tốt hơn hết bạn không cần tỉnh lại, tin tôi đi. Và đó cũng là khoảnh khắc bạn gặp tôi. \"Chuyện gì thế?\" \"Tôi đang ở đâu?' \"Cậu đã chết\" - tôi trả lời thẳng vào vấn đề Chẳng cần gì phải nói tránh cả."
     },
     {
       "id": 4,
       "position": 4,
-      "text": "was skidding yes I I died yes but don't feel bad about it",
-      "time_start": 40.84,
-      "time_end": 55.32,
-      "translation": "...và nó đã trượt bánh.\" \"Đúng\" \"Tôi...\" \"Tôi... đã chết rồi sao?\" \"Đúng vậy.\" \"Nhưng đừng cảm thấy buồn vì điều đó.\" \"Mọi người ai rồi cũng phải chết\" Bạn nhìn xung quanh đó. Chả có gì ở đây cả."
+      "text": "words there was there was a truck and it was skidding yes I I died yes but don't feel bad about it",
+      "time_start": 37.16,
+      "time_end": 51.4,
+      "translation": "Chẳng cần gì phải nói tránh cả. \"Có... có một chiếc xe tải... ...và nó đã trượt bánh.\" \"Đúng\" \"Tôi...\" \"Tôi... đã chết rồi sao?\" \"Đúng vậy.\" \"Nhưng đừng cảm thấy buồn vì điều đó.\" \"Mọi người ai rồi cũng phải chết\""
     },
     {
       "id": 5,
       "position": 5,
-      "text": "everyone dies you looked around there was nothingness just you and me what is this",
+      "text": "everyone dies you looked around there was nothingness just you and me what is this place is this the afterlife more or",
       "time_start": 51.4,
       "time_end": 66.04,
       "translation": "\"Mọi người ai rồi cũng phải chết\" Bạn nhìn xung quanh đó. Chả có gì ở đây cả. Chỉ có cậu và tôi. \"Đây là đâu thế?\" \"Đây là thế giới bên kia à?\" \"Đại loại là vậy.\""
@@ -46,282 +46,266 @@
     {
       "id": 6,
       "position": 6,
-      "text": "place is this the afterlife more or less are you God yes I'm God my kids my",
-      "time_start": 61.56,
-      "time_end": 77.56,
-      "translation": "\"Đây là thế giới bên kia à?\" \"Đại loại là vậy.\" \"Người là Chúa sao?\" \"Đúng thế, ta là Chúa.\" \"Những đứa con tôi, vợ tôi...\" \"... họ sẽ ra sao?\""
+      "text": "less are you God yes I'm God my kids my wife what about them will they be all",
+      "time_start": 66.04,
+      "time_end": 80.2,
+      "translation": "\"Người là Chúa sao?\" \"Đúng thế, ta là Chúa.\" \"Những đứa con tôi, vợ tôi...\" \"... họ sẽ ra sao?\" \"Liệu họ sẽ ổn chứ?\""
     },
     {
       "id": 7,
       "position": 7,
-      "text": "wife what about them will they be all right that's what I like to see I said you just died and your main concern is for your family that's good stuff right",
-      "time_start": 75.28,
-      "time_end": 90.44,
-      "translation": "\"... họ sẽ ra sao?\" \"Liệu họ sẽ ổn chứ?\" \"Đó là điều mà ta đang muốn nghe.\" \"Cậu vừa mới chết và mối bận tâm lớn nhất của cậu lại chính là gia đình.\" \"Đó là một điều tốt.\" Bạn nhìn tôi với một vẻ mê hoặc."
+      "text": "right that's what I like to see I said you just died and your main concern is for your family that's good stuff right",
+      "time_start": 80.2,
+      "time_end": 88.96,
+      "translation": "\"Đó là điều mà ta đang muốn nghe.\" \"Cậu vừa mới chết và mối bận tâm lớn nhất của cậu lại chính là gia đình.\" \"Đó là một điều tốt.\""
     },
     {
       "id": 8,
       "position": 8,
-      "text": "there you looked at me with Fascination to you I didn't look like God I just looked like some man or possibly a woman some vague authority figure",
+      "text": "there you looked at me with Fascination to you I didn't look like God I just looked like some man or possibly a woman some",
       "time_start": 88.96,
-      "time_end": 106.48,
-      "translation": "\"Đó là một điều tốt.\" Bạn nhìn tôi với một vẻ mê hoặc. Đối với bạn, có lẽ tôi không giống Chúa lắm. Tôi chỉ trông giống một người đàn ông, hoặc có thể là một người phụ nữ. Có thể là một thực thể quyền năng mơ hồ nào đó. \"Đừng lo, họ sẽ ổn thôi.\" Tôi nói. \"Lũ trẻ sẽ nhớ về cậu là một con người tuyệt vời."
+      "time_end": 99.92,
+      "translation": "\"Đó là một điều tốt.\" Bạn nhìn tôi với một vẻ mê hoặc. Đối với bạn, có lẽ tôi không giống Chúa lắm. Tôi chỉ trông giống một người đàn ông, hoặc có thể là một người phụ nữ. Có thể là một thực thể quyền năng mơ hồ nào đó."
     },
     {
       "id": 9,
       "position": 9,
-      "text": "maybe don't worry I said they'll be fine your kids will remember you as perfect in every way they didn't have time to grow contemptuous of you your wife will",
-      "time_start": 102.76,
-      "time_end": 117.92,
-      "translation": "\"Đừng lo, họ sẽ ổn thôi.\" Tôi nói. \"Lũ trẻ sẽ nhớ về cậu là một con người tuyệt vời. Chúng vẫn chưa đủ trưởng thành để đánh giá hoặc nhìn nhận cậu.\" \"Vợ của cậu sẽ phải đối mặt với những tổn thương bên ngoài, ...nhưng rồi chúng sẽ được xoa dịu một cách lặng lẽ.\""
+      "text": "vague authority figure maybe don't worry I said they'll be fine your kids will remember you as perfect in every way they didn't have time to",
+      "time_start": 99.92,
+      "time_end": 111.8,
+      "translation": "Có thể là một thực thể quyền năng mơ hồ nào đó. \"Đừng lo, họ sẽ ổn thôi.\" Tôi nói. \"Lũ trẻ sẽ nhớ về cậu là một con người tuyệt vời. Chúng vẫn chưa đủ trưởng thành để đánh giá hoặc nhìn nhận cậu.\""
     },
     {
       "id": 10,
       "position": 10,
-      "text": "cry on the outside but will be secretly relieved to be fair your marriage was falling apart if it's any consolation she'll feel very guilty for feeling",
-      "time_start": 115.24,
-      "time_end": 133.44,
-      "translation": "\"Vợ của cậu sẽ phải đối mặt với những tổn thương bên ngoài, ...nhưng rồi chúng sẽ được xoa dịu một cách lặng lẽ.\" \"Thành thật thì, hôn nhân của cậu đã tan vỡ. Nếu có bất cứ điều gì an ủi, ... thì đó là cô ấy sẽ cảm thấy có lỗi vì cảm giác nhẹ nhõm ấy.\" \"Ôi... \"Vậy, bây giờ tôi sẽ ra sao?\" \"Chẳng phải tôi sẽ được lên thiên đàng hay xuống địa ngục gì đó ư?”"
+      "text": "grow contemptuous of you your wife will cry on the outside but will be secretly relieved to be fair your marriage was falling",
+      "time_start": 111.8,
+      "time_end": 122.6,
+      "translation": "Chúng vẫn chưa đủ trưởng thành để đánh giá hoặc nhìn nhận cậu.\" \"Vợ của cậu sẽ phải đối mặt với những tổn thương bên ngoài, ...nhưng rồi chúng sẽ được xoa dịu một cách lặng lẽ.\" \"Thành thật thì, hôn nhân của cậu đã tan vỡ."
     },
     {
       "id": 11,
       "position": 11,
-      "text": "relieved oh so what happens now do I go to heaven or hell or something neither you'll be reincarnated",
-      "time_start": 128.68,
-      "time_end": 145.56,
-      "translation": "... thì đó là cô ấy sẽ cảm thấy có lỗi vì cảm giác nhẹ nhõm ấy.\" \"Ôi... \"Vậy, bây giờ tôi sẽ ra sao?\" \"Chẳng phải tôi sẽ được lên thiên đàng hay xuống địa ngục gì đó ư?” \"Không, cậu sẽ được đầu thai.\" \"Ah,\" “Vậy là những người Hindu đã đúng.\" \"Mỗi tôn giáo đều đúng theo cách riêng của nó.\""
+      "text": "apart if it's any consolation she'll feel very guilty for feeling relieved oh so what happens now do I go to heaven or hell or",
+      "time_start": 122.6,
+      "time_end": 136.08,
+      "translation": "\"Thành thật thì, hôn nhân của cậu đã tan vỡ. Nếu có bất cứ điều gì an ủi, ... thì đó là cô ấy sẽ cảm thấy có lỗi vì cảm giác nhẹ nhõm ấy.\" \"Ôi... \"Vậy, bây giờ tôi sẽ ra sao?\" \"Chẳng phải tôi sẽ được lên thiên đàng hay xuống địa ngục gì đó ư?”"
     },
     {
       "id": 12,
       "position": 12,
-      "text": "ah so the Hindus were right all religions are right in their own way walk with me you followed along as we stro through the",
-      "time_start": 141.96,
-      "time_end": 158.04,
-      "translation": "“Vậy là những người Hindu đã đúng.\" \"Mỗi tôn giáo đều đúng theo cách riêng của nó.\" \"Hãy đi với tôi.\" Bạn cùng tôi bước qua khoảng không trống rỗng. \"Chúng ta đang đi đâu vậy?\" “Không nơi nào cả."
+      "text": "something neither you'll be reincarnated ah so the Hindus were right all religions are right in their own way walk with me",
+      "time_start": 136.08,
+      "time_end": 151.12,
+      "translation": "\"Không, cậu sẽ được đầu thai.\" \"Ah,\" “Vậy là những người Hindu đã đúng.\" \"Mỗi tôn giáo đều đúng theo cách riêng của nó.\" \"Hãy đi với tôi.\" Bạn cùng tôi bước qua khoảng không trống rỗng."
     },
     {
       "id": 13,
       "position": 13,
-      "text": "void where are we going nowhere in particular it's just nice to walk while we talk so what's the point then when I get",
-      "time_start": 154.68,
-      "time_end": 169.68,
-      "translation": "\"Chúng ta đang đi đâu vậy?\" “Không nơi nào cả. Chỉ là vừa đi bộ vừa trò chuyện sẽ thoải mái hơn.” \"Vậy, điều Người vừa nói có ý nghĩa gì?\" \"Có phải là khi tôi được đầu thai, ...tôi sẽ giống như một phiến đá nhẵn nhụi, phải không?\" \"Là một đứa trẻ.\""
+      "text": "you followed along as we stro through the void where are we going nowhere in particular it's just nice to walk while",
+      "time_start": 151.12,
+      "time_end": 160.24,
+      "translation": "Bạn cùng tôi bước qua khoảng không trống rỗng. \"Chúng ta đang đi đâu vậy?\" “Không nơi nào cả. Chỉ là vừa đi bộ vừa trò chuyện sẽ thoải mái hơn.”"
     },
     {
       "id": 14,
       "position": 14,
-      "text": "reborn I'll just be a blank slate right a baby so all my experiences and everything everything I did in this life",
-      "time_start": 165.72,
-      "time_end": 180.72,
-      "translation": "\"Có phải là khi tôi được đầu thai, ...tôi sẽ giống như một phiến đá nhẵn nhụi, phải không?\" \"Là một đứa trẻ.\" \"Và rồi tất cả những trải nghiệm và mọi thứ của tôi, ...tất cả mọi thứ tôi đã làm trong cuộc đời này, đều trở nên vô nghĩa?\" \"Không hẳn thế.\" \"Những tri thức và kinh nghiệm sống trong tất cả các kiếp trước của cậu vẫn còn bên trong chính con người cậu."
+      "text": "we talk so what's the point then when I get reborn I'll just be a blank slate right a baby so all my experiences and",
+      "time_start": 160.24,
+      "time_end": 173.8,
+      "translation": "Chỉ là vừa đi bộ vừa trò chuyện sẽ thoải mái hơn.” \"Vậy, điều Người vừa nói có ý nghĩa gì?\" \"Có phải là khi tôi được đầu thai, ...tôi sẽ giống như một phiến đá nhẵn nhụi, phải không?\" \"Là một đứa trẻ.\" \"Và rồi tất cả những trải nghiệm và mọi thứ của tôi,"
     },
     {
       "id": 15,
       "position": 15,
-      "text": "won't matter not so you have within you all the knowledge and experiences of all your past lives you just don't remember them right",
-      "time_start": 176.0,
-      "time_end": 190.04,
-      "translation": "...tất cả mọi thứ tôi đã làm trong cuộc đời này, đều trở nên vô nghĩa?\" \"Không hẳn thế.\" \"Những tri thức và kinh nghiệm sống trong tất cả các kiếp trước của cậu vẫn còn bên trong chính con người cậu. Chỉ là ngay lúc này cậu không nhớ ra được thôi.\" Tôi dừng chân lại và khoác vai bạn."
+      "text": "everything everything I did in this life won't matter not so you have within you all the knowledge and experiences of all",
+      "time_start": 173.8,
+      "time_end": 183.4,
+      "translation": "\"Và rồi tất cả những trải nghiệm và mọi thứ của tôi, ...tất cả mọi thứ tôi đã làm trong cuộc đời này, đều trở nên vô nghĩa?\" \"Không hẳn thế.\" \"Những tri thức và kinh nghiệm sống trong tất cả các kiếp trước của cậu vẫn còn bên trong chính con người cậu."
     },
     {
       "id": 16,
       "position": 16,
-      "text": "now I stopped walking and took you by the shoulders your soul is more magnificent beautiful and gigantic than you can possibly imagine a human mind can only",
-      "time_start": 187.24,
-      "time_end": 203.28,
-      "translation": "Tôi dừng chân lại và khoác vai bạn. \"Linh hồn cậu lộng lẫy, đẹp đẽ và vĩ đại hơn tất cả những gì cậu có thể tưởng tượng được.\" \"Tâm trí con người chỉ có thể lưu giữ được một phần rất nhỏ con người thật của cậu.\" \"Nó như việc cậu nhúng ngón tay vào cốc nước để xem nó nóng hay lạnh.\""
+      "text": "your past lives you just don't remember them right now I stopped walking and took you by the shoulders your soul is more magnificent",
+      "time_start": 183.4,
+      "time_end": 194.16,
+      "translation": "\"Những tri thức và kinh nghiệm sống trong tất cả các kiếp trước của cậu vẫn còn bên trong chính con người cậu. Chỉ là ngay lúc này cậu không nhớ ra được thôi.\" Tôi dừng chân lại và khoác vai bạn. \"Linh hồn cậu lộng lẫy, đẹp đẽ và vĩ đại hơn tất cả những gì cậu có thể tưởng tượng được.\""
     },
     {
       "id": 17,
       "position": 17,
-      "text": "contain a tiny fraction of what you are it's like sticking your finger in a glass of water to see if it's hot or cold you put a tiny Part of Yourself into the vessel and when you bring it",
-      "time_start": 200.16,
-      "time_end": 214.6,
-      "translation": "\"Tâm trí con người chỉ có thể lưu giữ được một phần rất nhỏ con người thật của cậu.\" \"Nó như việc cậu nhúng ngón tay vào cốc nước để xem nó nóng hay lạnh.\" \"Cậu chỉ mới vừa đưa một phần cơ thể nhỏ bé của mình vào cốc nước, ...và khi rút ngón tay ra, ...cậu đã nhận được những trải nghiệm từ trong chiếc cốc ấy.\""
+      "text": "beautiful and gigantic than you can possibly imagine a human mind can only contain a tiny fraction of what you are it's like sticking your finger in a",
+      "time_start": 194.16,
+      "time_end": 205.0,
+      "translation": "\"Linh hồn cậu lộng lẫy, đẹp đẽ và vĩ đại hơn tất cả những gì cậu có thể tưởng tượng được.\" \"Tâm trí con người chỉ có thể lưu giữ được một phần rất nhỏ con người thật của cậu.\" \"Nó như việc cậu nhúng ngón tay vào cốc nước để xem nó nóng hay lạnh.\""
     },
     {
       "id": 18,
       "position": 18,
-      "text": "back out you've gained all the experiences it had you've been in a human for the last 48 years so you haven't stretched out yet and felt the rest of your immense",
-      "time_start": 212.28,
-      "time_end": 226.72,
-      "translation": "...và khi rút ngón tay ra, ...cậu đã nhận được những trải nghiệm từ trong chiếc cốc ấy.\" \"Cậu vừa mới sống trong hình hài một con người trong 48 năm qua ...nên cậu vẫn chưa vươn ra và cảm nhận hết được ý thức bao la của chính mình.\" \"Nếu chúng ta ở đây đủ lâu,"
+      "text": "glass of water to see if it's hot or cold you put a tiny Part of Yourself into the vessel and when you bring it",
+      "time_start": 205.0,
+      "time_end": 212.28,
+      "translation": "\"Nó như việc cậu nhúng ngón tay vào cốc nước để xem nó nóng hay lạnh.\" \"Cậu chỉ mới vừa đưa một phần cơ thể nhỏ bé của mình vào cốc nước, ...và khi rút ngón tay ra,"
     },
     {
       "id": 19,
       "position": 19,
-      "text": "Consciousness if we hung out here for long enough you'd start remembering everything but there's no point to doing that between each life how many times have I been",
-      "time_start": 224.48,
-      "time_end": 240.36,
-      "translation": "...nên cậu vẫn chưa vươn ra và cảm nhận hết được ý thức bao la của chính mình.\" \"Nếu chúng ta ở đây đủ lâu, cậu sẽ dần nhớ lại mọi chuyện. Nhưng không có lý do gì để làm thế lúc này cả.\" \"Vậy tôi đã được đầu thai bao nhiêu lần rồi?\" \"Ồ, nhiều lắm.\" \"Nhiều vô kể, ... và đã trải qua nhiều cuộc đời khác nhau.\""
+      "text": "back out you've gained all the experiences it had you've been in a human for the last 48 years so you haven't stretched out yet and felt the",
+      "time_start": 212.28,
+      "time_end": 222.6,
+      "translation": "...và khi rút ngón tay ra, ...cậu đã nhận được những trải nghiệm từ trong chiếc cốc ấy.\" \"Cậu vừa mới sống trong hình hài một con người trong 48 năm qua ...nên cậu vẫn chưa vươn ra và cảm nhận hết được ý thức bao la của chính mình.\""
     },
     {
       "id": 20,
       "position": 20,
-      "text": "reincarnated then oh lots lots and lots and into lots of different lives this time around you'll be a Chinese peasant girl in 540",
-      "time_start": 235.56,
-      "time_end": 253.4,
-      "translation": "\"Vậy tôi đã được đầu thai bao nhiêu lần rồi?\" \"Ồ, nhiều lắm.\" \"Nhiều vô kể, ... và đã trải qua nhiều cuộc đời khác nhau.\" \"Lần này, ...cậu sẽ là một cô thôn nữ Trung Hoa, sống vào năm 540 sau Công Nguyên.” \"Khoan đã, gì cơ? Người gửi tôi về quá khứ ư?\""
+      "text": "rest of your immense Consciousness if we hung out here for long enough you'd start remembering everything but there's no point to doing",
+      "time_start": 222.6,
+      "time_end": 231.16,
+      "translation": "...nên cậu vẫn chưa vươn ra và cảm nhận hết được ý thức bao la của chính mình.\" \"Nếu chúng ta ở đây đủ lâu, cậu sẽ dần nhớ lại mọi chuyện. Nhưng không có lý do gì để làm thế lúc này cả.\""
     },
     {
       "id": 21,
       "position": 21,
-      "text": "ad wait what you're sending me back in time well I guess technically time as you know it only exists in your Universe",
-      "time_start": 248.24,
-      "time_end": 262.6,
-      "translation": "\"Khoan đã, gì cơ? Người gửi tôi về quá khứ ư?\" \"Ừm, có thể coi là như thế. Khái niệm về thời gian mà cậu biết chỉ tồn tại trong vũ trụ của cậu mà thôi. Ở nơi của ta, mọi thứ hoàn toàn khác.\""
+      "text": "that between each life how many times have I been reincarnated then oh lots lots and lots and into lots of different lives this",
+      "time_start": 231.16,
+      "time_end": 243.16,
+      "translation": "Nhưng không có lý do gì để làm thế lúc này cả.\" \"Vậy tôi đã được đầu thai bao nhiêu lần rồi?\" \"Ồ, nhiều lắm.\" \"Nhiều vô kể, ... và đã trải qua nhiều cuộc đời khác nhau.\" \"Lần này,"
     },
     {
       "id": 22,
       "position": 22,
-      "text": "things are different Where I Come From Where where you come from oh sure I come from somewhere somewhere else and there are others like me I know you'll",
-      "time_start": 260.48,
-      "time_end": 274.96,
-      "translation": "Ở nơi của ta, mọi thứ hoàn toàn khác.\" \"Thế... người đến từ đâu?\" “Phải rồi, ta đến từ một nơi, một nơi rất rất khác Ở đó có những người giống như ta.\" \"Ta biết cậu đang rất muốn biết rằng nơi đó trông như thế nào,"
+      "text": "time around you'll be a Chinese peasant girl in 540 ad wait what you're sending me back in time well I guess technically time as",
+      "time_start": 243.16,
+      "time_end": 257.2,
+      "translation": "\"Lần này, ...cậu sẽ là một cô thôn nữ Trung Hoa, sống vào năm 540 sau Công Nguyên.” \"Khoan đã, gì cơ? Người gửi tôi về quá khứ ư?\" \"Ừm, có thể coi là như thế. Khái niệm về thời gian mà cậu biết chỉ tồn tại trong vũ trụ của cậu mà thôi."
     },
     {
       "id": 23,
       "position": 23,
-      "text": "want to know what it's like there but honestly you wouldn't understand oh you said a little let down but wait if I get reincarnated to",
-      "time_start": 272.96,
-      "time_end": 287.0,
-      "translation": "\"Ta biết cậu đang rất muốn biết rằng nơi đó trông như thế nào, ...nhưng thành thực mà nói cậu không hiểu được đâu.\" \"Ôi...” cậu nhỏ giọng, có một chút thất vọng. \"Nhưng chờ đã.\" \"Nếu như tôi được tái sinh vào những nơi cụ thể vào những thời điểm khác nhau, ...nếu vậy thì có thể tôi đã tương tác với chính bản thân mình vào một lúc nào đó sao?”"
+      "text": "you know it only exists in your Universe things are different Where I Come From Where where you come from oh sure I",
+      "time_start": 257.2,
+      "time_end": 267.8,
+      "translation": "Khái niệm về thời gian mà cậu biết chỉ tồn tại trong vũ trụ của cậu mà thôi. Ở nơi của ta, mọi thứ hoàn toàn khác.\" \"Thế... người đến từ đâu?\" “Phải rồi, ta đến từ một nơi, một nơi rất rất khác"
     },
     {
       "id": 24,
       "position": 24,
-      "text": "other places in time I could have interacted with myself at some point sure happens all the time and with both lives only aware of their own lifespan you don't even know it's",
-      "time_start": 284.8,
-      "time_end": 300.32,
-      "translation": "\"Nếu như tôi được tái sinh vào những nơi cụ thể vào những thời điểm khác nhau, ...nếu vậy thì có thể tôi đã tương tác với chính bản thân mình vào một lúc nào đó sao?” \"Dĩ nhiên rồi, chuyện đó xảy ra mọi lúc.\" \"Và bởi vì cả hai bản thể chỉ ý thức được duy nhất cuộc đời của chính mình, ... nên cậu chẳng thể nào biết chuyện đó đang xảy ra.\" \"Vậy, ý nghĩa của tất cả việc này là gì?\""
+      "text": "come from somewhere somewhere else and there are others like me I know you'll want to know what it's like there but",
+      "time_start": 267.8,
+      "time_end": 274.96,
+      "translation": "“Phải rồi, ta đến từ một nơi, một nơi rất rất khác Ở đó có những người giống như ta.\" \"Ta biết cậu đang rất muốn biết rằng nơi đó trông như thế nào,"
     },
     {
       "id": 25,
       "position": 25,
-      "text": "happening so what's the point of it all I looked you in the eye the meaning of life the reason I made this whole universe is for you to",
-      "time_start": 298.48,
-      "time_end": 314.72,
-      "translation": "... nên cậu chẳng thể nào biết chuyện đó đang xảy ra.\" \"Vậy, ý nghĩa của tất cả việc này là gì?\" Tôi nhìn thẳng vào mắt cậu. “Ý nghĩa của cuộc sống, ...là lý do tôi tạo ra toàn bộ vũ trụ này, ..là để cho cậu được hoàn thiện.” “Ý người là toàn thể nhân loại? Người muốn chúng tôi được hoàn thiện?\""
+      "text": "honestly you wouldn't understand oh you said a little let down but wait if I get reincarnated to other places in time I could have",
+      "time_start": 274.96,
+      "time_end": 287.0,
+      "translation": "\"Ta biết cậu đang rất muốn biết rằng nơi đó trông như thế nào, ...nhưng thành thực mà nói cậu không hiểu được đâu.\" \"Ôi...” cậu nhỏ giọng, có một chút thất vọng. \"Nhưng chờ đã.\" \"Nếu như tôi được tái sinh vào những nơi cụ thể vào những thời điểm khác nhau, ...nếu vậy thì có thể tôi đã tương tác với chính bản thân mình vào một lúc nào đó sao?”"
     },
     {
       "id": 26,
       "position": 26,
-      "text": "mature you mean mankind you want to ask to mature no just you I made this whole universe for you with each new life you",
-      "time_start": 311.16,
-      "time_end": 325.4,
-      "translation": "..là để cho cậu được hoàn thiện.” “Ý người là toàn thể nhân loại? Người muốn chúng tôi được hoàn thiện?\" \"Không, chỉ mình cậu thôi. Ta đã tạo nên cả vũ trụ này chỉ vì cậu. \"Với từng sự tái sinh vào từng cuộc đời mới, cậu dần trưởng thành và hoàn thiện hơn, ...và trở thành một con người có trí tuệ lớn lao và vĩ đại hơn.\""
+      "text": "interacted with myself at some point sure happens all the time and with both lives only aware of their own lifespan you don't even know it's",
+      "time_start": 287.0,
+      "time_end": 298.48,
+      "translation": "...nếu vậy thì có thể tôi đã tương tác với chính bản thân mình vào một lúc nào đó sao?” \"Dĩ nhiên rồi, chuyện đó xảy ra mọi lúc.\" \"Và bởi vì cả hai bản thể chỉ ý thức được duy nhất cuộc đời của chính mình, ... nên cậu chẳng thể nào biết chuyện đó đang xảy ra.\""
     },
     {
       "id": 27,
       "position": 27,
-      "text": "grow and mature and become a larger and greater intellect just me what about everyone else there is no one else in this",
-      "time_start": 322.72,
-      "time_end": 338.28,
-      "translation": "\"Với từng sự tái sinh vào từng cuộc đời mới, cậu dần trưởng thành và hoàn thiện hơn, ...và trở thành một con người có trí tuệ lớn lao và vĩ đại hơn.\" \"Chỉ mình tôi? Còn những người khác?\" \"Chẳng có ai khác. Trong vũ trụ này, chỉ có cậu và tôi.\" Bạn ngơ ngác nhìn tôi."
+      "text": "happening so what's the point of it all I looked you in the eye the meaning of life the reason I made this whole universe is for",
+      "time_start": 298.48,
+      "time_end": 309.88,
+      "translation": "... nên cậu chẳng thể nào biết chuyện đó đang xảy ra.\" \"Vậy, ý nghĩa của tất cả việc này là gì?\" Tôi nhìn thẳng vào mắt cậu. “Ý nghĩa của cuộc sống, ...là lý do tôi tạo ra toàn bộ vũ trụ này, ..là để cho cậu được hoàn thiện.”"
     },
     {
       "id": 28,
       "position": 28,
-      "text": "universe there's just you and me you stared blankly at me but all the people on Earth all you different incarnations of",
-      "time_start": 334.2,
-      "time_end": 349.36,
-      "translation": "Trong vũ trụ này, chỉ có cậu và tôi.\" Bạn ngơ ngác nhìn tôi. \"Nhưng có biết bao người trên Trái Đất...?\" \"Tất cả bọn họ đều là cậu.\" Những hiện thân khác nhau của cậu.\" \"Chờ đã, vậy tôi là... ...tất cả mọi người?\""
+      "text": "you to mature you mean mankind you want to ask to mature no just you I made this whole universe for you with each new life you",
+      "time_start": 309.88,
+      "time_end": 322.72,
+      "translation": "..là để cho cậu được hoàn thiện.” “Ý người là toàn thể nhân loại? Người muốn chúng tôi được hoàn thiện?\" \"Không, chỉ mình cậu thôi. Ta đã tạo nên cả vũ trụ này chỉ vì cậu. \"Với từng sự tái sinh vào từng cuộc đời mới, cậu dần trưởng thành và hoàn thiện hơn,"
     },
     {
       "id": 29,
       "position": 29,
-      "text": "you wait I'm everyone now you're guting it I'm every human being who ever",
+      "text": "grow and mature and become a larger and greater intellect just me what about everyone else there is no one else in this",
+      "time_start": 322.72,
+      "time_end": 334.2,
+      "translation": "\"Với từng sự tái sinh vào từng cuộc đời mới, cậu dần trưởng thành và hoàn thiện hơn, ...và trở thành một con người có trí tuệ lớn lao và vĩ đại hơn.\" \"Chỉ mình tôi? Còn những người khác?\" \"Chẳng có ai khác. Trong vũ trụ này, chỉ có cậu và tôi.\""
+    },
+    {
+      "id": 30,
+      "position": 30,
+      "text": "universe there's just you and me you stared blankly at me but all the people on Earth all you different incarnations of",
+      "time_start": 334.2,
+      "time_end": 345.92,
+      "translation": "Trong vũ trụ này, chỉ có cậu và tôi.\" Bạn ngơ ngác nhìn tôi. \"Nhưng có biết bao người trên Trái Đất...?\" \"Tất cả bọn họ đều là cậu.\" Những hiện thân khác nhau của cậu.\""
+    },
+    {
+      "id": 31,
+      "position": 31,
+      "text": "you wait I'm everyone now you're guting it I'm every human being who ever lived or who will ever live yes I'm",
       "time_start": 345.92,
       "time_end": 360.12,
       "translation": "Những hiện thân khác nhau của cậu.\" \"Chờ đã, vậy tôi là... ...tất cả mọi người?\" \"Giờ cậu bắt đầu hiểu ra rồi đấy.\" \"Tôi là tất cả những ai từng sống?\" \"Và những ai sẽ sống, đúng vậy đấy.\" \"Tôi là Abraham Lincoln?\""
     },
     {
-      "id": 30,
-      "position": 30,
-      "text": "lived or who will ever live yes I'm Abraham Lincoln and you're John wils Booth too I'm a Hitler you said a called and",
-      "time_start": 355.48,
-      "time_end": 372.2,
-      "translation": "\"Và những ai sẽ sống, đúng vậy đấy.\" \"Tôi là Abraham Lincoln?\" \"Và cậu cũng là John Wilkes Booth nữa.\" \"Tôi có phải là Hitler?\" ...Bạn nói, bàng hoàng. \"Và cũng là cả triệu người Hitler đã giết.\" \"Vậy tôi là Jesus?\""
-    },
-    {
-      "id": 31,
-      "position": 31,
-      "text": "you're the millions he killed I'm Jesus and you're everyone who followed him you fell silent every time you victimized someone",
-      "time_start": 369.08,
-      "time_end": 383.32,
-      "translation": "\"Và cũng là cả triệu người Hitler đã giết.\" \"Vậy tôi là Jesus?\" \"Và cũng là những tín đồ của ông ta.\" Bạn chìm vào im lặng. \"Mỗi khi cậu ngược đãi ai đó, ...Là cậu đang làm hại chính mình.\" \"Mỗi việc tốt cậu đã làm,"
-    },
-    {
       "id": 32,
       "position": 32,
-      "text": "you were victimizing yourself every act of kindness you've done you've done to yourself every happy and sad moment ever EXP experienced by any human was or will",
-      "time_start": 380.36,
-      "time_end": 395.08,
-      "translation": "...Là cậu đang làm hại chính mình.\" \"Mỗi việc tốt cậu đã làm, ...Là làm cho chính bản thân mình.\" \"Mọi trải nghiệm buồn vui, kinh nghiệm và cảm nhận của tất cả mọi người ...cậu đều đã từng cảm nhận hay sắp được tận hưởng nó\""
+      "text": "Abraham Lincoln and you're John wils Booth too I'm a Hitler you said a called and you're the millions he killed I'm",
+      "time_start": 360.12,
+      "time_end": 372.2,
+      "translation": "\"Tôi là Abraham Lincoln?\" \"Và cậu cũng là John Wilkes Booth nữa.\" \"Tôi có phải là Hitler?\" ...Bạn nói, bàng hoàng. \"Và cũng là cả triệu người Hitler đã giết.\" \"Vậy tôi là Jesus?\""
     },
     {
       "id": 33,
       "position": 33,
-      "text": "be experienced by you you thought for a long time why why do all this because someday you will become like me because that's",
-      "time_start": 392.76,
-      "time_end": 410.08,
-      "translation": "...cậu đều đã từng cảm nhận hay sắp được tận hưởng nó\" Cậu suy tư một hồi lâu. \"Vậy tại sao? Sao lại phải làm tất cả những việc này?\" \"Bởi vì một ngày nào đó, cậu sẽ trở nên giống như tôi. Bởi đó mới chính là cậu.\" \"Cậu thuộc chủng loài của tôi. Là con cháu của tôi!\""
+      "text": "Jesus and you're everyone who followed him you fell silent every time you victimized someone you were victimizing yourself every act of kindness you've done you've done to",
+      "time_start": 372.2,
+      "time_end": 386.12,
+      "translation": "\"Vậy tôi là Jesus?\" \"Và cũng là những tín đồ của ông ta.\" Bạn chìm vào im lặng. \"Mỗi khi cậu ngược đãi ai đó, ...Là cậu đang làm hại chính mình.\" \"Mỗi việc tốt cậu đã làm, ...Là làm cho chính bản thân mình.\""
     },
     {
       "id": 34,
       "position": 34,
-      "text": "what you are you're one of my kind you're my child wow you said incredulous you mean I'm a",
-      "time_start": 406.44,
-      "time_end": 421.92,
-      "translation": "Bởi đó mới chính là cậu.\" \"Cậu thuộc chủng loài của tôi. Là con cháu của tôi!\" \"Wow!\" cậu thốt lên, kinh ngạc. \"Ý người là, tôi là một vị Chúa!?\" \"Không, không hẳn. Cậu vẫn chỉ là một bào thai, cậu vẫn đang lớn lên.\""
+      "text": "yourself every happy and sad moment ever EXP experienced by any human was or will be experienced by you you thought for a long",
+      "time_start": 386.12,
+      "time_end": 398.16,
+      "translation": "...Là làm cho chính bản thân mình.\" \"Mọi trải nghiệm buồn vui, kinh nghiệm và cảm nhận của tất cả mọi người ...cậu đều đã từng cảm nhận hay sắp được tận hưởng nó\" Cậu suy tư một hồi lâu."
     },
     {
       "id": 35,
       "position": 35,
-      "text": "God no not yet you're a fetus you're still growing once you've lived every human life throughout all time you will have grown enough to be",
-      "time_start": 418.08,
-      "time_end": 434.32,
-      "translation": "\"Không, không hẳn. Cậu vẫn chỉ là một bào thai, cậu vẫn đang lớn lên.\" \"Một khi cậu đã trải qua hết mọi kiếp người trong mọi thời điểm, ...cậu sẽ đủ cứng cáp để được sinh ra.\" \"Vậy thì, toàn bộ vũ trụ này... Chỉ là...\""
+      "text": "time why why do all this because someday you will become like me because that's what you are you're one of my kind",
+      "time_start": 398.16,
+      "time_end": 410.08,
+      "translation": "\"Vậy tại sao? Sao lại phải làm tất cả những việc này?\" \"Bởi vì một ngày nào đó, cậu sẽ trở nên giống như tôi. Bởi đó mới chính là cậu.\" \"Cậu thuộc chủng loài của tôi. Là con cháu của tôi!\""
     },
     {
       "id": 36,
       "position": 36,
-      "text": "born so the whole universe it's just an egg I answered now it's time for you to move on to your next life and I",
-      "time_start": 430.12,
-      "time_end": 444.95,
-      "translation": "\"Vậy thì, toàn bộ vũ trụ này... Chỉ là...\" \"Một quả trứng!\", tôi đáp. \"Giờ là lúc cậu bước vào kiếp sống tiếp theo. Tôi sẽ gửi cậu đến con đường phía trước.\""
+      "text": "you're my child wow you said incredulous you mean I'm a God no not yet you're a fetus you're still growing once you've lived every",
+      "time_start": 410.08,
+      "time_end": 424.6,
+      "translation": "\"Cậu thuộc chủng loài của tôi. Là con cháu của tôi!\" \"Wow!\" cậu thốt lên, kinh ngạc. \"Ý người là, tôi là một vị Chúa!?\" \"Không, không hẳn. Cậu vẫn chỉ là một bào thai, cậu vẫn đang lớn lên.\" \"Một khi cậu đã trải qua hết mọi kiếp người trong mọi thời điểm,"
     },
     {
       "id": 37,
       "position": 37,
-      "text": "sent you on your way [Applause]",
-      "time_start": 441.76,
-      "time_end": 449.78,
-      "translation": "Tôi sẽ gửi cậu đến con đường phía trước.\""
+      "text": "human life throughout all time you will have grown enough to be born so the whole universe it's just an egg I answered now it's time for",
+      "time_start": 424.6,
+      "time_end": 438.96,
+      "translation": "\"Một khi cậu đã trải qua hết mọi kiếp người trong mọi thời điểm, ...cậu sẽ đủ cứng cáp để được sinh ra.\" \"Vậy thì, toàn bộ vũ trụ này... Chỉ là...\" \"Một quả trứng!\", tôi đáp. \"Giờ là lúc cậu bước vào kiếp sống tiếp theo."
     },
     {
       "id": 38,
       "position": 38,
-      "text": "[Applause] [Music]",
-      "time_start": 455.58,
-      "time_end": 460.64,
-      "translation": null
-    },
-    {
-      "id": 39,
-      "position": 39,
-      "text": "[Music]",
-      "time_start": 463.55,
-      "time_end": 468.78,
-      "translation": null
-    },
-    {
-      "id": 40,
-      "position": 40,
-      "text": "[Music]",
-      "time_start": 472.55,
-      "time_end": 476.13,
-      "translation": null
+      "text": "you to move on to your next life and I sent you on your way",
+      "time_start": 438.96,
+      "time_end": 444.95,
+      "translation": "\"Giờ là lúc cậu bước vào kiếp sống tiếp theo. Tôi sẽ gửi cậu đến con đường phía trước.\""
     }
   ]
 }

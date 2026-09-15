@@ -80,6 +80,28 @@
 
     <!-- TAB 1: Dictation Practice -->
     <div id="tab-dictation" class="tab-content">
+
+      <!-- Full Audio & Plain Transcript Accordion (DailyDictation Style) -->
+      <div class="full-audio-card" id="full-audio-accordion">
+        <div class="full-audio-header" id="full-audio-header">
+          <span>🎧 Full Audio &amp; Plain Transcript</span>
+          <span id="full-audio-icon" style="font-weight: bold; font-size: 1.1rem;">▲</span>
+        </div>
+        <div class="full-audio-content" id="full-audio-content">
+          <div class="full-audio-player-bar">
+            <button id="full-audio-play-btn" class="full-audio-play-btn" title="Phát / Dừng toàn bộ bài">
+              ▶
+            </button>
+            <span id="full-audio-current-time" class="full-audio-time">00:00</span>
+            <input type="range" id="full-audio-progress" class="full-audio-progress" min="0" max="100" value="0" step="0.1" />
+            <span id="full-audio-total-time" class="full-audio-time">00:00</span>
+          </div>
+          <div class="plain-transcript-text" id="plain-transcript-container">
+            <div style="color: var(--text-muted); font-style: italic;">Đang tải transcript...</div>
+          </div>
+        </div>
+      </div>
+
       <div class="exercise-grid">
 
         <!-- LEFT COLUMN: Video Player & Custom Controls -->
@@ -107,13 +129,6 @@
           </div>
 
           <div class="playback-controls">
-            <div class="loop-banner">
-              <span id="loop-info">Đang lặp câu 1 [00:04 - 00:14]</span>
-              <button id="loop-toggle-btn" class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;">
-                🔄 Lặp câu: Bật
-              </button>
-            </div>
-
             <div class="controls-row">
               <button id="replay-btn" class="btn btn-primary" title="Phát lại câu này (R / Ctrl+Space)">
                 🔁 Lặp lại câu (Ctrl+Space)
@@ -201,8 +216,8 @@
             <button id="hint-word-btn" class="btn btn-secondary" title="Mở 1 từ tiếp theo">
               🔍 Gợi ý từ
             </button>
-            <button id="show-answer-btn" class="btn btn-warning" title="Hiện câu đáp án">
-              👁️ Xem đáp án
+            <button id="show-answer-btn" class="btn btn-warning" title="Hiện toàn bộ câu đáp án (Esc)">
+              👁️ Xem đáp án (Esc)
             </button>
           </div>
 
@@ -230,7 +245,7 @@
     <!-- TAB 2: Full Transcript -->
     <div id="tab-transcript" class="tab-content" style="display: none;">
       <div class="card">
-        <h3 style="margin-bottom: 14px;">📜 Toàn bộ bản ghi âm & Dịch nghĩa song ngữ</h3>
+        <h3 style="margin-bottom: 14px;">📜 Toàn bộ bản ghi âm &amp; Dịch nghĩa song ngữ</h3>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
           Bấm vào bất kỳ câu nào để nhảy ngay đến mốc thời gian của câu đó trên video và luyện nghe.
         </p>
@@ -248,11 +263,15 @@
             <th style="padding: 10px;">Chức năng</th>
           </tr>
           <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 10px;"><kbd>Esc</kbd></td>
+            <td style="padding: 10px;"><strong>Hiện full câu đáp án (Xem đáp án)</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
             <td style="padding: 10px;"><kbd>Ctrl</kbd> + <kbd>Space</kbd></td>
             <td style="padding: 10px;">Tua lại từ đầu câu hiện tại</td>
           </tr>
           <tr style="border-bottom: 1px solid var(--border-color);">
-            <td style="padding: 10px;"><kbd>Esc</kbd></td>
+            <td style="padding: 10px;"><kbd>`</kbd> (dấu huyền)</td>
             <td style="padding: 10px;">Tạm dừng / Phát tiếp video</td>
           </tr>
           <tr style="border-bottom: 1px solid var(--border-color);">
@@ -322,22 +341,40 @@
               </td>
             </tr>
             <tr>
-              <td class="settings-label">Auto Replay</td>
+              <td class="settings-label">
+                <strong>Auto Replay (Lặp câu)</strong>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Tự động lặp lại câu khi phát hết</div>
+              </td>
               <td>
                 <select id="setting-auto-replay" class="settings-select">
-                  <option value="yes" selected>Yes</option>
-                  <option value="no">No</option>
+                  <option value="yes" selected>Yes (Bật lặp câu)</option>
+                  <option value="no">No (Dừng ở cuối câu)</option>
                 </select>
               </td>
             </tr>
             <tr>
-              <td class="settings-label">Seconds between replays</td>
+              <td class="settings-label">
+                <strong>Seconds between replays</strong>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Thời gian nghỉ giữa các lần lặp</div>
+              </td>
               <td>
                 <select id="setting-replay-interval" class="settings-select">
-                  <option value="0.5">0.5</option>
-                  <option value="1.0" selected>1.0</option>
-                  <option value="1.5">1.5</option>
-                  <option value="2.0">2.0</option>
+                  <option value="0.5">0.5s</option>
+                  <option value="1.0" selected>1.0s</option>
+                  <option value="1.5">1.5s</option>
+                  <option value="2.0">2.0s</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="settings-label">
+                <strong>Auto Advance (Tự nhảy câu)</strong>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Tự động chuyển câu tiếp theo khi làm đúng 100%</div>
+              </td>
+              <td>
+                <select id="setting-auto-advance" class="settings-select">
+                  <option value="yes" selected>Yes (Tự chuyển câu)</option>
+                  <option value="no">No (Không tự chuyển, ở lại câu)</option>
                 </select>
               </td>
             </tr>

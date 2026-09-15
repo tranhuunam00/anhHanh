@@ -53,6 +53,7 @@ class SettingsManager {
       playPauseKey: document.getElementById("setting-playpause-key"),
       autoReplay: document.getElementById("setting-auto-replay"),
       replayInterval: document.getElementById("setting-replay-interval"),
+      autoAdvance: document.getElementById("setting-auto-advance"),
       wordSuggestions: document.getElementById("setting-word-suggestions"),
       strictPunctuation: document.getElementById("setting-strict-punct"),
     };

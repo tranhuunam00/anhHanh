@@ -10,7 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentLesson = null;
   let currentPosition = 1;
   let autoLoop = settingsManager.get("autoReplay") === "yes";
-  let autoAdvance = true;
+  let autoAdvance = settingsManager.get("autoAdvance") === "yes";
+
+  playerController.setLooping(autoLoop);
+  playerController.setReplayInterval(settingsManager.get("replayInterval"));
 
   // DOM Elements
   const urlInput = document.getElementById("url-input");
@@ -31,8 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("next-btn");
   const replayBtn = document.getElementById("replay-btn");
   const playPauseBtn = document.getElementById("play-pause-btn");
-  const loopToggleBtn = document.getElementById("loop-toggle-btn");
-  const loopInfo = document.getElementById("loop-info");
   const completionCard = document.getElementById("completion-card");
   const originalSentence = document.getElementById("original-sentence");
   const translationSentence = document.getElementById("translation-sentence");
@@ -49,11 +50,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const externalYtLink = document.getElementById("external-yt-link");
   const speakSentenceBtn = document.getElementById("speak-sentence-btn");
 
+  // Full Audio Accordion Elements
+  const fullAudioHeader = document.getElementById("full-audio-header");
+  const fullAudioContent = document.getElementById("full-audio-content");
+  const fullAudioIcon = document.getElementById("full-audio-icon");
+  const fullAudioPlayBtn = document.getElementById("full-audio-play-btn");
+  const fullAudioCurrentTime = document.getElementById("full-audio-current-time");
+  const fullAudioTotalTime = document.getElementById("full-audio-total-time");
+  const fullAudioProgress = document.getElementById("full-audio-progress");
+  const plainTranscriptContainer = document.getElementById("plain-transcript-container");
+  let isFullAudioPlaying = false;
+  let fullAudioUpdateTimer = null;
+
   // Settings Manager
   settingsManager.bindUI((key, val) => {
     if (key === "autoReplay") {
       autoLoop = val === "yes";
       playerController.setLooping(autoLoop);
+    } else if (key === "replayInterval") {
+      playerController.setReplayInterval(val);
+    } else if (key === "autoAdvance") {
+      autoAdvance = val === "yes";
     } else if (key === "strictPunctuation" || key === "wordSuggestions") {
       evaluateAndRender();
     }
@@ -139,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderQuestionDrawer();
     renderTranscriptTab();
+    renderPlainTranscript();
     goToChallenge(currentPosition);
   }
 
@@ -167,7 +185,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const startFmt = formatTime(challenge.time_start);
     const endFmt = formatTime(challenge.time_end);
     challengeTime.textContent = `[${startFmt} - ${endFmt}]`;
-    loopInfo.textContent = `Lặp câu ${challenge.position} [${startFmt} - ${endFmt}]`;
+
+    // Highlight line in plain transcript
+    document.querySelectorAll(".plain-transcript-line").forEach((el) => el.classList.remove("current"));
+    const activePlainLine = document.getElementById(`plain-line-${challenge.position}`);
+    if (activePlainLine) {
+      activePlainLine.classList.add("current");
+      activePlainLine.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
 
     // Update progress bar
     const percent = Math.round((currentPosition / currentLesson.total_challenges) * 100);
@@ -195,26 +220,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const userInput = dictationInput.value;
     const isStrict = settingsManager.get("strictPunctuation") === "yes";
-    const result = dictationManager.evaluate(challenge.text, userInput, isStrict);
 
-    // Render diff preview based on word suggestions setting
+    // DailyDictation Masked Asterisk evaluation (*** ***)
+    const maskedResult = dictationManager.evaluateMasked(challenge.text, userInput);
+    const evalResult = dictationManager.evaluate(challenge.text, userInput, isStrict);
+
+    // Render diff preview as DailyDictation masked text
     diffPreview.innerHTML = "";
-    if (settingsManager.get("wordSuggestions") === "disabled" && !result.isCompleted) {
-      const span = document.createElement("span");
-      span.className = "token-missing";
-      span.textContent = "Gõ câu bạn nghe được...";
-      diffPreview.appendChild(span);
-    } else {
-      result.words.forEach((w) => {
-        const span = document.createElement("span");
-        span.className = `token-word token-${w.status}`;
-        span.textContent = w.targetWord || w.userWord;
-        diffPreview.appendChild(span);
+    const container = document.createElement("div");
+    container.className = "masked-sentence";
+
+    maskedResult.words.forEach((word) => {
+      const wordSpan = document.createElement("span");
+      wordSpan.className = "masked-word";
+      word.forEach((item) => {
+        const charSpan = document.createElement("span");
+        charSpan.className = `char-box char-${item.status}`;
+        charSpan.textContent = item.display;
+        wordSpan.appendChild(charSpan);
       });
-    }
+      container.appendChild(wordSpan);
+    });
+    diffPreview.appendChild(container);
 
     // Handle completed
-    if (result.isCompleted) {
+    const isDone = maskedResult.isCompleted || evalResult.isCompleted;
+    if (isDone) {
       dictationManager.saveProgress(currentLesson.video_id, currentPosition, userInput, true);
       completionCard.classList.add("active");
       originalSentence.textContent = challenge.text;
@@ -296,6 +327,75 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Plain Transcript Render & Full Audio Sync
+  function renderPlainTranscript() {
+    if (!currentLesson || !plainTranscriptContainer) return;
+    plainTranscriptContainer.innerHTML = "";
+
+    currentLesson.challenges.forEach((c) => {
+      const line = document.createElement("div");
+      line.className = "plain-transcript-line";
+      line.id = `plain-line-${c.position}`;
+      line.textContent = c.text;
+      line.title = `Click để nghe từ câu ${c.position} [${formatTime(c.time_start)}]`;
+      line.addEventListener("click", () => {
+        goToChallenge(c.position);
+      });
+      plainTranscriptContainer.appendChild(line);
+    });
+  }
+
+  // Full Audio Accordion Toggle
+  fullAudioHeader?.addEventListener("click", () => {
+    const isCollapsed = fullAudioContent.classList.toggle("collapsed");
+    fullAudioIcon.textContent = isCollapsed ? "▼" : "▲";
+  });
+
+  function updateFullAudioUI() {
+    if (!playerController.isReady) return;
+    const cur = playerController.getCurrentTime();
+    const dur = playerController.getDuration() || 1;
+    if (fullAudioCurrentTime) fullAudioCurrentTime.textContent = formatTime(cur);
+    if (fullAudioTotalTime) fullAudioTotalTime.textContent = formatTime(dur);
+    if (fullAudioProgress) fullAudioProgress.value = Math.min(100, (cur / dur) * 100);
+
+    // Highlight matching line in plain transcript
+    if (currentLesson) {
+      const activeC = currentLesson.challenges.find(
+        (c) => cur >= c.time_start && cur <= c.time_end
+      );
+      if (activeC) {
+        document.querySelectorAll(".plain-transcript-line").forEach((el) => el.classList.remove("current"));
+        const lineEl = document.getElementById(`plain-line-${activeC.position}`);
+        if (lineEl) {
+          lineEl.classList.add("current");
+        }
+      }
+    }
+  }
+
+  fullAudioPlayBtn?.addEventListener("click", () => {
+    if (!isFullAudioPlaying) {
+      isFullAudioPlaying = true;
+      fullAudioPlayBtn.textContent = "⏸";
+      playerController.playFull();
+      if (!fullAudioUpdateTimer) {
+        fullAudioUpdateTimer = setInterval(updateFullAudioUI, 250);
+      }
+    } else {
+      isFullAudioPlaying = false;
+      fullAudioPlayBtn.textContent = "▶";
+      playerController.pauseFull();
+    }
+  });
+
+  fullAudioProgress?.addEventListener("input", () => {
+    const dur = playerController.getDuration() || 1;
+    const seekSec = (parseFloat(fullAudioProgress.value) / 100) * dur;
+    playerController.seekTo(seekSec);
+    if (fullAudioCurrentTime) fullAudioCurrentTime.textContent = formatTime(seekSec);
+  });
+
   // Event Listeners
   loadBtn.addEventListener("click", () => loadLesson(urlInput.value));
   urlInput.addEventListener("keydown", (e) => {
@@ -361,14 +461,6 @@ document.addEventListener("DOMContentLoaded", () => {
   playPauseBtn.addEventListener("click", () => playerController.togglePlayPause());
   document.getElementById("backward-btn").addEventListener("click", () => playerController.seekRelative(-3));
   document.getElementById("forward-btn").addEventListener("click", () => playerController.seekRelative(3));
-
-  loopToggleBtn.addEventListener("click", () => {
-    autoLoop = !autoLoop;
-    playerController.setLooping(autoLoop);
-    loopToggleBtn.classList.toggle("btn-primary", autoLoop);
-    loopToggleBtn.classList.toggle("btn-secondary", !autoLoop);
-    loopToggleBtn.innerHTML = autoLoop ? "🔄 Lặp câu: Bật" : "🔄 Lặp câu: Tắt";
-  });
 
   // Drawer handlers
   function openDrawer() {
@@ -436,10 +528,10 @@ document.addEventListener("DOMContentLoaded", () => {
       playerController.togglePlayPause();
       return;
     }
-    // Esc fallback
-    if (e.code === "Escape") {
+    // Esc: Show full answer immediately (Hiện full câu luôn)
+    if (e.key === "Escape" || e.code === "Escape") {
       e.preventDefault();
-      playerController.togglePlayPause();
+      showAnswerBtn.click();
       return;
     }
     // Ctrl + H: Hint letter

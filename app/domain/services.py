@@ -135,13 +135,17 @@ class SentenceGrouperService:
 
     def __init__(
         self,
-        max_pause_seconds: float = 1.0,
-        max_sentence_duration: float = 5.0,
-        max_words_per_challenge: int = 11,
+        max_pause_seconds: float = 1.2,
+        max_sentence_duration: float = 12.0,
+        max_words_per_challenge: int = 22,
+        min_sentence_duration: float = 1.6,
+        min_words_per_challenge: int = 2,
     ):
         self.max_pause_seconds = max_pause_seconds
         self.max_sentence_duration = max_sentence_duration
         self.max_words_per_challenge = max_words_per_challenge
+        self.min_sentence_duration = min_sentence_duration
+        self.min_words_per_challenge = min_words_per_challenge
 
     def group_into_challenges(
         self,
@@ -151,18 +155,40 @@ class SentenceGrouperService:
         if not snippets:
             return []
 
+        # 1. Clean annotations and normalize rolling/overlapping durations (especially for YouTube auto captions)
+        cleaned_snippets: List[SubtitleSnippet] = []
+        for i, item in enumerate(snippets):
+            raw = TextNormalizer.normalize_quotes(item.text).replace("\n", " ").strip()
+            # Remove audio annotations like [music], [applause], (French), (Laughter)
+            clean_text = re.sub(r"\[.*?\]|\(.*?\)", "", raw).strip()
+            if not clean_text:
+                continue
+
+            s_start = item.start
+            s_duration = item.duration
+
+            # In auto-generated rolling captions, if the next snippet starts before this one ends,
+            # clamp the effective duration to avoid severe audio overlap
+            if i + 1 < len(snippets):
+                next_start = snippets[i + 1].start
+                if next_start > s_start and (s_start + s_duration) > next_start:
+                    s_duration = max(0.4, next_start - s_start)
+
+            cleaned_snippets.append(
+                SubtitleSnippet(text=clean_text, start=s_start, duration=s_duration)
+            )
+
+        if not cleaned_snippets:
+            return []
+
         challenges: List[Challenge] = []
         current_texts: List[str] = []
         start_time: Optional[float] = None
         last_end_time: Optional[float] = None
 
-        for item in snippets:
-            raw = TextNormalizer.normalize_quotes(item.text).replace("\n", " ").strip()
-            # Remove audio annotations like [music], [applause], (French)
-            clean_text = re.sub(r"\[.*?\]", "", raw).strip()
-            if not clean_text:
-                continue
+        total_snippets = len(cleaned_snippets)
 
+        for i, item in enumerate(cleaned_snippets):
             # Pause gap check
             if (
                 last_end_time is not None
@@ -178,17 +204,39 @@ class SentenceGrouperService:
             if start_time is None:
                 start_time = item.start
 
-            current_texts.append(clean_text)
+            current_texts.append(item.text)
             last_end_time = item.end
             current_duration = last_end_time - start_time
             current_words = len(" ".join(current_texts).split())
 
-            # Break on terminal punctuation or reasonable short chunk limit
-            ends_with_terminal = bool(re.search(r'[.!?]["\']?$', clean_text))
+            # Check termination criteria
+            ends_with_terminal = bool(re.search(r'[.!?]["\']?$', item.text))
             reached_duration = current_duration >= self.max_sentence_duration
             reached_words = current_words >= self.max_words_per_challenge
 
-            if ends_with_terminal or reached_duration or reached_words:
+            # Prevent cutting micro-sentences: if sentence is very short (< 2.8s or < 4 words)
+            # and the next snippet is immediately following (gap < max_pause_seconds), don't cut yet!
+            is_too_short = (
+                current_duration < self.min_sentence_duration
+                or current_words < self.min_words_per_challenge
+            )
+            has_next = i + 1 < total_snippets
+            next_is_close = (
+                has_next
+                and (cleaned_snippets[i + 1].start - last_end_time) <= self.max_pause_seconds
+            )
+
+            if ends_with_terminal:
+                if is_too_short and next_is_close:
+                    # Keep accumulating with the next snippet instead of creating a 1-second fragment
+                    continue
+                else:
+                    self._commit_challenge(
+                        challenges, current_texts, start_time, last_end_time, translations
+                    )
+                    current_texts = []
+                    start_time = None
+            elif reached_duration or reached_words:
                 self._commit_challenge(
                     challenges, current_texts, start_time, last_end_time, translations
                 )
@@ -230,7 +278,9 @@ class SentenceGrouperService:
             ]
             if overlapping:
                 raw_trans = " ".join(overlapping).replace("\n", " ")
-                translation_text = re.sub(r"\s+", " ", raw_trans).strip()
+                # Also clean annotations in translation if present
+                clean_trans = re.sub(r"\[.*?\]|\(.*?\)", "", raw_trans)
+                translation_text = re.sub(r"\s+", " ", clean_trans).strip()
 
         challenges.append(
             Challenge(

@@ -9,6 +9,10 @@ class YouTubePlayerController {
     this.currentLoopStart = 0;
     this.currentLoopEnd = 0;
     this.isLooping = true;
+    this.replayInterval = 1.0;
+    this.isWaitingReplay = false;
+    this.replayTimeout = null;
+    this.pendingPlay = false;
     this.loopInterval = null;
     this.currentVideoId = null;
     this.onReadyCallbacks = [];
@@ -62,6 +66,13 @@ class YouTubePlayerController {
         onReady: () => {
           this.isReady = true;
           this._startLoopMonitor();
+          if (this.pendingPlay) {
+            this.pendingPlay = false;
+            try {
+              this.player.seekTo(this.currentLoopStart, true);
+              this.player.playVideo();
+            } catch (e) {}
+          }
           this.onReadyCallbacks.forEach((cb) => cb());
           this.onReadyCallbacks = [];
         },
@@ -91,12 +102,25 @@ class YouTubePlayerController {
     }
   }
 
-  playSegment(start, end, loop = true) {
-    this.currentLoopStart = Math.max(0, start);
-    this.currentLoopEnd = end;
-    this.isLooping = loop;
+  setReplayInterval(seconds) {
+    this.replayInterval = Math.max(0.1, parseFloat(seconds) || 1.0);
+  }
 
-    if (!this.isReady || !this.player || !this.player.seekTo) return;
+  playSegment(start, end, loop = true) {
+    this.isFullMode = false;
+    // Audio pre-roll and post-roll padding to compensate for YouTube player seek latency & audio trailing
+    const paddingStart = 0.25;
+    const paddingEnd = 0.35;
+    this.currentLoopStart = Math.max(0, start - paddingStart);
+    this.currentLoopEnd = end + paddingEnd;
+    this.isLooping = loop;
+    this.isWaitingReplay = false;
+    if (this.replayTimeout) clearTimeout(this.replayTimeout);
+
+    if (!this.isReady || !this.player || !this.player.seekTo) {
+      this.pendingPlay = true;
+      return;
+    }
     try {
       this.player.seekTo(this.currentLoopStart, true);
       this.player.playVideo();
@@ -105,7 +129,59 @@ class YouTubePlayerController {
     }
   }
 
+  playFull(time) {
+    this.isFullMode = true;
+    this.isWaitingReplay = false;
+    if (this.replayTimeout) clearTimeout(this.replayTimeout);
+
+    if (!this.isReady || !this.player) return;
+    try {
+      if (typeof time === "number") {
+        this.player.seekTo(time, true);
+      }
+      this.player.playVideo();
+    } catch (e) {
+      console.warn("Could not play full audio", e);
+    }
+  }
+
+  pauseFull() {
+    if (!this.isReady || !this.player) return;
+    try {
+      this.player.pauseVideo();
+    } catch (e) {}
+  }
+
+  getCurrentTime() {
+    if (this.isReady && this.player && typeof this.player.getCurrentTime === "function") {
+      try {
+        return this.player.getCurrentTime() || 0;
+      } catch (e) {}
+    }
+    return 0;
+  }
+
+  getDuration() {
+    if (this.isReady && this.player && typeof this.player.getDuration === "function") {
+      try {
+        return this.player.getDuration() || 0;
+      } catch (e) {}
+    }
+    return 0;
+  }
+
+  seekTo(seconds) {
+    if (this.isReady && this.player && typeof this.player.seekTo === "function") {
+      try {
+        this.player.seekTo(seconds, true);
+      } catch (e) {}
+    }
+  }
+
   replayCurrentSegment() {
+    this.isFullMode = false;
+    if (this.replayTimeout) clearTimeout(this.replayTimeout);
+    this.isWaitingReplay = false;
     if (!this.isReady || !this.player || !this.player.seekTo) return;
     try {
       this.player.seekTo(this.currentLoopStart, true);
@@ -167,8 +243,10 @@ class YouTubePlayerController {
   _startLoopMonitor() {
     if (this.loopInterval) clearInterval(this.loopInterval);
     this.loopInterval = setInterval(() => {
-      if (!this.isReady || !this.player || !this.isLooping) return;
+      if (!this.isReady || !this.player) return;
+      if (this.isFullMode) return; // In Full Audio mode, don't stop/loop on segments
       if (this.currentLoopEnd <= this.currentLoopStart) return;
+      if (this.isWaitingReplay) return;
 
       try {
         if (typeof this.player.getPlayerState === "function") {
@@ -176,13 +254,33 @@ class YouTubePlayerController {
           if (state === window.YT.PlayerState.PLAYING) {
             const currentTime = this.player.getCurrentTime();
             if (currentTime >= this.currentLoopEnd) {
-              this.player.seekTo(this.currentLoopStart, true);
+              if (this.isLooping) {
+                // Auto Replay is ON: pause, wait replayInterval, then replay
+                this.isWaitingReplay = true;
+                this.player.pauseVideo();
+                if (this.replayTimeout) clearTimeout(this.replayTimeout);
+                this.replayTimeout = setTimeout(() => {
+                  this.isWaitingReplay = false;
+                  if (this.isReady && this.player && this.isLooping && !this.isFullMode) {
+                    try {
+                      this.player.seekTo(this.currentLoopStart, true);
+                      this.player.playVideo();
+                    } catch (err) {
+                      console.warn("Replay failed", err);
+                    }
+                  }
+                }, Math.max(100, this.replayInterval * 1000));
+              } else {
+                // Auto Replay is OFF: Stop (pause) at sentence end and prime start time
+                this.player.pauseVideo();
+                this.player.seekTo(this.currentLoopStart, true);
+              }
             }
           }
         }
       } catch (e) {
         // Player reinitializing
       }
-    }, 150);
+    }, 100);
   }
 }

@@ -17,6 +17,101 @@ class DictationManager {
   }
 
   /**
+   * Evaluate masked text character-by-character (DailyDictation style: *** ***)
+   */
+  evaluateMasked(targetText, userInput) {
+    const uChars = Array.from((userInput || "").trimStart());
+    const tChars = Array.from(targetText || "");
+
+    let uIdx = 0;
+    const words = [];
+    let currentWord = [];
+    let totalLetterCount = 0;
+    let correctLetterCount = 0;
+    let hasWrong = false;
+
+    for (let tIdx = 0; tIdx < tChars.length; tIdx++) {
+      const tChar = tChars[tIdx];
+      const isSpace = /\s/.test(tChar);
+      const isPunct = /^[^\w\s]$/.test(tChar);
+
+      if (isSpace) {
+        if (currentWord.length > 0) {
+          words.push(currentWord);
+          currentWord = [];
+        }
+        // Consume space in user input if present
+        if (uIdx < uChars.length && /\s/.test(uChars[uIdx])) {
+          uIdx++;
+        }
+        continue;
+      }
+
+      if (isPunct) {
+        // Punctuation is displayed as-is
+        if (uIdx < uChars.length && uChars[uIdx] === tChar) {
+          uIdx++;
+        }
+        currentWord.push({
+          char: tChar,
+          display: tChar,
+          status: "punct",
+        });
+        continue;
+      }
+
+      // Alphanumeric character
+      totalLetterCount++;
+
+      if (uIdx < uChars.length) {
+        const uChar = uChars[uIdx];
+        const isMatch = uChar.toLowerCase() === tChar.toLowerCase();
+        if (isMatch) {
+          currentWord.push({
+            char: tChar,
+            display: tChar,
+            status: "correct",
+          });
+          correctLetterCount++;
+          uIdx++;
+        } else {
+          hasWrong = true;
+          currentWord.push({
+            char: tChar,
+            display: "*",
+            typedChar: uChar,
+            status: "wrong",
+          });
+          uIdx++;
+        }
+      } else {
+        currentWord.push({
+          char: tChar,
+          display: "*",
+          status: "masked",
+        });
+      }
+    }
+
+    if (currentWord.length > 0) {
+      words.push(currentWord);
+    }
+
+    const isCompleted =
+      correctLetterCount === totalLetterCount &&
+      !hasWrong &&
+      (uIdx >= uChars.length || (userInput && userInput.trim() === targetText.trim()));
+
+    return {
+      words,
+      isCompleted,
+      correctLetterCount,
+      totalLetterCount,
+      hasWrong,
+    };
+  }
+
+  /**
    * Compare user's input with target sentence word-by-word
    */
   evaluate(targetText, userInput, strictPunctuation = false) {
