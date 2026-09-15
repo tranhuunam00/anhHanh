@@ -7,7 +7,7 @@ class SettingsManager {
     this.defaults = {
       replayKey: "Control", // "Control", "Tab", "Alt", "KeyR", "Space"
       playPauseKey: "Backquote", // "`" backtick, "Space", "Escape"
-      autoReplay: "yes", // "yes", "no"
+      autoReplay: "no", // "yes", "no" - Mặc định tắt tự lặp lại
       replayInterval: 1.0, // seconds
       wordSuggestions: "enabled", // "enabled", "disabled"
       strictPunctuation: "no", // "yes", "no"

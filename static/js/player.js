@@ -8,7 +8,7 @@ class YouTubePlayerController {
     this.isReady = false;
     this.currentLoopStart = 0;
     this.currentLoopEnd = 0;
-    this.isLooping = true;
+    this.isLooping = false; // Mặc định không lặp lại
     this.replayInterval = 1.0;
     this.isWaitingReplay = false;
     this.replayTimeout = null;
@@ -108,9 +108,9 @@ class YouTubePlayerController {
 
   playSegment(start, end, loop = true) {
     this.isFullMode = false;
-    // Audio pre-roll and post-roll padding to compensate for YouTube player seek latency & audio trailing
-    const paddingStart = 0.25;
-    const paddingEnd = 0.35;
+    // Audio pre-roll and post-roll padding (0.2s trước và 0.2s sau)
+    const paddingStart = 0.2;
+    const paddingEnd = 0.2;
     this.currentLoopStart = Math.max(0, start - paddingStart);
     this.currentLoopEnd = end + paddingEnd;
     this.isLooping = loop;

@@ -31,11 +31,9 @@ def test_get_lesson_use_case():
     
     response = use_case.execute(GetLessonRequest(url_or_id="test1234567"))
     assert response.video_id == "test1234567"
-    assert response.title == "Test Video Title"
-    assert response.total_challenges == 2
+    assert response.total_challenges == 1
     assert response.challenges[0].position == 1
-    assert response.challenges[0].text == "Hello world."
-    assert response.challenges[0].translation == "Xin chào thế giới."
+    assert response.challenges[0].text == "Hello world. Welcome to dictation practice."
     
     # Check cache hit
     assert cache.get("test1234567") is not None

@@ -18,7 +18,7 @@ def test_sentence_grouper_groups_by_punctuation():
     assert challenges[0].text == "When my son Patrick was around three or four years old, I came regularly into his playroom."
     assert challenges[0].time_start == 4.37
     assert challenges[0].time_end == pytest.approx(14.94, abs=0.1)
-    
+
     assert challenges[1].position == 2
     assert challenges[1].text == "And he said, \"Pa.\""
     assert challenges[1].time_start == 14.95

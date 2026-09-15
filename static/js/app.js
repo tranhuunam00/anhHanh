@@ -198,10 +198,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const percent = Math.round((currentPosition / currentLesson.total_challenges) * 100);
     progressBarFill.style.width = `${percent}%`;
 
-    // Load saved input or clear
+    // Load saved input or auto-fill for 1-word challenge (không mất thời gian)
     const saved = dictationManager.loadProgress(currentLesson.video_id);
     const challengeState = saved.challenges?.[currentPosition] || {};
-    dictationInput.value = challengeState.input || "";
+    const challengeTokens = challenge.text.trim().split(/\s+/).filter(Boolean);
+    const isSingleWord = challengeTokens.length <= 1;
+
+    if (isSingleWord) {
+      dictationInput.value = challenge.text;
+      dictationManager.saveProgress(currentLesson.video_id, currentPosition, challenge.text, true);
+    } else {
+      dictationInput.value = challengeState.input || "";
+    }
 
     // Play video segment
     playerController.playSegment(challenge.time_start, challenge.time_end, autoLoop);
@@ -406,6 +414,14 @@ document.addEventListener("DOMContentLoaded", () => {
     evaluateAndRender();
   });
 
+  // Ấn Enter là kiểm tra chứ không phải xuống dòng
+  dictationInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      checkBtn.click();
+    }
+  });
+
   if (speakSentenceBtn) {
     speakSentenceBtn.addEventListener("click", () => {
       const challenge = getCurrentChallenge();
@@ -445,13 +461,15 @@ document.addEventListener("DOMContentLoaded", () => {
     dictationInput.focus();
   });
 
-  showAnswerBtn.addEventListener("click", () => {
-    const challenge = getCurrentChallenge();
-    if (!challenge) return;
-    dictationInput.value = challenge.text;
-    evaluateAndRender();
-    dictationInput.focus();
-  });
+  if (showAnswerBtn) {
+    showAnswerBtn.addEventListener("click", () => {
+      const challenge = getCurrentChallenge();
+      if (!challenge) return;
+      dictationInput.value = challenge.text;
+      evaluateAndRender();
+      dictationInput.focus();
+    });
+  }
 
   prevBtn.addEventListener("click", () => goToChallenge(currentPosition - 1));
   nextBtn.addEventListener("click", () => goToChallenge(currentPosition + 1));
@@ -531,7 +549,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Esc: Show full answer immediately (Hiện full câu luôn)
     if (e.key === "Escape" || e.code === "Escape") {
       e.preventDefault();
-      showAnswerBtn.click();
+      const challenge = getCurrentChallenge();
+      if (challenge) {
+        dictationInput.value = challenge.text;
+        evaluateAndRender();
+        dictationInput.focus();
+      }
       return;
     }
     // Ctrl + H: Hint letter

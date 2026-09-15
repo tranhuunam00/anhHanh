@@ -136,9 +136,9 @@ class SentenceGrouperService:
     def __init__(
         self,
         max_pause_seconds: float = 1.2,
-        max_sentence_duration: float = 12.0,
-        max_words_per_challenge: int = 22,
-        min_sentence_duration: float = 1.6,
+        max_sentence_duration: float = 10.0,
+        max_words_per_challenge: int = 20,
+        min_sentence_duration: float = 1.2,
         min_words_per_challenge: int = 2,
     ):
         self.max_pause_seconds = max_pause_seconds
@@ -171,6 +171,38 @@ class SentenceGrouperService:
             return ""
         return cleaned
 
+    @staticmethod
+    def _split_snippet_by_terminal_punctuation(item: SubtitleSnippet) -> List[SubtitleSnippet]:
+        """Split a snippet only if it contains internal sentence boundary (. ! ? followed by space)."""
+        text = item.text.strip()
+        words = text.split()
+        if len(words) <= 3 or not re.search(r'[.!?]["\']?\s+[A-Z0-9"\u201c]', text):
+            return [item]
+
+        sub_parts = []
+        buf = []
+        for w in words:
+            buf.append(w)
+            if re.search(r'[.!?]["\']?$', w) and len(buf) >= 2:
+                sub_parts.append(" ".join(buf))
+                buf = []
+        if buf:
+            if sub_parts:
+                sub_parts[-1] += " " + " ".join(buf)
+            else:
+                sub_parts.append(" ".join(buf))
+
+        tot_w = sum(max(1, len(p.split())) for p in sub_parts)
+        sub_snippets = []
+        cur_t = item.start
+        for p in sub_parts:
+            pw = max(1, len(p.split()))
+            dur = max(0.4, item.duration * (pw / tot_w))
+            sub_snippets.append(SubtitleSnippet(text=p, start=round(cur_t, 2), duration=round(dur, 2)))
+            cur_t += dur
+
+        return sub_snippets
+
     def group_into_challenges(
         self,
         snippets: List[SubtitleSnippet],
@@ -179,11 +211,10 @@ class SentenceGrouperService:
         if not snippets:
             return []
 
-        # 1. Clean annotations and normalize rolling/overlapping durations (especially for YouTube auto captions)
+        # 1. Clean annotations and normalize overlapping durations
         cleaned_snippets: List[SubtitleSnippet] = []
         for i, item in enumerate(snippets):
             raw = TextNormalizer.normalize_quotes(item.text).replace("\n", " ").strip()
-            # Remove audio annotations like [music], [applause], (French), (Laughter)
             clean_text = re.sub(r"\[.*?\]|\(.*?\)", "", raw).strip()
             if not clean_text:
                 continue
@@ -191,74 +222,150 @@ class SentenceGrouperService:
             s_start = item.start
             s_duration = item.duration
 
-            # In auto-generated rolling captions, if the next snippet starts before this one ends,
-            # clamp the effective duration to avoid severe audio overlap
             if i + 1 < len(snippets):
                 next_start = snippets[i + 1].start
                 if next_start > s_start and (s_start + s_duration) > next_start:
                     s_duration = max(0.4, next_start - s_start)
 
-            cleaned_snippets.append(
+            sub_items = self._split_snippet_by_terminal_punctuation(
                 SubtitleSnippet(text=clean_text, start=s_start, duration=s_duration)
             )
+            cleaned_snippets.extend(sub_items)
 
         if not cleaned_snippets:
             return []
 
+        # 2. Group snippets into natural complete sentences (ended by . ! ? or significant pause)
+        sentences: List[List[SubtitleSnippet]] = []
+        current_sentence: List[SubtitleSnippet] = []
+
+        for i, s in enumerate(cleaned_snippets):
+            current_sentence.append(s)
+            ends_terminal = bool(re.search(r'[.!?]["\']?$', s.text))
+            has_next = i + 1 < len(cleaned_snippets)
+            next_pause = (cleaned_snippets[i + 1].start - s.end) if has_next else 999.0
+
+            curr_words = sum(len(x.text.split()) for x in current_sentence)
+            is_micro = curr_words < 2 and has_next and next_pause <= 0.8
+
+            if (ends_terminal and not is_micro) or next_pause > self.max_pause_seconds or not has_next:
+                sentences.append(current_sentence)
+                current_sentence = []
+
+        if current_sentence:
+            sentences.append(current_sentence)
+
+        # 3. Merge consecutive short sentences into coherent chunks (<= 20 words) to avoid fragmented sentences
+        merged_sentences: List[List[SubtitleSnippet]] = []
+        buf_sent: List[SubtitleSnippet] = []
+
+        for s_list in sentences:
+            if not buf_sent:
+                buf_sent = list(s_list)
+                continue
+
+            buf_words = sum(len(x.text.split()) for x in buf_sent)
+            s_words = sum(len(x.text.split()) for x in s_list)
+            pause = s_list[0].start - buf_sent[-1].end
+
+            # Merge if previous sentence is short (< 10 words), pause is natural (<= 1.2s),
+            # and combined word count does not exceed max_words (20 words)
+            can_merge = (
+                buf_words < 10
+                and pause <= 1.2
+                and (buf_words + s_words <= self.max_words_per_challenge)
+            )
+
+            if can_merge:
+                buf_sent.extend(s_list)
+            else:
+                merged_sentences.append(buf_sent)
+                buf_sent = list(s_list)
+
+        if buf_sent:
+            merged_sentences.append(buf_sent)
+
+        # 4. For each natural sentence:
+        # - If total words <= max_words (20): keep 100% COMPLETE (DO NOT split at comma!)
+        # - If total words > max_words (20): split into chunks <= 20 words prioritizing commas
         challenges: List[Challenge] = []
-        current_texts: List[str] = []
-        start_time: Optional[float] = None
-        last_end_time: Optional[float] = None
 
-        total_snippets = len(cleaned_snippets)
-
-        for i, item in enumerate(cleaned_snippets):
-            # Pause gap check
-            if (
-                last_end_time is not None
-                and (item.start - last_end_time) > self.max_pause_seconds
-                and current_texts
-            ):
-                self._commit_challenge(
-                    challenges, current_texts, start_time, last_end_time
+        def commit_chunk(chunk_snips: List[SubtitleSnippet]) -> None:
+            if not chunk_snips:
+                return
+            txt = " ".join(x.text for x in chunk_snips).strip()
+            txt = re.sub(r"\s+", " ", txt)
+            if not txt:
+                return
+            st = chunk_snips[0].start
+            en = chunk_snips[-1].end
+            pos = len(challenges) + 1
+            challenges.append(
+                Challenge(
+                    id=pos,
+                    position=pos,
+                    text=txt,
+                    time_start=round(st, 2),
+                    time_end=round(en, 2),
+                    translation=None,
                 )
-                current_texts = []
-                start_time = None
-
-            if start_time is None:
-                start_time = item.start
-
-            current_texts.append(item.text)
-            last_end_time = item.end
-            current_duration = last_end_time - start_time
-            current_words = len(" ".join(current_texts).split())
-
-            # Check termination criteria
-            ends_with_terminal = bool(re.search(r'[.!?]["\']?$', item.text))
-            reached_duration = current_duration >= self.max_sentence_duration
-            reached_words = current_words >= self.max_words_per_challenge
-
-            # Prevent cutting micro-sentences: if sentence is very short (< 2.8s or < 4 words)
-            # and the next snippet is immediately following (gap < max_pause_seconds), don't cut yet!
-            is_too_short = (
-                current_duration < self.min_sentence_duration
-                or current_words < self.min_words_per_challenge
-            )
-            has_next = i + 1 < total_snippets
-            next_is_close = (
-                has_next
-                and (cleaned_snippets[i + 1].start - last_end_time) <= self.max_pause_seconds
             )
 
-            if ends_with_terminal or reached_duration or reached_words:
-                if ends_with_terminal and is_too_short and next_is_close and not (reached_duration or reached_words):
-                    continue
-                self._commit_challenge(challenges, current_texts, start_time, last_end_time)
-                current_texts = []
-                start_time = None
+        for sent_snips in merged_sentences:
+            sent_words = sum(len(x.text.split()) for x in sent_snips)
+            # A complete sentence <= 20 words is NEVER split
+            if sent_words <= self.max_words_per_challenge:
+                commit_chunk(sent_snips)
+            else:
+                # Sentence > 20 words: intelligently partition at commas / sub-snippets <= 20 words
+                chunk: List[SubtitleSnippet] = []
+                for j, s in enumerate(sent_snips):
+                    words_count = len(s.text.split())
+                    chunk_words = sum(len(x.text.split()) for x in chunk)
 
-        if current_texts and start_time is not None and last_end_time is not None:
-            self._commit_challenge(challenges, current_texts, start_time, last_end_time)
+                    # If this individual snippet itself has > 20 words, split text at last comma or space <= 20 words
+                    if words_count > self.max_words_per_challenge:
+                        if chunk:
+                            commit_chunk(chunk)
+                            chunk = []
+                        s_tokens = s.text.split()
+                        s_parts = []
+                        buf = []
+                        for tok in s_tokens:
+                            buf.append(tok)
+                            if len(buf) >= self.max_words_per_challenge or (len(buf) >= 10 and re.search(r'[,;:]["\']?$', tok)):
+                                s_parts.append(" ".join(buf))
+                                buf = []
+                        if buf:
+                            if s_parts and len(buf) < 3 and len(s_parts[-1].split()) + len(buf) <= self.max_words_per_challenge:
+                                s_parts[-1] += " " + " ".join(buf)
+                            else:
+                                s_parts.append(" ".join(buf))
+
+                        tot_sw = sum(len(p.split()) for p in s_parts)
+                        c_t = s.start
+                        for p in s_parts:
+                            p_len = len(p.split())
+                            p_d = max(0.4, s.duration * (p_len / tot_sw))
+                            commit_chunk([SubtitleSnippet(text=p, start=round(c_t, 2), duration=round(p_d, 2))])
+                            c_t += p_d
+                        continue
+
+                    if chunk and (chunk_words + words_count > self.max_words_per_challenge):
+                        commit_chunk(chunk)
+                        chunk = [s]
+                    else:
+                        chunk.append(s)
+                        chunk_words += words_count
+                        ends_comma = bool(re.search(r'[,;:]["\']?$', s.text))
+                        rem_words = sum(len(x.text.split()) for x in sent_snips[j + 1:])
+                        # Split at comma if chunk has reached solid length (>= 8 words) and remaining is also solid (>= 3 words)
+                        if ends_comma and chunk_words >= 8 and rem_words >= 3:
+                            commit_chunk(chunk)
+                            chunk = []
+
+                if chunk:
+                    commit_chunk(chunk)
 
         # Clean and attach translations without credits and without cross-challenge duplication
         if translations and challenges:
