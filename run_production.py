@@ -42,7 +42,15 @@ def main():
     print("Press Ctrl+C to stop.\n")
 
     # Step 3: Run FastAPI Server
-    import uvicorn
+    try:
+        import uvicorn
+        import fastapi
+    except ImportError:
+        print("📦 Installing Python dependencies (pip install -r requirements.txt)...")
+        req_file = os.path.join(root_dir, "requirements.txt")
+        subprocess.run([sys.executable, "-m", "pip", "install", "-r", req_file])
+        import uvicorn
+
     from server import app
     uvicorn.run(app, host=host, port=port)
 
