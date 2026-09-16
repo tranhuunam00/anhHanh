@@ -22,7 +22,7 @@ import { SPEECH_LANG_MAP } from "./constants/languages";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
-  const { settings, updateSetting } = useSettings();
+  const { settings, updateSetting, resetSettings } = useSettings();
 
   // Navigation & Modal State
   const [activeTab, setActiveTab] = useState("tab-dictation");
@@ -359,6 +359,7 @@ export default function App() {
               onToggleMic={handleToggleMic}
               onCheck={handleCheck}
               onSkip={handleSkip}
+              onReplay={() => playerController.replayCurrentSegment()}
               onSpeakSentence={handleSpeakSentence}
               onHintLetter={handleHintLetter}
               onHintWord={handleHintWord}
@@ -419,6 +420,7 @@ export default function App() {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onUpdateSetting={updateSetting}
+        onResetSettings={resetSettings}
       />
 
       {/* Shortcuts Modal */}

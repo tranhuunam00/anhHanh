@@ -21,7 +21,14 @@ export const useShortcuts = ({
       const isInputOrTextarea =
         activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.isContentEditable);
 
-      // Replay Key (Control / Tab / Alt / KeyR / Space)
+      // Tab -> Hint 1 Word (Gợi ý 1 từ)
+      if (e.key === "Tab" || e.code === "Tab") {
+        e.preventDefault();
+        if (onHintWord) onHintWord();
+        return;
+      }
+
+      // Replay Key (Control / Alt / KeyR / Space)
       if (e.key === replayKey || e.code === replayKey) {
         if (!isInputOrTextarea || replayKey === "Control" || replayKey === "Alt") {
           e.preventDefault();
@@ -75,7 +82,7 @@ export const useShortcuts = ({
         return;
       }
 
-      // Ctrl + Shift + H or Alt + W -> Hint Word
+      // Alt + W or Ctrl + Shift + H -> Hint Word
       if (
         ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "h") ||
         (e.altKey && e.key.toLowerCase() === "w")

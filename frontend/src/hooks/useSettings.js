@@ -16,5 +16,10 @@ export const useSettings = () => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  return { settings, updateSetting };
+  const resetSettings = () => {
+    setSettings(DEFAULT_SETTINGS);
+    setStorageItem("dictation_settings", DEFAULT_SETTINGS);
+  };
+
+  return { settings, updateSetting, resetSettings };
 };

@@ -1,6 +1,6 @@
 import React from "react";
 
-export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting }) => {
+export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting, onResetSettings }) => {
   if (!isOpen) return null;
 
   return (
@@ -28,7 +28,6 @@ export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting }) =>
                     onChange={(e) => onUpdateSetting("replayKey", e.target.value)}
                   >
                     <option value="Control">Ctrl</option>
-                    <option value="Tab">Tab</option>
                     <option value="Alt">Alt</option>
                     <option value="KeyR">R</option>
                     <option value="Space">Space</option>
@@ -139,6 +138,25 @@ export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting }) =>
               </tr>
             </tbody>
           </table>
+
+          <div style={{ marginTop: "20px", paddingTop: "15px", borderTop: "1px solid var(--border-color)", display: "flex", justifyContent: "flex-end" }}>
+            <button
+              className="btn btn-secondary btn-with-icon"
+              style={{ fontSize: "0.85rem" }}
+              onClick={() => {
+                if (onResetSettings) {
+                  onResetSettings();
+                  alert("Đã khôi phục tất cả cài đặt về mặc định chuẩn!");
+                }
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              <span>Khôi phục mặc định</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
