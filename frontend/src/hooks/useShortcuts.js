@@ -68,15 +68,18 @@ export const useShortcuts = ({
         return;
       }
 
-      // Ctrl + H -> Hint Letter
-      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "h") {
+      // Ctrl + H or Alt + H -> Hint Letter
+      if (((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "h") || (e.altKey && e.key.toLowerCase() === "h")) {
         e.preventDefault();
         if (onHintLetter) onHintLetter();
         return;
       }
 
-      // Ctrl + Shift + H -> Hint Word
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "h") {
+      // Ctrl + Shift + H or Alt + W -> Hint Word
+      if (
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "h") ||
+        (e.altKey && e.key.toLowerCase() === "w")
+      ) {
         e.preventDefault();
         if (onHintWord) onHintWord();
         return;

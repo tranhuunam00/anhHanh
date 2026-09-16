@@ -158,12 +158,15 @@ export default function App() {
     return currentLesson?.challenges?.[currentIndex] || null;
   }, [currentLesson, currentIndex]);
 
+  const enterTrackerRef = useRef({ count: 0, lastTime: 0, lastInput: "" });
+
   // Actions
   const handleCheck = () => {
     if (!currentChallenge) return;
 
     // If sentence is already marked completed, hitting Enter / clicking Check immediately advances to next challenge
     if (isCompleted) {
+      enterTrackerRef.current = { count: 0, lastTime: 0, lastInput: "" };
       if (currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
         goToChallenge(currentIndex + 1);
       }
@@ -173,6 +176,7 @@ export default function App() {
     const evalResult = evaluateMasked(currentChallenge.text, userInput, settings.strictPunctuation);
 
     if (evalResult.isCompleted) {
+      enterTrackerRef.current = { count: 0, lastTime: 0, lastInput: "" };
       setIsCompleted(true);
       if (currentLesson) {
         const newProg = { ...progressMap };
@@ -188,8 +192,25 @@ export default function App() {
         }, 800);
       }
     } else {
-      // Replay audio segment so user can listen again and fix errors
-      playerController.replayCurrentSegment();
+      const now = Date.now();
+      const tracker = enterTrackerRef.current;
+
+      if (now - tracker.lastTime < 1500 && tracker.lastInput === userInput) {
+        tracker.count += 1;
+      } else {
+        tracker.count = 1;
+      }
+      tracker.lastTime = now;
+
+      if (tracker.count >= 2) {
+        // 2nd consecutive Enter: auto trigger 1 letter hint!
+        handleHintLetter();
+        tracker.count = 0;
+      } else {
+        tracker.lastInput = userInput;
+        // 1st Enter: Replay audio segment so user can listen again
+        playerController.replayCurrentSegment();
+      }
     }
   };
 

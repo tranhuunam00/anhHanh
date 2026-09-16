@@ -157,11 +157,11 @@ export const DictationStudio = ({
           <span>Nghe câu</span>
         </button>
 
-        <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (Ctrl+H)" onClick={onHintLetter}>
+        <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (Enter 2 lần / Ctrl+H / Alt+H)" onClick={onHintLetter}>
           <span>Gợi ý chữ</span>
         </button>
 
-        <button className="btn btn-secondary btn-with-icon" title="Mở 1 từ tiếp theo" onClick={onHintWord}>
+        <button className="btn btn-secondary btn-with-icon" title="Mở 1 từ tiếp theo (Ctrl+Shift+H / Alt+W)" onClick={onHintWord}>
           <span>Gợi ý từ</span>
         </button>
       </div>
