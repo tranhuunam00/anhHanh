@@ -48,7 +48,10 @@ def main():
     except ImportError:
         print("📦 Installing Python dependencies (pip install -r requirements.txt)...")
         req_file = os.path.join(root_dir, "requirements.txt")
-        subprocess.run([sys.executable, "-m", "pip", "install", "-r", req_file])
+        cmd = [sys.executable, "-m", "pip", "install", "-r", req_file]
+        if os.name != "nt":
+            cmd.append("--break-system-packages")
+        subprocess.run(cmd)
         import uvicorn
 
     from server import app
