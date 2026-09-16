@@ -17,6 +17,7 @@ export const DictationStudio = ({
   onPrev,
   onNext,
   onOpenDrawer,
+  isCompleted,
   strictPunctuation = false,
   onNextChallenge,
   onRetryChallenge,
