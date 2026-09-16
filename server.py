@@ -26,20 +26,36 @@ app.add_middleware(
 # Include clean architecture API router
 app.include_router(api_router)
 
-# Mount static files
-static_dir = os.path.join(os.path.dirname(__file__), "static")
-os.makedirs(static_dir, exist_ok=True)
+# Mount static files & frontend build
+base_dir = os.path.dirname(__file__)
+react_dist_dir = os.path.join(base_dir, "frontend", "dist")
+legacy_static_dir = os.path.join(base_dir, "static")
 
-app.mount("/static", StaticFiles(directory=static_dir), name="static")
+if os.path.exists(react_dist_dir):
+    assets_dir = os.path.join(react_dist_dir, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+app.mount("/static", StaticFiles(directory=legacy_static_dir), name="static")
 
 
-@app.get("/")
-def read_root():
-    """Serve the single-page application entrypoint."""
-    index_file = os.path.join(static_dir, "index.html")
-    if os.path.exists(index_file):
-        return FileResponse(index_file)
-    return {"message": "YouTube Dictation API is running. UI index.html will be loaded here."}
+@app.get("/{full_path:path}")
+def serve_spa(full_path: str):
+    """Serve React SPA index.html or fallback to legacy static/index.html."""
+    if full_path.startswith("api/"):
+        return {"detail": "Not Found"}
+
+    # 1. Prefer React Dist build if available
+    react_index = os.path.join(react_dist_dir, "index.html")
+    if os.path.exists(react_index):
+        return FileResponse(react_index)
+
+    # 2. Fall back to legacy static/index.html
+    legacy_index = os.path.join(legacy_static_dir, "index.html")
+    if os.path.exists(legacy_index):
+        return FileResponse(legacy_index)
+
+    return {"message": "YouTube Dictation API is running."}
 
 
 if __name__ == "__main__":

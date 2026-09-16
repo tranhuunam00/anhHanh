@@ -1,0 +1,355 @@
+/* Modern Dictation Studio Design System (Dictation & Practice Elements) */
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 16px;
+}
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: black;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color);
+}
+.video-wrapper iframe, .video-wrapper #youtube-player {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%; border: none;
+}
+
+.playback-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.speed-group {
+  display: flex;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  margin-left: 4px;
+}
+.speed-btn {
+  padding: 4px 9px;
+  background: var(--bg-card);
+  border: none;
+  border-right: 1px solid var(--border-color);
+  font-size: 0.78rem;
+  font-family: var(--font-family);
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+.speed-btn:last-child { border-right: none; }
+.speed-btn.active {
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+}
+
+/* Dictation Section Header - Nhỏ gọn */
+.challenge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+.challenge-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.challenge-time {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-family: var(--font-mono);
+  margin-top: 1px;
+}
+.challenge-nav-buttons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--success);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* Masked Card (So khớp ký tự thời gian thực) */
+.masked-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+}
+.masked-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.masked-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--primary);
+  background: var(--primary-light);
+  border: 1px solid var(--primary-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.masked-hint-note {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.diff-preview-container {
+  min-height: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.masked-sentence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 1.02rem;
+  line-height: 1.35;
+}
+.masked-word {
+  display: inline-flex;
+  gap: 1px;
+  background: var(--bg-card);
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+.char-box {
+  display: inline-block;
+  min-width: 8px;
+  text-align: center;
+  font-weight: 600;
+  transition: color 0.1s;
+}
+.char-masked {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+.char-correct {
+  color: var(--primary);
+  font-weight: 700;
+}
+.char-punct {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.char-wrong {
+  color: #ef4444 !important;
+  font-weight: 800 !important;
+  animation: shakeChar 0.35s ease-in-out;
+  display: inline-block;
+}
+
+@keyframes shakeChar {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+/* Dictation Input Box */
+.input-wrapper {
+  position: relative;
+  margin-bottom: 8px;
+}
+.dictation-input {
+  width: 100%;
+  min-height: 88px;
+  padding: 10px 45px 10px 12px;
+  font-size: 1.05rem;
+  font-family: var(--font-family);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  line-height: 1.45;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.dictation-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+.dictation-input::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.mic-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.mic-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.mic-btn.listening {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* Action Buttons Toolbar */
+.dictation-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Dedicated Bilingual Translation Card */
+.dictation-translation-card {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  display: block;
+  transition: all 0.2s ease;
+}
+[data-theme="dark"] .dictation-translation-card {
+  background: #082f4922;
+  border-color: #0369a1;
+}
+.dictation-translation-card.hidden {
+  display: none;
+}
+.translation-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.translation-lang-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0284c7;
+}
+.lang-code {
+  background: #0284c7;
+  color: #fff;
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.btn-text-action {
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+.btn-text-action:hover {
+  background: rgba(0,0,0,0.06);
+  color: var(--text-primary);
+}
+.dictation-translation-content {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: filter 0.2s;
+}
+.dictation-translation-content.blurred {
+  filter: blur(5px);
+  user-select: none;
+}
+
+/* Completion Card */
+.completion-card {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  border-radius: 8px;
+  display: none;
+}
+.completion-card.active { display: block; animation: fadeIn 0.3s ease; }
+.original-sentence {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.translation-sentence {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 500;
+  line-height: 1.4;
+}

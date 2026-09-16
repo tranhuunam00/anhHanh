@@ -1,0 +1,89 @@
+import { useEffect } from "react";
+
+export const useShortcuts = ({
+  replayKey = "Control",
+  playPauseKey = "Backquote",
+  onReplay,
+  onPlayPause,
+  onPrev,
+  onNext,
+  onCheck,
+  onSkip,
+  onHintLetter,
+  onHintWord,
+  enabled = true,
+}) => {
+  useEffect(() => {
+    if (!enabled) return;
+
+    const handleKeyDown = (e) => {
+      const activeEl = document.activeElement;
+      const isInputOrTextarea =
+        activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.isContentEditable);
+
+      // Replay Key (Control / Tab / Alt / KeyR / Space)
+      if (e.key === replayKey || e.code === replayKey) {
+        if (!isInputOrTextarea || replayKey === "Control" || replayKey === "Alt") {
+          e.preventDefault();
+          if (onReplay) onReplay();
+          return;
+        }
+      }
+
+      // Play/Pause Key (` / Escape / Space)
+      if (e.code === playPauseKey || e.key === playPauseKey) {
+        if (!isInputOrTextarea || playPauseKey === "Escape" || playPauseKey === "Backquote") {
+          e.preventDefault();
+          if (onPlayPause) onPlayPause();
+          return;
+        }
+      }
+
+      // Alt + LeftArrow -> Prev
+      if (e.altKey && e.code === "ArrowLeft") {
+        e.preventDefault();
+        if (onPrev) onPrev();
+        return;
+      }
+
+      // Alt + RightArrow -> Next
+      if (e.altKey && e.code === "ArrowRight") {
+        e.preventDefault();
+        if (onNext) onNext();
+        return;
+      }
+
+      // Enter -> Check (only inside dictation input or when active)
+      if (e.key === "Enter" && !e.shiftKey) {
+        if (activeEl && activeEl.id === "dictation-input") {
+          e.preventDefault();
+          if (onCheck) onCheck();
+          return;
+        }
+      }
+
+      // Esc -> Skip
+      if (e.key === "Escape") {
+        if (onSkip) onSkip();
+        return;
+      }
+
+      // Ctrl + H -> Hint Letter
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "h") {
+        e.preventDefault();
+        if (onHintLetter) onHintLetter();
+        return;
+      }
+
+      // Ctrl + Shift + H -> Hint Word
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "h") {
+        e.preventDefault();
+        if (onHintWord) onHintWord();
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [replayKey, playPauseKey, onReplay, onPlayPause, onPrev, onNext, onCheck, onSkip, onHintLetter, onHintWord, enabled]);
+};

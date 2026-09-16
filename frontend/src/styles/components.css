@@ -1,0 +1,304 @@
+/* Modern Dictation Studio Design System (Components, Drawer, Audio & Presets) */
+
+/* Full Audio Hero Section (Tab 2) */
+.full-audio-hero-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.full-audio-hero-header {
+  margin-bottom: 16px;
+}
+.hero-header-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.hero-header-title svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.full-audio-player-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-secondary);
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+.full-audio-play-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.full-audio-play-btn:hover {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+}
+.full-audio-time {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.full-audio-progress {
+  flex: 1;
+  cursor: pointer;
+  accent-color: var(--primary);
+  height: 6px;
+}
+
+/* Transcript List (Tab 2) */
+.transcript-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 700px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.transcript-item {
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.transcript-item:hover, .transcript-item.current {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  transform: translateX(3px);
+}
+.transcript-header-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.transcript-time {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--font-mono);
+}
+.transcript-en {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+.transcript-vi {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Shortcuts Table (Tab 3) */
+.shortcuts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.shortcuts-table th, .shortcuts-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+.shortcuts-table th {
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+kbd {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 3px 7px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
+/* Bottom Presets Section */
+.bottom-presets-section {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+  margin-bottom: 30px;
+}
+.presets-section-header {
+  margin-bottom: 16px;
+}
+.presets-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.presets-header-title svg {
+  color: var(--primary);
+}
+.presets-header-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  display: block;
+}
+.presets-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+.preset-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+}
+.preset-card:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.preset-card.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.preset-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.preset-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+.preset-card-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.preset-card-lang {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+/* Question Drawer / Modal */
+.drawer-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: none;
+}
+.drawer-overlay.active { display: block; }
+.drawer {
+  position: fixed;
+  top: 0; right: 0; width: 440px; max-width: 90vw; height: 100%;
+  background: var(--bg-card);
+  z-index: 201;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+.drawer.active { transform: translateX(0); }
+.drawer-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+}
+.drawer-legend {
+  display: flex;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.dot-success { background: var(--success); }
+.dot-current { background: var(--primary); }
+.dot-default { background: var(--border-color); }
+
+.question-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 8px;
+}
+.q-btn {
+  padding: 10px 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: var(--font-family);
+  transition: all 0.15s;
+}
+.q-btn:hover { border-color: var(--primary); }
+.q-btn.current { border: 2px solid var(--primary); background: var(--primary-light); color: var(--primary); }
+.q-btn.completed { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}

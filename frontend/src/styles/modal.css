@@ -1,0 +1,93 @@
+/* Settings Modal & Voice Input Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  width: 520px;
+  max-width: 92vw;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transform: translateY(-10px) scale(0.98);
+  transition: transform 0.2s ease;
+}
+.modal-overlay.active .settings-modal {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 20px 22px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.settings-table tr {
+  border-bottom: 1px solid var(--border-color);
+}
+.settings-table tr:last-child {
+  border-bottom: none;
+}
+.settings-table td {
+  padding: 12px 6px;
+  vertical-align: middle;
+}
+.settings-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+.settings-select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+.settings-select:focus {
+  border-color: var(--primary);
+}
