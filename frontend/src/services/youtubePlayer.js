@@ -18,8 +18,10 @@ export class YouTubePlayerController {
     this.loopInterval = null;
     this.currentVideoId = null;
     this.onReadyCallbacks = [];
+    this.onStateChangeCallbacks = [];
     this.onEmbedRestricted = null;
     this.isFullMode = false;
+    this.isPlaying = false;
   }
 
   setAudioPadding(seconds) {
@@ -85,6 +87,12 @@ export class YouTubePlayerController {
           this.onReadyCallbacks.forEach((cb) => cb());
           this.onReadyCallbacks = [];
         },
+        onStateChange: (event) => {
+          if (window.YT && window.YT.PlayerState) {
+            this.isPlaying = event.data === window.YT.PlayerState.PLAYING;
+            this.onStateChangeCallbacks.forEach((cb) => cb(this.isPlaying, event.data));
+          }
+        },
         onError: (e) => {
           if (e.data === 101 || e.data === 150 || e.data === 2) {
             if (this.onEmbedRestricted) {
@@ -94,6 +102,12 @@ export class YouTubePlayerController {
         },
       },
     });
+  }
+
+  onStateChange(cb) {
+    if (typeof cb === "function") {
+      this.onStateChangeCallbacks.push(cb);
+    }
   }
 
   loadVideo(videoId) {

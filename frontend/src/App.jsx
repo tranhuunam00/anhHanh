@@ -44,6 +44,7 @@ export default function App() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [progressMap, setProgressMap] = useState({});
   const [isListening, setIsListening] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Controller Refs
   const playerRef = useRef(null);
@@ -62,6 +63,7 @@ export default function App() {
       playerController.setLooping(settings.autoReplay === "yes");
       playerController.setReplayInterval(settings.replayInterval);
       playerController.setAudioPadding(settings.audioPadding);
+      playerController.onStateChange((playing) => setIsPlaying(playing));
     }
   }, [settings, playerController]);
 
@@ -342,6 +344,7 @@ export default function App() {
               isEmbedRestricted={isEmbedRestricted}
               currentSentenceText={currentChallenge?.text}
               sourceLang={sourceLang}
+              isPlaying={isPlaying}
               onReplay={() => playerController.replayCurrentSegment()}
               onPlayPause={() => playerController.togglePlayPause()}
               onSeekRelative={(sec) => playerController.seekRelative(sec)}
@@ -356,10 +359,12 @@ export default function App() {
               userInput={userInput}
               setUserInput={setUserInput}
               isListening={isListening}
+              isPlaying={isPlaying}
               onToggleMic={handleToggleMic}
               onCheck={handleCheck}
               onSkip={handleSkip}
               onReplay={() => playerController.replayCurrentSegment()}
+              onPlayPause={() => playerController.togglePlayPause()}
               onSpeakSentence={handleSpeakSentence}
               onHintLetter={handleHintLetter}
               onHintWord={handleHintWord}

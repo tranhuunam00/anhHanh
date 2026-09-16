@@ -5,6 +5,7 @@ export const PlayerCard = ({
   isEmbedRestricted,
   currentSentenceText,
   sourceLang,
+  isPlaying = false,
   onReplay,
   onPlayPause,
   onSeekRelative,
@@ -53,10 +54,44 @@ export const PlayerCard = ({
         <div id="youtube-player"></div>
       </div>
 
-      {/* Playback Speed Controls */}
-      <div className="playback-controls" style={{ justifyContent: "center" }}>
-        <div className="controls-row" style={{ justifyContent: "center", width: "100%" }}>
-          <div className="speed-group">
+      {/* Playback Controls & Speed */}
+      <div className="playback-controls">
+        <div className="controls-row" style={{ justifyContent: "center", gap: "8px", width: "100%" }}>
+          <button className="btn btn-secondary btn-icon" title="Tua lùi 3 giây (←)" onClick={() => onSeekRelative && onSeekRelative(-3)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="11 17 6 12 11 7" />
+              <polyline points="18 17 13 12 18 7" />
+            </svg>
+          </button>
+
+          <button className="btn btn-secondary btn-icon" title={isPlaying ? "Tạm dừng (Space)" : "Phát video (Space)"} onClick={onPlayPause}>
+            {isPlaying ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: "2px" }}>
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+            )}
+          </button>
+
+          <button className="btn btn-secondary btn-icon" title="Phát lại đoạn câu này (Ctrl)" onClick={onReplay}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
+          </button>
+
+          <button className="btn btn-secondary btn-icon" title="Tua tới 3 giây (→)" onClick={() => onSeekRelative && onSeekRelative(3)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="13 17 18 12 13 7" />
+              <polyline points="6 17 11 12 6 7" />
+            </svg>
+          </button>
+
+          <div className="speed-group" style={{ marginLeft: "4px" }}>
             {[0.75, 0.9, 1.0, 1.25].map((speed) => (
               <button
                 key={speed}
