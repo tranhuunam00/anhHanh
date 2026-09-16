@@ -77,10 +77,18 @@
   cursor: pointer;
   transition: all 0.15s;
 }
-.transcript-item:hover, .transcript-item.current {
-  background: var(--primary-light);
-  border-color: var(--primary);
-  transform: translateX(3px);
+.transcript-item:hover, .transcript-item.current, .transcript-item.active-sentence {
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  border-width: 2px !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
+}
+.transcript-item.active-sentence .transcript-time {
+  background: var(--primary);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 .transcript-header-meta {
   display: flex;

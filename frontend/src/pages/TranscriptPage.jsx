@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 
 export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) => {
   const [isPlayingFull, setIsPlayingFull] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isAutoScroll, setIsAutoScroll] = useState(true);
+
+  const activeItemRef = useRef(null);
 
   useEffect(() => {
     let interval;
@@ -17,6 +20,24 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
       if (interval) clearInterval(interval);
     };
   }, [playerController]);
+
+  // Compute active sentence index dynamically based on current audio time
+  const activeIndex = useMemo(() => {
+    if (!lesson || !lesson.challenges) return -1;
+    return lesson.challenges.findIndex(
+      (c) => currentTime >= c.time_start && currentTime <= c.time_end
+    );
+  }, [lesson, currentTime]);
+
+  // Smoothly scroll active sentence into view when autoScroll is enabled
+  useEffect(() => {
+    if (isAutoScroll && activeIndex !== -1 && activeItemRef.current) {
+      activeItemRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [activeIndex, isAutoScroll]);
 
   const formatTime = (seconds) => {
     if (typeof seconds !== "number" || isNaN(seconds)) return "00:00";
@@ -56,7 +77,7 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
     <div id="tab-transcript" className="tab-content">
       {/* Full Audio Hero Card */}
       <div className="card full-audio-hero-card">
-        <div className="full-audio-hero-header">
+        <div className="full-audio-hero-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
           <div className="hero-header-title">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
@@ -69,6 +90,19 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
               </div>
             </div>
           </div>
+
+          <button
+            className={`btn ${isAutoScroll ? "btn-primary" : "btn-secondary"} btn-with-icon`}
+            style={{ padding: "6px 14px", fontSize: "0.83rem" }}
+            onClick={() => setIsAutoScroll(!isAutoScroll)}
+            title="Bật/Tắt tự động cuộn danh sách câu theo thời gian audio"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="7 13 12 18 17 13" />
+              <polyline points="7 6 12 11 17 6" />
+            </svg>
+            <span>{isAutoScroll ? "Tự cuộn: BẬT" : "Tự cuộn: TẮT"}</span>
+          </button>
         </div>
 
         <div className="full-audio-player-bar">
@@ -102,33 +136,37 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
 
       {/* Transcript Items List */}
       <div className="transcript-list" style={{ marginTop: "16px" }}>
-        {lesson.challenges.map((c, idx) => (
-          <div
-            key={c.id || idx}
-            className="transcript-item"
-            onClick={() => {
-              if (playerController) playerController.playFull(c.time_start);
-            }}
-          >
-            <div className="transcript-header-meta">
-              <span className="transcript-time">
-                [{formatTime(c.time_start)} - {formatTime(c.time_end)}]
-              </span>
-              <button
-                className="btn btn-secondary btn-icon"
-                title="Luyện chép câu này"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onGoToChallenge(idx + 1);
-                }}
-              >
-                Luyện câu này ➔
-              </button>
+        {lesson.challenges.map((c, idx) => {
+          const isActive = idx === activeIndex;
+          return (
+            <div
+              key={c.id || idx}
+              ref={isActive ? activeItemRef : null}
+              className={`transcript-item ${isActive ? "active-sentence" : ""}`}
+              onClick={() => {
+                if (playerController) playerController.playFull(c.time_start);
+              }}
+            >
+              <div className="transcript-header-meta">
+                <span className="transcript-time">
+                  [{formatTime(c.time_start)} - {formatTime(c.time_end)}]
+                </span>
+                <button
+                  className="btn btn-secondary btn-icon"
+                  title="Luyện chép câu này"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onGoToChallenge(idx + 1);
+                  }}
+                >
+                  Luyện câu này ➔
+                </button>
+              </div>
+              <div className="transcript-en">{c.text}</div>
+              {c.translation && <div className="transcript-vi">{c.translation}</div>}
             </div>
-            <div className="transcript-en">{c.text}</div>
-            {c.translation && <div className="transcript-vi">{c.translation}</div>}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
