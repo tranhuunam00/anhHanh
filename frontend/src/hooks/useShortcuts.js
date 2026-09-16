@@ -37,7 +37,14 @@ export const useShortcuts = ({
         }
       }
 
-      // Play/Pause Key (` / Escape / Space)
+      // Shift + Space or Ctrl + Space -> Play/Pause (works even when typing inside textarea)
+      if ((e.shiftKey && e.code === "Space") || ((e.ctrlKey || e.metaKey) && e.code === "Space")) {
+        e.preventDefault();
+        if (onPlayPause) onPlayPause();
+        return;
+      }
+
+      // Play/Pause Key (` / Escape / Custom Key)
       if (e.code === playPauseKey || e.key === playPauseKey) {
         if (!isInputOrTextarea || playPauseKey === "Escape" || playPauseKey === "Backquote") {
           e.preventDefault();
