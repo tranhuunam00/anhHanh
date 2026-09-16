@@ -1,0 +1,173 @@
+/* ShotLang Responsive Design System for Mobile, Tablet & Desktop Widescreen */
+
+/* 🖥️ Large Desktop / Widescreen (min-width: 1025px) */
+@media (min-width: 1025px) {
+  .main-container {
+    max-width: 1560px;
+    padding: 0 24px;
+  }
+  .player-card {
+    position: sticky;
+    top: 68px;
+    align-self: start;
+    z-index: 10;
+  }
+}
+
+/* 📱 Tablet & Medium Screens (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .exercise-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .player-card {
+    position: static;
+  }
+}
+
+/* 📱 Mobile Devices (max-width: 768px) */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 8px 12px;
+  }
+  .header-inner {
+    gap: 8px;
+  }
+  .brand {
+    font-size: 1.1rem;
+  }
+  .brand img {
+    width: 26px !important;
+    height: 26px !important;
+  }
+  .url-input-form {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lang-selector-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .lang-select-wrapper {
+    flex: 1;
+  }
+  .header-lang-select {
+    width: 100%;
+    font-size: 0.82rem;
+  }
+
+  /* Main Container & Tabs */
+  .main-container {
+    padding: 0 10px;
+    margin: 6px auto;
+  }
+  .tabs-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .tabs-nav-group {
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .tab-btn {
+    font-size: 0.8rem;
+    padding: 6px 8px;
+    white-space: nowrap;
+  }
+
+  /* Challenge Header & Nav Buttons */
+  .challenge-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .challenge-nav-buttons {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .challenge-nav-buttons .btn {
+    padding: 5px 8px;
+    font-size: 0.78rem;
+  }
+
+  /* Input Box (Font-size 16px avoids iOS webview auto-zoom) */
+  .dictation-input {
+    font-size: 16px !important;
+    min-height: 80px;
+    padding: 8px 40px 8px 10px;
+  }
+  .mic-btn {
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Action Buttons Toolbar */
+  .dictation-actions {
+    gap: 6px;
+  }
+  .dictation-actions .btn {
+    flex: 1 1 calc(33.33% - 6px);
+    justify-content: center;
+    padding: 7px 8px;
+    font-size: 0.8rem;
+    min-height: 38px;
+  }
+
+  /* Full Audio Hero Bar (Tab 2) */
+  .full-audio-player-bar {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .full-audio-progress {
+    width: 100%;
+    flex: 100%;
+    order: 3;
+    margin-top: 4px;
+  }
+
+  /* Drawer / Modal */
+  .drawer {
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+  .question-grid {
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    gap: 6px;
+  }
+  .q-btn {
+    padding: 8px 2px;
+    font-size: 0.8rem;
+  }
+}
+
+/* 📱 Small Mobile Devices (max-width: 480px) */
+@media (max-width: 480px) {
+  .dictation-actions .btn {
+    flex: 1 1 calc(50% - 6px);
+  }
+  .controls-row {
+    gap: 4px;
+  }
+  .speed-group {
+    margin-left: 0 !important;
+    margin-top: 4px;
+    width: 100%;
+    justify-content: center;
+  }
+  .speed-btn {
+    flex: 1;
+    padding: 6px 4px;
+  }
+  .presets-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
