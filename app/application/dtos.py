@@ -8,6 +8,8 @@ from app.domain.models import EvaluationStatus
 class GetLessonRequest:
     url_or_id: str
     grouping_mode: str = "sentence"  # "sentence" or "snippet"
+    source_lang: Optional[str] = "en"
+    target_lang: Optional[str] = "vi"
 
 
 @dataclass
@@ -27,6 +29,9 @@ class LessonResponse:
     title: str
     total_challenges: int
     challenges: List[ChallengeDTO]
+    source_lang: Optional[str] = "en"
+    detected_source_lang: Optional[str] = "en"
+    target_lang: Optional[str] = "vi"
 
 
 @dataclass

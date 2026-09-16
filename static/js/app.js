@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const playerController = new YouTubePlayerController("youtube-player");
   const dictationManager = new DictationManager();
   const settingsManager = new SettingsManager();
+  const drawerManager = new DrawerManager();
+  const transcriptManager = new TranscriptManager(playerController);
 
   // State
   let currentLesson = null;
@@ -14,10 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   playerController.setLooping(autoLoop);
   playerController.setReplayInterval(settingsManager.get("replayInterval"));
+  playerController.setAudioPadding(settingsManager.get("audioPadding"));
 
   // DOM Elements
   const urlInput = document.getElementById("url-input");
   const loadBtn = document.getElementById("load-btn");
+  const sourceLangSelect = document.getElementById("source-lang-select");
+  const targetLangSelect = document.getElementById("target-lang-select");
   const themeToggleBtn = document.getElementById("theme-toggle-btn");
   const challengeTitle = document.getElementById("challenge-title");
   const challengeTime = document.getElementById("challenge-time");
@@ -38,37 +43,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const originalSentence = document.getElementById("original-sentence");
   const translationSentence = document.getElementById("translation-sentence");
   const nextChallengeBtn = document.getElementById("next-challenge-btn");
-  const openDrawerBtn = document.getElementById("open-drawer-btn");
-  const closeDrawerBtn = document.getElementById("close-drawer-btn");
-  const drawer = document.getElementById("drawer");
-  const drawerOverlay = document.getElementById("drawer-overlay");
-  const questionGrid = document.getElementById("question-grid");
-  const transcriptList = document.getElementById("transcript-list");
-  const presetPills = document.querySelectorAll(".preset-pill");
+  const retryChallengeBtn = document.getElementById("retry-challenge-btn");
+  const presetCards = document.querySelectorAll(".preset-card");
   const embedWarningBanner = document.getElementById("embed-warning-banner");
   const ttsSpeakBtn = document.getElementById("tts-speak-btn");
   const externalYtLink = document.getElementById("external-yt-link");
   const speakSentenceBtn = document.getElementById("speak-sentence-btn");
 
-  // Full Audio Accordion Elements
-  const fullAudioHeader = document.getElementById("full-audio-header");
-  const fullAudioContent = document.getElementById("full-audio-content");
-  const fullAudioIcon = document.getElementById("full-audio-icon");
-  const fullAudioPlayBtn = document.getElementById("full-audio-play-btn");
-  const fullAudioCurrentTime = document.getElementById("full-audio-current-time");
-  const fullAudioTotalTime = document.getElementById("full-audio-total-time");
-  const fullAudioProgress = document.getElementById("full-audio-progress");
-  const plainTranscriptContainer = document.getElementById("plain-transcript-container");
-  let isFullAudioPlaying = false;
-  let fullAudioUpdateTimer = null;
+  // Sync initial language dropdowns with settings
+  if (sourceLangSelect) sourceLangSelect.value = settingsManager.get("sourceLang") || "auto";
+  if (targetLangSelect) targetLangSelect.value = settingsManager.get("targetLang") || "vi";
 
-  // Settings Manager
+  sourceLangSelect?.addEventListener("change", () => {
+    settingsManager.set("sourceLang", sourceLangSelect.value);
+  });
+  targetLangSelect?.addEventListener("change", () => {
+    settingsManager.set("targetLang", targetLangSelect.value);
+  });
+
+  // Settings Manager bindings
   settingsManager.bindUI((key, val) => {
     if (key === "autoReplay") {
       autoLoop = val === "yes";
       playerController.setLooping(autoLoop);
     } else if (key === "replayInterval") {
       playerController.setReplayInterval(val);
+    } else if (key === "audioPadding") {
+      playerController.setAudioPadding(val);
+    } else if (key === "sourceLang") {
+      if (sourceLangSelect) sourceLangSelect.value = val;
+    } else if (key === "targetLang") {
+      if (targetLangSelect) targetLangSelect.value = val;
     } else if (key === "autoAdvance") {
       autoAdvance = val === "yes";
     } else if (key === "strictPunctuation" || key === "wordSuggestions") {
@@ -79,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Tab switching
   const tabBtns = document.querySelectorAll(".tab-btn");
   const tabContents = document.querySelectorAll(".tab-content");
-
   tabBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       tabBtns.forEach((b) => b.classList.remove("active"));
@@ -112,18 +116,56 @@ document.addEventListener("DOMContentLoaded", () => {
     themeToggleBtn.innerHTML = "☀️ Sáng";
   }
 
-  // Load lesson handler
+  function getSpeechLangCode(code) {
+    if (!code) return "en-US";
+    const map = { en: "en-US", fr: "fr-FR", ja: "ja-JP", ko: "ko-KR", zh: "zh-CN", de: "de-DE", es: "es-ES", vi: "vi-VN", ru: "ru-RU", it: "it-IT", pt: "pt-BR" };
+    return map[code.toLowerCase().split("-")[0]] || "en-US";
+  }
+
+  // Load lesson
   async function loadLesson(urlOrId) {
-    if (!urlOrId) return;
+    if (!urlOrId || loadBtn.disabled) return;
+    // Remember last loaded URL so we can restore on next page visit
+    localStorage.setItem("lastUrl", urlOrId);
     if (embedWarningBanner) embedWarningBanner.style.display = "none";
+
     loadBtn.disabled = true;
-    loadBtn.textContent = "⏳ Đang tải...";
+    loadBtn.innerHTML = '<span class="spinner-sm"></span> <span>Đang tải...</span>';
+    presetCards.forEach((c) => {
+      c.style.pointerEvents = "none";
+      c.style.opacity = "0.6";
+    });
+
+    const srcLang = sourceLangSelect ? sourceLangSelect.value : (settingsManager.get("sourceLang") || "auto");
+    const tgtLang = targetLangSelect ? targetLangSelect.value : (settingsManager.get("targetLang") || "vi");
+
+    // Match preset card active state if URL matches
+    presetCards.forEach((c) => {
+      c.classList.toggle("active", c.dataset.url === urlOrId);
+    });
+
+    fetch(`/api/video-languages?url_or_id=${encodeURIComponent(urlOrId)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((langData) => {
+        if (langData && langData.detected_source_lang && sourceLangSelect && sourceLangSelect.value === "auto") {
+          const autoOpt = sourceLangSelect.querySelector('option[value="auto"]');
+          if (autoOpt) {
+            autoOpt.textContent = `🌐 Tự động phát hiện (${langData.detected_source_lang.toUpperCase()})`;
+          }
+        }
+      })
+      .catch(() => {});
 
     try {
       const response = await fetch("/api/lesson", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url_or_id: urlOrId, grouping_mode: "sentence" }),
+        body: JSON.stringify({
+          url_or_id: urlOrId,
+          grouping_mode: "sentence",
+          source_lang: srcLang,
+          target_lang: tgtLang,
+        }),
       });
 
       if (!response.ok) {
@@ -137,32 +179,47 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Lỗi tải video: " + e.message);
     } finally {
       loadBtn.disabled = false;
-      loadBtn.textContent = "🚀 Tải bài tập";
+      loadBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <span>Tải bài tập</span>`;
+      presetCards.forEach((c) => {
+        c.style.pointerEvents = "";
+        c.style.opacity = "";
+      });
     }
   }
 
   function onLessonLoaded(lesson) {
-    // Setup restriction listener
     playerController.onEmbedRestricted = () => {
       if (embedWarningBanner) embedWarningBanner.style.display = "block";
     };
 
-    // Initialize YouTube Player
+    const detected = lesson.detected_source_lang || "en";
+    playerController.setSourceLang(detected);
+    if (speechRecognizer) {
+      speechRecognizer.lang = getSpeechLangCode(detected);
+    }
+
     playerController.loadVideo(lesson.video_id);
 
-    // Check saved progress
-    const progress = dictationManager.loadProgress(lesson.video_id);
-    currentPosition = progress.lastPosition || 1;
+    currentPosition = 1; // Always start from the beginning
+    const progress = dictationManager.loadProgress(lesson.video_id); // for sidebar completion state only
 
-    renderQuestionDrawer();
-    renderTranscriptTab();
-    renderPlainTranscript();
+    drawerManager.render(lesson, currentPosition, progress, (pos) => goToChallenge(pos));
+    transcriptManager.render(lesson, currentPosition, (pos) => goToChallenge(pos));
     goToChallenge(currentPosition);
   }
 
   function getCurrentChallenge() {
     if (!currentLesson || !currentLesson.challenges) return null;
     return currentLesson.challenges.find((c) => c.position === currentPosition);
+  }
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }
 
   function goToChallenge(position) {
@@ -174,52 +231,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const challenge = getCurrentChallenge();
     if (!challenge) return;
 
-    // Update external link if restriction occurs
     if (externalYtLink && currentLesson) {
       const startSec = Math.floor(challenge.time_start);
       externalYtLink.href = `https://www.youtube.com/watch?v=${currentLesson.video_id}&t=${startSec}s`;
     }
 
-    // Update UI headers
-    challengeTitle.textContent = `Câu ${challenge.position} / ${currentLesson.total_challenges}`;
-    const startFmt = formatTime(challenge.time_start);
-    const endFmt = formatTime(challenge.time_end);
-    challengeTime.textContent = `[${startFmt} - ${endFmt}]`;
+    challengeTitle.textContent = `Câu ${currentPosition} / ${currentLesson.total_challenges}`;
+    challengeTime.textContent = `[${formatTime(challenge.time_start)} - ${formatTime(challenge.time_end)}]`;
 
-    // Highlight line in plain transcript
-    document.querySelectorAll(".plain-transcript-line").forEach((el) => el.classList.remove("current"));
-    const activePlainLine = document.getElementById(`plain-line-${challenge.position}`);
-    if (activePlainLine) {
-      activePlainLine.classList.add("current");
-      activePlainLine.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-
-    // Update progress bar
     const percent = Math.round((currentPosition / currentLesson.total_challenges) * 100);
     progressBarFill.style.width = `${percent}%`;
 
-    // Load saved input or auto-fill for 1-word challenge (không mất thời gian)
     const saved = dictationManager.loadProgress(currentLesson.video_id);
-    const challengeState = saved.challenges?.[currentPosition] || {};
-    const challengeTokens = challenge.text.trim().split(/\s+/).filter(Boolean);
-    const isSingleWord = challengeTokens.length <= 1;
+    dictationInput.value = ""; // Always start fresh — don't restore saved input
 
-    if (isSingleWord) {
-      dictationInput.value = challenge.text;
-      dictationManager.saveProgress(currentLesson.video_id, currentPosition, challenge.text, true);
-    } else {
-      dictationInput.value = challengeState.input || "";
-    }
+    const prevChallenge = currentPosition > 1 ? currentLesson.challenges[currentPosition - 2] : null;
+    const nextChallenge = currentPosition < currentLesson.total_challenges ? currentLesson.challenges[currentPosition] : null;
+    const prevEnd = prevChallenge ? prevChallenge.time_end : null;
+    const nextStart = nextChallenge ? nextChallenge.time_start : null;
 
-    // Play video segment
-    playerController.playSegment(challenge.time_start, challenge.time_end, autoLoop);
+    playerController.playSegment(challenge.time_start, challenge.time_end, autoLoop, prevEnd, nextStart);
 
-    // Evaluate current state
     evaluateAndRender();
-
-    // Auto-focus input
     dictationInput.focus();
-    updateDrawerActiveState();
+    drawerManager.updateActive(currentPosition, saved);
   }
 
   function evaluateAndRender() {
@@ -229,11 +264,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const userInput = dictationInput.value;
     const isStrict = settingsManager.get("strictPunctuation") === "yes";
 
-    // DailyDictation Masked Asterisk evaluation (*** ***)
     const maskedResult = dictationManager.evaluateMasked(challenge.text, userInput);
     const evalResult = dictationManager.evaluate(challenge.text, userInput, isStrict);
 
-    // Render diff preview as DailyDictation masked text
     diffPreview.innerHTML = "";
     const container = document.createElement("div");
     container.className = "masked-sentence";
@@ -251,158 +284,52 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     diffPreview.appendChild(container);
 
-    // Handle completed
-    const isDone = maskedResult.isCompleted || evalResult.isCompleted;
+    const hasInput = Boolean(userInput && userInput.trim().length > 0);
+    const isDone = hasInput && (maskedResult.isCompleted || evalResult.isCompleted);
+
     if (isDone) {
       dictationManager.saveProgress(currentLesson.video_id, currentPosition, userInput, true);
       completionCard.classList.add("active");
       originalSentence.textContent = challenge.text;
-      translationSentence.textContent = challenge.translation || "(Không có bản dịch phụ đề)";
-      updateDrawerActiveState();
+
+      const tgtLang = targetLangSelect ? targetLangSelect.value : (settingsManager.get("targetLang") || "vi");
+      if (!challenge.translation && tgtLang !== "none") {
+        translationSentence.textContent = "⏳ Đang dịch nghĩa...";
+        fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: challenge.text,
+            source_lang: currentLesson.detected_source_lang || "auto",
+            target_lang: tgtLang,
+          }),
+        })
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.translation) {
+              challenge.translation = d.translation;
+              translationSentence.textContent = d.translation;
+              const tItemVi = document.querySelector(`#t-item-${challenge.position} .transcript-vi`);
+              if (tItemVi) tItemVi.textContent = d.translation;
+            } else {
+              translationSentence.textContent = "(Không có bản dịch phụ đề)";
+            }
+          })
+          .catch(() => {
+            translationSentence.textContent = "(Không có bản dịch phụ đề)";
+          });
+      } else {
+        translationSentence.textContent = challenge.translation || (tgtLang === "none" ? "" : "(Không có bản dịch phụ đề)");
+      }
+      const p = dictationManager.loadProgress(currentLesson.video_id);
+      drawerManager.updateActive(currentPosition, p);
     } else {
       completionCard.classList.remove("active");
       dictationManager.saveProgress(currentLesson.video_id, currentPosition, userInput, false);
+      const p = dictationManager.loadProgress(currentLesson.video_id);
+      drawerManager.updateActive(currentPosition, p);
     }
   }
-
-  // Formatting helper
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  }
-
-  // Drawer Render
-  function renderQuestionDrawer() {
-    if (!currentLesson) return;
-    questionGrid.innerHTML = "";
-    const progress = dictationManager.loadProgress(currentLesson.video_id);
-
-    currentLesson.challenges.forEach((c) => {
-      const btn = document.createElement("button");
-      btn.className = "q-btn";
-      btn.id = `q-btn-${c.position}`;
-      btn.textContent = `Câu ${c.position}`;
-
-      if (progress.challenges?.[c.position]?.isCompleted) {
-        btn.classList.add("completed");
-      }
-      if (c.position === currentPosition) {
-        btn.classList.add("current");
-      }
-
-      btn.addEventListener("click", () => {
-        goToChallenge(c.position);
-        closeDrawer();
-      });
-      questionGrid.appendChild(btn);
-    });
-  }
-
-  function updateDrawerActiveState() {
-    const allBtns = questionGrid.querySelectorAll(".q-btn");
-    const progress = dictationManager.loadProgress(currentLesson?.video_id || "");
-
-    allBtns.forEach((btn, idx) => {
-      const pos = idx + 1;
-      btn.classList.toggle("current", pos === currentPosition);
-      if (progress.challenges?.[pos]?.isCompleted) {
-        btn.classList.add("completed");
-      }
-    });
-  }
-
-  // Full Transcript Render
-  function renderTranscriptTab() {
-    if (!currentLesson) return;
-    transcriptList.innerHTML = "";
-
-    currentLesson.challenges.forEach((c) => {
-      const div = document.createElement("div");
-      div.className = "transcript-item";
-      div.id = `t-item-${c.position}`;
-      div.innerHTML = `
-        <div class="transcript-time">Câu ${c.position} [${formatTime(c.time_start)} - ${formatTime(c.time_end)}]</div>
-        <div class="transcript-en">${c.text}</div>
-        <div class="transcript-vi">${c.translation || ""}</div>
-      `;
-      div.addEventListener("click", () => {
-        goToChallenge(c.position);
-        // Switch back to dictation tab
-        document.querySelector('[data-target="tab-dictation"]').click();
-      });
-      transcriptList.appendChild(div);
-    });
-  }
-
-  // Plain Transcript Render & Full Audio Sync
-  function renderPlainTranscript() {
-    if (!currentLesson || !plainTranscriptContainer) return;
-    plainTranscriptContainer.innerHTML = "";
-
-    currentLesson.challenges.forEach((c) => {
-      const line = document.createElement("div");
-      line.className = "plain-transcript-line";
-      line.id = `plain-line-${c.position}`;
-      line.textContent = c.text;
-      line.title = `Click để nghe từ câu ${c.position} [${formatTime(c.time_start)}]`;
-      line.addEventListener("click", () => {
-        goToChallenge(c.position);
-      });
-      plainTranscriptContainer.appendChild(line);
-    });
-  }
-
-  // Full Audio Accordion Toggle
-  fullAudioHeader?.addEventListener("click", () => {
-    const isCollapsed = fullAudioContent.classList.toggle("collapsed");
-    fullAudioIcon.textContent = isCollapsed ? "▼" : "▲";
-  });
-
-  function updateFullAudioUI() {
-    if (!playerController.isReady) return;
-    const cur = playerController.getCurrentTime();
-    const dur = playerController.getDuration() || 1;
-    if (fullAudioCurrentTime) fullAudioCurrentTime.textContent = formatTime(cur);
-    if (fullAudioTotalTime) fullAudioTotalTime.textContent = formatTime(dur);
-    if (fullAudioProgress) fullAudioProgress.value = Math.min(100, (cur / dur) * 100);
-
-    // Highlight matching line in plain transcript
-    if (currentLesson) {
-      const activeC = currentLesson.challenges.find(
-        (c) => cur >= c.time_start && cur <= c.time_end
-      );
-      if (activeC) {
-        document.querySelectorAll(".plain-transcript-line").forEach((el) => el.classList.remove("current"));
-        const lineEl = document.getElementById(`plain-line-${activeC.position}`);
-        if (lineEl) {
-          lineEl.classList.add("current");
-        }
-      }
-    }
-  }
-
-  fullAudioPlayBtn?.addEventListener("click", () => {
-    if (!isFullAudioPlaying) {
-      isFullAudioPlaying = true;
-      fullAudioPlayBtn.textContent = "⏸";
-      playerController.playFull();
-      if (!fullAudioUpdateTimer) {
-        fullAudioUpdateTimer = setInterval(updateFullAudioUI, 250);
-      }
-    } else {
-      isFullAudioPlaying = false;
-      fullAudioPlayBtn.textContent = "▶";
-      playerController.pauseFull();
-    }
-  });
-
-  fullAudioProgress?.addEventListener("input", () => {
-    const dur = playerController.getDuration() || 1;
-    const seekSec = (parseFloat(fullAudioProgress.value) / 100) * dur;
-    playerController.seekTo(seekSec);
-    if (fullAudioCurrentTime) fullAudioCurrentTime.textContent = formatTime(seekSec);
-  });
 
   // Event Listeners
   loadBtn.addEventListener("click", () => loadLesson(urlInput.value));
@@ -410,41 +337,61 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") loadLesson(urlInput.value);
   });
 
-  dictationInput.addEventListener("input", () => {
-    evaluateAndRender();
-  });
+  dictationInput.addEventListener("input", () => evaluateAndRender());
 
-  // Ấn Enter là kiểm tra chứ không phải xuống dòng
+  // Enter: kiểm tra và chuyển câu tức thì (0ms nếu đã xong, 120ms nếu vừa hoàn tất)
   dictationInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      checkBtn.click();
+      const alreadyDone = completionCard.classList.contains("active");
+      if (alreadyDone && currentPosition < (currentLesson ? currentLesson.total_challenges : 1)) {
+        goToChallenge(currentPosition + 1);
+      } else {
+        checkBtn.click();
+      }
     }
   });
-
-  if (speakSentenceBtn) {
-    speakSentenceBtn.addEventListener("click", () => {
-      const challenge = getCurrentChallenge();
-      if (challenge) playerController.speakText(challenge.text);
-    });
-  }
-
-  if (ttsSpeakBtn) {
-    ttsSpeakBtn.addEventListener("click", () => {
-      const challenge = getCurrentChallenge();
-      if (challenge) playerController.speakText(challenge.text);
-    });
-  }
 
   checkBtn.addEventListener("click", () => {
-    evaluateAndRender();
     const challenge = getCurrentChallenge();
+    if (!challenge) return;
+
+    const alreadyDone = completionCard.classList.contains("active");
+    evaluateAndRender();
     const result = dictationManager.evaluate(challenge.text, dictationInput.value, false);
-    if (result.isCompleted && autoAdvance && currentPosition < currentLesson.total_challenges) {
-      setTimeout(() => goToChallenge(currentPosition + 1), 600);
+
+    if ((alreadyDone || result.isCompleted) && autoAdvance && currentPosition < currentLesson.total_challenges) {
+      const delay = alreadyDone ? 0 : 120;
+      if (delay === 0) {
+        goToChallenge(currentPosition + 1);
+      } else {
+        setTimeout(() => goToChallenge(currentPosition + 1), delay);
+      }
     }
   });
 
+  // Bỏ qua = Esc (hiện đáp án) + Enter (sang câu tiếp theo)
+  skipBtn?.addEventListener("click", () => {
+    const challenge = getCurrentChallenge();
+    if (!challenge) return;
+    dictationInput.value = challenge.text;
+    evaluateAndRender();
+    if (currentPosition < (currentLesson ? currentLesson.total_challenges : 1)) {
+      goToChallenge(currentPosition + 1);
+    }
+  });
+
+  // Luyện lại câu này
+  if (retryChallengeBtn) {
+    retryChallengeBtn.addEventListener("click", () => {
+      dictationInput.value = "";
+      evaluateAndRender();
+      dictationInput.focus();
+      playerController.replayCurrentSegment();
+    });
+  }
+
+  // Gợi ý
   hintLetterBtn.addEventListener("click", () => {
     const challenge = getCurrentChallenge();
     if (!challenge) return;
@@ -471,6 +418,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Navigation buttons
   prevBtn.addEventListener("click", () => goToChallenge(currentPosition - 1));
   nextBtn.addEventListener("click", () => goToChallenge(currentPosition + 1));
   nextChallengeBtn.addEventListener("click", () => goToChallenge(currentPosition + 1));
@@ -480,104 +428,88 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("backward-btn").addEventListener("click", () => playerController.seekRelative(-3));
   document.getElementById("forward-btn").addEventListener("click", () => playerController.seekRelative(3));
 
-  // Drawer handlers
-  function openDrawer() {
-    drawer.classList.add("active");
-    drawerOverlay.classList.add("active");
+  if (speakSentenceBtn) {
+    speakSentenceBtn.addEventListener("click", () => {
+      const challenge = getCurrentChallenge();
+      if (challenge) playerController.speakText(challenge.text);
+    });
   }
-  function closeDrawer() {
-    drawer.classList.remove("active");
-    drawerOverlay.classList.remove("active");
+  if (ttsSpeakBtn) {
+    ttsSpeakBtn.addEventListener("click", () => {
+      const challenge = getCurrentChallenge();
+      if (challenge) playerController.speakText(challenge.text);
+    });
   }
-  openDrawerBtn.addEventListener("click", openDrawer);
-  closeDrawerBtn.addEventListener("click", closeDrawer);
-  drawerOverlay.addEventListener("click", closeDrawer);
 
-  // Preset pills
-  presetPills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      presetPills.forEach((p) => p.classList.remove("active"));
-      pill.classList.add("active");
-      urlInput.value = pill.dataset.url;
-      loadLesson(pill.dataset.url);
+  // Preset Cards click handler (Sửa lỗi không bấm được vào các bài mẫu)
+  presetCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      presetCards.forEach((c) => c.classList.remove("active"));
+      card.classList.add("active");
+
+      // Apply language pair from card's data attributes
+      const srcLang = card.dataset.sourceLang;
+      const tgtLang = card.dataset.targetLang;
+      if (srcLang && sourceLangSelect) {
+        sourceLangSelect.value = srcLang;
+        settingsManager.set("sourceLang", srcLang);
+      }
+      if (tgtLang && targetLangSelect) {
+        targetLangSelect.value = tgtLang;
+        settingsManager.set("targetLang", tgtLang);
+      }
+
+      urlInput.value = card.dataset.url;
+      loadLesson(card.dataset.url);
     });
   });
 
-  skipBtn?.addEventListener("click", () => goToChallenge(currentPosition + 1));
-
-  // Speech-to-Text Microphone (Voice Dictation)
+  // Speech Recognition Microphone
+  let speechRecognizer = null;
   if (micBtn && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognizer = new SpeechRecognition();
-    recognizer.lang = "en-US";
+    speechRecognizer = new SpeechRecognition();
+    speechRecognizer.lang = "en-US";
     let isListening = false;
 
     micBtn.addEventListener("click", () => {
       if (isListening) {
-        recognizer.stop();
+        speechRecognizer.stop();
         return;
       }
       try {
-        recognizer.start();
+        speechRecognizer.start();
         isListening = true;
         micBtn.classList.add("listening");
       } catch (e) { console.warn(e); }
     });
-    recognizer.onresult = (evt) => {
+    speechRecognizer.onresult = (evt) => {
       const txt = evt.results[0][0].transcript;
       dictationInput.value = (dictationInput.value ? dictationInput.value + " " : "") + txt;
       evaluateAndRender();
     };
-    recognizer.onend = () => { isListening = false; micBtn.classList.remove("listening"); };
-    recognizer.onerror = () => { isListening = false; micBtn.classList.remove("listening"); };
+    speechRecognizer.onend = () => { isListening = false; micBtn.classList.remove("listening"); };
+    speechRecognizer.onerror = () => { isListening = false; micBtn.classList.remove("listening"); };
   }
 
-  // Global Keyboard Shortcuts (Configurable via Settings)
-  window.addEventListener("keydown", (e) => {
-    // Configured Replay Key (Ctrl / Space / Tab / Alt / R)
-    if (settingsManager.isReplayKey(e)) {
-      e.preventDefault();
-      playerController.replayCurrentSegment();
-      return;
-    }
-    // Configured Play/Pause Key (` / Esc / Space)
-    if (settingsManager.isPlayPauseKey(e)) {
-      e.preventDefault();
-      playerController.togglePlayPause();
-      return;
-    }
-    // Esc: Show full answer immediately (Hiện full câu luôn)
-    if (e.key === "Escape" || e.code === "Escape") {
-      e.preventDefault();
-      const challenge = getCurrentChallenge();
-      if (challenge) {
-        dictationInput.value = challenge.text;
-        evaluateAndRender();
-        dictationInput.focus();
-      }
-      return;
-    }
-    // Ctrl + H: Hint letter
-    if (e.ctrlKey && e.key.toLowerCase() === "h") {
-      e.preventDefault();
-      hintLetterBtn.click();
-      return;
-    }
-    // Alt + ArrowRight: Next challenge
-    if (e.altKey && e.key === "ArrowRight") {
-      e.preventDefault();
-      goToChallenge(currentPosition + 1);
-      return;
-    }
-    // Alt + ArrowLeft: Previous challenge
-    if (e.altKey && e.key === "ArrowLeft") {
-      e.preventDefault();
-      goToChallenge(currentPosition - 1);
-      return;
-    }
+  // Global Keyboard Shortcuts (Esc = xem đáp án, Enter = sang câu, Ctrl = replay,...)
+  new ShortcutManager({
+    settingsManager,
+    playerController,
+    drawerManager,
+    dictationInput,
+    getCurrentChallenge: () => getCurrentChallenge(),
+    evaluateAndRender: () => evaluateAndRender(),
+    goToChallenge: (pos) => goToChallenge(pos),
+    getCurrentPosition: () => currentPosition,
+    hintLetterBtn,
   });
 
-  // Auto load default video on start!
+  // Restore last used URL from localStorage (overrides hardcoded HTML default)
+  const lastUrl = localStorage.getItem("lastUrl");
+  if (lastUrl) urlInput.value = lastUrl;
+
+  // Auto load initial video
   if (urlInput.value) {
     loadLesson(urlInput.value);
   }

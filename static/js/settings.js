@@ -9,6 +9,9 @@ class SettingsManager {
       playPauseKey: "Backquote", // "`" backtick, "Space", "Escape"
       autoReplay: "no", // "yes", "no" - Mặc định tắt tự lặp lại
       replayInterval: 1.0, // seconds
+      audioPadding: 0.1, // seconds (mặc định 0.1s)
+      sourceLang: "en", // Mặc định ngôn ngữ 1: Tiếng Anh
+      targetLang: "vi", // Mặc định ngôn ngữ 2: Tiếng Việt
       wordSuggestions: "enabled", // "enabled", "disabled"
       strictPunctuation: "no", // "yes", "no"
       autoAdvance: "yes", // "yes", "no"
@@ -53,6 +56,9 @@ class SettingsManager {
       playPauseKey: document.getElementById("setting-playpause-key"),
       autoReplay: document.getElementById("setting-auto-replay"),
       replayInterval: document.getElementById("setting-replay-interval"),
+      audioPadding: document.getElementById("setting-audio-padding"),
+      sourceLang: document.getElementById("setting-source-lang"),
+      targetLang: document.getElementById("setting-target-lang"),
       autoAdvance: document.getElementById("setting-auto-advance"),
       wordSuggestions: document.getElementById("setting-word-suggestions"),
       strictPunctuation: document.getElementById("setting-strict-punct"),
@@ -75,7 +81,10 @@ class SettingsManager {
 
     for (const [k, el] of Object.entries(selects)) {
       el?.addEventListener("change", () => {
-        const val = k === "replayInterval" ? parseFloat(el.value) : el.value;
+        let val = el.value;
+        if (k === "replayInterval" || k === "audioPadding") {
+          val = parseFloat(el.value);
+        }
         this.set(k, val);
         if (onSettingsChanged) onSettingsChanged(k, val);
       });

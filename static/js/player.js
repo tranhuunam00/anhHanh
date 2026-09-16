@@ -10,6 +10,8 @@ class YouTubePlayerController {
     this.currentLoopEnd = 0;
     this.isLooping = false; // Mặc định không lặp lại
     this.replayInterval = 1.0;
+    this.audioPadding = 0.1; // Mặc định 0.1s thay vì 0.2s
+    this.sourceLang = "en";
     this.isWaitingReplay = false;
     this.replayTimeout = null;
     this.pendingPlay = false;
@@ -17,6 +19,14 @@ class YouTubePlayerController {
     this.currentVideoId = null;
     this.onReadyCallbacks = [];
     this.onEmbedRestricted = null;
+  }
+
+  setAudioPadding(seconds) {
+    this.audioPadding = Math.max(0.0, parseFloat(seconds) ?? 0.1);
+  }
+
+  setSourceLang(lang) {
+    if (lang) this.sourceLang = lang;
   }
 
   init(videoId, onReady) {
@@ -106,13 +116,22 @@ class YouTubePlayerController {
     this.replayInterval = Math.max(0.1, parseFloat(seconds) || 1.0);
   }
 
-  playSegment(start, end, loop = true) {
+  playSegment(start, end, loop = true, prevEnd = null, nextStart = null) {
     this.isFullMode = false;
-    // Audio pre-roll and post-roll padding (0.2s trước và 0.2s sau)
-    const paddingStart = 0.2;
-    const paddingEnd = 0.2;
-    this.currentLoopStart = Math.max(0, start - paddingStart);
-    this.currentLoopEnd = end + paddingEnd;
+    // Audio pre-roll and post-roll padding (mặc định 0.1s hoặc theo cài đặt người dùng)
+    const padding = typeof this.audioPadding === "number" ? this.audioPadding : 0.1;
+    let loopStart = Math.max(0, start - padding);
+    if (typeof prevEnd === "number" && !isNaN(prevEnd)) {
+      // Chặn không cho lẹm vào câu trước
+      loopStart = Math.max(loopStart, prevEnd);
+    }
+    let loopEnd = end + padding;
+    if (typeof nextStart === "number" && !isNaN(nextStart)) {
+      // Chặn không cho tràn sang câu sau
+      loopEnd = Math.min(loopEnd, nextStart);
+    }
+    this.currentLoopStart = Math.max(0, loopStart);
+    this.currentLoopEnd = Math.max(this.currentLoopStart + 0.1, loopEnd);
     this.isLooping = loop;
     this.isWaitingReplay = false;
     if (this.replayTimeout) clearTimeout(this.replayTimeout);
@@ -231,11 +250,25 @@ class YouTubePlayerController {
   /**
    * Browser Text-To-Speech Fallback (Web Speech API)
    */
-  speakText(text) {
+  speakText(text, lang) {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
+    const code = (lang || this.sourceLang || "en").toLowerCase();
+    const langMap = {
+      en: "en-US",
+      fr: "fr-FR",
+      ja: "ja-JP",
+      ko: "ko-KR",
+      zh: "zh-CN",
+      de: "de-DE",
+      es: "es-ES",
+      vi: "vi-VN",
+      ru: "ru-RU",
+      it: "it-IT",
+      pt: "pt-BR",
+    };
+    utterance.lang = langMap[code] || langMap[code.split("-")[0]] || "en-US";
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   }
@@ -281,6 +314,6 @@ class YouTubePlayerController {
       } catch (e) {
         // Player reinitializing
       }
-    }, 100);
+    }, 50);
   }
 }

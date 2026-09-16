@@ -13,8 +13,7 @@ from app.application.dtos import (
     EvaluateResponse,
     WordEvaluationDTO,
 )
-
-
+from app.infrastructure.raw_subtitle_cache import RawSubtitleFileCache
 from app.infrastructure.translation_service import TranslationService
 
 
@@ -45,28 +44,59 @@ class GetLessonUseCase:
         cache_repo: Optional[ICacheRepository] = None,
         sentence_grouper: Optional[SentenceGrouperService] = None,
         translation_service: Optional[TranslationService] = None,
+        raw_sub_cache: Optional[RawSubtitleFileCache] = None,
     ):
         self.transcript_service = transcript_service
-        self.cache_repo = cache_repo
+        self.cache_repo = cache_repo  # kept for interface compat, not used for lesson caching
         self.sentence_grouper = sentence_grouper or SentenceGrouperService()
         self.translation_service = translation_service or TranslationService()
+        self.raw_sub_cache = raw_sub_cache or RawSubtitleFileCache()
 
     def execute(self, request: GetLessonRequest) -> LessonResponse:
         video_id = extract_youtube_id(request.url_or_id)
+        source_lang = (request.source_lang or "en").strip().lower()
+        target_lang = (request.target_lang or "vi").strip().lower()
 
-        # Check cache
-        if self.cache_repo:
-            cached_lesson = self.cache_repo.get(video_id)
-            if cached_lesson:
-                for c in cached_lesson.challenges:
-                    if c.translation:
-                        c.translation = SentenceGrouperService.clean_credits(c.translation)
-                return self._to_response(cached_lesson)
+        # --- Step 1: Get raw source subtitles (file cache or YouTube) ---
+        cached_src = self.raw_sub_cache.get(video_id, source_lang)
+        if cached_src:
+            title, src_snippets = cached_src
+            detected_source_lang = source_lang
+            # Target subs: try cache, else fetch separately
+            cached_tgt = self.raw_sub_cache.get(video_id, f"{source_lang}_tgt_{target_lang}")
+            if cached_tgt:
+                tgt_snippets = cached_tgt[1]
+            elif target_lang and target_lang not in ("none", "", source_lang):
+                _, _, tgt_snippets, _ = self.transcript_service.fetch_transcripts(
+                    video_id, source_lang=source_lang, target_lang=target_lang
+                )
+                if tgt_snippets:
+                    self.raw_sub_cache.save(
+                        video_id,
+                        f"{source_lang}_tgt_{target_lang}",
+                        title,
+                        tgt_snippets,
+                    )
+            else:
+                tgt_snippets = None
+        else:
+            # Fetch fresh from YouTube
+            title, src_snippets, tgt_snippets, detected_source_lang = (
+                self.transcript_service.fetch_transcripts(
+                    video_id, source_lang=source_lang, target_lang=target_lang
+                )
+            )
+            # Save raw subs to file cache
+            self.raw_sub_cache.save(video_id, source_lang, title, src_snippets)
+            if tgt_snippets:
+                self.raw_sub_cache.save(
+                    video_id,
+                    f"{source_lang}_tgt_{target_lang}",
+                    title,
+                    tgt_snippets,
+                )
 
-        # Fetch from transcript service
-        title, en_snippets, vi_snippets = self.transcript_service.fetch_transcripts(video_id)
-
-        # Group snippets into natural sentences
+        # --- Step 2: Always run grouping fresh (so algorithm changes take effect) ---
         if request.grouping_mode == "snippet":
             challenges = [
                 Challenge(
@@ -75,15 +105,15 @@ class GetLessonUseCase:
                     text=s.text.replace("\n", " ").strip(),
                     time_start=round(s.start, 2),
                     time_end=round(s.end, 2),
-                    translation=vi_snippets[i].text.replace("\n", " ").strip()
-                    if vi_snippets and i < len(vi_snippets)
+                    translation=tgt_snippets[i].text.replace("\n", " ").strip()
+                    if tgt_snippets and i < len(tgt_snippets)
                     else None,
                 )
-                for i, s in enumerate(en_snippets)
+                for i, s in enumerate(src_snippets)
             ]
         else:
             challenges = self.sentence_grouper.group_into_challenges(
-                snippets=en_snippets, translations=vi_snippets
+                snippets=src_snippets, translations=tgt_snippets
             )
 
         # Ensure all translations are clean of credits
@@ -91,15 +121,37 @@ class GetLessonUseCase:
             if c.translation:
                 c.translation = SentenceGrouperService.clean_credits(c.translation)
 
-        lesson = Lesson(video_id=video_id, title=title, challenges=challenges)
+        # Auto-translate first 12 challenges if target_lang differs from source
+        if target_lang not in ("none", "", detected_source_lang):
+            for c in challenges[:12]:
+                if not c.translation:
+                    translated = self.translation_service.translate(
+                        c.text, source_lang=detected_source_lang, target_lang=target_lang
+                    )
+                    if translated:
+                        c.translation = translated
 
-        # Save to cache
-        if self.cache_repo:
-            self.cache_repo.save(lesson)
+        lesson = Lesson(
+            video_id=video_id,
+            title=title,
+            challenges=challenges,
+            detected_source_lang=detected_source_lang,
+        )
 
-        return self._to_response(lesson)
+        return self._to_response(
+            lesson,
+            source_lang=source_lang,
+            detected_source_lang=detected_source_lang,
+            target_lang=target_lang,
+        )
 
-    def _to_response(self, lesson: Lesson) -> LessonResponse:
+    def _to_response(
+        self,
+        lesson: Lesson,
+        source_lang: Optional[str] = "auto",
+        detected_source_lang: Optional[str] = "en",
+        target_lang: Optional[str] = "vi",
+    ) -> LessonResponse:
         dto_challenges = [
             ChallengeDTO(
                 id=c.id,
@@ -117,6 +169,9 @@ class GetLessonUseCase:
             title=lesson.title,
             total_challenges=lesson.total_challenges,
             challenges=dto_challenges,
+            source_lang=source_lang,
+            detected_source_lang=detected_source_lang,
+            target_lang=target_lang,
         )
 
 

@@ -1,69 +1,26 @@
-"""File-based cache repository for lessons."""
-import json
-import os
-from typing import Optional
-from app.domain.models import Lesson, Challenge
+"""In-memory cache repository for lessons (cleared on server restart).
+
+Same video+language combo is cached in RAM for the life of the server process.
+Restarting the server always fetches fresh from YouTube.
+This prevents YouTube rate-limiting from repeated identical requests.
+"""
+from typing import Optional, Dict
+from app.domain.models import Lesson
 from app.application.interfaces import ICacheRepository
 
 
 class FileCacheRepository(ICacheRepository):
-    """Caches lessons as JSON files in a cache directory."""
+    """Stores lessons in a process-level dict — no disk writes."""
 
     def __init__(self, cache_dir: str = "data/cache"):
-        self.cache_dir = cache_dir
-        os.makedirs(self.cache_dir, exist_ok=True)
+        # cache_dir kept for interface compatibility; not used
+        self._store: Dict[str, Lesson] = {}
 
-    def _get_path(self, video_id: str) -> str:
-        return os.path.join(self.cache_dir, f"{video_id}.json")
+    def _key(self, video_id: str, cache_key: Optional[str]) -> str:
+        return cache_key if cache_key else video_id
 
-    def get(self, video_id: str) -> Optional[Lesson]:
-        path = self._get_path(video_id)
-        if not os.path.isfile(path):
-            return None
+    def get(self, video_id: str, cache_key: Optional[str] = None) -> Optional[Lesson]:
+        return self._store.get(self._key(video_id, cache_key))
 
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-
-            challenges = [
-                Challenge(
-                    id=c["id"],
-                    position=c["position"],
-                    text=c["text"],
-                    time_start=c["time_start"],
-                    time_end=c["time_end"],
-                    translation=c.get("translation"),
-                )
-                for c in data.get("challenges", [])
-            ]
-            return Lesson(
-                video_id=data["video_id"],
-                title=data["title"],
-                challenges=challenges,
-            )
-        except Exception:
-            return None
-
-    def save(self, lesson: Lesson) -> None:
-        path = self._get_path(lesson.video_id)
-        try:
-            data = {
-                "video_id": lesson.video_id,
-                "title": lesson.title,
-                "total_challenges": lesson.total_challenges,
-                "challenges": [
-                    {
-                        "id": c.id,
-                        "position": c.position,
-                        "text": c.text,
-                        "time_start": c.time_start,
-                        "time_end": c.time_end,
-                        "translation": c.translation,
-                    }
-                    for c in lesson.challenges
-                ],
-            }
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
+    def save(self, lesson: Lesson, cache_key: Optional[str] = None) -> None:
+        self._store[self._key(lesson.video_id, cache_key)] = lesson

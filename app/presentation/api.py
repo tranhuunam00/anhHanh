@@ -36,10 +36,16 @@ class LessonApiRequest(BaseModel):
     grouping_mode: str = Field(
         default="sentence", description="'sentence' hoặc 'snippet'"
     )
+    source_lang: Optional[str] = Field(
+        default="en", description="Ngôn ngữ gốc ('en', 'auto', 'fr', 'ja', 'ko', 'zh', 'de', 'es', 'vi',...)"
+    )
+    target_lang: Optional[str] = Field(
+        default="vi", description="Ngôn ngữ dịch ('vi', 'en', 'fr', 'ja', 'ko', 'zh', 'de', 'es', 'none')"
+    )
 
 
 class EvaluateApiRequest(BaseModel):
-    target_text: str = Field(..., description="Câu mẫu tiếng Anh")
+    target_text: str = Field(..., description="Câu mẫu")
     user_input: str = Field(..., description="Câu người dùng đã gõ")
     strict_punctuation: bool = Field(
         default=False, description="Có yêu cầu đúng dấu câu hay không"
@@ -51,7 +57,10 @@ def get_or_create_lesson(body: LessonApiRequest):
     """Trích xuất bài tập chép chính tả theo từng câu từ link YouTube."""
     try:
         req = GetLessonRequest(
-            url_or_id=body.url_or_id, grouping_mode=body.grouping_mode
+            url_or_id=body.url_or_id,
+            grouping_mode=body.grouping_mode,
+            source_lang=body.source_lang,
+            target_lang=body.target_lang,
         )
         return _get_lesson_uc.execute(req)
     except InvalidVideoIdException as e:
@@ -61,6 +70,21 @@ def get_or_create_lesson(body: LessonApiRequest):
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Lỗi khi xử lý video: {str(e)}"
+        )
+
+
+@api_router.get("/video-languages")
+def get_video_languages(url_or_id: str):
+    """Lấy danh sách các ngôn ngữ phụ đề thực tế và ngôn ngữ phát hiện của video."""
+    try:
+        from app.application.use_cases import extract_youtube_id
+        video_id = extract_youtube_id(url_or_id)
+        return _youtube_adapter.get_available_languages(video_id)
+    except InvalidVideoIdException as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Lỗi khi lấy thông tin ngôn ngữ: {str(e)}"
         )
 
 
@@ -79,17 +103,26 @@ def evaluate_submission(body: EvaluateApiRequest):
 
 
 class TranslateApiRequest(BaseModel):
-    text: str = Field(..., description="Câu tiếng Anh cần dịch sang tiếng Việt")
+    text: str = Field(..., description="Câu cần dịch")
+    source_lang: Optional[str] = Field(default="auto", description="Ngôn ngữ nguồn")
+    target_lang: Optional[str] = Field(default="vi", description="Ngôn ngữ đích")
 
 
 @api_router.post("/translate")
 def translate_text(body: TranslateApiRequest):
-    """Dịch câu tiếng Anh sang tiếng Việt chuẩn nghĩa và lưu cache."""
+    """Dịch câu giữa các ngôn ngữ qua MyMemory và lưu cache."""
     from app.infrastructure.translation_service import TranslationService
 
     service = TranslationService()
-    translation = service.translate_to_vietnamese(body.text)
-    return {"original": body.text, "translation": translation}
+    translation = service.translate(
+        body.text, source_lang=body.source_lang or "auto", target_lang=body.target_lang or "vi"
+    )
+    return {
+        "original": body.text,
+        "translation": translation,
+        "source_lang": body.source_lang,
+        "target_lang": body.target_lang,
+    }
 
 
 @api_router.get("/presets")

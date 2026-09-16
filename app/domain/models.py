@@ -75,6 +75,7 @@ class Lesson:
     challenges: List[Challenge] = field(default_factory=list)
     author: Optional[str] = None
     thumbnail_url: Optional[str] = None
+    detected_source_lang: Optional[str] = "en"
 
     @property
     def total_challenges(self) -> int:

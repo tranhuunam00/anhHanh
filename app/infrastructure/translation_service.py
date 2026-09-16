@@ -61,31 +61,50 @@ class TranslationService:
             return ""
         return cleaned
 
-    def translate_to_vietnamese(self, text: str) -> str:
-        """Translate English sentence to Vietnamese using cache or MyMemory translation API."""
+    def translate(
+        self, text: str, source_lang: str = "auto", target_lang: str = "vi"
+    ) -> str:
+        """Translate sentence between languages using cache or MyMemory API."""
         cleaned = self.clean_text(text)
         if not cleaned:
             return ""
 
-        # Check cache
-        if cleaned in self.memory_cache:
-            return self.memory_cache[cleaned]
+        src = (source_lang or "auto").strip().lower()
+        tgt = (target_lang or "vi").strip().lower()
 
-        # Call translation provider (MyMemory API)
-        translated = self._fetch_mymemory(cleaned)
+        # If source and target are the same, or target is none, return as-is
+        if tgt in ("none", "") or (src == tgt and src != "auto"):
+            return cleaned
+
+        cache_key = f"{src}_{tgt}_{cleaned}"
+
+        # Check cache
+        if cache_key in self.memory_cache:
+            return self.memory_cache[cache_key]
+
+        # Call translation provider
+        pair_src = "en" if src == "auto" else src
+        translated = self._fetch_mymemory(cleaned, pair_src, tgt)
         if translated:
             cleaned_trans = self.clean_credits(translated)
-            self.memory_cache[cleaned] = cleaned_trans
+            self.memory_cache[cache_key] = cleaned_trans
             self._save_cache()
             return cleaned_trans
 
         return ""
 
-    def _fetch_mymemory(self, text: str) -> Optional[str]:
+    def translate_to_vietnamese(self, text: str) -> str:
+        """Backwards-compatible helper for English to Vietnamese translation."""
+        return self.translate(text, source_lang="en", target_lang="vi")
+
+    def _fetch_mymemory(
+        self, text: str, source_lang: str = "en", target_lang: str = "vi"
+    ) -> Optional[str]:
         """Fetch translation from MyMemory API."""
         try:
             q = urllib.parse.quote(text)
-            url = f"https://api.mymemory.translated.net/get?q={q}&langpair=en|vi"
+            langpair = f"{source_lang}|{target_lang}"
+            url = f"https://api.mymemory.translated.net/get?q={q}&langpair={langpair}"
             req = urllib.request.Request(
                 url,
                 headers={

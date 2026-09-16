@@ -29,3 +29,22 @@ def test_api_invalid_url():
     payload = {"url_or_id": "invalid_url_with_no_id"}
     response = client.post("/api/lesson", json=payload)
     assert response.status_code == 400
+
+
+def test_api_video_languages_invalid():
+    response = client.get("/api/video-languages?url_or_id=invalid_id")
+    assert response.status_code == 400
+
+
+def test_api_translate():
+    payload = {
+        "text": "Bonjour",
+        "source_lang": "fr",
+        "target_lang": "vi"
+    }
+    response = client.post("/api/translate", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert "translation" in data
+    assert data["source_lang"] == "fr"
+    assert data["target_lang"] == "vi"

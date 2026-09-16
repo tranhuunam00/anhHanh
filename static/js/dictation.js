@@ -10,8 +10,8 @@ class DictationManager {
     if (!token) return "";
     return token
       .replace(/[’‘]/g, "'")
-      .replace(/[“”]/g, '"')
-      .replace(/^[^\w']+|[^\w']+$/g, "")
+      .replace(/[“”«»„]/g, '"')
+      .replace(/^[^\p{L}\p{N}']+|[^\p{L}\p{N}']+$/gu, "")
       .trim()
       .toLowerCase();
   }
@@ -33,7 +33,7 @@ class DictationManager {
     for (let tIdx = 0; tIdx < tChars.length; tIdx++) {
       const tChar = tChars[tIdx];
       const isSpace = /\s/.test(tChar);
-      const isPunct = /^[^\w\s]$/.test(tChar);
+      const isPunct = /^[^\p{L}\p{N}\s]$/u.test(tChar);
 
       if (isSpace) {
         if (currentWord.length > 0) {
@@ -216,7 +216,7 @@ class DictationManager {
 
       data.challenges[position] = {
         input,
-        isCompleted: isCompleted || data.challenges[position]?.isCompleted,
+        isCompleted: !!isCompleted,
         lastUpdated: Date.now(),
       };
       data.lastPosition = position;
