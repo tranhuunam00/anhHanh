@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BRD & SRS - DailyDictation Studio 2.0 Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --secondary: #0d9488;
+      --secondary-light: #f0fdfa;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --sidebar-width: 300px;
+      --header-height: 68px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    [data-theme="dark"] {
+      --primary: #3b82f6;
+      --primary-dark: #60a5fa;
+      --primary-light: rgba(59, 130, 246, 0.15);
+      --secondary: #14b8a6;
+      --secondary-light: rgba(20, 184, 166, 0.15);
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 15px;
+      transition: background-color 0.25s, color 0.25s;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      color: #fff;
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      margin-top: var(--header-height);
+      min-height: calc(100vh - var(--header-height));
+    }
+
+    /* Sidebar Table of Contents */
+    .sidebar {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: var(--header-height);
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      scrollbar-width: thin;
+    }
+
+    .toc-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      padding-left: 12px;
+    }
+
+    .toc-list {
+      list-style: none;
+    }
+
+    .toc-item {
+      margin-bottom: 3px;
+    }
+
+    .toc-link {
+      display: block;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+
+    .toc-link:hover, .toc-link.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .toc-sublist {
+      list-style: none;
+      padding-left: 16px;
+      margin-top: 2px;
+    }
+
+    .toc-sublist .toc-link {
+      font-size: 12.5px;
+      padding: 6px 10px;
+    }
+
+    /* Main Content Container */
+    .content-wrap {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 2.5rem 3.5rem 5rem 3.5rem;
+      max-width: 1280px;
+    }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a, #0d9488);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      opacity: 0.9;
+      max-width: 800px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .meta-label {
+      font-size: 11.5px;
+      opacity: 0.75;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .meta-val {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    /* Section Cards */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-card h2 {
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+
+    .section-card h3 {
+      font-size: 16.5px;
+      font-weight: 700;
+      margin: 1.5rem 0 0.85rem 0;
+      color: var(--primary);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-admin { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .badge-user { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .badge-guest { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+    .badge-post { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-family: 'JetBrains Mono', monospace; }
+    .badge-get { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; font-family: 'JetBrains Mono', monospace; }
+    .badge-patch { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; font-family: 'JetBrains Mono', monospace; }
+
+    [data-theme="dark"] .badge-admin { background: rgba(220, 38, 38, 0.2); color: #f87171; border-color: rgba(220, 38, 38, 0.4); }
+    [data-theme="dark"] .badge-user { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border-color: rgba(37, 99, 235, 0.4); }
+    [data-theme="dark"] .badge-guest { background: rgba(107, 114, 128, 0.2); color: #9ca3af; border-color: rgba(107, 114, 128, 0.4); }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin: 1rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    th {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(0, 0, 0, 0.015);
+    }
+
+    [data-theme="dark"] tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Callout Boxes */
+    .callout {
+      padding: 1.25rem 1.5rem;
+      border-radius: var(--radius-sm);
+      margin: 1.25rem 0;
+      border-left: 4px solid;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .callout-info {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--text);
+    }
+
+    .callout-success {
+      background: var(--secondary-light);
+      border-color: var(--secondary);
+      color: var(--text);
+    }
+
+    .callout-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* Grid cards for Objectives & Requirements */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin: 1.25rem 0;
+    }
+
+    .feature-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem;
+      background: var(--card-bg);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    .feature-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .feature-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .feature-card-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .feature-card-body {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Code block */
+    .code-block {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      position: relative;
+      margin: 1rem 0;
+      overflow-x: auto;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #e2e8f0;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ER Diagram / Schema Tree */
+    .schema-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 1rem 0;
+    }
+
+    .schema-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card-bg);
+      overflow: hidden;
+    }
+
+    .schema-card-header {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 10px 14px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .schema-card-fields {
+      list-style: none;
+      padding: 8px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .schema-card-fields li {
+      padding: 4px 0;
+      border-bottom: 1px dashed var(--border);
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+
+    .schema-card-fields li:last-child {
+      border-bottom: none;
+    }
+
+    .field-name {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .field-type {
+      color: var(--secondary);
+      font-size: 11px;
+    }
+
+    .pk-badge {
+      background: #fef3c7;
+      color: #b45309;
+      font-size: 9.5px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: 700;
+    }
+
+    .fk-badge {
+      background: #e0e7ff;
+      color: #4338ca;
+      font-size: 9.5px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: 700;
+    }
+
+    /* Checkbox list for Acceptance Criteria */
+    .checklist {
+      list-style: none;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      background: var(--card-bg);
+    }
+
+    .check-icon {
+      color: var(--success);
+      font-size: 18px;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .check-content strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .check-content span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2.5rem 0 1rem 0;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    /* Print styling */
+    @media print {
+      .navbar, .sidebar, .btn, .copy-btn {
+        display: none !important;
+      }
+      .layout {
+        margin-top: 0 !important;
+      }
+      .content-wrap {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .hero {
+        background: #1e3a8a !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .section-card {
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        margin-bottom: 1.5rem !important;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar {
+        display: none;
+      }
+      .content-wrap {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+    /* Mermaid Diagram Containers */
+    .mermaid-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin: 1.5rem 0 2rem 0;
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+    .mermaid-box h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mermaid-box p.diagram-caption {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      background: transparent;
+      min-height: 200px;
+    }
+    .mermaid svg {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <a href="#" class="brand">
+      <div class="brand-logo">D</div>
+      <div>
+        <div class="brand-title">DailyDictation Studio Enterprise</div>
+        <div class="brand-subtitle">Tài Liệu Yêu Cầu Nghiệp Vụ & Thiết Kế Hệ Thống</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <button class="btn" onclick="toggleTheme()" id="themeBtn">🌓 Đổi giao diện</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ In / Lưu PDF</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Sticky Sidebar Table of Contents -->
+    <aside class="sidebar">
+      <div class="toc-title">Mục lục tài liệu</div>
+      <ul class="toc-list">
+        <li class="toc-item"><a href="#section-1" class="toc-link">1. Mục tiêu dự án</a></li>
+        <li class="toc-item">
+          <a href="#section-diagrams" class="toc-link">2. Sơ đồ Luồng Nghiệp Vụ BRD</a>
+          <ul class="toc-sublist">
+            <li><a href="#diag-flow" class="toc-link">2.1. Luồng Học & Lưu tiến độ</a></li>
+            <li><a href="#diag-vocab" class="toc-link">2.2. Luồng Sổ từ & Kéo ảnh AI</a></li>
+          </ul>
+        </li>
+        <li class="toc-item"><a href="#section-2" class="toc-link">3. Phân quyền hệ thống (RBAC)</a></li>
+        <li class="toc-item">
+          <a href="#section-3" class="toc-link">4. Đặc tả yêu cầu chức năng (SRS)</a>
+          <ul class="toc-sublist">
+            <li><a href="#fr-auth" class="toc-link">4.1. Xác thực & Quản lý User</a></li>
+            <li><a href="#fr-session" class="toc-link">4.2. Bắt đầu bài & Lưu tiến độ</a></li>
+            <li><a href="#fr-vocab" class="toc-link">4.3. Sổ tay từ vựng & Ảnh AI</a></li>
+            <li><a href="#fr-streak" class="toc-link">4.4. Streak & Thống kê từ</a></li>
+          </ul>
+        </li>
+        <li class="toc-item"><a href="#section-4" class="toc-link">5. Thiết kế CSDL & Sơ đồ ERD</a></li>
+        <li class="toc-item"><a href="#section-5" class="toc-link">6. Danh mục RESTful API</a></li>
+        <li class="toc-item"><a href="#section-6" class="toc-link">7. Kiến trúc Hệ thống & Docker (1 Lệnh)</a></li>
+        <li class="toc-item"><a href="#section-8" class="toc-link">8. Bảo Mật & Chống Tấn Công</a></li>
+        <li class="toc-item"><a href="#section-7" class="toc-link">9. Tiêu chí nghiệm thu (DoD)</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Document -->
+    <main class="content-wrap">
+
+      <!-- Hero Header -->
+      <section class="hero">
+        <span class="hero-badge">Tài liệu kỹ thuật chính thức • v2.0.0</span>
+        <h1 class="hero-title">TÀI LIỆU YÊU CẦU NGHIỆP VỤ (BRD)<br>& ĐẶC TẢ YÊU CẦU HỆ THỐNG (SRS)</h1>
+        <p class="hero-desc">Dự án Nâng cấp Nền tảng DailyDictation Studio: Chuyển đổi kiến trúc cơ sở dữ liệu quan hệ PostgreSQL, đóng gói container hóa Docker Compose 1 câu lệnh, phân quyền RBAC và tích hợp Sổ tay từ vựng minh họa tự động.</p>
+        
+        <div class="hero-meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Dự án</span>
+            <span class="meta-val">DailyDictation Studio Enterprise</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Ngày phê duyệt</span>
+            <span class="meta-val">16/09/2026</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Hạ tầng</span>
+            <span class="meta-val">PostgreSQL 16 + FastAPI + Docker</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Trạng thái</span>
+            <span class="meta-val">✅ Sẵn sàng thực thi (Ready to Code)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 1 -->
+      <section id="section-1" class="section-card">
+        <h2>🎯 1. Mục Tiêu Dự Án (Project Objectives)</h2>
+        <p>Nâng cấp DailyDictation Studio từ mô hình chạy cục bộ (file-cache/localStorage) sang hệ sinh thái Fullstack hoàn chỉnh, hướng tới trải nghiệm học nghe chép chính tả tiếng Anh toàn diện, tự động hóa cao và lưu trữ dữ liệu vĩnh cửu:</p>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-icon">1</div>
+              <div class="feature-card-title">Bền vững Dữ liệu (PostgreSQL)</div>
+            </div>
+            <div class="feature-card-body">Chuyển toàn bộ lịch sử học tập, tiến độ từng câu và từ vựng cá nhân lên CSDL PostgreSQL. Người học đổi máy hay xóa cache trình duyệt vẫn bảo toàn 100% dữ liệu.</div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-icon">2</div>
+              <div class="feature-card-title">Khởi chạy 1 Lệnh (Docker Compose)</div>
+            </div>
+            <div class="feature-card-body">Đóng gói Web App + Database. Chỉ cần chạy <code>docker compose up --build</code> là mọi thứ tự động khởi tạo bảng, cấu hình volume và sẵn sàng sử dụng.</div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-icon">3</div>
+              <div class="feature-card-title">Phân quyền Chuẩn (RBAC)</div>
+            </div>
+            <div class="feature-card-body">Đúng 1 tài khoản Super Admin (cấu hình qua <code>.env</code>) quản lý presets và học viên. Các tài khoản còn lại là User với hỗ trợ đăng nhập kép (Email & Google One-tap).</div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-icon">4</div>
+              <div class="feature-card-title">Quy trình Bắt đầu Bài Chủ động</div>
+            </div>
+            <div class="feature-card-body">Dán link YouTube &rarr; Hiện Card xem trước thông tin video &rarr; Nhấn "Bắt đầu học bài này" mới bắt đầu tạo bản ghi lưu lịch sử và tính giờ.</div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-icon">5</div>
+              <div class="feature-card-title">Nhớ Vị trí Câu Làm dở</div>
+            </div>
+            <div class="feature-card-body">Hiển thị rõ ràng đang ở câu nào (▶ viền cam), câu đã xong (✓ xanh lá), câu chưa làm (⚪ xám). Khi mở lại video cũ, hệ thống tự động nhảy tới câu dở dang.</div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-icon">6</div>
+              <div class="feature-card-title">Sổ Từ Vựng Minh họa Tự động</div>
+            </div>
+            <div class="feature-card-body">Bôi đen từ/cụm từ trên câu nghe để lưu &rarr; Hệ thống tự động truy vấn ảnh chất lượng cao (Unsplash/Wikimedia) + Phiên âm IPA + Nghĩa + Audio câu gốc.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Diagrams -->
+      <section id="section-diagrams" class="section-card">
+        <h2>🗺️ 2. Sơ Đồ Luồng Nghiệp Vụ BRD (Business Process Flows)</h2>
+        <p>Hai sơ đồ trực quan hóa toàn bộ trải nghiệm người dùng tương tác với hệ thống DailyDictation Studio:</p>
+
+        <!-- Diagram 2.1 -->
+        <div class="mermaid-box" id="diag-flow">
+          <h4>🔄 2.1. Sơ đồ Luồng Nghiệp vụ Bài học & Lưu Tiến độ (Learning Workflow)</h4>
+          <p class="diagram-caption">Trình tự tuần tự: Dán link &rarr; Xem trước Video Preview Card &rarr; Bấm "Bắt đầu học bài này" kích hoạt phiên học &rarr; Vòng lặp gõ câu, lưu tiến độ, cập nhật Streak &rarr; Nhớ vị trí câu khi quay lại.</p>
+          <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User as Học Viên (User)
+    participant UI as Giao diện Web (Client)
+    participant API as Backend (FastAPI)
+    participant DB as CSDL (PostgreSQL)
+    participant YT as YouTube API
+
+    User->>UI: Dán link video YouTube & Bấm Kiểm tra
+    UI->>API: POST /api/lesson/preview
+    API->>YT: Tải phụ đề và thông tin video
+    API->>API: Phân đoạn câu chuẩn (<= 20 từ/câu)
+    API-->>UI: Trả về Preview Data (Thumbnail, Title, Số câu)
+    UI-->>User: Hiển thị Video Preview Card & Nút Bắt đầu học
+
+    User->>UI: Bấm "🚀 Bắt đầu học bài này"
+    UI->>API: POST /api/lesson/start
+    API->>DB: Ghi nhận bài học & Tra cứu câu dở dang
+    DB-->>API: Trả về trạng thái & câu cần học
+    API-->>UI: Dữ liệu bài học + Vị trí câu đang làm dở
+
+    loop Nghe chép chính tả từng câu
+        UI->>UI: Phát audio lặp lại (Padding 0.2s)
+        User->>UI: Gõ từ vào ô input & Bấm Enter
+        UI->>API: POST /api/progress/save
+        API->>DB: Lưu kết quả câu, cập nhật số từ hôm nay & Streak
+        DB-->>API: Cập nhật thành công
+        API-->>UI: Cập nhật chỉ báo: Câu hoàn thành (✓), Câu kế tiếp (▶)
+    end
+
+    User->>UI: Hoàn thành 100% các câu
+    UI->>API: Đánh dấu bài học hoàn thành
+    UI-->>User: Hiển thị Thẻ Chúc mừng & Tích lũy Streak 🔥
+          </pre>
+        </div>
+
+        <!-- Diagram 2.2 -->
+        <div class="mermaid-box" id="diag-vocab">
+          <h4>📚 2.2. Sơ đồ Luồng Sổ tay Từ vựng & Kéo Ảnh Minh họa Tự động (Visual Vocab Flow)</h4>
+          <p class="diagram-caption">Quy trình bôi đen từ/cụm từ trên câu nghe, tự động truy vấn API ảnh (Unsplash/Wikimedia) để tạo thẻ Flashcard đa giác quan hoàn chỉnh.</p>
+          <pre class="mermaid">
+flowchart TD
+    A["Học viên đang nghe chép câu tiếng Anh"] --> B["Bôi đen từ hoặc cụm từ mới trên màn hình"]
+    B --> C["Xuất hiện Tooltip nổi: ➕ Thêm vào Sổ từ"]
+    C -->|Học viên bấm Thêm| D["Gửi yêu cầu POST /api/vocab"]
+    D --> E["FastAPI trích xuất từ khóa, câu gốc và timestamp"]
+    E --> F["Tự động gọi Unsplash / Wikimedia API tìm ảnh"]
+    F --> G["Tự động tra cứu phiên âm quốc tế IPA & nghĩa tiếng Việt"]
+    G --> H["Lưu vào bảng user_vocabulary trên PostgreSQL"]
+    H --> I["Hiển thị Flashcard hoàn chỉnh trong Sổ Từ Vựng"]
+          </pre>
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section id="section-2" class="section-card">
+        <h2>👥 3. Phân Quyền Hệ Thống (RBAC Matrix)</h2>
+        <p>Hệ thống phân định rành mạch 3 nhóm đối tượng người dùng với thẩm quyền tương ứng:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 22%;">Vai trò (Role)</th>
+                <th style="width: 20%;">Đối tượng</th>
+                <th>Quyền hạn chi tiết trên hệ thống</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-admin">ADMIN (1 Tài khoản)</span></td>
+                <td><strong>Quản trị viên tối cao</strong></td>
+                <td>
+                  • Toàn quyền quản trị hệ thống.<br>
+                  • Quản lý danh sách video mẫu (Presets) chuẩn cho toàn bộ người học.<br>
+                  • Xem danh sách học viên và báo cáo số liệu học tập tổng quan.<br>
+                  • Có đầy đủ mọi quyền học tập và sổ tay từ vựng như User.<br>
+                  • <em>Khởi tạo:</em> Tự động seed qua biến môi trường <code>ADMIN_EMAIL</code> & <code>ADMIN_PASSWORD</code> khi khởi chạy lần đầu.
+                </td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-user">USER</span></td>
+                <td><strong>Học viên đã có tài khoản</strong></td>
+                <td>
+                  • Đăng ký bằng Email/Password hoặc Đăng nhập nhanh Google One-tap.<br>
+                  • Dán link video YouTube bất kỳ, xem trước và bấm bắt đầu học.<br>
+                  • Lưu tiến độ từng câu trên PostgreSQL (không bao giờ mất dữ liệu).<br>
+                  • Quản lý Sổ tay từ vựng cá nhân (xem flashcard, đổi ảnh minh họa, đổi trạng thái đã thuộc).<br>
+                  • Tích lũy chuỗi ngày học Streak (🔥) và đếm số từ gõ hàng ngày.
+                </td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-guest">GUEST</span></td>
+                <td><strong>Khách vãng lai</strong></td>
+                <td>
+                  • Trải nghiệm gõ thử bình thường (lưu tạm <code>localStorage</code> trên trình duyệt).<br>
+                  • Khi bấm Đăng nhập/Đăng ký, hệ thống tự động đồng bộ kết quả vừa gõ lên tài khoản mới.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section id="section-3" class="section-card">
+        <h2>⚙️ 3. Đặc Tả Yêu Cầu Chức Năng (SRS)</h2>
+
+        <!-- FR 3.1 -->
+        <h3 id="fr-auth">3.1. Phân hệ Xác thực & Quản lý Tài khoản (Authentication)</h3>
+        <div class="checklist">
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-1.1: Đăng ký & Đăng nhập bằng Email/Mật khẩu</strong>
+              <span>Biểu mẫu đăng ký gồm Họ tên, Email và Mật khẩu. Mật khẩu được mã hóa an toàn bằng thuật toán băm <code>bcrypt</code> (10 salt rounds) trước khi lưu vào CSDL.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-1.2: Đăng nhập Google One-tap (Google OAuth 2.0)</strong>
+              <span>Tích hợp Google Identity Services chính thức. Người dùng chỉ cần 1 cú nhấp chuột để đăng nhập. Backend xác thực Google ID token và liên kết tài khoản qua <code>google_id</code>.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-1.3: Quản lý Phiên bằng JWT (JSON Web Token)</strong>
+              <span>Sau khi xác thực thành công, máy chủ trả về JWT Token có thời hạn. Client gửi token qua header <code>Authorization: Bearer &lt;token&gt;</code> để bảo vệ các API riêng tư.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-1.4: Tự động khởi tạo Tài khoản Admin Duy nhất</strong>
+              <span>Khi khởi chạy lần đầu, container kiểm tra bảng <code>users</code>. Nếu chưa tồn tại tài khoản có role <code>ADMIN</code>, hệ thống tự động khởi tạo từ biến <code>ADMIN_EMAIL</code> và <code>ADMIN_PASSWORD</code>.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FR 3.2 -->
+        <h3 id="fr-session">3.2. Phân hệ Bắt đầu bài học & Lưu Tiến độ (Study Session & Progress)</h3>
+        <div class="checklist">
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-2.1: Quy trình Bắt đầu bài học (Search &rarr; Preview &rarr; Start)</strong>
+              <span>Khi dán link YouTube và tìm kiếm, hệ thống hiển thị Card xem trước (Thumbnail, Tiêu đề, Tác giả, Thời lượng, Tổng số câu dự kiến &le; 20 từ/câu) kèm nút <strong>"🚀 Bắt đầu học bài này"</strong>.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-2.2: Kích hoạt ghi nhận tiến độ phiên học</strong>
+              <span>Chỉ khi người học bấm nút xác nhận, Backend mới tạo bản ghi trong <code>user_lessons</code> và bắt đầu tính thời gian cũng như lưu tiến trình từng câu.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-2.3: Chỉ báo vị trí câu trực quan trên Header & Drawer</strong>
+              <span>Header bài học hiển thị rõ: <code>Đang học: Câu 8 / 45</code> kèm thanh % hoàn thành. Drawer danh sách câu phân định: <code>✓ Xanh lá</code> (Đã xong 100%), <code>▶ Viền cam</code> (Đang làm), <code>⚪ Xám</code> (Chưa làm).</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-2.4: Tự động nhảy tới câu đang làm dở</strong>
+              <span>Khi mở lại bất kỳ bài học cũ nào, hệ thống kiểm tra Database và tự động cuộn/nhảy tới đúng câu đang làm dở lần trước mà người dùng không cần bấm tìm kiếm lại.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FR 3.3 -->
+        <h3 id="fr-vocab">3.3. Phân hệ Sổ tay Từ vựng Thông minh có Hình ảnh (Visual Vocabulary)</h3>
+        <div class="checklist">
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-3.1: Bôi đen lưu từ vựng tức thì</strong>
+              <span>Người học dùng chuột bôi đen bất kỳ từ hoặc cụm từ nào trên câu tiếng Anh. Ngay lập tức xuất hiện tooltip nổi: <code>[ ➕ Thêm vào Sổ từ ]</code>.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-3.2: Tự động tìm và gán Hình ảnh minh họa chất lượng cao</strong>
+              <span>Backend tự động truy vấn API ảnh mở (Unsplash Source / Wikimedia Commons) để kéo về 1 bức ảnh minh họa sắc nét và gán vào thẻ từ vựng.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-3.3: Tùy chọn đổi ảnh minh họa linh hoạt</strong>
+              <span>Trên thẻ Flashcard có nút 🔄 <em>"Đổi ảnh khác"</em> để người học tự do xoay vòng và chọn bức ảnh minh họa ưng ý nhất.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-3.4: Cấu trúc Thẻ Flashcard chuyên nghiệp</strong>
+              <span>Mỗi thẻ từ bao gồm: Ảnh minh họa trực quan, Từ vựng, Phiên âm quốc tế IPA (ví dụ: <code>/ˈsaɪəntɪst/</code>), Nghĩa tiếng Việt, Câu gốc ngữ cảnh, và nút 🔊 bấm nghe lại đúng đoạn audio trong video.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-3.5: Quản lý và Phân loại trạng thái ghi nhớ</strong>
+              <span>Tab riêng <strong>"📚 Sổ tay từ vựng & Ôn tập"</strong>. Cho phép lọc theo từng Video hoặc xem toàn bộ từ đã lưu (sắp xếp Mới nhất &rarr; Cũ nhất) với 3 trạng thái: <code>🔴 Mới lưu</code> &rarr; <code>🟡 Đang nhớ</code> &rarr; <code>🟢 Đã thuộc</code>.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FR 3.4 -->
+        <h3 id="fr-streak">3.4. Phân hệ Thống kê & Động lực Học tập (Streak & Daily Stats)</h3>
+        <div class="checklist">
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-4.1: Chuỗi ngày học liên tục (Daily Streak 🔥)</strong>
+              <span>Mỗi ngày người học hoàn thành ít nhất 1 câu nghe chép, Streak được cộng dồn +1 ngày. Nếu nghỉ học quá 1 ngày, Streak tự động reset về 1 khi bắt đầu lại.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-4.2: Bộ đếm số từ gõ trong ngày</strong>
+              <span>Mỗi câu hoàn thành chính xác, hệ thống tự động cộng dồn số từ vào bộ đếm "Hôm nay đã gõ: X từ".</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>FR-4.3: Huy hiệu trực quan trên Header</strong>
+              <span>Hiển thị nhỏ gọn, hiện đại ở góc trên Header: <code>🔥 3 ngày</code> | <code>📝 150 từ hôm nay</code>.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 5: Database & ERD -->
+      <section id="section-4" class="section-card">
+        <h2>🗄️ 5. Thiết Kế Cơ Sở Dữ Liệu PostgreSQL & Sơ Đồ ERD</h2>
+        <p>Hệ thống sử dụng 7 bảng quan hệ chuẩn hóa trên PostgreSQL. Mối quan hệ giữa các bảng được thể hiện trực quan qua sơ đồ ERD dưới đây kèm Bảng Từ điển Dữ liệu chi tiết:</p>
+
+        <!-- Diagram ERD -->
+        <div class="mermaid-box" id="diag-erd">
+          <h4>🗄️ Sơ đồ Thực thể Quan hệ (Entity Relationship Diagram - ERD)</h4>
+          <p class="diagram-caption">Mô hình quan hệ 7 bảng chuẩn hóa với các liên kết 1-N (Foreign Keys) đảm bảo toàn vẹn dữ liệu học tập.</p>
+          <pre class="mermaid">
+erDiagram
+    users ||--o{ user_lessons : "tracks"
+    users ||--o{ user_progress : "submits"
+    users ||--o{ user_vocabulary : "saves"
+    users ||--o| user_streaks : "maintains"
+
+    lessons ||--o{ challenges : "has"
+    lessons ||--o{ user_lessons : "enrolled_by"
+
+    challenges ||--o{ user_progress : "graded_in"
+
+    users {
+        UUID id PK
+        VARCHAR email UK
+        VARCHAR password_hash
+        VARCHAR google_id UK
+        VARCHAR name
+        VARCHAR role
+        VARCHAR avatar_url
+        TIMESTAMP created_at
+    }
+
+    lessons {
+        UUID id PK
+        VARCHAR video_id UK
+        VARCHAR title
+        VARCHAR thumbnail_url
+        INTEGER total_challenges
+        TIMESTAMP created_at
+    }
+
+    challenges {
+        UUID id PK
+        UUID lesson_id FK
+        INTEGER position
+        TEXT text
+        FLOAT time_start
+        FLOAT time_end
+        TEXT translation
+    }
+
+    user_lessons {
+        UUID id PK
+        UUID user_id FK
+        UUID lesson_id FK
+        INTEGER current_position
+        BOOLEAN is_completed
+        TIMESTAMP started_at
+        TIMESTAMP last_studied_at
+    }
+
+    user_progress {
+        UUID id PK
+        UUID user_id FK
+        UUID challenge_id FK
+        TEXT user_input
+        BOOLEAN is_completed
+        FLOAT accuracy
+        TIMESTAMP updated_at
+    }
+
+    user_vocabulary {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR word
+        VARCHAR phonetic
+        TEXT meaning
+        TEXT context_sentence
+        VARCHAR image_url
+        VARCHAR status
+        TIMESTAMP created_at
+    }
+
+    user_streaks {
+        UUID id PK
+        UUID user_id FK_UK
+        INTEGER current_streak
+        INTEGER longest_streak
+        INTEGER words_today
+        DATE last_study_date
+    }
+          </pre>
+        </div>
+
+        <h3>Bảng Từ Điển Dữ Liệu Chi Tiết (Data Dictionary)</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 20%;">Tên Bảng (Table)</th>
+                <th style="width: 24%;">Khóa PK / FK / Index</th>
+                <th>Mục đích lưu trữ & Các trường dữ liệu quan trọng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><code>users</code></strong></td>
+                <td><span class="pk-badge">PK: id (UUID)</span><br><span class="badge badge-get">UQ: email</span></td>
+                <td>Tài khoản người dùng: <code>email</code>, <code>password_hash</code>, <code>google_id</code>, <code>name</code>, <code>role ('ADMIN'|'USER')</code>, <code>avatar_url</code>, <code>created_at</code>.</td>
+              </tr>
+              <tr>
+                <td><strong><code>lessons</code></strong></td>
+                <td><span class="pk-badge">PK: id (UUID)</span><br><span class="badge badge-get">UQ: video_id</span></td>
+                <td>Thông tin video bài học: <code>video_id</code>, <code>title</code>, <code>thumbnail_url</code>, <code>total_challenges</code>, <code>created_at</code>.</td>
+              </tr>
+              <tr>
+                <td><strong><code>challenges</code></strong></td>
+                <td><span class="pk-badge">PK: id (UUID)</span><br><span class="fk-badge">FK: lesson_id</span></td>
+                <td>Từng câu thử thách (&le; 20 từ): <code>position (1,2..)</code>, <code>text</code>, <code>time_start</code>, <code>time_end</code>, <code>translation</code>.</td>
+              </tr>
+              <tr>
+                <td><strong><code>user_lessons</code></strong></td>
+                <td><span class="pk-badge">PK: id (UUID)</span><br><span class="fk-badge">FK: user_id, lesson_id</span></td>
+                <td>Phiên học của người dùng: <code>current_position (câu dở dang)</code>, <code>is_completed</code>, <code>started_at</code>, <code>last_studied_at</code>.</td>
+              </tr>
+              <tr>
+                <td><strong><code>user_progress</code></strong></td>
+                <td><span class="pk-badge">PK: id (UUID)</span><br><span class="fk-badge">FK: user_id, challenge_id</span></td>
+                <td>Tiến độ gõ từng câu: <code>user_input</code>, <code>is_completed</code>, <code>accuracy (% đúng)</code>, <code>updated_at</code>.</td>
+              </tr>
+              <tr>
+                <td><strong><code>user_vocabulary</code></strong></td>
+                <td><span class="pk-badge">PK: id (UUID)</span><br><span class="fk-badge">FK: user_id</span></td>
+                <td>Sổ tay từ vựng: <code>word</code>, <code>phonetic (IPA)</code>, <code>meaning</code>, <code>context_sentence</code>, <code>image_url</code>, <code>status ('NEW'|'LEARNING'|'MASTERED')</code>.</td>
+              </tr>
+              <tr>
+                <td><strong><code>user_streaks</code></strong></td>
+                <td><span class="pk-badge">PK: id (UUID)</span><br><span class="fk-badge">FK: user_id (Unique)</span></td>
+                <td>Thống kê thói quen: <code>current_streak</code>, <code>longest_streak</code>, <code>words_today</code>, <code>last_study_date</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 6: API -->
+      <section id="section-5" class="section-card">
+        <h2>🔌 6. Danh Mục RESTful API Backend</h2>
+        <p>Các Endpoint được thiết kế theo chuẩn RESTful, trả về định dạng JSON và bảo mật qua JWT Token:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 14%;">Nhóm</th>
+                <th style="width: 12%;">Method</th>
+                <th style="width: 28%;">Endpoint</th>
+                <th>Mục đích nghiệp vụ & Tham số</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Auth</strong></td>
+                <td><span class="badge badge-post">POST</span></td>
+                <td><code>/api/auth/register</code></td>
+                <td>Đăng ký tài khoản Email + Mật khẩu + Họ tên.</td>
+              </tr>
+              <tr>
+                <td><strong>Auth</strong></td>
+                <td><span class="badge badge-post">POST</span></td>
+                <td><code>/api/auth/login</code></td>
+                <td>Đăng nhập bằng Email/Password, cấp phát JWT Access Token.</td>
+              </tr>
+              <tr>
+                <td><strong>Auth</strong></td>
+                <td><span class="badge badge-post">POST</span></td>
+                <td><code>/api/auth/google</code></td>
+                <td>Xác thực Google One-tap ID Token, liên kết hoặc tạo user mới.</td>
+              </tr>
+              <tr>
+                <td><strong>Auth</strong></td>
+                <td><span class="badge badge-get">GET</span></td>
+                <td><code>/api/auth/me</code></td>
+                <td>Lấy thông tin User hiện tại, vai trò (ADMIN/USER), avatar.</td>
+              </tr>
+              <tr>
+                <td><strong>Lesson</strong></td>
+                <td><span class="badge badge-post">POST</span></td>
+                <td><code>/api/lesson/preview</code></td>
+                <td>Lấy thông tin xem trước video (Thumbnail, Tiêu đề, Số câu &le; 20 từ).</td>
+              </tr>
+              <tr>
+                <td><strong>Lesson</strong></td>
+                <td><span class="badge badge-post">POST</span></td>
+                <td><code>/api/lesson/start</code></td>
+                <td>Xác nhận bắt đầu học bài, tạo <code>user_lesson</code> và trả câu dở dang.</td>
+              </tr>
+              <tr>
+                <td><strong>Progress</strong></td>
+                <td><span class="badge badge-post">POST</span></td>
+                <td><code>/api/progress/save</code></td>
+                <td>Lưu tiến độ câu vừa gõ, tự động cập nhật số từ hôm nay và Streak.</td>
+              </tr>
+              <tr>
+                <td><strong>Progress</strong></td>
+                <td><span class="badge badge-get">GET</span></td>
+                <td><code>/api/progress/{video_id}</code></td>
+                <td>Lấy toàn bộ lịch sử làm bài và vị trí câu đang học dở của video này.</td>
+              </tr>
+              <tr>
+                <td><strong>Vocab</strong></td>
+                <td><span class="badge badge-post">POST</span></td>
+                <td><code>/api/vocab</code></td>
+                <td>Thêm từ vào Sổ từ, tự động cào ảnh Unsplash/Wikimedia.</td>
+              </tr>
+              <tr>
+                <td><strong>Vocab</strong></td>
+                <td><span class="badge badge-get">GET</span></td>
+                <td><code>/api/vocab</code></td>
+                <td>Lấy danh sách từ vựng cá nhân (hỗ trợ lọc video, trạng thái).</td>
+              </tr>
+              <tr>
+                <td><strong>Vocab</strong></td>
+                <td><span class="badge badge-patch">PATCH</span></td>
+                <td><code>/api/vocab/{id}/status</code></td>
+                <td>Đổi trạng thái từ (<code>NEW</code> &rarr; <code>LEARNING</code> &rarr; <code>MASTERED</code>).</td>
+              </tr>
+              <tr>
+                <td><strong>Streak</strong></td>
+                <td><span class="badge badge-get">GET</span></td>
+                <td><code>/api/streak</code></td>
+                <td>Lấy số ngày streak hiện tại và tổng số từ đã gõ trong ngày hôm nay.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 7: Docker & Architecture -->
+      <section id="section-6" class="section-card">
+        <h2>🐳 7. Kiến Trúc Hệ Thống & Đóng Gói Docker (1-Click Run)</h2>
+        <p>Toàn bộ kiến trúc hệ thống được đóng gói hoàn chỉnh bằng Docker Compose với 2 dịch vụ độc lập:</p>
+
+        <!-- Diagram Architecture & Docker -->
+        <div class="mermaid-box" id="diag-arch">
+          <h4>🏛️ Sơ đồ Kiến trúc Hệ thống & Đóng gói Docker (Docker Architecture & Topology)</h4>
+          <p class="diagram-caption">Mô hình phân tầng: Client Browser &rarr; Docker Network &rarr; Web Container (FastAPI) &harr; DB Container (PostgreSQL 16) & Volume &harr; Dịch vụ ngoài.</p>
+          <pre class="mermaid">
+graph TB
+    subgraph Client ["1. TẦNG GIAO DIỆN (CLIENT BROWSER)"]
+        UI["Giao diện Học tập (HTML5/Vanilla JS/CSS)"]
+        YT["YouTube Iframe Player API"]
+        AudioEng["Bộ điều khiển Audio (Padding 0.2s)"]
+    end
+
+    subgraph HostDocker ["2. DOCKER ENGINE CONTAINER (1 LỆNH DUY NHẤT)"]
+        subgraph WebCont ["Container: dictation_web (FastAPI Server - Port 8000)"]
+            App["FastAPI + Uvicorn ASGI"]
+            AuthSvc["Auth & Token Service"]
+            LessonSvc["Lesson & Dictation Engine"]
+            VocabSvc["Vocab & Image Scraper"]
+        end
+
+        subgraph DBCont ["Container: dictation_db (PostgreSQL 16 - Port 5432)"]
+            PG["PostgreSQL 16 Alpine Engine"]
+            DiskVolume[("Volume: postgres_data (Lưu đĩa bền vững)")]
+        end
+    end
+
+    subgraph External ["3. DỊCH VỤ NGOÀI (EXTERNAL CLOUD)"]
+        ExtYT["YouTube API (Subtitles & Info)"]
+        ExtGoogle["Google Identity OAuth 2.0"]
+        ExtImg["Unsplash / Wikimedia Image APIs"]
+    end
+
+    Client -->|Port 8000:8000| WebCont
+    WebCont -->|DATABASE_URL| DBCont
+    DBCont <--> DiskVolume
+    WebCont --> External
+          </pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">💡</div>
+          <div>
+            <strong>1-Click Command:</strong> Chỉ cần gõ lệnh duy nhất bên dưới, toàn bộ Database PostgreSQL và Web Application Server sẽ tự động khởi tạo và chạy tại <code>http://localhost:8000</code>.
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span>TERMINAL (POWERSHELL / BASH)</span>
+            <button class="copy-btn" onclick="copyCode(this)">Sao chép</button>
+          </div>
+          <code>docker compose up --build</code>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span>docker-compose.yml</span>
+            <button class="copy-btn" onclick="copyCode(this)">Sao chép</button>
+          </div>
+          <pre>services:
+  db:
+    image: postgres:16-alpine
+    container_name: dictation_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dictation_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dictation_pass123}
+      POSTGRES_DB: ${POSTGRES_DB:-dictation_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: dictation_web
+    restart: always
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dictation_user}:${POSTGRES_PASSWORD:-dictation_pass123}@db:5432/${POSTGRES_DB:-dictation_db}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@dictation.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      JWT_SECRET: ${JWT_SECRET:-supersecretkey_dictation_2026}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:</pre>
+        </div>
+      </section>
+
+      <!-- Section 8: Security -->
+      <section id="section-8" class="section-card">
+        <h2>🛡️ 8. Phân Hệ Bảo Mật, Chống Tấn Công & Chống Spam (Anti-Abuse & Security)</h2>
+        <p>Tuân thủ nghiêm ngặt theo tiêu chuẩn an ninh ứng dụng web <strong>OWASP Top 10</strong> và khuyến nghị từ kỹ năng <code>web-security-auditor</code>, hệ thống thiết lập kiến trúc phòng thủ đa tầng (Defense-in-Depth) chống lại mọi hành vi phá hoại, spam bot, dò mật khẩu và cạn kiệt tài nguyên:</p>
+
+        <!-- Diagram Security -->
+        <div class="mermaid-box" id="diag-sec">
+          <h4>🛡️ Sơ đồ Quy trình Phòng thủ An ninh Đa tầng (Defense-in-Depth Pipeline)</h4>
+          <p class="diagram-caption">Quy trình sàng lọc nghiêm ngặt qua 6 lớp an ninh bảo vệ CSDL và hệ thống khỏi spam bot và phá hoại.</p>
+          <pre class="mermaid">
+flowchart LR
+    Request["🌐 Request từ Client"] --> L1["Lớp 1: DoS & Rate Limiting\n(120 req/phút, Login: 5/15m)"]
+    L1 --> L2["Lớp 2: Security Headers\n(CSP, HSTS, X-Frame, No-Sniff)"]
+    L2 --> L3["Lớp 3: Anti-Bot Honeypot\n(Bẫy Bot điền field b_trap -> Drop)"]
+    L3 --> L4["Lớp 4: Auth & Token Guard\n(Bcrypt 12 rounds, JWT 12h)"]
+    L4 --> L5["Lớp 5: Data Injection Guard\n(Pydantic validation, Prepared Stmt)"]
+    L5 --> L6["Lớp 6: IDOR Ownership\n(user_id == current_user.id)"]
+    L6 --> Core["🚀 Xử lý Nghiệp vụ & CSDL An toàn"]
+          </pre>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-icon">🛡️</div>
+          <div>
+            <strong>Tiêu chuẩn InfoSec Doanh nghiệp:</strong> Hệ thống cách ly hoàn toàn Secrets trong <code>.env</code>, áp dụng Rate Limiting chặt chẽ trên từng Endpoint, trang bị bẫy Bot Honeypot, kiểm soát chặt Headers bảo mật (tương đương Helmet) và vô hiệu hóa hoàn toàn rủi ro SQL Injection / XSS.
+          </div>
+        </div>
+
+        <h3>8.1. Ma Trận Giới Hạn Tần Suất (Rate Limiting Matrix)</h3>
+        <p>Ngăn chặn tấn công Brute-force từ điển dò mật khẩu, spam tạo tài khoản rác và spam cào API YouTube/Hình ảnh:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 26%;">Mục tiêu / Endpoint</th>
+                <th style="width: 22%;">Ngưỡng giới hạn</th>
+                <th style="width: 24%;">Mục đích phòng thủ</th>
+                <th>Hành động khi vượt ngưỡng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>POST /api/auth/login</code></td>
+                <td><strong>Tối đa 5 lần / 15 phút</strong> (theo IP & Email)</td>
+                <td>Chống Brute-force dò mật khẩu & Credential Stuffing</td>
+                <td>Khóa IP 15 phút, trả mã lỗi <code>429 Too Many Requests</code> kèm thời gian chờ</td>
+              </tr>
+              <tr>
+                <td><code>POST /api/auth/register</code></td>
+                <td><strong>Tối đa 3 lần / 15 phút</strong> (theo IP)</td>
+                <td>Chống Bot spam tạo hàng loạt tài khoản rác làm đầy CSDL</td>
+                <td>Chặn đăng ký, yêu cầu đợi hoặc xác thực captcha</td>
+              </tr>
+              <tr>
+                <td><code>POST /api/lesson/preview</code></td>
+                <td><strong>Tối đa 10 lần / phút</strong></td>
+                <td>Chống spam cào phụ đề YouTube hàng loạt (tránh bị YouTube ban IP server)</td>
+                <td>Từ chối request, trả mã <code>429</code></td>
+              </tr>
+              <tr>
+                <td><code>POST /api/vocab</code></td>
+                <td><strong>Tối đa 20 lần / phút</strong></td>
+                <td>Chống spam truy vấn API ảnh (Unsplash / Wikimedia)</td>
+                <td>Tạm dừng kéo ảnh tự động, chỉ lưu chữ</td>
+              </tr>
+              <tr>
+                <td><code>Toàn bộ API (/api/*)</code></td>
+                <td><strong>Tối đa 120 requests / phút</strong> (per IP)</td>
+                <td>Chống DoS / Flooding tầng ứng dụng (Application Layer DoS)</td>
+                <td>Trả về <code>429 Too Many Requests</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>8.2. Cơ Chế Bẫy Bot Honeypot & Giới Hạn Kích Thước Tải (Anti-Bot Shield)</h3>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-icon">🪤</div>
+              <div class="feature-card-title">Bẫy Bot Ẩn (Form Honeypot)</div>
+            </div>
+            <div class="feature-card-body">
+              Các form Đăng ký và Đăng nhập được nhúng 1 trường input ẩn vô hình với mắt người dùng: <code>&lt;input type="text" name="b_trap" class="antispam-trap" tabindex="-1"&gt;</code>.<br>
+              • <strong>Người thật:</strong> Trường này ẩn, giá trị rỗng.<br>
+              • <strong>Spam Bot:</strong> Bot tự động quét và điền mọi trường &rarr; Backend phát hiện trường này có dữ liệu lập tức <strong>âm thầm từ chối (Drop request)</strong> mà không tốn tài nguyên băm mật khẩu hay tra CSDL.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-icon">📦</div>
+              <div class="feature-card-title">Giới Hạn Kích Thước Tải (Payload Guard)</div>
+            </div>
+            <div class="feature-card-body">
+              Chặn triệt để tấn công Large Payload DoS (gửi gói tin JSON khổng lồ làm sập RAM server):<br>
+              • Giới hạn kích thước Body tối đa <strong>512 KB</strong> cho các API REST.<br>
+              • Request vượt kích thước bị máy chủ Uvicorn từ chối ngay lập tức với mã <code>413 Payload Too Large</code> trước khi nạp vào bộ nhớ.
+            </div>
+          </div>
+        </div>
+
+        <h3>8.3. Thiết Lập HTTP Security Headers (Tương Đương Helmet)</h3>
+        <p>Toàn bộ phản hồi HTTP từ FastAPI Server được bổ sung bộ Security Headers bắt buộc:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 32%;">HTTP Security Header</th>
+                <th style="width: 30%;">Giá trị cấu hình</th>
+                <th>Mục đích bảo vệ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>X-Content-Type-Options</code></td>
+                <td><code>nosniff</code></td>
+                <td>Chống tấn công MIME-type sniffing giả mạo file thực thi.</td>
+              </tr>
+              <tr>
+                <td><code>X-Frame-Options</code></td>
+                <td><code>SAMEORIGIN</code></td>
+                <td>Chống tấn công Clickjacking (không cho phép web ngoài nhúng iframe DailyDictation).</td>
+              </tr>
+              <tr>
+                <td><code>X-XSS-Protection</code></td>
+                <td><code>1; mode=block</code></td>
+                <td>Kích hoạt bộ lọc chống Cross-Site Scripting tích hợp trên trình duyệt cũ.</td>
+              </tr>
+              <tr>
+                <td><code>Referrer-Policy</code></td>
+                <td><code>strict-origin-when-cross-origin</code></td>
+                <td>Bảo vệ quyền riêng tư, không làm rò rỉ URL và query parameters sang bên thứ ba.</td>
+              </tr>
+              <tr>
+                <td><code>Strict-Transport-Security (HSTS)</code></td>
+                <td><code>max-age=31536000; includeSubDomains</code></td>
+                <td>Bắt buộc trình duyệt kết nối qua HTTPS an toàn khi triển khai production.</td>
+              </tr>
+              <tr>
+                <td><code>Content-Security-Policy (CSP)</code></td>
+                <td>Cho phép YouTube, Google Accounts, Unsplash</td>
+                <td>Chỉ cho phép nạp script, iframe và ảnh từ các nguồn đáng tin cậy.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>8.4. Phòng Chống Tấn Công OWASP Top 10 (Injection, XSS, IDOR)</h3>
+        <div class="checklist">
+          <div class="checklist-item">
+            <span class="check-icon">🛡️</span>
+            <div class="check-content">
+              <strong>Triệt tiêu 100% SQL Injection qua Prepared Statements</strong>
+              <span>Tuyệt đối không sử dụng ghép chuỗi thô. Mọi truy vấn CSDL đều sử dụng SQLAlchemy ORM và asyncpg Parameterized Queries (Placeholder <code>$1, $2...</code>) cô lập dữ liệu người dùng khỏi lệnh SQL.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">🛡️</span>
+            <div class="check-content">
+              <strong>Xác thực & Làm sạch Dữ liệu Đầu vào (Pydantic Validation & XSS Sanitization)</strong>
+              <span>Tất cả dữ liệu nhận từ Client được kiểm tra chặt chẽ bởi Pydantic Model (giới hạn độ dài từ vựng &le; 100 ký tự, regex kiểm tra định dạng YouTube Video ID 11 ký tự, email RFC chuẩn). Phía Frontend luôn dùng <code>textContent</code> hoặc escape HTML chống XSS Stored.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">🛡️</span>
+            <div class="check-content">
+              <strong>Chống Leo Quyền & Xâm Nhập Dữ liệu Chéo (IDOR & RBAC Protection)</strong>
+              <span>Mỗi thao tác cập nhật tiến độ (Progress) hoặc Sổ từ vựng (Vocabulary) đều bắt buộc kiểm tra ràng buộc <code>user_id == current_user.id</code>. Người dùng này tuyệt đối không thể xem, sửa hoặc xóa từ vựng/tiến độ của người dùng khác.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">🛡️</span>
+            <div class="check-content">
+              <strong>Mã Hóa Mật Khẩu Chuẩn Bcrypt & Cách Ly Bí Mật</strong>
+              <span>Mật khẩu được băm bằng thuật toán <code>bcrypt</code> với 12 salt rounds, không lưu dạng rõ. Toàn bộ chuỗi bí mật (<code>JWT_SECRET</code>, <code>DATABASE_URL</code>, <code>ADMIN_PASSWORD</code>) được cô lập trong file <code>.env</code> (nằm trong <code>.gitignore</code>, không bao giờ lộ trên git).</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 9 -->
+      <section id="section-7" class="section-card">
+        <h2>✅ 9. Tiêu Chí Nghiệm Thu (Definition of Done)</h2>
+        <p>Bộ tiêu chí bắt buộc để đánh giá việc bàn giao hệ thống đạt chuẩn chất lượng và an ninh:</p>
+
+        <div class="checklist">
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>1. Khởi chạy 1 lệnh</strong>
+              <span>Chạy <code>docker compose up --build</code> thành công trên máy tính người dùng mà không cần cài đặt thêm bất kỳ môi trường nào khác ngoài Docker.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>2. Đăng nhập Admin duy nhất</strong>
+              <span>Đăng nhập thành công với tài khoản Admin mặc định (<code>admin@dictation.local</code> / <code>admin123</code>). Không thể đăng ký thêm tài khoản Admin từ giao diện người dùng thông thường.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>3. Đăng ký & Đăng nhập Người học (User)</strong>
+              <span>Người học đăng ký tài khoản mới bằng Email hoặc bấm Google One-tap để đăng nhập ngay lập tức.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>4. Quy trình Bài học Chuẩn xác</strong>
+              <span>Dán link YouTube &rarr; Hiện Card xem trước thông tin &rarr; Bấm "Bắt đầu học bài này" mới bắt đầu lưu dữ liệu và tính giờ.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>5. Tự động Khôi phục Câu dở dang</strong>
+              <span>Đang làm dở câu 15/45, thoát trình duyệt hoặc đăng xuất, khi đăng nhập lại và mở lại bài học thì hệ thống tự động nhảy tới câu 15.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>6. Sổ Từ Vựng Flashcard có Ảnh & Audio</strong>
+              <span>Bôi đen từ tiếng Anh &rarr; Bấm lưu &rarr; Mở Sổ từ vựng hiển thị đầy đủ: Ảnh minh họa chất lượng cao + Phiên âm IPA + Nghĩa tiếng Việt + Nút nghe lại câu gốc trong video.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">✓</span>
+            <div class="check-content">
+              <strong>7. Thống kê Streak & Số từ gõ</strong>
+              <span>Gõ xong câu, bộ đếm số từ hôm nay và huy hiệu Streak (🔥) trên Header cập nhật tức thì.</span>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="check-icon">🛡️</span>
+            <div class="check-content">
+              <strong>8. Lá chắn Bảo mật & Chống Spam vượt qua bài test</strong>
+              <span>Thử nghiệm đăng nhập sai 5 lần bị khóa 15 phút (mã 429), bẫy Bot Honeypot tự động chặn bot form, và HTTP Security Headers hiện diện đầy đủ.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p><strong>DailyDictation Studio Enterprise v2.0</strong> • Bản quyền tài liệu kỹ thuật thuộc về Dự án DailyDictation Studio</p>
+        <p style="margin-top: 4px;">Tài liệu định dạng HTML Responsive chuẩn • Hỗ trợ in trực tiếp (Ctrl + P) hoặc xuất PDF</p>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    // Theme Toggle
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const target = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', target);
+      localStorage.setItem('doc_theme', target);
+    }
+
+    // Initialize Mermaid Diagrams
+    if (window.mermaid) {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+        securityLevel: 'loose',
+        flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+      });
+    }
+
+    // Restore Theme
+    const savedTheme = localStorage.getItem('doc_theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    // Copy code snippet
+    function copyCode(btn) {
+      const codeBlock = btn.closest('.code-block').querySelector('code, pre');
+      if (codeBlock) {
+        navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+          const original = btn.innerText;
+          btn.innerText = 'Đã sao chép!';
+          setTimeout(() => { btn.innerText = original; }, 2000);
+        });
+      }
+    }
+
+    // Highlight active TOC link on scroll
+    const sections = document.querySelectorAll('section[id], h3[id]');
+    const tocLinks = document.querySelectorAll('.toc-link');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const top = section.offsetTop - 100;
+        if (window.pageYOffset >= top) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

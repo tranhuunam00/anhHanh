@@ -37,6 +37,14 @@ if os.path.exists(react_dist_dir):
         app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
 app.mount("/static", StaticFiles(directory=legacy_static_dir), name="static")
+@app.get("/tai-lieu", include_in_schema=False)
+@app.get("/tai-lieu/index.html", include_in_schema=False)
+@app.get("/docs-brd", include_in_schema=False)
+def serve_documentation():
+    doc_path = os.path.join(base_dir, "tai_lieu", "index.html")
+    if os.path.exists(doc_path):
+        return FileResponse(doc_path)
+    return {"detail": "Documentation not found"}
 
 
 @app.get("/{full_path:path}")

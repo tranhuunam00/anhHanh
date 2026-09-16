@@ -7,3 +7,5 @@ scratch/
 .env
 .DS_Store
 data/cache/
+.agents/
+skill_agent_namth/
