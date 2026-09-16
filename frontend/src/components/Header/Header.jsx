@@ -26,12 +26,12 @@ export const Header = ({
     <header className="app-header">
       <div className="header-inner">
         <a href="/" className="brand" onClick={(e) => e.preventDefault()}>
-          <svg className="brand-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
-            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
-            <path d="M9 13v2a3 3 0 0 0 6 0v-2" />
-          </svg>
-          <span>DailyDictation <strong>Studio</strong></span>
+          <img
+            src="/linguagun_logo.jpg"
+            alt="ShotLang Logo"
+            style={{ width: "30px", height: "30px", borderRadius: "7px", objectFit: "cover", boxShadow: "0 0 8px rgba(37, 99, 235, 0.35)" }}
+          />
+          <span style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.3px" }}>Shot<strong style={{ color: "var(--primary)" }}>Lang</strong></span>
         </a>
 
         {/* URL Input Form */}

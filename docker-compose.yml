@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  linguagun:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: linguagun_app
+    ports:
+      - "8000:8000"
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1

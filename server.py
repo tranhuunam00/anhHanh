@@ -9,8 +9,8 @@ import uvicorn
 from app.presentation.api import api_router
 
 app = FastAPI(
-    title="YouTube Dictation Studio (DailyDictation Clone)",
-    description="Học tiếng Anh qua chép chính tả video YouTube theo từng câu chuẩn thể thức DailyDictation.",
+    title="ShotLang - Precision YouTube Dictation & Listening App",
+    description="Ứng dụng ShotLang: Luyện nghe và chép chính tả YouTube thông minh, chuẩn xác.",
     version="1.0.0",
 )
 
@@ -41,9 +41,15 @@ app.mount("/static", StaticFiles(directory=legacy_static_dir), name="static")
 
 @app.get("/{full_path:path}")
 def serve_spa(full_path: str):
-    """Serve React SPA index.html or fallback to legacy static/index.html."""
+    """Serve React SPA index.html, static dist files, or fallback to legacy static/index.html."""
     if full_path.startswith("api/"):
         return {"detail": "Not Found"}
+
+    # Check if a specific file exists in react_dist_dir (e.g. /linguagun_logo.jpg, favicon.ico)
+    if full_path and os.path.exists(react_dist_dir):
+        target_file = os.path.abspath(os.path.join(react_dist_dir, full_path))
+        if target_file.startswith(os.path.abspath(react_dist_dir)) and os.path.exists(target_file) and os.path.isfile(target_file):
+            return FileResponse(target_file)
 
     # 1. Prefer React Dist build if available
     react_index = os.path.join(react_dist_dir, "index.html")
