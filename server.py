@@ -65,6 +65,7 @@ def serve_spa(full_path: str):
 
 
 if __name__ == "__main__":
+    host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", 5100))
-    print(f"Starting ShotLang Server at http://127.0.0.1:{port}")
-    uvicorn.run("server:app", host="127.0.0.1", port=port, reload=True)
+    print(f"Starting ShotLang Server at http://{host}:{port}")
+    uvicorn.run("server:app", host=host, port=port, reload=True)

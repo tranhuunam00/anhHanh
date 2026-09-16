@@ -22,15 +22,16 @@ def main():
         print("❌ Frontend build failed. Please check errors above.")
         sys.exit(1)
 
+    host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", 5100))
     print(f"\n✅ Frontend built successfully!")
-    print(f"Step 2: Starting FastAPI Production Server at http://127.0.0.1:{port}")
+    print(f"Step 2: Starting FastAPI Production Server at http://{host}:{port}")
     print("Press Ctrl+C to stop.\n")
 
     # Step 2: Run FastAPI Server
     import uvicorn
     from server import app
-    uvicorn.run(app, host="127.0.0.1", port=port)
+    uvicorn.run(app, host=host, port=port)
 
 if __name__ == "__main__":
     main()
