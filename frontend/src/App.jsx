@@ -161,6 +161,15 @@ export default function App() {
   // Actions
   const handleCheck = () => {
     if (!currentChallenge) return;
+
+    // If sentence is already marked completed, hitting Enter / clicking Check immediately advances to next challenge
+    if (isCompleted) {
+      if (currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
+        goToChallenge(currentIndex + 1);
+      }
+      return;
+    }
+
     const evalResult = evaluateMasked(currentChallenge.text, userInput, settings.strictPunctuation);
 
     if (evalResult.isCompleted) {
@@ -176,7 +185,7 @@ export default function App() {
       if (settings.autoAdvance === "yes" && currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
         setTimeout(() => {
           goToChallenge(currentIndex + 1);
-        }, 1200);
+        }, 800);
       }
     } else {
       // Replay audio segment so user can listen again and fix errors
