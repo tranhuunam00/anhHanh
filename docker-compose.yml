@@ -7,7 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: linguagun_app
     ports:
-      - "8000:8000"
+      - "5100:5100"
     restart: always
     environment:
+      - PORT=5100
       - PYTHONUNBUFFERED=1

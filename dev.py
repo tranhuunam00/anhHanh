@@ -9,9 +9,9 @@ def main():
     frontend_dir = os.path.join(root_dir, "frontend")
 
     print("=========================================================")
-    print("Starting DailyDictation Studio (Backend + Frontend)...")
-    print("  - Backend:  http://127.0.0.1:8000")
-    print("  - Frontend: http://localhost:5173")
+    print("Starting ShotLang (Backend + Frontend)...")
+    print("  - Backend:  http://127.0.0.1:5100")
+    print("  - Frontend: http://localhost:5101")
     print("=========================================================\n")
 
     # Start FastAPI Backend

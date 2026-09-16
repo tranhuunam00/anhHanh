@@ -65,5 +65,6 @@ def serve_spa(full_path: str):
 
 
 if __name__ == "__main__":
-    print("Starting YouTube Dictation Server at http://127.0.0.1:8000")
-    uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)
+    port = int(os.getenv("PORT", 5100))
+    print(f"Starting ShotLang Server at http://127.0.0.1:{port}")
+    uvicorn.run("server:app", host="127.0.0.1", port=port, reload=True)

@@ -23,7 +23,8 @@ COPY static/ ./static/
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Expose port
-EXPOSE 8000
+EXPOSE 5100
+ENV PORT=5100
 
 # Run Uvicorn server in production
-CMD ["python", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "5100"]
