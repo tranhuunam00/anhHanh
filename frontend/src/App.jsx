@@ -161,19 +161,26 @@ export default function App() {
   // Actions
   const handleCheck = () => {
     if (!currentChallenge) return;
-    setIsCompleted(true);
-    if (currentLesson) {
-      const newProg = { ...progressMap };
-      if (!newProg.challenges) newProg.challenges = {};
-      newProg.challenges[currentIndex + 1] = { isCompleted: true, lastUpdated: Date.now() };
-      setProgressMap(newProg);
-      saveLessonProgress(currentLesson.video_id, newProg);
-    }
+    const evalResult = evaluateMasked(currentChallenge.text, userInput, settings.strictPunctuation);
 
-    if (settings.autoAdvance === "yes" && currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
-      setTimeout(() => {
-        goToChallenge(currentIndex + 1);
-      }, 1200);
+    if (evalResult.isCompleted) {
+      setIsCompleted(true);
+      if (currentLesson) {
+        const newProg = { ...progressMap };
+        if (!newProg.challenges) newProg.challenges = {};
+        newProg.challenges[currentIndex + 1] = { isCompleted: true, lastUpdated: Date.now() };
+        setProgressMap(newProg);
+        saveLessonProgress(currentLesson.video_id, newProg);
+      }
+
+      if (settings.autoAdvance === "yes" && currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
+        setTimeout(() => {
+          goToChallenge(currentIndex + 1);
+        }, 1200);
+      }
+    } else {
+      // Replay audio segment so user can listen again and fix errors
+      playerController.replayCurrentSegment();
     }
   };
 
@@ -329,6 +336,7 @@ export default function App() {
               onNext={() => goToChallenge(currentIndex + 1)}
               onOpenDrawer={() => setIsDrawerOpen(true)}
               isCompleted={isCompleted}
+              strictPunctuation={settings.strictPunctuation}
               onNextChallenge={() => goToChallenge(currentIndex + 1)}
               onRetryChallenge={() => {
                 setUserInput("");

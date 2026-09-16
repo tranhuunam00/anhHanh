@@ -8,8 +8,9 @@ export const cleanWord = (token) => {
     .toLowerCase();
 };
 
-export const evaluateMasked = (targetText, userInput) => {
-  const uChars = Array.from((userInput || "").trimStart());
+export const evaluateMasked = (targetText, userInput, strictPunctuation = false) => {
+  const rawInput = (userInput || "").trim();
+  const uChars = Array.from(rawInput);
   const tChars = Array.from(targetText || "");
 
   let uIdx = 0;
@@ -19,10 +20,12 @@ export const evaluateMasked = (targetText, userInput) => {
   let correctLetterCount = 0;
   let hasWrong = false;
 
+  const isPunctuation = (ch) => /^[^\p{L}\p{N}\s]$/u.test(ch);
+
   for (let tIdx = 0; tIdx < tChars.length; tIdx++) {
     const tChar = tChars[tIdx];
     const isSpace = /\s/.test(tChar);
-    const isPunct = /^[^\p{L}\p{N}\s]$/u.test(tChar);
+    const isPunct = isPunctuation(tChar);
 
     if (isSpace) {
       if (currentWord.length > 0) {
@@ -36,8 +39,16 @@ export const evaluateMasked = (targetText, userInput) => {
     }
 
     if (isPunct) {
-      if (uIdx < uChars.length && uChars[uIdx] === tChar) {
-        uIdx++;
+      if (uIdx < uChars.length) {
+        const uChar = uChars[uIdx];
+        if (uChar === tChar) {
+          uIdx++;
+        } else if (isPunctuation(uChar)) {
+          if (strictPunctuation) {
+            hasWrong = true;
+          }
+          uIdx++;
+        }
       }
       currentWord.push({
         char: tChar,
@@ -47,7 +58,15 @@ export const evaluateMasked = (targetText, userInput) => {
       continue;
     }
 
+    // Target is alphanumeric letter/digit
     totalLetterCount++;
+
+    // Skip any unexpected user punctuation if not strictPunctuation
+    if (!strictPunctuation) {
+      while (uIdx < uChars.length && isPunctuation(uChars[uIdx])) {
+        uIdx++;
+      }
+    }
 
     if (uIdx < uChars.length) {
       const uChar = uChars[uIdx];
@@ -79,6 +98,13 @@ export const evaluateMasked = (targetText, userInput) => {
     }
   }
 
+  // Consume remaining trailing user punctuation if not strictPunctuation
+  if (!strictPunctuation) {
+    while (uIdx < uChars.length && (isPunctuation(uChars[uIdx]) || /\s/.test(uChars[uIdx]))) {
+      uIdx++;
+    }
+  }
+
   if (currentWord.length > 0) {
     words.push(currentWord);
   }
@@ -86,7 +112,7 @@ export const evaluateMasked = (targetText, userInput) => {
   const isCompleted =
     correctLetterCount === totalLetterCount &&
     !hasWrong &&
-    (uIdx >= uChars.length || (userInput && userInput.trim() === targetText.trim()));
+    (uIdx >= uChars.length || !strictPunctuation);
 
   return {
     words,

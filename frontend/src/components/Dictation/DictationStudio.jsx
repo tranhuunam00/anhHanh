@@ -17,7 +17,7 @@ export const DictationStudio = ({
   onPrev,
   onNext,
   onOpenDrawer,
-  isCompleted,
+  strictPunctuation = false,
   onNextChallenge,
   onRetryChallenge,
 }) => {
@@ -26,8 +26,8 @@ export const DictationStudio = ({
   // Compute live masked diff evaluation
   const maskedEvaluation = useMemo(() => {
     if (!targetText) return { words: [], isCompleted: false };
-    return evaluateMasked(targetText, userInput);
-  }, [targetText, userInput]);
+    return evaluateMasked(targetText, userInput, strictPunctuation);
+  }, [targetText, userInput, strictPunctuation]);
 
   const progressPercent = totalChallenges > 0 ? Math.round(((currentIndex + 1) / totalChallenges) * 100) : 0;
 
