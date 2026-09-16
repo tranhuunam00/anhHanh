@@ -28,6 +28,8 @@
 /* 📱 Mobile Devices (max-width: 768px) */
 @media (max-width: 768px) {
   .app-header {
+    position: relative;
+    top: auto;
     padding: 8px 12px;
   }
   .header-inner {
