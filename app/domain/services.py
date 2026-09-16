@@ -140,7 +140,7 @@ class SentenceGrouperService:
         self,
         max_pause_seconds: float = 1.2,
         max_sentence_duration: float = 10.0,
-        max_words_per_challenge: int = 20,
+        max_words_per_challenge: int = 25,
         min_sentence_duration: float = 1.2,
         min_words_per_challenge: int = 2,
         max_duration_seconds: float = 20.0,  # force-split any challenge longer than this
