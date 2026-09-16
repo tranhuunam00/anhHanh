@@ -23,10 +23,23 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
 
   // Compute active sentence index dynamically based on current audio time
   const activeIndex = useMemo(() => {
-    if (!lesson || !lesson.challenges) return -1;
-    return lesson.challenges.findIndex(
+    if (!lesson || !lesson.challenges || lesson.challenges.length === 0) return -1;
+    // 1. Exact range match
+    const exactIdx = lesson.challenges.findIndex(
       (c) => currentTime >= c.time_start && currentTime <= c.time_end
     );
+    if (exactIdx !== -1) return exactIdx;
+
+    // 2. Fallback to latest challenge whose time_start <= currentTime
+    let lastStartedIdx = -1;
+    for (let i = 0; i < lesson.challenges.length; i++) {
+      if (currentTime >= lesson.challenges[i].time_start) {
+        lastStartedIdx = i;
+      } else {
+        break;
+      }
+    }
+    return lastStartedIdx !== -1 ? lastStartedIdx : 0;
   }, [lesson, currentTime]);
 
   // Smoothly scroll active sentence into view when autoScroll is enabled
@@ -128,6 +141,7 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
             max={duration || 100}
             step="0.1"
             value={currentTime}
+            onInput={handleSeek}
             onChange={handleSeek}
             title="Kéo để tua thời gian audio"
           />
