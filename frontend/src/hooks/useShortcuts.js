@@ -37,16 +37,16 @@ export const useShortcuts = ({
         }
       }
 
-      // Shift + Space or Ctrl + Space -> Play/Pause (works even when typing inside textarea)
-      if ((e.shiftKey && e.code === "Space") || ((e.ctrlKey || e.metaKey) && e.code === "Space")) {
+      // Ctrl + Space or Shift + Space -> Play/Pause (works anywhere including inside input)
+      if (((e.ctrlKey || e.metaKey) && e.code === "Space") || (e.shiftKey && e.code === "Space")) {
         e.preventDefault();
         if (onPlayPause) onPlayPause();
         return;
       }
 
-      // Play/Pause Key (` / Escape / Custom Key)
-      if (e.code === playPauseKey || e.key === playPauseKey) {
-        if (!isInputOrTextarea || playPauseKey === "Escape" || playPauseKey === "Backquote") {
+      // Space / Backquote / PlayPauseKey -> Play/Pause (only when NOT focused inside text input/textarea)
+      if (e.code === "Space" || e.code === playPauseKey || e.key === playPauseKey) {
+        if (!isInputOrTextarea) {
           e.preventDefault();
           if (onPlayPause) onPlayPause();
           return;

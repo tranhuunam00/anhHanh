@@ -1,7 +1,7 @@
 export const SHORTCUTS_LIST = [
   { key: "Ctrl", action: "Phát lại (Replay) câu hiện tại" },
   { key: "Tab", action: "Gợi ý 1 từ tiếp theo" },
-  { key: "Shift + Space / Ctrl + Space / `", action: "Tạm dừng / Phát tiếp tục (Play/Pause ngay khi đang gõ)" },
+  { key: "Space (khi không ở ô gõ) / Ctrl+Space / Shift+Space", action: "Tạm dừng / Phát tiếp tục (Play/Pause)" },
   { key: "Alt + LeftArrow", action: "Chuyển sang câu trước đó" },
   { key: "Alt + RightArrow", action: "Chuyển sang câu kế tiếp" },
   { key: "Enter (1 lần)", action: "Kiểm tra câu vừa gõ / Phát lại âm thanh" },

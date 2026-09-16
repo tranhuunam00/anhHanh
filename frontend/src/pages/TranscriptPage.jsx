@@ -1,10 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) => {
   const [isPlayingFull, setIsPlayingFull] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    let interval;
+    if (playerController) {
+      interval = setInterval(() => {
+        setCurrentTime(playerController.getCurrentTime() || 0);
+        setDuration(playerController.getDuration() || 0);
+      }, 300);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [playerController]);
 
   const formatTime = (seconds) => {
-    if (typeof seconds !== "number") return "00:00";
+    if (typeof seconds !== "number" || isNaN(seconds)) return "00:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
@@ -18,6 +33,14 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
     } else {
       playerController.playFull();
       setIsPlayingFull(true);
+    }
+  };
+
+  const handleSeek = (e) => {
+    const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    if (playerController) {
+      playerController.seekTo(newTime);
     }
   };
 
@@ -62,9 +85,18 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
             )}
           </button>
           <span className="full-audio-time">
-            {formatTime(playerController ? playerController.getCurrentTime() : 0)} /{" "}
-            {formatTime(playerController ? playerController.getDuration() : 0)}
+            {formatTime(currentTime)} / {formatTime(duration)}
           </span>
+          <input
+            type="range"
+            className="full-audio-progress"
+            min="0"
+            max={duration || 100}
+            step="0.1"
+            value={currentTime}
+            onChange={handleSeek}
+            title="Kéo để tua thời gian audio"
+          />
         </div>
       </div>
 
