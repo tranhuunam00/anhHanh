@@ -31,7 +31,7 @@ JWT_EXPIRATION_HOURS = int(os.getenv('JWT_EXPIRATION_HOURS', '12'))
 
 
 def get_google_client_id() -> str:
-    return os.getenv('GOOGLE_MAILER_CLIENT_ID', '').strip()
+    return os.getenv('GOOGLE_CLIENT_ID', '1010771231278-42hd59gesjf8ts5ta7nra9qrfkmobgrt.apps.googleusercontent.com').strip()
 
 
 GOOGLE_CLIENT_ID = get_google_client_id()

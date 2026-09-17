@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   });
   const [streak, setStreak] = useState(0);
   const [wordsToday, setWordsToday] = useState(0);
-  const [googleClientId, setGoogleClientId] = useState("");
+  const [googleClientId, setGoogleClientId] = useState("1010771231278-42hd59gesjf8ts5ta7nra9qrfkmobgrt.apps.googleusercontent.com");
   const [toasts, setToasts] = useState([]);
 
   // Toast helper
