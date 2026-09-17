@@ -1,8 +1,13 @@
-"""Development Runner Script to start both FastAPI Backend and Vite React Frontend concurrently."""
 import os
 import sys
 import subprocess
 import time
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 def kill_proc_tree(pid):
     """Cleanly terminate a process and all its child workers."""

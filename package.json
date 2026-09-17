@@ -4,8 +4,12 @@
   "private": true,
   "description": "DailyDictation Studio - Single Command Runner",
   "scripts": {
+    "start": "python run_production.py",
     "dev": "python dev.py",
     "build": "cd frontend && npm run build",
-    "start": "python server.py"
+    "docker": "docker compose up --build -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "test": "python -m pytest"
   }
 }
