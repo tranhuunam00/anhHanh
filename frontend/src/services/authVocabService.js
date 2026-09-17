@@ -126,11 +126,15 @@ export const updateVocabStatus = async (vocabId, status, token) => {
   return await safeParseResponse(res, "Không thể cập nhật trạng thái");
 };
 
-export const rotateVocabImage = async (vocabId, word, currentImg, token) => {
+export const rotateVocabImage = async (vocabId, word, currentImg, token, contextSentence = "") => {
   const headers = {};
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`/api/vocab/image-candidates?word=${encodeURIComponent(word)}`, { headers });
+  let url = `/api/vocab/image-candidates?word=${encodeURIComponent(word)}`;
+  if (contextSentence) {
+    url += `&context_sentence=${encodeURIComponent(contextSentence)}`;
+  }
+  const res = await fetch(url, { headers });
   const data = await safeParseResponse(res, "Không thể tải danh sách ảnh thay thế");
   const candidates = data.candidates || [];
   if (candidates.length === 0) throw new Error("Không có ảnh thay thế nào khác");

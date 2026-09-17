@@ -51,10 +51,10 @@ export const VocabTab = ({ isActive = false }) => {
     }
   };
 
-  const handleRotateImage = async (vocabId, word, currentImg) => {
+  const handleRotateImage = async (vocabId, word, currentImg, contextSentence = "") => {
     try {
       showToast("Đang tìm ảnh minh họa mới...", "info");
-      const nextImg = await rotateVocabImage(vocabId, word, currentImg, token);
+      const nextImg = await rotateVocabImage(vocabId, word, currentImg, token, contextSentence);
       setItems((prev) =>
         prev.map((item) => (item.id === vocabId ? { ...item, image_url: nextImg } : item))
       );
@@ -215,8 +215,8 @@ export const VocabTab = ({ isActive = false }) => {
                 />
                 <button
                   className="vocab-img-rotate-btn"
-                  onClick={() => handleRotateImage(v.id, v.word, v.image_url)}
-                  title="Tìm ảnh minh họa khác bằng AI"
+                  onClick={() => handleRotateImage(v.id, v.word, v.image_url, v.context_sentence)}
+                  title="Tìm ảnh minh họa khác theo ngữ cảnh"
                 >
                   🔄 Đổi ảnh
                 </button>

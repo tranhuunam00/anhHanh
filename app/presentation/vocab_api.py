@@ -71,7 +71,12 @@ async def save_vocabulary_word(
     # 3. Auto-fetch image if not provided
     image_url = payload.image_url
     if not image_url:
-        candidates = ImageSearchService.get_image_candidates(clean_word, max_results=1)
+        candidates = ImageSearchService.get_image_candidates(
+            word=clean_word,
+            context_sentence=payload.context_sentence or "",
+            meaning=meaning or "",
+            max_results=3
+        )
         if candidates:
             image_url = candidates[0]
 
@@ -165,10 +170,15 @@ async def list_vocabulary(
 @router.get('/image-candidates')
 async def get_image_candidates(
     word: str = Query(..., min_length=1),
+    context_sentence: Optional[str] = Query(None),
     current_user: User = Depends(get_current_user)
 ):
     """Retrieve multiple image options so user can cycle through and pick their preferred image."""
-    candidates = ImageSearchService.get_image_candidates(word.strip(), max_results=6)
+    candidates = ImageSearchService.get_image_candidates(
+        word=word.strip(),
+        context_sentence=context_sentence or "",
+        max_results=8
+    )
     return {'word': word, 'candidates': candidates}
 
 
