@@ -73,13 +73,20 @@ async def run_migrations(target_engine=None) -> int:
     return applied_count
 
 
+async def _async_cli():
+    from app.infrastructure.database.connection import engine
+    print("Checking and applying database migrations...")
+    try:
+        count = await run_migrations(engine)
+        print(f"Migrations run completed. {count} migration(s) applied.")
+    finally:
+        await engine.dispose()
+
+
 def cli_main():
     """CLI runner: python -m app.infrastructure.database.migrate"""
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-    from app.infrastructure.database.connection import engine
-    print("Checking and applying database migrations...")
-    count = asyncio.run(run_migrations(engine))
-    print(f"Migrations run completed. {count} migration(s) applied.")
+    asyncio.run(_async_cli())
 
 
 if __name__ == "__main__":
