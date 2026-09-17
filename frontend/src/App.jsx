@@ -188,8 +188,10 @@ export default function App() {
         speechRef.current.setLang(langCode);
       }
 
-      playerController.loadVideo(lessonData.video_id);
       cueChallengeAtIndex(lessonData, targetIndex);
+      const targetChallenge = lessonData.challenges && lessonData.challenges[targetIndex];
+      const targetStartTime = targetChallenge ? targetChallenge.time_start : 0;
+      playerController.loadVideo(lessonData.video_id, targetStartTime, false);
     } catch (e) {
       alert("Lỗi tải video: " + e.message);
     } finally {

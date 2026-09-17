@@ -53,10 +53,22 @@ export class YouTubePlayerController {
   }
 
   _createPlayer(videoId) {
+    const start = typeof this.currentLoopStart === "number" ? Math.max(0, this.currentLoopStart) : 0;
     if (this.player) {
       try {
-        this.player.loadVideoById(videoId);
-        return;
+        if (this.pendingCue && this.player.cueVideoById) {
+          this.player.cueVideoById({
+            videoId: videoId,
+            startSeconds: start,
+          });
+          return;
+        } else if (this.player.loadVideoById) {
+          this.player.loadVideoById({
+            videoId: videoId,
+            startSeconds: start,
+          });
+          return;
+        }
       } catch (e) {}
     }
 
@@ -72,6 +84,7 @@ export class YouTubePlayerController {
         enablejsapi: 1,
         origin: origin,
         widget_referrer: window.location.href,
+        start: Math.floor(start),
       },
       events: {
         onReady: () => {
@@ -116,11 +129,22 @@ export class YouTubePlayerController {
     }
   }
 
-  loadVideo(videoId) {
+  loadVideo(videoId, startSeconds = 0, autoplay = false) {
     this.currentVideoId = videoId;
-    if (this.isReady && this.player && this.player.loadVideoById) {
+    const start = typeof startSeconds === "number" ? Math.max(0, startSeconds) : 0;
+    if (this.isReady && this.player) {
       try {
-        this.player.loadVideoById(videoId);
+        if (!autoplay && this.player.cueVideoById) {
+          this.player.cueVideoById({
+            videoId: videoId,
+            startSeconds: start,
+          });
+        } else if (this.player.loadVideoById) {
+          this.player.loadVideoById({
+            videoId: videoId,
+            startSeconds: start,
+          });
+        }
       } catch (e) {
         this.init(videoId);
       }
@@ -261,6 +285,16 @@ export class YouTubePlayerController {
       if (state === window.YT.PlayerState.PLAYING) {
         this.player.pauseVideo();
       } else {
+        if (this.replayTimeout) clearTimeout(this.replayTimeout);
+        this.isWaitingReplay = false;
+
+        if (!this.isFullMode && typeof this.currentLoopStart === "number") {
+          const cur = typeof this.player.getCurrentTime === "function" ? (this.player.getCurrentTime() || 0) : 0;
+          const isUnstartedOrCued = state === -1 || state === 5 || state === 0;
+          if (isUnstartedOrCued || cur < this.currentLoopStart || (this.currentLoopEnd && cur >= this.currentLoopEnd - 0.15)) {
+            this.player.seekTo(this.currentLoopStart, true);
+          }
+        }
         this.player.playVideo();
       }
     } catch (e) {
