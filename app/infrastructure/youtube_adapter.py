@@ -37,8 +37,11 @@ class YouTubeTranscriptAdapter(ITranscriptService):
         session = requests.Session()
         session.headers.update({"User-Agent": self.user_agent})
 
-        if self.proxy:
-            session.proxies = {"http": self.proxy, "https": self.proxy}
+        proxy = os.getenv("YOUTUBE_PROXY") or self.proxy
+        if proxy:
+            session.proxies = {"http": proxy, "https": proxy}
+            safe_proxy = proxy.split("@")[-1] if "@" in proxy else proxy
+            logger.info(f"YouTube requests routing via proxy: {safe_proxy}")
 
         # Check candidate locations dynamically if cookie file was copied after start
         active_cookie = self.cookie_file
@@ -123,14 +126,20 @@ class YouTubeTranscriptAdapter(ITranscriptService):
             f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
         )
         try:
-            req = urllib.request.Request(
-                oembed_url, headers={"User-Agent": self.user_agent}
+            proxy = os.getenv("YOUTUBE_PROXY") or self.proxy
+            proxies = {"http": proxy, "https": proxy} if proxy else None
+            resp = requests.get(
+                oembed_url,
+                headers={"User-Agent": self.user_agent},
+                proxies=proxies,
+                timeout=5,
             )
-            with urllib.request.urlopen(req, timeout=5) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
+            if resp.status_code == 200:
+                data = resp.json()
                 return data.get("title", f"YouTube Video ({video_id})")
-        except Exception:
-            return f"YouTube Video ({video_id})"
+        except Exception as e:
+            logger.warning(f"Could not fetch video title for {video_id}: {e}")
+        return f"YouTube Video ({video_id})"
 
     def _fetch_source_transcript(
         self, video_id: str, source_lang: Optional[str] = "auto"
