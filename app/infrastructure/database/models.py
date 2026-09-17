@@ -54,6 +54,7 @@ class Lesson(Base):
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     video_id = Column(String(50), unique=True, nullable=False, index=True)
+    youtube_url = Column(Text, nullable=True)
     title = Column(String(500), nullable=False)
     thumbnail_url = Column(Text, nullable=False)
     total_challenges = Column(Integer, default=0, nullable=False)
@@ -61,15 +62,38 @@ class Lesson(Base):
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     user_lessons = relationship('UserLesson', back_populates='lesson', cascade='all, delete-orphan')
+    subtitles = relationship('LessonSubtitle', back_populates='lesson', cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
             'id': self.id,
             'video_id': self.video_id,
+            'youtube_url': self.youtube_url,
             'title': self.title,
             'thumbnail_url': self.thumbnail_url,
             'total_challenges': self.total_challenges,
             'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
+
+class LessonSubtitle(Base):
+    """Raw subtitle cache per video × language, fetched from YouTube."""
+    __tablename__ = 'lesson_subtitles'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    lesson_id = Column(String(36), ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False, index=True)
+    lang_code = Column(String(20), nullable=False)
+    raw_data = Column(JSON, nullable=False, default=list)
+    fetched_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+
+    lesson = relationship('Lesson', back_populates='subtitles')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'lesson_id': self.lesson_id,
+            'lang_code': self.lang_code,
+            'fetched_at': self.fetched_at.isoformat() if self.fetched_at else None,
         }
 
 
@@ -79,6 +103,8 @@ class UserLesson(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     user_id = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
     lesson_id = Column(String(36), ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False, index=True)
+    source_lang = Column(String(20), nullable=False, default='en')
+    target_lang = Column(String(20), nullable=False, default='vi')
     current_position = Column(Integer, default=1, nullable=False)
     is_completed = Column(Boolean, default=False, nullable=False)
     started_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
@@ -92,6 +118,8 @@ class UserLesson(Base):
             'id': self.id,
             'user_id': self.user_id,
             'lesson_id': self.lesson_id,
+            'source_lang': self.source_lang,
+            'target_lang': self.target_lang,
             'current_position': self.current_position,
             'is_completed': self.is_completed,
             'started_at': self.started_at.isoformat() if self.started_at else None,

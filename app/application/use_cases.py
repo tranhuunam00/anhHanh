@@ -1,5 +1,6 @@
 """Application Use Cases."""
 import re
+import logging
 from typing import Optional
 from app.domain.exceptions import InvalidVideoIdException
 from app.domain.models import Lesson, Challenge
@@ -13,8 +14,9 @@ from app.application.dtos import (
     EvaluateResponse,
     WordEvaluationDTO,
 )
-from app.infrastructure.raw_subtitle_cache import RawSubtitleFileCache
 from app.infrastructure.translation_service import TranslationService
+
+logger = logging.getLogger(__name__)
 
 
 def extract_youtube_id(url_or_id: str) -> str:
@@ -36,68 +38,140 @@ def extract_youtube_id(url_or_id: str) -> str:
 
 
 class GetLessonUseCase:
-    """Use case to retrieve or generate a dictation lesson from YouTube URL/ID."""
+    """Use case to retrieve or generate a dictation lesson from YouTube URL/ID.
+
+    Raw subtitles are cached in the `lesson_subtitles` DB table.
+    YouTube is only called when no cached row exists for the requested language pair.
+    """
 
     def __init__(
         self,
         transcript_service: ITranscriptService,
-        cache_repo: Optional[ICacheRepository] = None,
+        cache_repo: Optional[ICacheRepository] = None,  # kept for interface compat (unused)
         sentence_grouper: Optional[SentenceGrouperService] = None,
         translation_service: Optional[TranslationService] = None,
-        raw_sub_cache: Optional[RawSubtitleFileCache] = None,
     ):
         self.transcript_service = transcript_service
-        self.cache_repo = cache_repo  # kept for interface compat, not used for lesson caching
         self.sentence_grouper = sentence_grouper or SentenceGrouperService()
         self.translation_service = translation_service or TranslationService()
-        self.raw_sub_cache = raw_sub_cache or RawSubtitleFileCache()
 
     def execute(self, request: GetLessonRequest) -> LessonResponse:
+        """Synchronous execution without DB — used only for preview (no DB access needed yet).
+
+        Full DB-backed execution is in execute_with_db() called from lesson_api.py.
+        """
         video_id = extract_youtube_id(request.url_or_id)
         source_lang = (request.source_lang or "en").strip().lower()
         target_lang = (request.target_lang or "vi").strip().lower()
 
-        # --- Step 1: Get raw source subtitles (file cache or YouTube) ---
-        cached_src = self.raw_sub_cache.get(video_id, source_lang)
-        if cached_src:
-            title, src_snippets = cached_src
-            detected_source_lang = source_lang
-            # Target subs: try cache, else fetch separately
-            cached_tgt = self.raw_sub_cache.get(video_id, f"{source_lang}_tgt_{target_lang}")
-            if cached_tgt:
-                tgt_snippets = cached_tgt[1]
-            elif target_lang and target_lang not in ("none", "", source_lang):
-                _, _, tgt_snippets, _ = self.transcript_service.fetch_transcripts(
-                    video_id, source_lang=source_lang, target_lang=target_lang
-                )
-                if tgt_snippets:
-                    self.raw_sub_cache.save(
-                        video_id,
-                        f"{source_lang}_tgt_{target_lang}",
-                        title,
-                        tgt_snippets,
-                    )
-            else:
-                tgt_snippets = None
-        else:
-            # Fetch fresh from YouTube
-            title, src_snippets, tgt_snippets, detected_source_lang = (
+        # Fetch directly from YouTube (no DB, no file cache)
+        title, src_snippets, tgt_snippets, detected_source_lang = (
+            self.transcript_service.fetch_transcripts(
+                video_id, source_lang=source_lang, target_lang=target_lang
+            )
+        )
+
+        return self._build_response(
+            video_id, title, src_snippets, tgt_snippets,
+            source_lang=source_lang,
+            detected_source_lang=detected_source_lang,
+            target_lang=target_lang,
+            grouping_mode=request.grouping_mode,
+        )
+
+    async def execute_with_db(
+        self,
+        request: GetLessonRequest,
+        subtitle_repo,  # LessonSubtitleRepo instance
+    ) -> tuple:
+        """DB-backed execution: check lesson_subtitles first, fetch YouTube only if missing.
+
+        Returns: (LessonResponse, lesson_record)
+        """
+        video_id = extract_youtube_id(request.url_or_id)
+        source_lang = (request.source_lang or "en").strip().lower()
+        target_lang = (request.target_lang or "vi").strip().lower()
+        tgt_key = f"{source_lang}_tgt_{target_lang}"
+
+        # 1. Ensure lesson row exists in DB
+        youtube_url = f"https://www.youtube.com/watch?v={video_id}"
+        lesson = await subtitle_repo.get_or_create_lesson(video_id, youtube_url=youtube_url)
+
+        # 2. Check DB for source subtitle cache
+        src_snippets = await subtitle_repo.get_raw(lesson.id, source_lang)
+        detected_source_lang = source_lang
+        title = lesson.title
+
+        if src_snippets is None:
+            logger.info(f"No cached source subtitles for {video_id} lang={source_lang} — fetching YouTube")
+            title, src_snippets, tgt_snippets_from_yt, detected_source_lang = (
                 self.transcript_service.fetch_transcripts(
                     video_id, source_lang=source_lang, target_lang=target_lang
                 )
             )
-            # Save raw subs to file cache
-            self.raw_sub_cache.save(video_id, source_lang, title, src_snippets)
-            if tgt_snippets:
-                self.raw_sub_cache.save(
-                    video_id,
-                    f"{source_lang}_tgt_{target_lang}",
-                    title,
-                    tgt_snippets,
-                )
+            await subtitle_repo.save_raw(lesson.id, source_lang, src_snippets)
+            if tgt_snippets_from_yt:
+                await subtitle_repo.save_raw(lesson.id, tgt_key, tgt_snippets_from_yt)
+        else:
+            logger.info(f"Using cached source subtitles for {video_id} lang={source_lang} from DB")
+            tgt_snippets_from_yt = None
 
-        # --- Step 2: Always run grouping fresh (so algorithm changes take effect) ---
-        if request.grouping_mode == "snippet":
+        # 3. Check DB for target subtitle cache
+        tgt_snippets = await subtitle_repo.get_raw(lesson.id, tgt_key)
+        if tgt_snippets is None and tgt_snippets_from_yt is not None:
+            tgt_snippets = tgt_snippets_from_yt
+        elif tgt_snippets is None and target_lang not in ("none", "", source_lang, detected_source_lang):
+            # Target not cached and not fetched yet — fetch separately
+            logger.info(f"Fetching target subtitles for {video_id} lang={target_lang}")
+            try:
+                _, _, tgt_snippets, _ = self.transcript_service.fetch_transcripts(
+                    video_id, source_lang=source_lang, target_lang=target_lang
+                )
+                if tgt_snippets:
+                    await subtitle_repo.save_raw(lesson.id, tgt_key, tgt_snippets)
+            except Exception as e:
+                logger.warning(f"Could not fetch target subtitles for {video_id}: {e}")
+                tgt_snippets = None
+
+        # 4. Build challenges and update lesson metadata in DB
+        lesson_response = self._build_response(
+            video_id, title, src_snippets, tgt_snippets,
+            source_lang=source_lang,
+            detected_source_lang=detected_source_lang,
+            target_lang=target_lang,
+            grouping_mode=request.grouping_mode,
+        )
+        sentences_list = [
+            {
+                "position": c.id,
+                "text": c.text,
+                "time_start": c.time_start,
+                "time_end": c.time_end,
+                "translation": c.translation or "",
+            }
+            for c in lesson_response.challenges
+        ]
+        await subtitle_repo.update_lesson_meta(
+            lesson,
+            title=title,
+            total_challenges=len(sentences_list),
+            sentences_data=sentences_list,
+        )
+
+        return lesson_response, lesson
+
+    def _build_response(
+        self,
+        video_id: str,
+        title: str,
+        src_snippets,
+        tgt_snippets,
+        source_lang: str,
+        detected_source_lang: str,
+        target_lang: str,
+        grouping_mode: str = "sentence",
+    ) -> LessonResponse:
+        if grouping_mode == "snippet":
             challenges = [
                 Challenge(
                     id=i + 1,
@@ -116,12 +190,12 @@ class GetLessonUseCase:
                 snippets=src_snippets, translations=tgt_snippets
             )
 
-        # Ensure all translations are clean of credits
+        # Clean subtitle credits
         for c in challenges:
             if c.translation:
                 c.translation = SentenceGrouperService.clean_credits(c.translation)
 
-        # Auto-translate first 12 challenges if target_lang differs from source
+        # Auto-translate first 12 if translation missing
         if target_lang not in ("none", "", detected_source_lang):
             for c in challenges[:12]:
                 if not c.translation:
@@ -137,13 +211,7 @@ class GetLessonUseCase:
             challenges=challenges,
             detected_source_lang=detected_source_lang,
         )
-
-        return self._to_response(
-            lesson,
-            source_lang=source_lang,
-            detected_source_lang=detected_source_lang,
-            target_lang=target_lang,
-        )
+        return self._to_response(lesson, source_lang, detected_source_lang, target_lang)
 
     def _to_response(
         self,

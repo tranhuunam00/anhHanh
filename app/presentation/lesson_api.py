@@ -7,7 +7,7 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, and_
 
 from app.infrastructure.database.connection import get_db
 from app.infrastructure.database.models import User, Lesson, UserLesson, UserStreak
@@ -15,7 +15,7 @@ from app.application.auth_service import get_current_user_optional, get_current_
 from app.application.dtos import GetLessonRequest
 from app.application.use_cases import extract_youtube_id, GetLessonUseCase
 from app.infrastructure.youtube_adapter import YouTubeTranscriptAdapter
-from app.infrastructure.cache_repository import FileCacheRepository
+from app.infrastructure.lesson_subtitle_repo import LessonSubtitleRepo
 from app.presentation.security_middleware import limiter
 
 logger = logging.getLogger(__name__)
@@ -23,9 +23,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/api/lesson', tags=['Lessons'])
 
 _youtube_adapter = YouTubeTranscriptAdapter()
-_cache_repo = FileCacheRepository()
-_get_lesson_uc = GetLessonUseCase(transcript_service=_youtube_adapter, cache_repo=_cache_repo)
+_get_lesson_uc = GetLessonUseCase(transcript_service=_youtube_adapter)
 
+
+# ---------------------------------------------------------------------------
+# Request / Response schemas
+# ---------------------------------------------------------------------------
 
 class PreviewApiRequest(BaseModel):
     url_or_id: str = Field(..., description='YouTube URL hoặc video ID')
@@ -41,6 +44,8 @@ class StartLessonRequest(BaseModel):
 
 class ProgressApiRequest(BaseModel):
     video_id: str
+    source_lang: Optional[str] = 'en'
+    target_lang: Optional[str] = 'vi'
     current_position: Optional[int] = None
     current_challenge_index: Optional[int] = None
     is_completed: bool = False
@@ -55,6 +60,47 @@ class ProgressApiRequest(BaseModel):
         return 1
 
 
+# ---------------------------------------------------------------------------
+# Helper: find or create UserLesson scoped to (user, lesson, source_lang, target_lang)
+# ---------------------------------------------------------------------------
+
+async def _get_or_create_user_lesson(
+    db: AsyncSession,
+    user_id: str,
+    lesson_id: str,
+    source_lang: str,
+    target_lang: str,
+) -> tuple:
+    """Return (user_lesson, created: bool)."""
+    res = await db.execute(
+        select(UserLesson).where(
+            and_(
+                UserLesson.user_id == user_id,
+                UserLesson.lesson_id == lesson_id,
+                UserLesson.source_lang == source_lang,
+                UserLesson.target_lang == target_lang,
+            )
+        )
+    )
+    ul = res.scalar_one_or_none()
+    if ul:
+        return ul, False
+    ul = UserLesson(
+        user_id=user_id,
+        lesson_id=lesson_id,
+        source_lang=source_lang,
+        target_lang=target_lang,
+        current_position=1,
+        is_completed=False,
+    )
+    db.add(ul)
+    return ul, True
+
+
+# ---------------------------------------------------------------------------
+# Endpoints
+# ---------------------------------------------------------------------------
+
 @router.post('/preview')
 @limiter.limit('20/minute')
 async def preview_video(
@@ -63,16 +109,25 @@ async def preview_video(
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
-    """Return video preview metadata before starting dictation session, including resumePosition if already studied."""
+    """Return video preview metadata before starting dictation session.
+
+    Checks DB subtitle cache first; only calls YouTube when uncached.
+    """
     try:
         vid = extract_youtube_id(payload.url_or_id)
+        source_lang = (payload.source_lang or 'en').lower()
+        target_lang = (payload.target_lang or 'vi').lower()
+
+        subtitle_repo = LessonSubtitleRepo(db)
         req = GetLessonRequest(
             url_or_id=vid,
             grouping_mode='sentence',
-            source_lang=payload.source_lang or 'en',
-            target_lang=payload.target_lang or 'vi'
+            source_lang=source_lang,
+            target_lang=target_lang,
         )
-        lesson_dto = _get_lesson_uc.execute(req)
+        lesson_dto, lesson_record = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
+        await db.commit()
+
         total_challenges = len(lesson_dto.challenges)
         est_minutes = max(1, round(total_challenges * 0.25))
 
@@ -80,12 +135,16 @@ async def preview_video(
         is_done = False
 
         if current_user:
-            stmt = (
-                select(UserLesson)
-                .join(Lesson, Lesson.id == UserLesson.lesson_id)
-                .where(UserLesson.user_id == current_user.id, Lesson.video_id == vid)
+            ul_res = await db.execute(
+                select(UserLesson).where(
+                    and_(
+                        UserLesson.user_id == current_user.id,
+                        UserLesson.lesson_id == lesson_record.id,
+                        UserLesson.source_lang == source_lang,
+                        UserLesson.target_lang == target_lang,
+                    )
+                )
             )
-            ul_res = await db.execute(stmt)
             user_lesson = ul_res.scalar_one_or_none()
             if user_lesson:
                 resume_pos = user_lesson.current_position
@@ -97,10 +156,10 @@ async def preview_video(
             'thumbnailUrl': f'https://i.ytimg.com/vi/{vid}/hqdefault.jpg',
             'totalChallenges': total_challenges,
             'estimatedMinutes': est_minutes,
-            'sourceLang': getattr(lesson_dto, 'source_lang', payload.source_lang or 'en'),
-            'targetLang': getattr(lesson_dto, 'target_lang', payload.target_lang or 'vi'),
+            'sourceLang': source_lang,
+            'targetLang': target_lang,
             'resumePosition': resume_pos,
-            'isCompleted': is_done
+            'isCompleted': is_done,
         }
     except Exception as e:
         logger.warning(f'Preview video failed: {e}')
@@ -113,77 +172,47 @@ async def start_lesson_session(
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
-    """Start a study session, ensure lesson in DB, and retrieve current_position for resume."""
+    """Start a study session: ensure lesson + subtitles cached in DB, return resume position."""
     vid = extract_youtube_id(payload.video_id)
+    source_lang = (payload.source_lang or 'en').lower()
+    target_lang = (payload.target_lang or 'vi').lower()
 
-    # 1. Fetch or get lesson from DB
-    res = await db.execute(select(Lesson).where(Lesson.video_id == vid))
-    lesson_record = res.scalar_one_or_none()
+    subtitle_repo = LessonSubtitleRepo(db)
+    req = GetLessonRequest(
+        url_or_id=vid,
+        grouping_mode='sentence',
+        source_lang=source_lang,
+        target_lang=target_lang,
+    )
+    lesson_dto, lesson_record = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
 
-    if not lesson_record:
-        req = GetLessonRequest(
-            url_or_id=vid,
-            grouping_mode='sentence',
-            source_lang=payload.source_lang or 'en',
-            target_lang=payload.target_lang or 'vi'
-        )
-        lesson_dto = _get_lesson_uc.execute(req)
-        sentences_list = [
-            {
-                'position': c.id,
-                'text': c.text,
-                'time_start': c.time_start,
-                'time_end': c.time_end,
-                'translation': c.translation or ''
-            }
-            for c in lesson_dto.challenges
-        ]
-        lesson_record = Lesson(
-            video_id=vid,
-            title=lesson_dto.title,
-            thumbnail_url=f'https://i.ytimg.com/vi/{vid}/hqdefault.jpg',
-            total_challenges=len(sentences_list),
-            sentences_data=sentences_list
-        )
-        db.add(lesson_record)
-        await db.flush()
-
-    # 2. Check user session for resume position
     current_pos = 1
     is_done = False
 
     if current_user:
-        ul_res = await db.execute(
-            select(UserLesson).where(
-                UserLesson.user_id == current_user.id,
-                UserLesson.lesson_id == lesson_record.id
-            )
+        user_lesson, created = await _get_or_create_user_lesson(
+            db, current_user.id, lesson_record.id, source_lang, target_lang
         )
-        user_lesson = ul_res.scalar_one_or_none()
-        if user_lesson:
+        if not created:
             current_pos = user_lesson.current_position
             is_done = user_lesson.is_completed
-        else:
-            user_lesson = UserLesson(
-                user_id=current_user.id,
-                lesson_id=lesson_record.id,
-                current_position=1,
-                is_completed=False
-            )
-            db.add(user_lesson)
-            await db.commit()
+
+    await db.commit()
 
     return {
         'lesson': {
             'id': lesson_record.id,
             'videoId': lesson_record.video_id,
+            'youtubeUrl': lesson_record.youtube_url,
             'title': lesson_record.title,
             'thumbnailUrl': lesson_record.thumbnail_url,
             'totalChallenges': lesson_record.total_challenges,
-            'sentences': lesson_record.sentences_data
+            'sentences': lesson_record.sentences_data,
+            'sourceLang': source_lang,
+            'targetLang': target_lang,
         },
         'currentPosition': current_pos,
-        'isCompleted': is_done
+        'isCompleted': is_done,
     }
 
 
@@ -195,17 +224,24 @@ async def update_lesson_progress(
 ):
     """Update active sentence current_position and update daily streak & words counter."""
     vid = extract_youtube_id(payload.video_id)
+    source_lang = (payload.source_lang or 'en').lower()
+    target_lang = (payload.target_lang or 'vi').lower()
     streak_info = {'current_streak': 0, 'words_today': payload.words_typed}
 
     if current_user:
-        # 1. Update UserLesson
+        # 1. Find lesson record
         l_res = await db.execute(select(Lesson).where(Lesson.video_id == vid))
         lesson = l_res.scalar_one_or_none()
+
         if lesson:
             ul_res = await db.execute(
                 select(UserLesson).where(
-                    UserLesson.user_id == current_user.id,
-                    UserLesson.lesson_id == lesson.id
+                    and_(
+                        UserLesson.user_id == current_user.id,
+                        UserLesson.lesson_id == lesson.id,
+                        UserLesson.source_lang == source_lang,
+                        UserLesson.target_lang == target_lang,
+                    )
                 )
             )
             user_lesson = ul_res.scalar_one_or_none()
@@ -226,7 +262,7 @@ async def update_lesson_progress(
                 current_streak=1,
                 longest_streak=1,
                 words_today=payload.words_typed,
-                last_study_date=today
+                last_study_date=today,
             )
             db.add(streak)
         else:
@@ -238,7 +274,6 @@ async def update_lesson_progress(
                     streak.current_streak += 1
                 else:
                     streak.current_streak = 1
-
                 streak.words_today = payload.words_typed
                 streak.last_study_date = today
 
@@ -248,41 +283,55 @@ async def update_lesson_progress(
         streak_info = {
             'current_streak': streak.current_streak,
             'longest_streak': streak.longest_streak,
-            'words_today': streak.words_today
+            'words_today': streak.words_today,
         }
 
     return {
         'videoId': vid,
         'currentPosition': payload.target_position,
         'isCompleted': payload.is_completed,
-        'streak': streak_info
+        'streak': streak_info,
     }
 
 
 @router.get('/status/{video_id}')
 async def get_lesson_status(
     video_id: str,
+    source_lang: Optional[str] = 'en',
+    target_lang: Optional[str] = 'vi',
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
-    """Retrieve resume position for active user on given video."""
+    """Retrieve resume position for active user on given video + language pair."""
     vid = extract_youtube_id(video_id)
+    src = (source_lang or 'en').lower()
+    tgt = (target_lang or 'vi').lower()
+
     if not current_user:
         return {'videoId': vid, 'currentPosition': 1, 'isCompleted': False}
 
     res = await db.execute(
         select(UserLesson)
         .join(Lesson, Lesson.id == UserLesson.lesson_id)
-        .where(UserLesson.user_id == current_user.id, Lesson.video_id == vid)
+        .where(
+            and_(
+                UserLesson.user_id == current_user.id,
+                Lesson.video_id == vid,
+                UserLesson.source_lang == src,
+                UserLesson.target_lang == tgt,
+            )
+        )
     )
     user_lesson = res.scalar_one_or_none()
     if user_lesson:
         return {
             'videoId': vid,
+            'sourceLang': src,
+            'targetLang': tgt,
             'currentPosition': user_lesson.current_position,
-            'isCompleted': user_lesson.is_completed
+            'isCompleted': user_lesson.is_completed,
         }
-    return {'videoId': vid, 'currentPosition': 1, 'isCompleted': False}
+    return {'videoId': vid, 'sourceLang': src, 'targetLang': tgt, 'currentPosition': 1, 'isCompleted': False}
 
 
 @router.get('/history')
@@ -310,8 +359,10 @@ async def get_user_lesson_history(
             'lessonId': l.id,
             'videoId': l.video_id,
             'title': l.title,
-            'thumbnailUrl': l.thumbnail_url or f"https://i.ytimg.com/vi/{l.video_id}/hqdefault.jpg",
+            'thumbnailUrl': l.thumbnail_url or f'https://i.ytimg.com/vi/{l.video_id}/hqdefault.jpg',
             'totalChallenges': l.total_challenges,
+            'sourceLang': ul.source_lang,
+            'targetLang': ul.target_lang,
             'currentPosition': ul.current_position,
             'isCompleted': ul.is_completed,
             'percent': percent,
@@ -325,15 +376,27 @@ async def get_user_lesson_history(
 @router.delete('/history/{video_id}')
 async def delete_user_lesson_history(
     video_id: str,
+    source_lang: Optional[str] = 'en',
+    target_lang: Optional[str] = 'vi',
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Remove a lesson from user's study history."""
+    """Remove a lesson progress record (for a specific language pair) from user's study history."""
     vid = extract_youtube_id(video_id)
+    src = (source_lang or 'en').lower()
+    tgt = (target_lang or 'vi').lower()
+
     stmt = (
         select(UserLesson)
         .join(Lesson, Lesson.id == UserLesson.lesson_id)
-        .where(UserLesson.user_id == current_user.id, Lesson.video_id == vid)
+        .where(
+            and_(
+                UserLesson.user_id == current_user.id,
+                Lesson.video_id == vid,
+                UserLesson.source_lang == src,
+                UserLesson.target_lang == tgt,
+            )
+        )
     )
     res = await db.execute(stmt)
     ul = res.scalar_one_or_none()
