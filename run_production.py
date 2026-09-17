@@ -61,6 +61,26 @@ def main():
         import uvicorn
 
     from server import app
+    import threading
+    import webbrowser
+    import time
+
+    def open_browser():
+        time.sleep(1.2)
+        try:
+            webbrowser.open(f"http://localhost:{port}")
+        except Exception:
+            pass
+
+    threading.Thread(target=open_browser, daemon=True).start()
+
+    print("====================================================================")
+    print(f"🎉 CẢ FRONTEND & BACKEND ĐANG CHẠY CHUNG TẠI: http://localhost:{port}")
+    print(f"👉 Trình duyệt đang tự động mở: http://localhost:{port}")
+    print(f"📖 Tài liệu API Docs:           http://localhost:{port}/docs")
+    print(f"📘 Bản đặc tả yêu cầu BRD:      http://localhost:{port}/tai-lieu")
+    print("====================================================================\n")
+
     uvicorn.run(app, host=host, port=port)
 
 if __name__ == "__main__":

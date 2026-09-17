@@ -62,6 +62,18 @@ def main():
     fe_cmd = [npm_cmd, "run", "dev"]
     fe_proc = subprocess.Popen(fe_cmd, cwd=frontend_dir, shell=(os.name == "nt"))
 
+    import threading
+    import webbrowser
+
+    def open_dev_browser():
+        time.sleep(1.5)
+        try:
+            webbrowser.open("http://localhost:5101")
+        except Exception:
+            pass
+
+    threading.Thread(target=open_dev_browser, daemon=True).start()
+
     try:
         while True:
             time.sleep(1)
