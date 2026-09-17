@@ -23,12 +23,19 @@ _translation_service = TranslationService()
 
 class CreateVocabRequest(BaseModel):
     word: str = Field(..., min_length=1, max_length=100)
-    context_sentence: str = Field(..., min_length=1)
+    context_sentence: Optional[str] = ""
     meaning: Optional[str] = None
     phonetic: Optional[str] = None
     image_url: Optional[str] = None
     video_id: Optional[str] = None
     video_timestamp: Optional[float] = None
+    timestamp: Optional[float] = None
+
+    @property
+    def effective_timestamp(self) -> Optional[float]:
+        if self.video_timestamp is not None:
+            return self.video_timestamp
+        return self.timestamp
 
 
 class UpdateStatusRequest(BaseModel):
@@ -97,10 +104,10 @@ async def save_vocabulary_word(
         word=clean_word,
         phonetic=phonetic,
         meaning=meaning,
-        context_sentence=payload.context_sentence,
+        context_sentence=payload.context_sentence or "",
         image_url=image_url,
         video_id=payload.video_id,
-        video_timestamp=payload.video_timestamp,
+        video_timestamp=payload.effective_timestamp,
         status='NEW'
     )
     db.add(new_vocab)
@@ -114,6 +121,7 @@ async def save_vocabulary_word(
 async def list_vocabulary(
     video_id: Optional[str] = None,
     status_filter: Optional[str] = Query(None, alias='status'),
+    search: Optional[str] = Query(None),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -122,8 +130,11 @@ async def list_vocabulary(
 
     if video_id:
         stmt = stmt.where(UserVocabulary.video_id == video_id)
-    if status_filter:
+    if status_filter and status_filter.upper() != 'ALL':
         stmt = stmt.where(UserVocabulary.status == status_filter.upper())
+    if search and search.strip():
+        s = f"%{search.strip()}%"
+        stmt = stmt.where((UserVocabulary.word.ilike(s)) | (UserVocabulary.meaning.ilike(s)))
 
     stmt = stmt.order_by(UserVocabulary.created_at.desc())
     res = await db.execute(stmt)
@@ -136,15 +147,18 @@ async def list_vocabulary(
         .group_by(UserVocabulary.status)
     )
     status_counts = {'total': 0, 'new': 0, 'learning': 0, 'mastered': 0}
-    for s, count in stats_res.all():
-        key = s.lower()
+    for s_val, count in stats_res.all():
+        key = s_val.lower()
         if key in status_counts:
             status_counts[key] = count
         status_counts['total'] += count
 
+    word_dicts = [w.to_dict() for w in words]
     return {
-        'stats': status_counts,
-        'vocabulary': [w.to_dict() for w in words]
+        'items': word_dicts,
+        'vocabulary': word_dicts,
+        'total': status_counts['total'],
+        'stats': status_counts
     }
 
 

@@ -6,6 +6,8 @@ export const QuestionsDrawer = ({
   totalChallenges,
   currentIndex,
   progressMap,
+  maxReachedIndex = 0,
+  onRestartLesson,
   onSelectQuestion,
 }) => {
   return (
@@ -52,7 +54,7 @@ export const QuestionsDrawer = ({
             {Array.from({ length: totalChallenges }, (_, i) => {
               const pos = i + 1;
               const isCurr = i === currentIndex;
-              const isComp = progressMap?.challenges?.[pos]?.isCompleted;
+              const isComp = (i < maxReachedIndex) || progressMap?.challenges?.[pos]?.isCompleted;
 
               let btnClass = "q-btn";
               if (isCurr) btnClass += " current";
@@ -72,6 +74,25 @@ export const QuestionsDrawer = ({
               );
             })}
           </div>
+
+          {onRestartLesson && (
+            <div style={{ marginTop: "1.25rem", borderTop: "1px solid var(--border, #e2e8f0)", paddingTop: "1rem" }}>
+              <button
+                className="btn btn-secondary btn-with-icon"
+                style={{ width: "100%", justifyContent: "center", color: "#ef4444", borderColor: "#fecaca" }}
+                onClick={() => {
+                  onClose();
+                  onRestartLesson();
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
+                <span>Làm lại bài này từ câu số 1</span>
+              </button>
+            </div>
+          )}
         </div>
       </aside>
     </>

@@ -19,8 +19,9 @@ export const VocabTab = () => {
     setIsLoading(true);
     try {
       const data = await fetchVocabList(filterStatus, searchQuery, token);
-      setItems(data.items || []);
-      setTotal(data.total || 0);
+      const list = data?.items || data?.vocabulary || [];
+      setItems(list);
+      setTotal(data?.total !== undefined ? data.total : (data?.stats?.total || list.length));
     } catch (e) {
       console.error("Failed to load vocab:", e);
     } finally {

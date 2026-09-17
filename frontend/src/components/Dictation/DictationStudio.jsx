@@ -20,6 +20,7 @@ export const DictationStudio = ({
   onPrev,
   onNext,
   onOpenDrawer,
+  onRestartLesson,
   isCompleted,
   strictPunctuation = false,
   onNextChallenge,
@@ -99,6 +100,21 @@ export const DictationStudio = ({
             </svg>
             <span>Danh sách câu</span>
           </button>
+
+          {onRestartLesson && (
+            <button
+              className="btn btn-secondary btn-with-icon"
+              title="Làm lại bài này từ câu số 1"
+              onClick={onRestartLesson}
+              style={{ color: "#ef4444", borderColor: "#fecaca" }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              <span>Làm lại bài này</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -220,6 +236,15 @@ export const DictationStudio = ({
               </svg>
               <span>Luyện lại câu này</span>
             </button>
+            {onRestartLesson && (
+              <button
+                className="btn btn-secondary btn-with-icon"
+                style={{ padding: "7px 14px", fontSize: "0.85rem", color: "#ef4444", borderColor: "#fecaca" }}
+                onClick={onRestartLesson}
+              >
+                <span>🔄 Làm lại bài này từ đầu</span>
+              </button>
+            )}
           </div>
         </div>
       )}

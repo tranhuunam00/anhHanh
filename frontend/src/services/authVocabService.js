@@ -99,7 +99,7 @@ export const fetchVocabList = async (status = "ALL", search = "", token = null) 
   } catch (e) {
     console.error("Error fetching vocab list:", e);
   }
-  return { items: [], total: 0 };
+  return { items: [], vocabulary: [], total: 0 };
 };
 
 export const createVocabWord = async (vocabData, token) => {
@@ -161,10 +161,13 @@ export const deleteVocabWord = async (vocabId, token) => {
   return await safeParseResponse(res, "Không thể xóa từ này");
 };
 
-export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang = "vi") => {
+export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang = "vi", token = null) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
   const res = await fetch("/api/lesson/preview", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({
       url_or_id: urlOrId,
       source_lang: sourceLang,

@@ -41,18 +41,29 @@ class StartLessonRequest(BaseModel):
 
 class ProgressApiRequest(BaseModel):
     video_id: str
-    current_position: int = Field(..., ge=1)
+    current_position: Optional[int] = None
+    current_challenge_index: Optional[int] = None
     is_completed: bool = False
     words_typed: int = Field(default=0, ge=0)
+
+    @property
+    def target_position(self) -> int:
+        if self.current_position is not None:
+            return max(1, self.current_position)
+        if self.current_challenge_index is not None:
+            return max(1, self.current_challenge_index)
+        return 1
 
 
 @router.post('/preview')
 @limiter.limit('20/minute')
 async def preview_video(
     request: Request,
-    payload: PreviewApiRequest
+    payload: PreviewApiRequest,
+    current_user: Optional[User] = Depends(get_current_user_optional),
+    db: AsyncSession = Depends(get_db)
 ):
-    """Return video preview metadata before starting dictation session."""
+    """Return video preview metadata before starting dictation session, including resumePosition if already studied."""
     try:
         vid = extract_youtube_id(payload.url_or_id)
         req = GetLessonRequest(
@@ -65,6 +76,21 @@ async def preview_video(
         total_challenges = len(lesson_dto.challenges)
         est_minutes = max(1, round(total_challenges * 0.25))
 
+        resume_pos = 1
+        is_done = False
+
+        if current_user:
+            stmt = (
+                select(UserLesson)
+                .join(Lesson, Lesson.id == UserLesson.lesson_id)
+                .where(UserLesson.user_id == current_user.id, Lesson.video_id == vid)
+            )
+            ul_res = await db.execute(stmt)
+            user_lesson = ul_res.scalar_one_or_none()
+            if user_lesson:
+                resume_pos = user_lesson.current_position
+                is_done = user_lesson.is_completed
+
         return {
             'videoId': vid,
             'title': lesson_dto.title,
@@ -72,7 +98,9 @@ async def preview_video(
             'totalChallenges': total_challenges,
             'estimatedMinutes': est_minutes,
             'sourceLang': getattr(lesson_dto, 'source_lang', payload.source_lang or 'en'),
-            'targetLang': getattr(lesson_dto, 'target_lang', payload.target_lang or 'vi')
+            'targetLang': getattr(lesson_dto, 'target_lang', payload.target_lang or 'vi'),
+            'resumePosition': resume_pos,
+            'isCompleted': is_done
         }
     except Exception as e:
         logger.warning(f'Preview video failed: {e}')
@@ -182,7 +210,7 @@ async def update_lesson_progress(
             )
             user_lesson = ul_res.scalar_one_or_none()
             if user_lesson:
-                user_lesson.current_position = payload.current_position
+                user_lesson.current_position = payload.target_position
                 if payload.is_completed:
                     user_lesson.is_completed = True
                 user_lesson.last_studied_at = datetime.now(timezone.utc)
@@ -225,7 +253,7 @@ async def update_lesson_progress(
 
     return {
         'videoId': vid,
-        'currentPosition': payload.current_position,
+        'currentPosition': payload.target_position,
         'isCompleted': payload.is_completed,
         'streak': streak_info
     }

@@ -57,6 +57,7 @@ export default function App() {
 
   const [currentLesson, setCurrentLesson] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [maxReachedIndex, setMaxReachedIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
   const [progressMap, setProgressMap] = useState({});
@@ -97,6 +98,15 @@ export default function App() {
     }
   }, [playerController]);
 
+  // Auto-restore last lesson on mount (F5 reload or initial visit)
+  const initialLoadDoneRef = useRef(false);
+  useEffect(() => {
+    if (!initialLoadDoneRef.current && urlInput) {
+      initialLoadDoneRef.current = true;
+      executeLoadLesson(urlInput, sourceLang, targetLang, 0);
+    }
+  }, [urlInput, token]);
+
   // Step 1: User requests loading a lesson -> Fetch preview first
   const handleRequestPreview = async (urlOrId, reqSourceLang, reqTargetLang) => {
     if (!urlOrId || isLoading) return;
@@ -113,7 +123,7 @@ export default function App() {
         }
       });
 
-      const preview = await fetchLessonPreview(urlOrId, sLang, tLang);
+      const preview = await fetchLessonPreview(urlOrId, sLang, tLang, token);
       setPreviewData(preview);
       setIsPreviewOpen(true);
     } catch (e) {
@@ -143,18 +153,32 @@ export default function App() {
       setCurrentLesson(lessonData);
       setStorageItem("lastUrl", urlOrId);
 
-      // Record session start in backend
-      startLessonSession(lessonData.video_id, token).catch(() => {});
+      // Record session start in backend and retrieve saved currentPosition
+      let effectivePos = Number(startPos) || 0;
+      try {
+        const sessionData = await startLessonSession(lessonData.video_id, token);
+        if (effectivePos <= 0 && sessionData && sessionData.currentPosition) {
+          effectivePos = Number(sessionData.currentPosition);
+        }
+      } catch (err) {
+        console.warn("Could not start session:", err);
+      }
+
+      // Load progress map from localStorage as fallback
+      const prog = loadLessonProgress(lessonData.video_id);
+      setProgressMap(prog);
+
+      if (effectivePos <= 0 && prog && prog.lastPosition) {
+        effectivePos = Number(prog.lastPosition);
+      }
 
       // Calculate initial question index (0-indexed)
-      const targetIndex = startPos > 0 && startPos <= lessonData.challenges.length ? startPos - 1 : 0;
+      const finalPos = Math.max(1, effectivePos || 1);
+      const targetIndex = finalPos <= lessonData.challenges.length ? finalPos - 1 : 0;
+      setMaxReachedIndex(targetIndex);
       setCurrentIndex(targetIndex);
       setUserInput("");
       setIsCompleted(false);
-
-      // Load progress map
-      const prog = loadLessonProgress(lessonData.video_id);
-      setProgressMap(prog);
 
       // Setup Player & Speech Recognition
       const detected = lessonData.detected_source_lang || "en";
@@ -193,14 +217,44 @@ export default function App() {
   const goToChallenge = (index) => {
     if (!currentLesson || index < 0 || index >= currentLesson.challenges.length) return;
     setCurrentIndex(index);
-    setUserInput("");
-    setIsCompleted(false);
     playChallengeAtIndex(currentLesson, index);
 
-    // Sync progress with backend
-    if (currentLesson.video_id) {
-      updateLessonProgress(currentLesson.video_id, index + 1, false, token);
+    // If user goes back to a previously reached sentence: auto-fill and mark completed!
+    // User requirement: "các câu trước đó mặc định đã điền, chỉ cần quan tâm đang đến câu nào thôi, cái đáp án đó tự fill"
+    if (index < maxReachedIndex) {
+      setUserInput(currentLesson.challenges[index].text);
+      setIsCompleted(true);
+    } else {
+      setUserInput("");
+      setIsCompleted(false);
+      if (index > maxReachedIndex) {
+        setMaxReachedIndex(index);
+      }
     }
+
+    // Sync progress with backend (never downgrade saved position if user is just reviewing earlier questions)
+    if (currentLesson.video_id) {
+      const posToSync = Math.max(index + 1, maxReachedIndex + 1);
+      updateLessonProgress(currentLesson.video_id, posToSync, false, token);
+    }
+  };
+
+  // Restart lesson from câu 1
+  const handleRestartLesson = () => {
+    if (!currentLesson) return;
+    const confirmReset = window.confirm("Bạn có chắc chắn muốn làm lại bài học này từ câu số 1?");
+    if (!confirmReset) return;
+
+    setMaxReachedIndex(0);
+    setCurrentIndex(0);
+    setUserInput("");
+    setIsCompleted(false);
+
+    const newProg = { challenges: {}, lastPosition: 1 };
+    setProgressMap(newProg);
+    saveLessonProgress(currentLesson.video_id, newProg);
+    updateLessonProgress(currentLesson.video_id, 1, false, token);
+    playChallengeAtIndex(currentLesson, 0);
   };
 
   const currentChallenge = useMemo(() => {
@@ -230,14 +284,19 @@ export default function App() {
       const isAllDone = currentIndex === (currentLesson?.challenges?.length || 0) - 1;
 
       if (currentLesson) {
+        const nextPos = Math.min((currentLesson.challenges?.length || 1), currentIndex + 2);
+        const newMax = Math.max(maxReachedIndex, currentIndex + 1);
+        setMaxReachedIndex(newMax);
+
         const newProg = { ...progressMap };
         if (!newProg.challenges) newProg.challenges = {};
         newProg.challenges[currentIndex + 1] = { isCompleted: true, lastUpdated: Date.now() };
+        newProg.lastPosition = Math.max(nextPos, (newProg.lastPosition || 1));
         setProgressMap(newProg);
         saveLessonProgress(currentLesson.video_id, newProg);
 
         // Record progress in backend DB
-        updateLessonProgress(currentLesson.video_id, currentIndex + 1, isAllDone, token);
+        updateLessonProgress(currentLesson.video_id, nextPos, isAllDone, token);
         refreshStreak();
       }
 
@@ -268,9 +327,22 @@ export default function App() {
   };
 
   const handleSkip = () => {
-    if (!currentChallenge) return;
+    if (!currentChallenge || !currentLesson) return;
     setUserInput(currentChallenge.text);
     setIsCompleted(true);
+
+    const nextPos = Math.min((currentLesson.challenges?.length || 1), currentIndex + 2);
+    const newMax = Math.max(maxReachedIndex, currentIndex + 1);
+    setMaxReachedIndex(newMax);
+
+    const newProg = { ...progressMap };
+    if (!newProg.challenges) newProg.challenges = {};
+    newProg.challenges[currentIndex + 1] = { isCompleted: true, lastUpdated: Date.now() };
+    newProg.lastPosition = Math.max(nextPos, (newProg.lastPosition || 1));
+    setProgressMap(newProg);
+    saveLessonProgress(currentLesson.video_id, newProg);
+
+    updateLessonProgress(currentLesson.video_id, nextPos, false, token);
   };
 
   const handleHintLetter = () => {
@@ -446,6 +518,7 @@ export default function App() {
               onPrev={() => goToChallenge(currentIndex - 1)}
               onNext={() => goToChallenge(currentIndex + 1)}
               onOpenDrawer={() => setIsDrawerOpen(true)}
+              onRestartLesson={handleRestartLesson}
               isCompleted={isCompleted}
               strictPunctuation={settings.strictPunctuation}
               onNextChallenge={() => goToChallenge(currentIndex + 1)}
@@ -493,7 +566,7 @@ export default function App() {
           <HistoryTab
             onSelectLesson={(videoId, targetPos) => {
               setActiveTab("tab-dictation");
-              handleRequestPreview(videoId, sourceLang, targetLang);
+              executeLoadLesson(videoId, sourceLang, targetLang, targetPos);
             }}
             onOpenAuth={() => setIsAuthOpen(true)}
           />
@@ -530,6 +603,8 @@ export default function App() {
         totalChallenges={currentLesson?.total_challenges || 0}
         currentIndex={currentIndex}
         progressMap={progressMap}
+        maxReachedIndex={maxReachedIndex}
+        onRestartLesson={handleRestartLesson}
         onSelectQuestion={(pos) => goToChallenge(pos - 1)}
       />
 
