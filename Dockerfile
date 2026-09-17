@@ -28,13 +28,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ ./app/
 COPY server.py ./
 COPY tai_lieu/ ./tai_lieu/
-COPY data/cache/ ./data/cache/
 
 # Copy built frontend dist from Stage 1
 COPY --from=frontend-builder /app/frontend/dist/ ./frontend/dist/
 
-# Ensure data directory exists
-RUN mkdir -p /app/data
+# Ensure data directories exist
+RUN mkdir -p /app/data /app/data/cache/raw
 
 # Ports and runtime configurations
 EXPOSE 5100

@@ -13,3 +13,5 @@ data/*.sqlite3
 *.db
 .agents/
 skill_agent_namth/
+cookies.txt
+*cookies*.txt
