@@ -22,7 +22,8 @@ ADMIN_EMAIL_ADDRESS = os.getenv('ADMIN_EMAIL_ADDRESS', 'itdaogroup@gmail.com').s
 ADMIN_EMAILS = {
     ADMIN_EMAIL_ADDRESS,
     'itdaogroup@gmail.com',
-    'tranhuunam23022000@gmail.com'
+    'tranhuunam23022000@gmail.com',
+    'vuthiquynhtrangbl6d@gmail.com'
 }
 JWT_SECRET = os.getenv('JWT_SECRET')
 if not JWT_SECRET:

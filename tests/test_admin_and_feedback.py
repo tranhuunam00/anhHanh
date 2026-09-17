@@ -167,3 +167,29 @@ def test_admin_portal_data_and_status_update():
     updated_fb = update_res.json()
     assert "feedback" in updated_fb
     assert updated_fb["feedback"]["status"] == "RESOLVED"
+
+
+def test_quynh_trang_admin_privilege():
+    """Verify vuthiquynhtrangbl6d@gmail.com is automatically recognized as ADMIN."""
+    email = "vuthiquynhtrangbl6d@gmail.com"
+    pwd = "QuynhTrangPass123!"
+    reg_res = client.post("/api/auth/register", json={
+        "email": email,
+        "password": pwd,
+        "name": "Vu Thi Quynh Trang"
+    })
+    if reg_res.status_code == 200:
+        user_data = reg_res.json()["user"]
+        token = reg_res.json()["access_token"]
+    else:
+        login_res = client.post("/api/auth/login", json={"email": email, "password": pwd})
+        assert login_res.status_code == 200
+        user_data = login_res.json()["user"]
+        token = login_res.json()["access_token"]
+
+    assert user_data["role"] == "ADMIN"
+
+    # Verify she can access admin endpoint
+    res = client.get("/api/admin/overview", headers={"Authorization": f"Bearer {token}"})
+    assert res.status_code == 200
+

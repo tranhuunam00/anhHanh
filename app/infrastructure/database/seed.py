@@ -54,8 +54,19 @@ async def seed_super_admin(session: AsyncSession) -> None:
         session.add(streak)
         await session.commit()
         logger.info('Super Admin seeded successfully.')
-    else:
-        if existing_admin.role != 'ADMIN':
-            existing_admin.role = 'ADMIN'
+    # Ensure all designated admin emails have ADMIN role
+    admin_emails = {
+        admin_email,
+        'itdaogroup@gmail.com',
+        'tranhuunam23022000@gmail.com',
+        'vuthiquynhtrangbl6d@gmail.com'
+    }
+    for email_addr in admin_emails:
+        if not email_addr:
+            continue
+        res = await session.execute(select(User).where(User.email == email_addr))
+        u = res.scalar_one_or_none()
+        if u and u.role != 'ADMIN':
+            u.role = 'ADMIN'
             await session.commit()
-            logger.info(f'Updated {admin_email} to ADMIN role.')
+            logger.info(f'Promoted {email_addr} to ADMIN role.')
