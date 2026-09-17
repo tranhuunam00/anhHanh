@@ -82,9 +82,14 @@ class TranslationService:
         if cache_key in self.memory_cache:
             return self.memory_cache[cache_key]
 
-        # Call translation provider
+        # Call translation provider: 1. Primary Google Translate (standard, natural)
         pair_src = "en" if src == "auto" else src
-        translated = self._fetch_mymemory(cleaned, pair_src, tgt)
+        translated = self._fetch_google(cleaned, pair_src, tgt)
+
+        # 2. Secondary fallback: MyMemory
+        if not translated:
+            translated = self._fetch_mymemory(cleaned, pair_src, tgt)
+
         if translated:
             cleaned_trans = self.clean_credits(translated)
             self.memory_cache[cache_key] = cleaned_trans
@@ -97,10 +102,38 @@ class TranslationService:
         """Backwards-compatible helper for English to Vietnamese translation."""
         return self.translate(text, source_lang="en", target_lang="vi")
 
+    def _fetch_google(
+        self, text: str, source_lang: str = "en", target_lang: str = "vi"
+    ) -> Optional[str]:
+        """Fetch accurate, standard translation via Google Translate."""
+        try:
+            q = urllib.parse.quote(text)
+            sl = "auto" if source_lang == "auto" else source_lang
+            tl = target_lang
+            url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl={sl}&tl={tl}&dt=t&q={q}"
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                },
+            )
+            with urllib.request.urlopen(req, timeout=4) as res:
+                data = json.loads(res.read().decode("utf-8"))
+                if data and isinstance(data, list) and len(data) > 0:
+                    translated_segments = []
+                    for seg in data[0]:
+                        if seg and len(seg) > 0 and seg[0]:
+                            translated_segments.append(seg[0])
+                    if translated_segments:
+                        return "".join(translated_segments).strip()
+        except Exception:
+            pass
+        return None
+
     def _fetch_mymemory(
         self, text: str, source_lang: str = "en", target_lang: str = "vi"
     ) -> Optional[str]:
-        """Fetch translation from MyMemory API."""
+        """Fetch translation from MyMemory API with match quality selection."""
         try:
             q = urllib.parse.quote(text)
             langpair = f"{source_lang}|{target_lang}"
@@ -111,8 +144,24 @@ class TranslationService:
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
                 },
             )
-            with urllib.request.urlopen(req, timeout=5) as res:
+            with urllib.request.urlopen(req, timeout=4) as res:
                 data = json.loads(res.read().decode("utf-8"))
+                # Prefer machine translation or highest quality match over crowd movie subtitles
+                matches = data.get("matches", [])
+                best_trans = None
+                best_quality = -1
+                for m in matches:
+                    q_val = float(m.get("quality", 0) or 0)
+                    t_val = m.get("translation", "").strip()
+                    if t_val and "MYMEMORY" not in t_val:
+                        if m.get("created-by") == "MT!":
+                            return html.unescape(t_val).strip()
+                        if q_val > best_quality:
+                            best_quality = q_val
+                            best_trans = t_val
+                if best_trans and best_quality > 0:
+                    return html.unescape(best_trans).strip()
+
                 trans = data.get("responseData", {}).get("translatedText", "")
                 if trans and "MYMEMORY WARNING" not in trans:
                     return html.unescape(trans).strip()
