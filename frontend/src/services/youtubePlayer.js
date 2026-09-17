@@ -83,6 +83,12 @@ export class YouTubePlayerController {
               this.player.seekTo(this.currentLoopStart, true);
               this.player.playVideo();
             } catch (e) {}
+          } else if (this.pendingCue) {
+            this.pendingCue = false;
+            try {
+              this.player.seekTo(this.currentLoopStart, true);
+              this.player.pauseVideo();
+            } catch (e) {}
           }
           this.onReadyCallbacks.forEach((cb) => cb());
           this.onReadyCallbacks = [];
@@ -153,6 +159,36 @@ export class YouTubePlayerController {
       this.player.playVideo();
     } catch (e) {
       console.warn("Could not play segment", e);
+    }
+  }
+
+  cueSegment(start, end, loop = true, prevEnd = null, nextStart = null) {
+    this.isFullMode = false;
+    const padding = typeof this.audioPadding === "number" ? this.audioPadding : 0.1;
+    let loopStart = Math.max(0, start - padding);
+    if (typeof prevEnd === "number" && !isNaN(prevEnd)) {
+      loopStart = Math.max(loopStart, prevEnd);
+    }
+    let loopEnd = end + padding;
+    if (typeof nextStart === "number" && !isNaN(nextStart)) {
+      loopEnd = Math.min(loopEnd, nextStart);
+    }
+    this.currentLoopStart = Math.max(0, loopStart);
+    this.currentLoopEnd = Math.max(this.currentLoopStart + 0.1, loopEnd);
+    this.isLooping = loop;
+    this.isWaitingReplay = false;
+    if (this.replayTimeout) clearTimeout(this.replayTimeout);
+
+    if (!this.isReady || !this.player || !this.player.seekTo) {
+      this.pendingPlay = false;
+      this.pendingCue = true;
+      return;
+    }
+    try {
+      this.player.seekTo(this.currentLoopStart, true);
+      this.player.pauseVideo();
+    } catch (e) {
+      console.warn("Could not cue segment", e);
     }
   }
 

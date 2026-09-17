@@ -189,12 +189,28 @@ export default function App() {
       }
 
       playerController.loadVideo(lessonData.video_id);
-      playChallengeAtIndex(lessonData, targetIndex);
+      cueChallengeAtIndex(lessonData, targetIndex);
     } catch (e) {
       alert("Lỗi tải video: " + e.message);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Cue segment for challenge at specific index (ready and paused, no autoplay)
+  const cueChallengeAtIndex = (lessonObj, index) => {
+    if (!lessonObj || !lessonObj.challenges || !lessonObj.challenges[index]) return;
+    const c = lessonObj.challenges[index];
+    const prevC = index > 0 ? lessonObj.challenges[index - 1] : null;
+    const nextC = index < lessonObj.challenges.length - 1 ? lessonObj.challenges[index + 1] : null;
+
+    playerController.cueSegment(
+      c.time_start,
+      c.time_end,
+      settings.autoReplay === "yes",
+      prevC ? prevC.time_end : null,
+      nextC ? nextC.time_start : null
+    );
   };
 
   // Play segment for challenge at specific index
@@ -415,7 +431,7 @@ export default function App() {
               className={`tab-btn ${activeTab === "tab-dictation" ? "active" : ""}`}
               onClick={() => {
                 setActiveTab("tab-dictation");
-                if (currentLesson) playChallengeAtIndex(currentLesson, currentIndex);
+                if (currentLesson) cueChallengeAtIndex(currentLesson, currentIndex);
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -558,12 +574,13 @@ export default function App() {
 
         {/* TAB 3: Smart Vocabulary Notebook */}
         <div style={{ display: activeTab === "tab-vocab" ? "block" : "none" }}>
-          <VocabTab />
+          <VocabTab isActive={activeTab === "tab-vocab"} />
         </div>
 
         {/* TAB 4: Study History */}
         <div style={{ display: activeTab === "tab-history" ? "block" : "none" }}>
           <HistoryTab
+            isActive={activeTab === "tab-history"}
             onSelectLesson={(videoId, targetPos) => {
               setActiveTab("tab-dictation");
               executeLoadLesson(videoId, sourceLang, targetLang, targetPos);

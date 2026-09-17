@@ -7,7 +7,7 @@ import {
   deleteVocabWord,
 } from "../../services/authVocabService";
 
-export const VocabTab = () => {
+export const VocabTab = ({ isActive = false }) => {
   const { token, isAuthenticated, showToast } = useAuth();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
@@ -32,6 +32,12 @@ export const VocabTab = () => {
   useEffect(() => {
     loadWords();
   }, [loadWords]);
+
+  useEffect(() => {
+    if (isActive) {
+      loadWords();
+    }
+  }, [isActive, loadWords]);
 
   const handleStatusChange = async (vocabId, newStatus) => {
     try {
@@ -211,7 +217,11 @@ export const VocabTab = () => {
               <div className="vocab-card-body">
                 <div className="vocab-word-row">
                   <span className="vocab-word-text">{v.word}</span>
-                  <span className="vocab-phonetic-text">{v.phonetic || ""}</span>
+                  {v.phonetic && (
+                    <span className="vocab-phonetic-badge" title="Phiên âm quốc tế IPA">
+                      {v.phonetic.startsWith("/") ? v.phonetic : `/${v.phonetic}/`}
+                    </span>
+                  )}
                 </div>
 
                 <div className="vocab-meaning-text">{v.meaning}</div>
@@ -222,7 +232,7 @@ export const VocabTab = () => {
 
                 <div className="vocab-card-footer">
                   <select
-                    className="vocab-status-select"
+                    className={`vocab-status-select status-${v.status}`}
                     value={v.status}
                     onChange={(e) => handleStatusChange(v.id, e.target.value)}
                   >

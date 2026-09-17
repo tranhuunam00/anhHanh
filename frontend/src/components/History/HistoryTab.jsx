@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { fetchLessonHistory, deleteLessonHistory } from "../../services/authVocabService";
 
-export const HistoryTab = ({ onSelectLesson, onOpenAuth }) => {
+export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => {
   const { token, isAuthenticated, showToast } = useAuth();
   const [historyList, setHistoryList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +28,12 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth }) => {
   useEffect(() => {
     loadHistory();
   }, [loadHistory]);
+
+  useEffect(() => {
+    if (isActive) {
+      loadHistory();
+    }
+  }, [isActive, loadHistory]);
 
   const handleDelete = async (videoId, title, e) => {
     e.stopPropagation();
