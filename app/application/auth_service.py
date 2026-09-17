@@ -18,7 +18,12 @@ from app.infrastructure.database.seed import hash_password, verify_password
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-ADMIN_EMAIL_ADDRESS = os.getenv('ADMIN_EMAIL_ADDRESS', 'admin@example.com').strip().lower()
+ADMIN_EMAIL_ADDRESS = os.getenv('ADMIN_EMAIL_ADDRESS', 'itdaogroup@gmail.com').strip().lower()
+ADMIN_EMAILS = {
+    ADMIN_EMAIL_ADDRESS,
+    'itdaogroup@gmail.com',
+    'tranhuunam23022000@gmail.com'
+}
 JWT_SECRET = os.getenv('JWT_SECRET')
 if not JWT_SECRET:
     if os.getenv('NODE_ENV') == 'production':
@@ -91,7 +96,7 @@ async def register_user_account(
     if result.scalar_one_or_none():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email này đã được đăng ký')
 
-    role = 'ADMIN' if cleaned_email == ADMIN_EMAIL_ADDRESS else 'USER'
+    role = 'ADMIN' if cleaned_email in ADMIN_EMAILS else 'USER'
     new_user = User(
         email=cleaned_email,
         password_hash=hash_password(password),
@@ -140,13 +145,13 @@ async def authenticate_google_user(db: AsyncSession, credential: str) -> User:
             user.google_id = google_id
         if picture and not user.avatar_url:
             user.avatar_url = picture
-        if email == ADMIN_EMAIL_ADDRESS and user.role != 'ADMIN':
+        if email in ADMIN_EMAILS and user.role != 'ADMIN':
             user.role = 'ADMIN'
         await db.commit()
         await db.refresh(user)
         return user
 
-    role = 'ADMIN' if email == ADMIN_EMAIL_ADDRESS else 'USER'
+    role = 'ADMIN' if email in ADMIN_EMAILS else 'USER'
     user = User(
         email=email,
         google_id=google_id,

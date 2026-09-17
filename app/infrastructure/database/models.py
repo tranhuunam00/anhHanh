@@ -36,6 +36,7 @@ class User(Base):
     lessons = relationship('UserLesson', back_populates='user', cascade='all, delete-orphan')
     vocabulary = relationship('UserVocabulary', back_populates='user', cascade='all, delete-orphan')
     streak = relationship('UserStreak', back_populates='user', uselist=False, cascade='all, delete-orphan')
+    feedbacks = relationship('Feedback', back_populates='user', cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
@@ -151,4 +152,31 @@ class UserStreak(Base):
             'longest_streak': self.longest_streak,
             'words_today': self.words_today,
             'last_study_date': self.last_study_date.isoformat() if self.last_study_date else None,
+        }
+
+
+class Feedback(Base):
+    __tablename__ = 'feedbacks'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    feedback_type = Column(String(50), default='GENERAL', nullable=False)
+    rating = Column(Integer, nullable=True)
+    content = Column(Text, nullable=False)
+    status = Column(String(20), default='PENDING', nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+
+    user = relationship('User', back_populates='feedbacks')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'user_name': self.user.name if self.user else None,
+            'user_email': self.user.email if self.user else None,
+            'feedback_type': self.feedback_type,
+            'rating': self.rating,
+            'content': self.content,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
         }

@@ -76,6 +76,13 @@ async def init_db() -> None:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("Fallback SQLite tables initialized.")
 
+    # Run automated database migrations
+    try:
+        from app.infrastructure.database.migrate import run_migrations
+        await run_migrations(engine)
+    except Exception as e:
+        logger.warning(f"Database migration runner warning: {e}")
+
     # Automatically seed Super Admin account
     try:
         async with async_session_factory() as session:

@@ -17,6 +17,8 @@ from app.presentation.auth_api import router as auth_router
 from app.presentation.lesson_api import router as lesson_router
 from app.presentation.vocab_api import router as vocab_router
 from app.presentation.streak_api import router as streak_router
+from app.presentation.feedback_api import router as feedback_router
+from app.presentation.admin_api import router as admin_router
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +81,8 @@ app.include_router(auth_router)
 app.include_router(lesson_router)
 app.include_router(vocab_router)
 app.include_router(streak_router)
+app.include_router(feedback_router)
+app.include_router(admin_router)
 
 # 5. Mount React frontend build
 base_dir = os.path.dirname(__file__)

@@ -17,6 +17,8 @@ export const Header = ({
   onOpenSettings,
   onOpenAuth,
   onOpenVocabTab,
+  onOpenFeedback,
+  onOpenAdminTab,
 }) => {
   const { user, isAuthenticated, streak, wordsToday, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -169,6 +171,18 @@ export const Header = ({
                   >
                     📚 Sổ tay từ vựng
                   </div>
+                  {user.role === "ADMIN" && (
+                    <div
+                      className="user-dropdown-item"
+                      style={{ color: "#0284c7", fontWeight: 700 }}
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onOpenAdminTab && onOpenAdminTab();
+                      }}
+                    >
+                      ⚙️ Bảng Quản trị
+                    </div>
+                  )}
                   <div className="user-dropdown-divider"></div>
                   <div
                     className="user-dropdown-item"
@@ -198,6 +212,19 @@ export const Header = ({
             </button>
           )}
         </div>
+
+        {/* Feedback Button */}
+        <button
+          className="btn btn-secondary btn-icon-text"
+          onClick={onOpenFeedback}
+          title="Gửi góp ý & báo lỗi"
+          style={{ padding: "6px 12px", fontSize: "0.85rem" }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span>Góp ý</span>
+        </button>
 
         {/* Theme Toggle */}
         <button
