@@ -847,17 +847,15 @@
           </ul>
         </li>
         <li class="toc-item">
-          <a href="#section-4" class="toc-link">5. Thiết kế CSDL & Sơ đồ ERD (7 Bảng)</a>
+          <a href="#section-4" class="toc-link">5. Thiết kế CSDL & Sơ đồ ERD (5 Bảng Tinh Gọn)</a>
           <ul class="toc-sublist">
-            <li><a href="#db-overview" class="toc-link">5.1. Thống kê & 7 Bảng CSDL</a></li>
+            <li><a href="#db-overview" class="toc-link">5.1. Thống kê & 5 Bảng CSDL Tinh Gọn</a></li>
             <li><a href="#diag-erd" class="toc-link">5.2. Sơ đồ Thực thể ERD</a></li>
             <li><a href="#tbl-users" class="toc-link">5.3. Bảng 1: users</a></li>
             <li><a href="#tbl-lessons" class="toc-link">5.4. Bảng 2: lessons</a></li>
-            <li><a href="#tbl-challenges" class="toc-link">5.5. Bảng 3: challenges</a></li>
-            <li><a href="#tbl-user-lessons" class="toc-link">5.6. Bảng 4: user_lessons</a></li>
-            <li><a href="#tbl-user-progress" class="toc-link">5.7. Bảng 5: user_progress</a></li>
-            <li><a href="#tbl-user-vocab" class="toc-link">5.8. Bảng 6: user_vocabulary</a></li>
-            <li><a href="#tbl-user-streaks" class="toc-link">5.9. Bảng 7: user_streaks</a></li>
+            <li><a href="#tbl-user-lessons" class="toc-link">5.5. Bảng 3: user_lessons</a></li>
+            <li><a href="#tbl-user-vocab" class="toc-link">5.6. Bảng 4: user_vocabulary</a></li>
+            <li><a href="#tbl-user-streaks" class="toc-link">5.7. Bảng 5: user_streaks</a></li>
           </ul>
         </li>
         <li class="toc-item"><a href="#section-5" class="toc-link">6. Danh mục RESTful API</a></li>
@@ -1205,21 +1203,24 @@ flowchart TD
 
       <!-- Section 5: Database & ERD -->
       <section id="section-4" class="section-card">
-        <h2>🗄️ 5. Thiết Kế Cơ Sở Dữ Liệu PostgreSQL & Sơ Đồ ERD (7 Bảng)</h2>
-        <p>Hệ thống sử dụng cơ sở dữ liệu quan hệ <strong>PostgreSQL 16</strong> với kiến trúc chuẩn hóa bậc 3 (3NF). Dữ liệu học tập, phiên nghe chép và sổ từ vựng được lưu trữ bền vững vĩnh viễn, khắc phục triệt để nhược điểm mất dữ liệu của <code>localStorage</code> trên trình duyệt.</p>
+        <h2>🗄️ 5. Thiết Kế Cơ Sở Dữ Liệu PostgreSQL & Sơ Đồ ERD (5 Bảng Tinh Gọn)</h2>
+        <p>Hệ thống sử dụng cơ sở dữ liệu quan hệ <strong>PostgreSQL 16</strong> với kiến trúc <strong>5 Bảng Tinh Gọn (Lean Schema)</strong>. Toàn bộ tiến độ học tập, phiên nghe chép và sổ từ vựng được lưu trữ vĩnh viễn, khắc phục triệt để nhược điểm mất dữ liệu của <code>localStorage</code> trên trình duyệt.</p>
 
-        <!-- Callout Banner: Exact Count of Tables -->
+        <!-- Callout Banner: 5 Tables Lean Architecture -->
         <div class="callout callout-info" id="db-overview">
           <div class="callout-icon">📊</div>
           <div>
-            <strong>HỆ THỐNG CƠ SỞ DỮ LIỆU: TỔNG CỘNG 7 BẢNG QUAN HỆ CHUẨN HÓA</strong>
+            <strong>HỆ THỐNG CƠ SỞ DỮ LIỆU: TỔNG CỘNG 5 BẢNG TINH GỌN (LEAN ARCHITECTURE)</strong>
             <p style="margin-top: 4px; font-size: 13.5px;">
-              Toàn bộ kiến trúc CSDL gồm đúng <strong>7 bảng</strong> chuyên biệt, sử dụng <code>UUIDv4</code> làm khóa chính ngẫu nhiên chống tấn công dự đoán ID (Insecure Direct Object Reference), bảo toàn toàn vẹn tham chiếu thông qua <code>FOREIGN KEY ... ON DELETE CASCADE</code> và chuẩn hóa múi giờ quốc tế <code>TIMESTAMPTZ</code>.
+              Kiến trúc được tối ưu hóa theo chỉ đạo hệ thống:
+              <br>• <strong>Loại bỏ bảng trung gian <code>challenges</code></strong>: Toàn bộ danh sách câu nghe chép (&le; 20 từ) được nhúng trực tiếp vào cột <code>sentences_data</code> (kiểu <code>JSONB</code>) của bảng <code>lessons</code>. Việc này giúp API nạp bài học chỉ tốn đúng <strong>1 query duy nhất</strong>, không tốn tài nguyên JOIN bảng.
+              <br>• <strong>Loại bỏ bảng <code>user_progress</code></strong>: Tiến trình học tập của học viên được quản lý tối giản và hiệu quả qua trường <code>current_position</code> trong bảng <code>user_lessons</code>. Tất cả các câu đứng trước <code>current_position</code> mặc định là đã hoàn thành (<span style="color:#10b981; font-weight:700;">✓</span>), câu hiện tại đang làm (<span style="color:#0284c7; font-weight:700;">▶</span>), và các câu kế tiếp chưa làm (<span style="color:#94a3b8;">⚪</span>).
+              <br>• <strong>Bảo mật & Toàn vẹn</strong>: Sử dụng <code>UUIDv4</code> làm khóa chính ngẫu nhiên chống tấn công IDOR, ràng buộc tham chiếu <code>FOREIGN KEY ... ON DELETE CASCADE</code> và chuẩn hóa múi giờ quốc tế <code>TIMESTAMPTZ</code>.
             </p>
           </div>
         </div>
 
-        <!-- Summary Grid of 7 Tables -->
+        <!-- Summary Grid of 5 Tables -->
         <div class="db-summary-grid">
           <div class="db-summary-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1233,24 +1234,15 @@ flowchart TD
           <div class="db-summary-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <strong style="color: var(--primary);">2. lessons</strong>
-              <span class="badge badge-user">6 Cột</span>
+              <span class="badge badge-user">7 Cột</span>
             </div>
-            <span style="font-size: 12.5px; color: var(--text-muted);">Danh mục bài học từ YouTube: Video ID, Tiêu đề, Thumbnail, Tổng số câu &le; 20 từ.</span>
+            <span style="font-size: 12.5px; color: var(--text-muted);">Danh mục bài học từ YouTube: Video ID, Tiêu đề, Thumbnail và mảng câu sentences_data (JSONB).</span>
             <span style="font-size: 11.5px; font-weight: 600; color: var(--secondary);">PK: id (UUID) • UQ: video_id</span>
           </div>
 
           <div class="db-summary-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: var(--primary);">3. challenges</strong>
-              <span class="badge badge-user">7 Cột</span>
-            </div>
-            <span style="font-size: 12.5px; color: var(--text-muted);">Từng câu nghe chép bẻ nhỏ &le; 20 từ kèm mốc thời gian phát audio (time_start, time_end).</span>
-            <span style="font-size: 11.5px; font-weight: 600; color: var(--secondary);">PK: id (UUID) • FK: lesson_id</span>
-          </div>
-
-          <div class="db-summary-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: var(--primary);">4. user_lessons</strong>
+              <strong style="color: var(--primary);">3. user_lessons</strong>
               <span class="badge badge-user">7 Cột</span>
             </div>
             <span style="font-size: 12.5px; color: var(--text-muted);">Phiên học cá nhân của User: Lưu vị trí câu đang làm dở (current_position) để tự động nhảy tới.</span>
@@ -1259,25 +1251,16 @@ flowchart TD
 
           <div class="db-summary-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: var(--primary);">5. user_progress</strong>
-              <span class="badge badge-user">7 Cột</span>
-            </div>
-            <span style="font-size: 12.5px; color: var(--text-muted);">Tiến độ gõ chi tiết từng câu: Từ đã gõ (user_input), trạng thái đã xong (✓) và tỷ lệ % accuracy.</span>
-            <span style="font-size: 11.5px; font-weight: 600; color: var(--secondary);">PK: id (UUID) • FK: user_id, challenge_id</span>
-          </div>
-
-          <div class="db-summary-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: var(--primary);">6. user_vocabulary</strong>
+              <strong style="color: var(--primary);">4. user_vocabulary</strong>
               <span class="badge badge-user">11 Cột</span>
             </div>
-            <span style="font-size: 12.5px; color: var(--text-muted);">Sổ tay từ vựng: Từ bôi đen, Phiên âm IPA, Nghĩa tiếng Việt, Ảnh Unsplash và link nghe audio.</span>
+            <span style="font-size: 12.5px; color: var(--text-muted);">Sổ tay từ vựng: Từ bôi đen, Phiên âm IPA, Nghĩa tiếng Việt, Ảnh minh họa tự động và link nghe audio.</span>
             <span style="font-size: 11.5px; font-weight: 600; color: var(--secondary);">PK: id (UUID) • FK: user_id</span>
           </div>
 
           <div class="db-summary-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: var(--primary);">7. user_streaks</strong>
+              <strong style="color: var(--primary);">5. user_streaks</strong>
               <span class="badge badge-user">6 Cột</span>
             </div>
             <span style="font-size: 12.5px; color: var(--text-muted);">Thống kê động lực học tập: Chuỗi ngày học liên tục (🔥 Streak) và bộ đếm số từ gõ hôm nay.</span>
@@ -1287,19 +1270,15 @@ flowchart TD
 
         <!-- Diagram ERD -->
         <div class="mermaid-box" id="diag-erd">
-          <h4>🗄️ 5.2. Sơ đồ Thực thể Quan hệ (Entity Relationship Diagram - ERD)</h4>
-          <p class="diagram-caption">Mô hình quan hệ 7 bảng chuẩn hóa với các liên kết 1-N (Foreign Keys) đảm bảo toàn vẹn dữ liệu học tập.</p>
+          <h4>🗄️ 5.2. Sơ đồ Thực thể Quan hệ (Entity Relationship Diagram - ERD) 5 Bảng</h4>
+          <p class="diagram-caption">Mô hình quan hệ 5 bảng tinh gọn, loại bỏ các bảng trung gian dư thừa và tối ưu hóa tốc độ truy vấn 1-query.</p>
           <pre class="mermaid">
 erDiagram
     users ||--o{ user_lessons : "tracks"
-    users ||--o{ user_progress : "submits"
     users ||--o{ user_vocabulary : "saves"
     users ||--o| user_streaks : "maintains"
 
-    lessons ||--o{ challenges : "has"
     lessons ||--o{ user_lessons : "enrolled_by"
-
-    challenges ||--o{ user_progress : "graded_in"
 
     users {
         UUID id PK
@@ -1318,17 +1297,8 @@ erDiagram
         VARCHAR title
         TEXT thumbnail_url
         INTEGER total_challenges
+        JSONB sentences_data
         TIMESTAMPTZ created_at
-    }
-
-    challenges {
-        UUID id PK
-        UUID lesson_id FK
-        INTEGER position
-        TEXT text
-        FLOAT time_start
-        FLOAT time_end
-        TEXT translation
     }
 
     user_lessons {
@@ -1339,16 +1309,6 @@ erDiagram
         BOOLEAN is_completed
         TIMESTAMPTZ started_at
         TIMESTAMPTZ last_studied_at
-    }
-
-    user_progress {
-        UUID id PK
-        UUID user_id FK
-        UUID challenge_id FK
-        TEXT user_input
-        BOOLEAN is_completed
-        FLOAT accuracy
-        TIMESTAMPTZ updated_at
     }
 
     user_vocabulary {
@@ -1376,7 +1336,7 @@ erDiagram
           </pre>
         </div>
 
-        <h3 style="margin-top: 2.5rem; font-size: 18px; color: var(--text);">📑 5.3. Từ Điển Dữ Liệu Chi Tiết Của Toàn Bộ 7 Bảng (Data Dictionary)</h3>
+        <h3 style="margin-top: 2.5rem; font-size: 18px; color: var(--text);">📑 5.3. Từ Điển Dữ Liệu Chi Tiết Của Toàn Bộ 5 Bảng (Data Dictionary)</h3>
         <p>Bảng quy cách chi tiết từng trường dữ liệu, kiểu dữ liệu chuẩn PostgreSQL, các ràng buộc toàn vẹn và ý nghĩa nghiệp vụ thực tế:</p>
 
         <!-- Table 1: users -->
@@ -1411,7 +1371,7 @@ erDiagram
                 <td><span class="type-badge">VARCHAR(255)</span></td>
                 <td><span class="nn-badge">NOT NULL</span> <span class="uq-badge">UNIQUE</span></td>
                 <td>Địa chỉ thư điện tử dùng để đăng nhập, lập chỉ mục tìm kiếm nhanh (Index).</td>
-                <td><code>hocvien@shotlang.io</code></td>
+                <td><code>itdaogroup@gmail.com</code></td>
               </tr>
               <tr>
                 <td><strong><code>password_hash</code></strong></td>
@@ -1432,13 +1392,13 @@ erDiagram
                 <td><span class="type-badge">VARCHAR(100)</span></td>
                 <td><span class="nn-badge">NOT NULL</span></td>
                 <td>Họ và tên hiển thị của người dùng trên thanh điều hướng Header.</td>
-                <td><code>Nguyễn Văn Nam</code></td>
+                <td><code>Super Admin</code></td>
               </tr>
               <tr>
                 <td><strong><code>role</code></strong></td>
                 <td><span class="type-badge">VARCHAR(20)</span></td>
                 <td><span class="nn-badge">NOT NULL</span> <span class="def-badge">DEFAULT 'USER'</span></td>
-                <td>Phân quyền tài khoản: Đúng 1 tài khoản <code>ADMIN</code> (từ .env), còn lại là <code>USER</code>.</td>
+                <td>Phân quyền tài khoản: Đúng 1 tài khoản <code>ADMIN</code> (từ .env ADMIN_EMAIL_ADDRESS), còn lại là <code>USER</code>.</td>
                 <td><code>USER</code> / <code>ADMIN</code></td>
               </tr>
               <tr>
@@ -1463,9 +1423,9 @@ erDiagram
         <div class="table-detail-header" id="tbl-lessons">
           <div class="table-detail-title">
             <span>🎬 Bảng 2: <code>lessons</code></span>
-            <span class="badge badge-user">6 Cột</span>
+            <span class="badge badge-user">7 Cột</span>
           </div>
-          <span style="font-size: 12.5px; color: var(--text-muted);">Lưu trữ thông tin các bài học YouTube, ảnh thu nhỏ, tiêu đề và số câu thử thách.</span>
+          <span style="font-size: 12.5px; color: var(--text-muted);">Lưu trữ thông tin các bài học YouTube, ảnh thu nhỏ, tiêu đề và toàn bộ dữ liệu câu JSONB (không cần bảng challenges rời).</span>
         </div>
         <div class="table-container">
           <table>
@@ -1491,28 +1451,35 @@ erDiagram
                 <td><span class="type-badge">VARCHAR(50)</span></td>
                 <td><span class="nn-badge">NOT NULL</span> <span class="uq-badge">UNIQUE</span></td>
                 <td>Mã video YouTube 11 ký tự (hoặc mã video preset). Lập chỉ mục Index tra cứu tức thì.</td>
-                <td><code>dQw4w9WgXcQ</code></td>
+                <td><code>qe9QSCF-d88</code></td>
               </tr>
               <tr>
                 <td><strong><code>title</code></strong></td>
                 <td><span class="type-badge">VARCHAR(500)</span></td>
                 <td><span class="nn-badge">NOT NULL</span></td>
-                <td>Tiêu đề bài học / video YouTube để hiển thị trên thẻ bài học và trang Preview.</td>
-                <td><code>Daily English Conversation 01</code></td>
+                <td>Tiêu đề bài học / video YouTube để hiển thị trên thẻ bài học và trang Preview Card.</td>
+                <td><code>Daily English Conversation Practice</code></td>
               </tr>
               <tr>
                 <td><strong><code>thumbnail_url</code></strong></td>
                 <td><span class="type-badge">TEXT</span></td>
                 <td><span class="nn-badge">NOT NULL</span></td>
                 <td>Đường dẫn ảnh thu nhỏ chất lượng cao (hqdefault/maxresdefault).</td>
-                <td><code>https://i.ytimg.com/vi/.../hqdefault.jpg</code></td>
+                <td><code>https://i.ytimg.com/vi/qe9QSCF-d88/hqdefault.jpg</code></td>
               </tr>
               <tr>
                 <td><strong><code>total_challenges</code></strong></td>
                 <td><span class="type-badge">INTEGER</span></td>
                 <td><span class="nn-badge">NOT NULL</span> <span class="def-badge">DEFAULT 0</span></td>
                 <td>Tổng số câu nghe chép sau khi thuật toán bẻ nhỏ thành các câu &le; 20 từ.</td>
-                <td><code>38</code></td>
+                <td><code>24</code></td>
+              </tr>
+              <tr>
+                <td><strong><code>sentences_data</code></strong></td>
+                <td><span class="type-badge">JSONB</span></td>
+                <td><span class="nn-badge">NOT NULL</span> <span class="def-badge">DEFAULT '[]'</span></td>
+                <td>Mảng JSON lưu trữ toàn bộ các câu trong bài: position, text (&le; 20 từ), time_start, time_end, translation. Giúp tải bài 1 query không cần JOIN.</td>
+                <td><code>[{"position":1,"text":"Hello world","time_start":0.5,"time_end":2.4,"translation":"Xin chào"}]</code></td>
               </tr>
               <tr>
                 <td><strong><code>created_at</code></strong></td>
@@ -1525,86 +1492,13 @@ erDiagram
           </table>
         </div>
 
-        <!-- Table 3: challenges -->
-        <div class="table-detail-header" id="tbl-challenges">
-          <div class="table-detail-title">
-            <span>🎯 Bảng 3: <code>challenges</code></span>
-            <span class="badge badge-user">7 Cột</span>
-          </div>
-          <span style="font-size: 12.5px; color: var(--text-muted);">Lưu trữ chi tiết từng câu nghe chép (&le; 20 từ) cùng các mốc thời gian phát audio chuẩn xác.</span>
-        </div>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 16%;">Tên Cột (Field)</th>
-                <th style="width: 15%;">Kiểu Dữ Liệu</th>
-                <th style="width: 22%;">Ràng Buộc (Constraints)</th>
-                <th style="width: 27%;">Mô Tả Nghiệp Vụ & Quy Tắc</th>
-                <th style="width: 20%;">Dữ Liệu Mẫu (Example)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong><code>id</code></strong></td>
-                <td><span class="type-badge">UUID</span></td>
-                <td><span class="pk-badge">PK</span> <span class="def-badge">DEFAULT gen_random_uuid()</span></td>
-                <td>Khóa chính từng câu thử thách nghe chép.</td>
-                <td><code>c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>lesson_id</code></strong></td>
-                <td><span class="type-badge">UUID</span></td>
-                <td><span class="fk-badge">FK &rarr; lessons(id)</span> <span class="nn-badge">NOT NULL</span></td>
-                <td>Khóa ngoại liên kết tới bài học chứa câu này (xóa bài học tự động xóa câu - CASCADE).</td>
-                <td><code>b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>position</code></strong></td>
-                <td><span class="type-badge">INTEGER</span></td>
-                <td><span class="nn-badge">NOT NULL</span></td>
-                <td>Thứ tự câu trong bài học (1, 2, 3...) dùng để duyệt tiến trình câu tiếp theo.</td>
-                <td><code>1</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>text</code></strong></td>
-                <td><span class="type-badge">TEXT</span></td>
-                <td><span class="nn-badge">NOT NULL</span></td>
-                <td>Nội dung câu tiếng Anh chuẩn để người học nghe và gõ (tối đa &le; 20 từ/câu).</td>
-                <td><code>I love practicing English dictation every day.</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>time_start</code></strong></td>
-                <td><span class="type-badge">FLOAT</span></td>
-                <td><span class="nn-badge">NOT NULL</span></td>
-                <td>Mốc giây bắt đầu phát âm thanh của câu trên YouTube Player (đã trừ padding 0.2s).</td>
-                <td><code>14.25</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>time_end</code></strong></td>
-                <td><span class="type-badge">FLOAT</span></td>
-                <td><span class="nn-badge">NOT NULL</span></td>
-                <td>Mốc giây kết thúc phát âm thanh của câu trên YouTube Player (đã cộng padding 0.2s).</td>
-                <td><code>18.60</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>translation</code></strong></td>
-                <td><span class="type-badge">TEXT</span></td>
-                <td><span class="def-badge">NULLABLE</span></td>
-                <td>Bản dịch tiếng Việt gợi ý nghĩa cho câu khi người học bấm nút hỗ trợ.</td>
-                <td><code>Tôi thích luyện nghe chép tiếng Anh mỗi ngày.</code></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Table 4: user_lessons -->
+        <!-- Table 3: user_lessons -->
         <div class="table-detail-header" id="tbl-user-lessons">
           <div class="table-detail-title">
-            <span>📖 Bảng 4: <code>user_lessons</code></span>
+            <span>📖 Bảng 3: <code>user_lessons</code></span>
             <span class="badge badge-user">7 Cột</span>
           </div>
-          <span style="font-size: 12.5px; color: var(--text-muted);">Quản lý phiên học của từng học viên trên mỗi bài học, lưu vị trí câu dở dang để tự động nhảy tới.</span>
+          <span style="font-size: 12.5px; color: var(--text-muted);">Quản lý phiên học của từng học viên trên mỗi bài học, lưu vị trí câu dở dang (current_position) để tự động nhảy tới.</span>
         </div>
         <div class="table-container">
           <table>
@@ -1643,8 +1537,8 @@ erDiagram
                 <td><strong><code>current_position</code></strong></td>
                 <td><span class="type-badge">INTEGER</span></td>
                 <td><span class="nn-badge">NOT NULL</span> <span class="def-badge">DEFAULT 1</span></td>
-                <td>Vị trí câu đang làm dở. Khi mở lại bài, Player tự động nhảy ngay tới câu này.</td>
-                <td><code>7</code></td>
+                <td>Vị trí câu đang học dở dang. Mọi câu &lt; current_position là hoàn thành (✓), câu này là (▶), câu sau là (⚪).</td>
+                <td><code>5</code></td>
               </tr>
               <tr>
                 <td><strong><code>is_completed</code></strong></td>
@@ -1671,83 +1565,10 @@ erDiagram
           </table>
         </div>
 
-        <!-- Table 5: user_progress -->
-        <div class="table-detail-header" id="tbl-user-progress">
-          <div class="table-detail-title">
-            <span>✍️ Bảng 5: <code>user_progress</code></span>
-            <span class="badge badge-user">7 Cột</span>
-          </div>
-          <span style="font-size: 12.5px; color: var(--text-muted);">Ghi nhận tiến độ gõ chi tiết từng câu, văn bản người dùng gõ, trạng thái hoàn thành và độ chính xác.</span>
-        </div>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 16%;">Tên Cột (Field)</th>
-                <th style="width: 15%;">Kiểu Dữ Liệu</th>
-                <th style="width: 22%;">Ràng Buộc (Constraints)</th>
-                <th style="width: 27%;">Mô Tả Nghiệp Vụ & Quy Tắc</th>
-                <th style="width: 20%;">Dữ Liệu Mẫu (Example)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong><code>id</code></strong></td>
-                <td><span class="type-badge">UUID</span></td>
-                <td><span class="pk-badge">PK</span> <span class="def-badge">DEFAULT gen_random_uuid()</span></td>
-                <td>Khóa chính bản ghi tiến độ từng câu.</td>
-                <td><code>e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a55</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>user_id</code></strong></td>
-                <td><span class="type-badge">UUID</span></td>
-                <td><span class="fk-badge">FK &rarr; users(id)</span> <span class="nn-badge">NOT NULL</span></td>
-                <td>Khóa ngoại liên kết tới người học.</td>
-                <td><code>a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>challenge_id</code></strong></td>
-                <td><span class="type-badge">UUID</span></td>
-                <td><span class="fk-badge">FK &rarr; challenges(id)</span> <span class="nn-badge">NOT NULL</span></td>
-                <td>Khóa ngoại liên kết tới câu thử thách tương ứng.</td>
-                <td><code>c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>user_input</code></strong></td>
-                <td><span class="type-badge">TEXT</span></td>
-                <td><span class="nn-badge">NOT NULL</span> <span class="def-badge">DEFAULT ''</span></td>
-                <td>Các từ người học đã gõ đúng vào ô input (phục vụ khôi phục câu dở dang).</td>
-                <td><code>I love practicing English</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>is_completed</code></strong></td>
-                <td><span class="type-badge">BOOLEAN</span></td>
-                <td><span class="nn-badge">NOT NULL</span> <span class="def-badge">DEFAULT FALSE</span></td>
-                <td>Trạng thái hoàn thành câu: <code>true</code> (hiện icon ✓ xanh lá) hoặc <code>false</code> (⚪ xám).</td>
-                <td><code>true</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>accuracy</code></strong></td>
-                <td><span class="type-badge">FLOAT</span></td>
-                <td><span class="nn-badge">NOT NULL</span> <span class="def-badge">DEFAULT 0.0</span></td>
-                <td>Tỷ lệ phần trăm gõ chính xác các từ trong câu (thang điểm từ 0.0 đến 100.0).</td>
-                <td><code>98.5</code></td>
-              </tr>
-              <tr>
-                <td><strong><code>updated_at</code></strong></td>
-                <td><span class="type-badge">TIMESTAMPTZ</span></td>
-                <td><span class="nn-badge">NOT NULL</span> <span class="def-badge">DEFAULT CURRENT_TIMESTAMP</span></td>
-                <td>Thời điểm lưu lại lần gõ gần nhất của câu này.</td>
-                <td><code>2026-09-16 14:40:10+07</code></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Table 6: user_vocabulary -->
+        <!-- Table 4: user_vocabulary -->
         <div class="table-detail-header" id="tbl-user-vocab">
           <div class="table-detail-title">
-            <span>🗂️ Bảng 6: <code>user_vocabulary</code></span>
+            <span>🗂️ Bảng 4: <code>user_vocabulary</code></span>
             <span class="badge badge-user">11 Cột</span>
           </div>
           <span style="font-size: 12.5px; color: var(--text-muted);">Sổ tay từ vựng trực quan: Lưu từ bôi đen, phiên âm IPA, nghĩa tiếng Việt, câu ngữ cảnh và ảnh minh họa tự động.</span>
@@ -1818,7 +1639,7 @@ erDiagram
                 <td><span class="type-badge">VARCHAR(50)</span></td>
                 <td><span class="def-badge">NULLABLE</span></td>
                 <td>Mã video YouTube xuất xứ của từ để hỗ trợ nghe lại đúng video.</td>
-                <td><code>dQw4w9WgXcQ</code></td>
+                <td><code>qe9QSCF-d88</code></td>
               </tr>
               <tr>
                 <td><strong><code>video_timestamp</code></strong></td>
@@ -1845,10 +1666,10 @@ erDiagram
           </table>
         </div>
 
-        <!-- Table 7: user_streaks -->
+        <!-- Table 5: user_streaks -->
         <div class="table-detail-header" id="tbl-user-streaks">
           <div class="table-detail-title">
-            <span>🔥 Bảng 7: <code>user_streaks</code></span>
+            <span>🔥 Bảng 5: <code>user_streaks</code></span>
             <span class="badge badge-user">6 Cột</span>
           </div>
           <span style="font-size: 12.5px; color: var(--text-muted);">Theo dõi chuỗi ngày học liên tục (Streak 🔥), kỷ lục dài nhất và bộ đếm từ gõ hàng ngày.</span>

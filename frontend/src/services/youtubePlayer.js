@@ -60,7 +60,7 @@ export class YouTubePlayerController {
       } catch (e) {}
     }
 
-    const origin = window.location.origin || "http://127.0.0.1:8000";
+    const origin = window.location.origin || "http://127.0.0.1:5101";
 
     this.player = new window.YT.Player(this.containerId, {
       videoId: videoId,

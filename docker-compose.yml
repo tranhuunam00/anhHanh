@@ -1,14 +1,50 @@
 version: '3.8'
 
 services:
-  linguagun:
+  db:
+    image: postgres:16-alpine
+    container_name: dailydictation_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dailydictation
+    ports:
+      - "${DB_PORT:-5444}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dailydictation"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: linguagun_app
+    container_name: dailydictation_web
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "5100:5100"
-    restart: always
     environment:
-      - PORT=5100
+      - PORT=${PORT:-5100}
+      - HOST=${HOST:-0.0.0.0}
+      - RUNNING_IN_DOCKER=1
+      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@db:5432/dailydictation}
+      - ADMIN_EMAIL_ADDRESS=${ADMIN_EMAIL_ADDRESS}
+      - ADMIN_DEFAULT_PASSWORD=${ADMIN_DEFAULT_PASSWORD}
+      - GOOGLE_MAILER_CLIENT_ID=${GOOGLE_MAILER_CLIENT_ID}
+      - GOOGLE_MAILER_CLIENT_SECRET=${GOOGLE_MAILER_CLIENT_SECRET}
+      - GOOGLE_MAILER_REFRESH_TOKEN=${GOOGLE_MAILER_REFRESH_TOKEN}
+      - JWT_SECRET=${JWT_SECRET}
       - PYTHONUNBUFFERED=1
+    volumes:
+      - app_data:/app/data
+
+volumes:
+  pgdata:
+  app_data:

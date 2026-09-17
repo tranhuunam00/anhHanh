@@ -5,7 +5,14 @@ import { getStorageItem, setStorageItem } from "../utils/storage";
 export const useSettings = () => {
   const [settings, setSettings] = useState(() => {
     const saved = getStorageItem("dictation_settings", {});
-    return { ...DEFAULT_SETTINGS, ...saved };
+    const initial = { ...DEFAULT_SETTINGS, ...saved };
+    if (!initial.sourceLang || initial.sourceLang === "auto") {
+      initial.sourceLang = "en";
+    }
+    if (!initial.targetLang) {
+      initial.targetLang = "vi";
+    }
+    return initial;
   });
 
   useEffect(() => {

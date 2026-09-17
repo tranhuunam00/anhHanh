@@ -6,40 +6,56 @@ import { PresetsSection } from "./components/Presets/PresetsSection";
 import { QuestionsDrawer } from "./components/Drawer/QuestionsDrawer";
 import { SettingsModal } from "./components/Modals/SettingsModal";
 import { ShortcutsModal } from "./components/Modals/ShortcutsModal";
+import { AuthModal } from "./components/Modals/AuthModal";
+import { PreviewModal } from "./components/Modals/PreviewModal";
+import { VocabTab } from "./components/Vocab/VocabTab";
+import { FloatingVocabSaver } from "./components/Vocab/FloatingVocabSaver";
 import { TranscriptPage } from "./pages/TranscriptPage";
 
 import { useTheme } from "./hooks/useTheme";
 import { useSettings } from "./hooks/useSettings";
 import { useShortcuts } from "./hooks/useShortcuts";
+import { useAuth } from "./context/AuthContext";
 
 import { fetchLesson, fetchVideoLanguages } from "./services/api";
+import {
+  fetchLessonPreview,
+  startLessonSession,
+  updateLessonProgress,
+} from "./services/authVocabService";
 import { YouTubePlayerController } from "./services/youtubePlayer";
 import { SpeechRecognitionService } from "./services/speechRecognition";
 
-import { getNextLetterHint, getNextWordHint } from "./utils/diffCalculator";
-import { loadLessonProgress, saveLessonProgress, getStorageItem } from "./utils/storage";
+import { evaluateMasked, getNextLetterHint, getNextWordHint } from "./utils/diffCalculator";
+import { loadLessonProgress, saveLessonProgress, getStorageItem, setStorageItem } from "./utils/storage";
 import { SPEECH_LANG_MAP } from "./constants/languages";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
   const { settings, updateSetting, resetSettings } = useSettings();
+  const { token, refreshStreak } = useAuth();
 
   // Navigation & Modal State
   const [activeTab, setActiveTab] = useState("tab-dictation");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
 
   // Lesson & Player State
   const [urlInput, setUrlInput] = useState(() => getStorageItem("lastUrl", "https://www.youtube.com/watch?v=qe9QSCF-d88"));
-  const [sourceLang, setSourceLang] = useState(settings.sourceLang || "auto");
+  const [sourceLang, setSourceLang] = useState(
+    settings.sourceLang && settings.sourceLang !== "auto" ? settings.sourceLang : "en"
+  );
   const [targetLang, setTargetLang] = useState(settings.targetLang || "vi");
   const [autoDetectedLang, setAutoDetectedLang] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isEmbedRestricted, setIsEmbedRestricted] = useState(false);
 
   const [currentLesson, setCurrentLesson] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0); // Always start from Question 1
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
   const [progressMap, setProgressMap] = useState({});
@@ -50,11 +66,9 @@ export default function App() {
   const playerRef = useRef(null);
   const speechRef = useRef(null);
 
-  // Instantiate Player Controller once
   if (!playerRef.current) {
     playerRef.current = new YouTubePlayerController("youtube-player");
   }
-
   const playerController = playerRef.current;
 
   // Sync settings with player controller
@@ -82,9 +96,36 @@ export default function App() {
     }
   }, [playerController]);
 
-  // Load Lesson Handler (Explicitly pass source & target lang to avoid React state race condition)
-  const handleLoadLesson = async (urlOrId, reqSourceLang, reqTargetLang) => {
+  // Step 1: User requests loading a lesson -> Fetch preview first
+  const handleRequestPreview = async (urlOrId, reqSourceLang, reqTargetLang) => {
     if (!urlOrId || isLoading) return;
+    setIsLoading(true);
+
+    const sLang = reqSourceLang !== undefined ? reqSourceLang : sourceLang;
+    const tLang = reqTargetLang !== undefined ? reqTargetLang : targetLang;
+
+    try {
+      // Async language detection check
+      fetchVideoLanguages(urlOrId).then((langData) => {
+        if (langData && langData.detected_source_lang) {
+          setAutoDetectedLang(langData.detected_source_lang);
+        }
+      });
+
+      const preview = await fetchLessonPreview(urlOrId, sLang, tLang);
+      setPreviewData(preview);
+      setIsPreviewOpen(true);
+    } catch (e) {
+      // If preview fails, fall back to direct load
+      console.warn("Preview failed, falling back to direct load:", e);
+      await executeLoadLesson(urlOrId, sLang, tLang, 0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Step 2: Confirm start lesson from preview modal (or direct load)
+  const executeLoadLesson = async (urlOrId, reqSourceLang, reqTargetLang, startPos = 0) => {
     setIsLoading(true);
     setIsEmbedRestricted(false);
 
@@ -92,13 +133,6 @@ export default function App() {
     const tLang = reqTargetLang !== undefined ? reqTargetLang : targetLang;
 
     try {
-      // Check detected source languages asynchronously
-      fetchVideoLanguages(urlOrId).then((langData) => {
-        if (langData && langData.detected_source_lang) {
-          setAutoDetectedLang(langData.detected_source_lang);
-        }
-      });
-
       const lessonData = await fetchLesson({
         urlOrId,
         sourceLang: sLang,
@@ -106,11 +140,18 @@ export default function App() {
       });
 
       setCurrentLesson(lessonData);
-      setCurrentIndex(0); // Always start from 0 (Question 1)
+      setStorageItem("lastUrl", urlOrId);
+
+      // Record session start in backend
+      startLessonSession(lessonData.video_id, token).catch(() => {});
+
+      // Calculate initial question index (0-indexed)
+      const targetIndex = startPos > 0 && startPos <= lessonData.challenges.length ? startPos - 1 : 0;
+      setCurrentIndex(targetIndex);
       setUserInput("");
       setIsCompleted(false);
 
-      // Load progress map for sidebar drawer indicators
+      // Load progress map
       const prog = loadLessonProgress(lessonData.video_id);
       setProgressMap(prog);
 
@@ -123,7 +164,7 @@ export default function App() {
       }
 
       playerController.loadVideo(lessonData.video_id);
-      playChallengeAtIndex(lessonData, 0);
+      playChallengeAtIndex(lessonData, targetIndex);
     } catch (e) {
       alert("Lỗi tải video: " + e.message);
     } finally {
@@ -154,6 +195,11 @@ export default function App() {
     setUserInput("");
     setIsCompleted(false);
     playChallengeAtIndex(currentLesson, index);
+
+    // Sync progress with backend
+    if (currentLesson.video_id) {
+      updateLessonProgress(currentLesson.video_id, index + 1, false, token);
+    }
   };
 
   const currentChallenge = useMemo(() => {
@@ -162,11 +208,10 @@ export default function App() {
 
   const enterTrackerRef = useRef({ count: 0, lastTime: 0, lastInput: "" });
 
-  // Actions
+  // Handle checking answers
   const handleCheck = () => {
     if (!currentChallenge) return;
 
-    // If sentence is already marked completed, hitting Enter / clicking Check immediately advances to next challenge
     if (isCompleted) {
       enterTrackerRef.current = { count: 0, lastTime: 0, lastInput: "" };
       if (currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
@@ -180,12 +225,19 @@ export default function App() {
     if (evalResult.isCompleted) {
       enterTrackerRef.current = { count: 0, lastTime: 0, lastInput: "" };
       setIsCompleted(true);
+
+      const isAllDone = currentIndex === (currentLesson?.challenges?.length || 0) - 1;
+
       if (currentLesson) {
         const newProg = { ...progressMap };
         if (!newProg.challenges) newProg.challenges = {};
         newProg.challenges[currentIndex + 1] = { isCompleted: true, lastUpdated: Date.now() };
         setProgressMap(newProg);
         saveLessonProgress(currentLesson.video_id, newProg);
+
+        // Record progress in backend DB
+        updateLessonProgress(currentLesson.video_id, currentIndex + 1, isAllDone, token);
+        refreshStreak();
       }
 
       if (settings.autoAdvance === "yes" && currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
@@ -205,12 +257,10 @@ export default function App() {
       tracker.lastTime = now;
 
       if (tracker.count >= 2) {
-        // 2nd consecutive Enter: auto trigger 1 letter hint!
         handleHintLetter();
         tracker.count = 0;
       } else {
         tracker.lastInput = userInput;
-        // 1st Enter: Replay audio segment so user can listen again
         playerController.replayCurrentSegment();
       }
     }
@@ -276,10 +326,12 @@ export default function App() {
         }}
         autoDetectedLang={autoDetectedLang}
         isLoading={isLoading}
-        onLoadLesson={(url) => handleLoadLesson(url, sourceLang, targetLang)}
+        onLoadLesson={(url) => handleRequestPreview(url, sourceLang, targetLang)}
         theme={theme}
         onToggleTheme={toggleTheme}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenVocabTab={() => setActiveTab("tab-vocab")}
       />
 
       <main className="main-container">
@@ -312,6 +364,17 @@ export default function App() {
             </button>
 
             <button
+              className={`tab-btn ${activeTab === "tab-vocab" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-vocab")}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+              </svg>
+              <span>📚 Sổ tay từ vựng</span>
+            </button>
+
+            <button
               className={`tab-btn ${activeTab === "tab-shortcuts" ? "active" : ""}`}
               onClick={() => setIsShortcutsOpen(true)}
             >
@@ -336,7 +399,7 @@ export default function App() {
           </button>
         </div>
 
-        {/* Tab 1: Dictation Practice (Kept mounted via CSS display to preserve YouTube Player DOM) */}
+        {/* TAB 1: Dictation Practice */}
         <div style={{ display: activeTab === "tab-dictation" ? "block" : "none" }}>
           <div className="exercise-grid">
             <PlayerCard
@@ -391,12 +454,12 @@ export default function App() {
               setTargetLang(preset.targetLang);
               updateSetting("sourceLang", preset.sourceLang);
               updateSetting("targetLang", preset.targetLang);
-              handleLoadLesson(preset.url, preset.sourceLang, preset.targetLang);
+              handleRequestPreview(preset.url, preset.sourceLang, preset.targetLang);
             }}
           />
         </div>
 
-        {/* Tab 2: Transcript & Full Audio */}
+        {/* TAB 2: Transcript & Full Audio */}
         <div style={{ display: activeTab === "tab-transcript" ? "block" : "none" }}>
           <TranscriptPage
             lesson={currentLesson}
@@ -407,7 +470,35 @@ export default function App() {
             }}
           />
         </div>
+
+        {/* TAB 3: Smart Vocabulary Notebook */}
+        <div style={{ display: activeTab === "tab-vocab" ? "block" : "none" }}>
+          <VocabTab />
+        </div>
       </main>
+
+      {/* Floating Vocab Selection Saver Tooltip */}
+      <FloatingVocabSaver
+        currentSentence={currentChallenge?.text || ""}
+        currentVideoId={currentLesson?.video_id || ""}
+        currentTimestamp={currentChallenge?.time_start || 0}
+      />
+
+      {/* Auth Modal (Login / Register) */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+      />
+
+      {/* Video Preview Modal */}
+      <PreviewModal
+        isOpen={isPreviewOpen}
+        previewData={previewData}
+        onClose={() => setIsPreviewOpen(false)}
+        onConfirmStart={(videoId, targetPos) => {
+          executeLoadLesson(videoId, sourceLang, targetLang, targetPos);
+        }}
+      />
 
       {/* Questions Sidebar Drawer */}
       <QuestionsDrawer

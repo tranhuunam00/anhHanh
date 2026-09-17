@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { SOURCE_LANGUAGES, TARGET_LANGUAGES } from "../../constants/languages";
+import { useAuth } from "../../context/AuthContext";
 
 export const Header = ({
   urlInput,
@@ -14,13 +15,30 @@ export const Header = ({
   theme,
   onToggleTheme,
   onOpenSettings,
+  onOpenAuth,
+  onOpenVocabTab,
 }) => {
+  const { user, isAuthenticated, streak, wordsToday, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (urlInput && !isLoading) {
       onLoadLesson(urlInput);
     }
   };
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   return (
     <header className="app-header">
@@ -106,6 +124,80 @@ export const Header = ({
             )}
           </button>
         </form>
+
+        {/* Daily Streak & Words Badge */}
+        <div className="header-streak-badge" title="Chuỗi ngày học liên tục và tổng từ hôm nay">
+          <span className="streak-fire">🔥 <span>{streak}</span> ngày</span>
+          <span className="streak-words">📝 <span>{wordsToday}</span> từ</span>
+        </div>
+
+        {/* User Auth Container */}
+        <div ref={menuRef} style={{ display: "flex", alignItems: "center" }}>
+          {isAuthenticated ? (
+            <div className="user-profile-menu">
+              <button
+                className="user-avatar-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMenuOpen((prev) => !prev);
+                }}
+              >
+                {user.avatar_url ? (
+                  <img src={user.avatar_url} className="user-avatar-img" alt={user.name} />
+                ) : (
+                  <div className="user-avatar-img">
+                    {(user.name || user.email || "U").charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span>{user.name || user.email}</span>
+                {user.role === "ADMIN" && (
+                  <small style={{ color: "#0284c7", fontWeight: 700 }}>★ ADMIN</small>
+                )}
+              </button>
+
+              {isMenuOpen && (
+                <div className="user-dropdown-menu show">
+                  <div style={{ padding: "8px 16px", fontSize: "0.75rem", color: "#64748b", borderBottom: "1px solid #f1f5f9" }}>
+                    {user.email}
+                  </div>
+                  <div
+                    className="user-dropdown-item"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onOpenVocabTab && onOpenVocabTab();
+                    }}
+                  >
+                    📚 Sổ tay từ vựng
+                  </div>
+                  <div className="user-dropdown-divider"></div>
+                  <div
+                    className="user-dropdown-item"
+                    style={{ color: "#dc2626" }}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      logout();
+                    }}
+                  >
+                    🚪 Đăng xuất
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              className="btn btn-primary btn-with-icon"
+              onClick={onOpenAuth}
+              style={{ padding: "6px 14px", fontSize: "0.85rem" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+              <span>Đăng nhập / Đăng ký</span>
+            </button>
+          )}
+        </div>
 
         {/* Theme Toggle */}
         <button

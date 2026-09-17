@@ -5,7 +5,7 @@ export const DEFAULT_SETTINGS = {
   replayInterval: 1.0,
   autoAdvance: "yes",
   audioPadding: 0.1,
-  sourceLang: "auto",
+  sourceLang: "en",
   targetLang: "vi",
   strictPunctuation: false,
 };

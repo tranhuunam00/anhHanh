@@ -1,18 +1,20 @@
-export const fetchLesson = async ({ urlOrId, sourceLang = "auto", targetLang = "vi" }) => {
+export const fetchLesson = async ({ urlOrId, sourceLang = "en", targetLang = "vi" }) => {
   const response = await fetch("/api/lesson", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       url_or_id: urlOrId,
-      grouping_mode: "sentence",
       source_lang: sourceLang,
       target_lang: targetLang,
+      grouping_mode: "sentence",
     }),
   });
 
   if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.detail || "Không thể tải bài học");
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.detail || "Không thể tải bài học từ video này.");
   }
 
   return await response.json();
@@ -21,9 +23,11 @@ export const fetchLesson = async ({ urlOrId, sourceLang = "auto", targetLang = "
 export const fetchVideoLanguages = async (urlOrId) => {
   try {
     const res = await fetch(`/api/video-languages?url_or_id=${encodeURIComponent(urlOrId)}`);
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      return await res.json();
+    }
   } catch (e) {
-    console.warn("Error fetching video languages:", e);
+    console.warn("fetchVideoLanguages error", e);
   }
   return null;
 };
@@ -31,14 +35,16 @@ export const fetchVideoLanguages = async (urlOrId) => {
 export const fetchPresets = async () => {
   try {
     const res = await fetch("/api/presets");
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      return await res.json();
+    }
   } catch (e) {
-    console.warn("Error fetching presets:", e);
+    console.warn("fetchPresets error", e);
   }
-  return [];
+  return null;
 };
 
-export const translateText = async (text, sourceLang = "auto", targetLang = "vi") => {
+export const translateText = async (text, sourceLang = "en", targetLang = "vi") => {
   const res = await fetch("/api/translate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

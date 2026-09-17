@@ -7,5 +7,9 @@ scratch/
 .env
 .DS_Store
 data/cache/
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+*.db
 .agents/
 skill_agent_namth/
