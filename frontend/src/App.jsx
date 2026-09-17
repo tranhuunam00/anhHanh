@@ -239,10 +239,10 @@ export default function App() {
       // 7. CRITICAL: Load video FIRST in the player controller so it points to the new video ID
       const targetChallenge = lessonData.challenges && lessonData.challenges[targetIndex];
       const targetStartTime = targetChallenge ? targetChallenge.time_start : 0;
-      playerController.loadVideo(lessonData.video_id, targetStartTime, false);
+      playerController.loadVideo(lessonData.video_id, targetStartTime, true);
 
-      // 8. THEN cue the segment boundaries for this target index
-      cueChallengeAtIndex(lessonData, targetIndex);
+      // 8. THEN play the segment boundaries for this target index (autoplay from resume position)
+      playChallengeAtIndex(lessonData, targetIndex);
     } catch (e) {
       alert("Lỗi tải video: " + e.message);
     } finally {
