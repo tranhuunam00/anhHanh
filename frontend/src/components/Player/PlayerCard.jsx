@@ -21,6 +21,14 @@ export const PlayerCard = ({
     }
   };
 
+  const youtubeTimestampUrl = React.useMemo(() => {
+    if (!videoUrl) return "#";
+    const sec = Math.floor(playerController?.currentLoopStart || 0);
+    const cleanUrl = videoUrl.replace(/[?&]t=\d+s?/, "");
+    const sep = cleanUrl.includes("?") ? "&" : "?";
+    return `${cleanUrl}${sep}t=${sec}s`;
+  }, [videoUrl, playerController?.currentLoopStart]);
+
   return (
     <section className="card player-card">
       {/* Embed Warning Banner (YouTube Error 150/101) */}
@@ -42,7 +50,7 @@ export const PlayerCard = ({
               </svg>
               <span>Nghe phát âm giọng mẫu (TTS)</span>
             </button>
-            <a href={videoUrl} target="_blank" rel="noreferrer" className="btn btn-secondary btn-with-icon" style={{ padding: "6px 12px", fontSize: "0.85rem", textDecoration: "none" }}>
+            <a href={youtubeTimestampUrl} target="_blank" rel="noreferrer" className="btn btn-secondary btn-with-icon" style={{ padding: "6px 12px", fontSize: "0.85rem", textDecoration: "none" }}>
               <span>Mở YouTube tại mốc câu này ↗</span>
             </a>
           </div>

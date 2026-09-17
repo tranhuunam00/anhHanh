@@ -54,7 +54,12 @@ export const PreviewModal = ({ isOpen, onClose, previewData, onConfirmStart }) =
             <button
               className="preview-btn-start"
               onClick={() => {
-                onConfirmStart(previewData.videoId, resumePos);
+                onConfirmStart(
+                  previewData.videoId,
+                  resumePos,
+                  previewData.sourceLang,
+                  previewData.targetLang
+                );
                 onClose();
               }}
             >

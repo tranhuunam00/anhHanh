@@ -129,26 +129,74 @@ export class YouTubePlayerController {
     }
   }
 
+  _ensureCorrectVideo(autoplay = false) {
+    if (!this.player || !this.currentVideoId) return false;
+    try {
+      const currentData = typeof this.player.getVideoData === "function" ? this.player.getVideoData() : null;
+      const loadedId = currentData?.video_id;
+      if (loadedId && loadedId !== this.currentVideoId) {
+        const start = typeof this.currentLoopStart === "number" ? Math.max(0, this.currentLoopStart) : 0;
+        if (autoplay && typeof this.player.loadVideoById === "function") {
+          this.player.loadVideoById({
+            videoId: this.currentVideoId,
+            startSeconds: start,
+          });
+        } else if (typeof this.player.cueVideoById === "function") {
+          this.player.cueVideoById({
+            videoId: this.currentVideoId,
+            startSeconds: start,
+          });
+        }
+        return false;
+      }
+    } catch (e) {
+      console.warn("Could not verify loaded video:", e);
+    }
+    return true;
+  }
+
   loadVideo(videoId, startSeconds = 0, autoplay = false) {
+    if (!videoId) return;
     this.currentVideoId = videoId;
     const start = typeof startSeconds === "number" ? Math.max(0, startSeconds) : 0;
+    this.currentLoopStart = start;
+
+    if (this.replayTimeout) clearTimeout(this.replayTimeout);
+    this.isWaitingReplay = false;
+
     if (this.isReady && this.player) {
       try {
-        if (!autoplay && this.player.cueVideoById) {
-          this.player.cueVideoById({
+        const currentData = typeof this.player.getVideoData === "function" ? this.player.getVideoData() : null;
+        const loadedId = currentData?.video_id;
+
+        if (loadedId === videoId) {
+          this.player.seekTo(start, true);
+          if (autoplay) {
+            this.player.playVideo();
+          } else {
+            this.player.pauseVideo();
+          }
+          return;
+        }
+
+        if (autoplay && typeof this.player.loadVideoById === "function") {
+          this.player.loadVideoById({
             videoId: videoId,
             startSeconds: start,
           });
-        } else if (this.player.loadVideoById) {
-          this.player.loadVideoById({
+        } else if (typeof this.player.cueVideoById === "function") {
+          this.player.cueVideoById({
             videoId: videoId,
             startSeconds: start,
           });
         }
       } catch (e) {
+        console.warn("loadVideo error, reinitializing player:", e);
         this.init(videoId);
       }
     } else {
+      this.pendingPlay = autoplay;
+      this.pendingCue = !autoplay;
       this.init(videoId);
     }
   }
@@ -179,6 +227,8 @@ export class YouTubePlayerController {
       return;
     }
     try {
+      const isCorrect = this._ensureCorrectVideo(true);
+      if (!isCorrect) return;
       this.player.seekTo(this.currentLoopStart, true);
       this.player.playVideo();
     } catch (e) {
@@ -209,6 +259,8 @@ export class YouTubePlayerController {
       return;
     }
     try {
+      const isCorrect = this._ensureCorrectVideo(false);
+      if (!isCorrect) return;
       this.player.seekTo(this.currentLoopStart, true);
       this.player.pauseVideo();
     } catch (e) {
@@ -223,6 +275,8 @@ export class YouTubePlayerController {
 
     if (!this.isReady || !this.player) return;
     try {
+      const isCorrect = this._ensureCorrectVideo(true);
+      if (!isCorrect) return;
       if (typeof time === "number") {
         this.player.seekTo(time, true);
       }
@@ -281,6 +335,8 @@ export class YouTubePlayerController {
     this.isWaitingReplay = false;
     if (!this.isReady || !this.player || !this.player.seekTo) return;
     try {
+      const isCorrect = this._ensureCorrectVideo(true);
+      if (!isCorrect) return;
       this.player.seekTo(this.currentLoopStart, true);
       this.player.playVideo();
     } catch (e) {
@@ -291,6 +347,9 @@ export class YouTubePlayerController {
   togglePlayPause() {
     if (!this.isReady || !this.player || !this.player.getPlayerState) return;
     try {
+      const isCorrect = this._ensureCorrectVideo(true);
+      if (!isCorrect) return;
+
       const state = this.player.getPlayerState();
       if (state === window.YT.PlayerState.PLAYING) {
         this.player.pauseVideo();
@@ -371,6 +430,11 @@ export class YouTubePlayerController {
         if (typeof this.player.getPlayerState === "function") {
           const state = this.player.getPlayerState();
           if (state === window.YT.PlayerState.PLAYING) {
+            // Guard: if somehow playing wrong video, don't execute loop monitor
+            const data = typeof this.player.getVideoData === "function" ? this.player.getVideoData() : null;
+            if (data?.video_id && this.currentVideoId && data.video_id !== this.currentVideoId) {
+              return;
+            }
             const currentTime = this.player.getCurrentTime();
             if (currentTime >= this.currentLoopEnd) {
               if (this.isLooping) {
@@ -399,3 +463,4 @@ export class YouTubePlayerController {
     }, 50);
   }
 }
+

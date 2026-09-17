@@ -32,6 +32,7 @@ import { SpeechRecognitionService } from "./services/speechRecognition";
 
 import { evaluateMasked, getNextLetterHint, getNextWordHint } from "./utils/diffCalculator";
 import { loadLessonProgress, saveLessonProgress, getStorageItem, setStorageItem } from "./utils/storage";
+import { extractYouTubeId, toCanonicalYouTubeUrl } from "./utils/textNormalizer";
 import { SPEECH_LANG_MAP } from "./constants/languages";
 
 export default function App() {
@@ -161,6 +162,13 @@ export default function App() {
     }
   };
 
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    if (currentLesson?.video_id) {
+      setUrlInput(toCanonicalYouTubeUrl(currentLesson.video_id));
+    }
+  };
+
   // Step 2: Confirm start lesson from preview modal (or direct load)
   const executeLoadLesson = async (urlOrId, reqSourceLang, reqTargetLang, startPos = 0) => {
     setIsLoading(true);
@@ -176,10 +184,25 @@ export default function App() {
         targetLang: tLang,
       });
 
+      // 1. Unified Global State Synchronization: Set lesson and canonical YouTube URL
       setCurrentLesson(lessonData);
-      setStorageItem("lastUrl", urlOrId);
+      const canonicalUrl = toCanonicalYouTubeUrl(lessonData.video_id);
+      setUrlInput(canonicalUrl);
+      setStorageItem("lastUrl", canonicalUrl);
 
-      // Record session start in backend and retrieve saved currentPosition
+      // 2. Language synchronization
+      const effectiveSourceLang = (sLang && sLang !== "auto") ? sLang : (lessonData.detected_source_lang || "en");
+      setSourceLang(effectiveSourceLang);
+      updateSetting("sourceLang", effectiveSourceLang);
+      if (lessonData.detected_source_lang) {
+        setAutoDetectedLang(lessonData.detected_source_lang);
+      }
+      if (tLang) {
+        setTargetLang(tLang);
+        updateSetting("targetLang", tLang);
+      }
+
+      // 3. Record session start in backend and retrieve saved currentPosition
       let effectivePos = Number(startPos) || 0;
       try {
         const sessionData = await startLessonSession(lessonData.video_id, token);
@@ -190,7 +213,7 @@ export default function App() {
         console.warn("Could not start session:", err);
       }
 
-      // Load progress map from localStorage as fallback
+      // 4. Load progress map from localStorage as fallback
       const prog = loadLessonProgress(lessonData.video_id);
       setProgressMap(prog);
 
@@ -198,7 +221,7 @@ export default function App() {
         effectivePos = Number(prog.lastPosition);
       }
 
-      // Calculate initial question index (0-indexed)
+      // 5. Calculate initial question index (0-indexed)
       const finalPos = Math.max(1, effectivePos || 1);
       const targetIndex = finalPos <= lessonData.challenges.length ? finalPos - 1 : 0;
       setMaxReachedIndex(targetIndex);
@@ -206,18 +229,20 @@ export default function App() {
       setUserInput("");
       setIsCompleted(false);
 
-      // Setup Player & Speech Recognition
-      const detected = lessonData.detected_source_lang || "en";
-      playerController.setSourceLang(detected);
+      // 6. Setup Player & Speech Recognition
+      playerController.setSourceLang(effectiveSourceLang);
       if (speechRef.current) {
-        const langCode = SPEECH_LANG_MAP[detected.toLowerCase()] || "en-US";
+        const langCode = SPEECH_LANG_MAP[effectiveSourceLang.toLowerCase()] || "en-US";
         speechRef.current.setLang(langCode);
       }
 
-      cueChallengeAtIndex(lessonData, targetIndex);
+      // 7. CRITICAL: Load video FIRST in the player controller so it points to the new video ID
       const targetChallenge = lessonData.challenges && lessonData.challenges[targetIndex];
       const targetStartTime = targetChallenge ? targetChallenge.time_start : 0;
       playerController.loadVideo(lessonData.video_id, targetStartTime, false);
+
+      // 8. THEN cue the segment boundaries for this target index
+      cueChallengeAtIndex(lessonData, targetIndex);
     } catch (e) {
       alert("Lỗi tải video: " + e.message);
     } finally {
@@ -594,11 +619,6 @@ export default function App() {
             activeUrl={urlInput}
             isLoading={isLoading}
             onSelectPreset={(preset) => {
-              setUrlInput(preset.url);
-              setSourceLang(preset.sourceLang);
-              setTargetLang(preset.targetLang);
-              updateSetting("sourceLang", preset.sourceLang);
-              updateSetting("targetLang", preset.targetLang);
               handleRequestPreview(preset.url, preset.sourceLang, preset.targetLang);
             }}
           />
@@ -627,7 +647,7 @@ export default function App() {
             isActive={activeTab === "tab-history"}
             onSelectLesson={(videoId, targetPos) => {
               setActiveTab("tab-dictation");
-              executeLoadLesson(videoId, sourceLang, targetLang, targetPos);
+              executeLoadLesson(videoId, undefined, undefined, targetPos);
             }}
             onOpenAuth={() => setIsAuthOpen(true)}
           />
@@ -668,9 +688,9 @@ export default function App() {
       <PreviewModal
         isOpen={isPreviewOpen}
         previewData={previewData}
-        onClose={() => setIsPreviewOpen(false)}
-        onConfirmStart={(videoId, targetPos) => {
-          executeLoadLesson(videoId, sourceLang, targetLang, targetPos);
+        onClose={handleClosePreview}
+        onConfirmStart={(videoId, targetPos, sLang, tLang) => {
+          executeLoadLesson(videoId, sLang, tLang, targetPos);
         }}
       />
 

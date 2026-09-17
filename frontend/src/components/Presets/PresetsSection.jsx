@@ -1,7 +1,10 @@
 import React from "react";
 import { PRESET_CARDS } from "../../constants/presets";
+import { extractYouTubeId } from "../../utils/textNormalizer";
 
 export const PresetsSection = ({ activeUrl, onSelectPreset, isLoading }) => {
+  const activeId = extractYouTubeId(activeUrl);
+
   return (
     <section className="bottom-presets-section">
       <div className="presets-section-header">
@@ -17,7 +20,8 @@ export const PresetsSection = ({ activeUrl, onSelectPreset, isLoading }) => {
 
       <div className="presets-cards-grid">
         {PRESET_CARDS.map((card) => {
-          const isActive = activeUrl === card.url;
+          const cardId = extractYouTubeId(card.url);
+          const isActive = Boolean(activeId && cardId && activeId === cardId);
           return (
             <button
               key={card.id}
