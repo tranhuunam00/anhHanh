@@ -232,11 +232,21 @@ export class YouTubePlayerController {
     }
   }
 
-  pauseFull() {
+  pause() {
+    this.isWaitingReplay = false;
+    if (this.replayTimeout) clearTimeout(this.replayTimeout);
     if (!this.isReady || !this.player) return;
     try {
-      this.player.pauseVideo();
-    } catch (e) {}
+      if (typeof this.player.pauseVideo === "function") {
+        this.player.pauseVideo();
+      }
+    } catch (e) {
+      console.warn("Could not pause video", e);
+    }
+  }
+
+  pauseFull() {
+    this.pause();
   }
 
   getCurrentTime() {

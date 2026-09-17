@@ -98,6 +98,28 @@ export default function App() {
     }
   }, [playerController]);
 
+  // Auto pause playback when switching tabs away from dictation tab
+  useEffect(() => {
+    if (activeTab !== "tab-dictation") {
+      playerController.pause();
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+  }, [activeTab, playerController]);
+
+  // Auto pause playback when switching browser tabs or minimizing window
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        playerController.pause();
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [playerController]);
+
   // Auto-restore last lesson on mount (F5 reload or initial visit)
   const initialLoadDoneRef = useRef(false);
   useEffect(() => {
