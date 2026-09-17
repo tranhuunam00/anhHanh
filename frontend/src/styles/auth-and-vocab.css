@@ -321,12 +321,12 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .vocab-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-color: #cbd5e1;
 }
 
 .vocab-card-img-wrap {
@@ -415,13 +415,12 @@
   justify-content: center;
   padding: 2px 4px;
   border-radius: 4px;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
 
 .vocab-pron-speaker-btn:hover {
   color: #2563eb;
   background: #f1f5f9;
-  transform: scale(1.1);
 }
 
 .vocab-pron-ipa-text {
@@ -467,31 +466,44 @@
   border-radius: 20px;
   cursor: pointer;
   outline: none;
-  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  min-width: 118px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .vocab-status-select.status-NEW {
-  background: #fef2f2;
+  background-color: #fef2f2;
   color: #b91c1c;
-  border: 1.5px solid #fecaca;
+  border-color: #fecaca;
 }
 
 .vocab-status-select.status-LEARNING {
-  background: #fffbeb;
+  background-color: #fffbeb;
   color: #b45309;
-  border: 1.5px solid #fde68a;
+  border-color: #fde68a;
 }
 
 .vocab-status-select.status-MASTERED {
-  background: #ecfdf5;
+  background-color: #ecfdf5;
   color: #047857;
-  border: 1.5px solid #a7f3d0;
+  border-color: #a7f3d0;
 }
 
 .vocab-status-select:hover {
   filter: brightness(0.96);
-  transform: translateY(-1px);
+}
+
+.vocab-status-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.vocab-status-select option {
+  background-color: #ffffff;
+  color: #1e293b;
+  font-weight: 600;
+  padding: 8px 12px;
 }
 
 .vocab-audio-btn {

@@ -80,12 +80,8 @@ export const VocabTab = ({ isActive = false }) => {
     if (!raw) return "";
     let clean = raw.trim();
     clean = clean.replace(/^[\[\/]+|[\]\/]+$/g, "").trim();
-    clean = clean.replace(/['’]/g, "").replace(/\s+/g, " ");
-    clean = clean.replace(/\ban\b/g, "ɑːn");
-    clean = clean.replace(/\bjor\b/g, "jʊr");
-    clean = clean.replace(/\bwei\b/g, "weɪ");
-    clean = clean.replace(/\bhoum\b/g, "hoʊm");
-    return `[${clean}]`;
+    clean = clean.replace(/['’]/g, "ˈ").replace(/\s+/g, " ");
+    return `/${clean}/`;
   };
 
   const speakWord = (word, lang = "en-GB") => {
