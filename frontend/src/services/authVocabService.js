@@ -193,7 +193,7 @@ export const startLessonSession = async (videoId, token) => {
   return null;
 };
 
-export const updateLessonProgress = async (videoId, currentPosition, isCompleted = false, token) => {
+export const updateLessonProgress = async (videoId, currentPosition, isCompleted = false, token, wordsTyped = 0) => {
   try {
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -203,8 +203,9 @@ export const updateLessonProgress = async (videoId, currentPosition, isCompleted
       headers,
       body: JSON.stringify({
         video_id: videoId,
-        current_challenge_index: currentPosition,
+        current_position: Math.max(1, currentPosition),
         is_completed: isCompleted,
+        words_typed: wordsTyped,
       }),
     });
     if (res.ok) {
@@ -214,4 +215,33 @@ export const updateLessonProgress = async (videoId, currentPosition, isCompleted
     console.warn("Could not update progress:", e);
   }
   return null;
+};
+
+export const fetchLessonHistory = async (token) => {
+  if (!token) return [];
+  try {
+    const res = await fetch("/api/lesson/history", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (e) {
+    console.warn("fetchLessonHistory error:", e);
+  }
+  return [];
+};
+
+export const deleteLessonHistory = async (videoId, token) => {
+  if (!token) return false;
+  try {
+    const res = await fetch(`/api/lesson/history/${encodeURIComponent(videoId)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn("deleteLessonHistory error:", e);
+    return false;
+  }
 };

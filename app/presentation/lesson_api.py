@@ -255,3 +255,62 @@ async def get_lesson_status(
             'isCompleted': user_lesson.is_completed
         }
     return {'videoId': vid, 'currentPosition': 1, 'isCompleted': False}
+
+
+@router.get('/history')
+async def get_user_lesson_history(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieve all dictation lessons practiced by current user with progress & completion status."""
+    stmt = (
+        select(UserLesson, Lesson)
+        .join(Lesson, Lesson.id == UserLesson.lesson_id)
+        .where(UserLesson.user_id == current_user.id)
+        .order_by(UserLesson.last_studied_at.desc())
+    )
+    res = await db.execute(stmt)
+    records = res.all()
+
+    history = []
+    for ul, l in records:
+        total = l.total_challenges or 1
+        pos = min(ul.current_position, total)
+        percent = 100 if ul.is_completed else min(99, round((pos / total) * 100))
+        history.append({
+            'id': ul.id,
+            'lessonId': l.id,
+            'videoId': l.video_id,
+            'title': l.title,
+            'thumbnailUrl': l.thumbnail_url or f"https://i.ytimg.com/vi/{l.video_id}/hqdefault.jpg",
+            'totalChallenges': l.total_challenges,
+            'currentPosition': ul.current_position,
+            'isCompleted': ul.is_completed,
+            'percent': percent,
+            'lastStudiedAt': ul.last_studied_at.isoformat() if ul.last_studied_at else None,
+            'startedAt': ul.started_at.isoformat() if ul.started_at else None,
+        })
+
+    return history
+
+
+@router.delete('/history/{video_id}')
+async def delete_user_lesson_history(
+    video_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Remove a lesson from user's study history."""
+    vid = extract_youtube_id(video_id)
+    stmt = (
+        select(UserLesson)
+        .join(Lesson, Lesson.id == UserLesson.lesson_id)
+        .where(UserLesson.user_id == current_user.id, Lesson.video_id == vid)
+    )
+    res = await db.execute(stmt)
+    ul = res.scalar_one_or_none()
+    if ul:
+        await db.delete(ul)
+        await db.commit()
+        return {'message': 'Đã xóa bài khỏi lịch sử học tập'}
+    return {'message': 'Bài học không tồn tại trong lịch sử'}

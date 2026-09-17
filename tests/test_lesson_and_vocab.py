@@ -1,4 +1,5 @@
 """Unit & Integration Tests for Lesson Session, Resume, and Smart Vocabulary."""
+import uuid
 import pytest
 from fastapi.testclient import TestClient
 from server import app
@@ -87,3 +88,29 @@ def test_vocabulary_crud_flow():
     status_res = client.patch(f"/api/vocab/{vocab_id}/status", json={"status": "MASTERED"}, headers=headers)
     assert status_res.status_code == 200
     assert status_res.json()["vocab"]["status"] == "MASTERED"
+
+
+def test_lesson_history_api():
+    """Verify GET and DELETE /api/lesson/history endpoints."""
+    login_res = client.post("/api/auth/login", json={"email": "vocab_tester@example.com", "password": "Password123!"})
+    token = login_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Start a lesson session to create history entry
+    start_res = client.post("/api/lesson/start", json={"video_id": "qe9QSCF-d88"}, headers=headers)
+    assert start_res.status_code == 200
+
+    # Fetch history
+    hist_res = client.get("/api/lesson/history", headers=headers)
+    assert hist_res.status_code == 200
+    history = hist_res.json()
+    assert len(history) >= 1
+    assert any(item["videoId"] == "qe9QSCF-d88" for item in history)
+
+    # Delete history
+    del_res = client.delete("/api/lesson/history/qe9QSCF-d88", headers=headers)
+    assert del_res.status_code == 200
+
+    # Verify deleted
+    hist_after = client.get("/api/lesson/history", headers=headers).json()
+    assert not any(item["videoId"] == "qe9QSCF-d88" for item in hist_after)
