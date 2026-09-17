@@ -76,11 +76,23 @@ export const VocabTab = ({ isActive = false }) => {
     }
   };
 
-  const speakWord = (word) => {
+  const formatCleanIpa = (raw) => {
+    if (!raw) return "";
+    let clean = raw.trim();
+    clean = clean.replace(/^[\[\/]+|[\]\/]+$/g, "").trim();
+    clean = clean.replace(/['’]/g, "").replace(/\s+/g, " ");
+    clean = clean.replace(/\ban\b/g, "ɑːn");
+    clean = clean.replace(/\bjor\b/g, "jʊr");
+    clean = clean.replace(/\bwei\b/g, "weɪ");
+    clean = clean.replace(/\bhoum\b/g, "hoʊm");
+    return `[${clean}]`;
+  };
+
+  const speakWord = (word, lang = "en-GB") => {
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(word);
-      utter.lang = "en-US";
+      utter.lang = lang;
       window.speechSynthesis.speak(utter);
     }
   };
@@ -217,12 +229,27 @@ export const VocabTab = ({ isActive = false }) => {
               <div className="vocab-card-body">
                 <div className="vocab-word-row">
                   <span className="vocab-word-text">{v.word}</span>
-                  {v.phonetic && (
-                    <span className="vocab-phonetic-badge" title="Phiên âm quốc tế IPA">
-                      {v.phonetic.startsWith("/") ? v.phonetic : `/${v.phonetic}/`}
-                    </span>
-                  )}
                 </div>
+
+                {v.phonetic && (
+                  <div className="vocab-pronunciation-row">
+                    <span className="vocab-pron-tag">UK</span>
+                    <button
+                      className="vocab-pron-speaker-btn"
+                      onClick={() => speakWord(v.word, "en-GB")}
+                      title="Nghe phát âm giọng UK"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                      </svg>
+                    </button>
+                    <span className="vocab-pron-ipa-text">
+                      {formatCleanIpa(v.phonetic)}
+                    </span>
+                  </div>
+                )}
 
                 <div className="vocab-meaning-text">{v.meaning}</div>
 

@@ -390,17 +390,47 @@
   letter-spacing: -0.01em;
 }
 
-.vocab-phonetic-badge {
+.vocab-pronunciation-row {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
+  margin: 2px 0 8px 0;
+  user-select: none;
+}
+
+.vocab-pron-tag {
   font-size: 0.85rem;
-  font-weight: 600;
-  color: #0284c7;
-  background: #e0f2fe;
-  border: 1px solid #bae6fd;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-family: 'JetBrains Mono', 'Segoe UI', monospace;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.02em;
+}
+
+.vocab-pron-speaker-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.vocab-pron-speaker-btn:hover {
+  color: #2563eb;
+  background: #f1f5f9;
+  transform: scale(1.1);
+}
+
+.vocab-pron-ipa-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.98rem;
+  color: #334155;
+  letter-spacing: 0.01em;
 }
 
 .vocab-meaning-text {

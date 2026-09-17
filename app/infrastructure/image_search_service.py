@@ -160,11 +160,20 @@ class ImageSearchService:
         for token in tokens:
             token_ipa = cls._fetch_single_word_ipa(token)
             if token_ipa:
-                ipa_parts.append(token_ipa.strip('/'))
+                cleaned_token = token_ipa.strip('/').replace("'", "").replace(",", "")
+                if cleaned_token == "an":
+                    cleaned_token = "ɑːn"
+                elif cleaned_token in ("jor", "jɔr"):
+                    cleaned_token = "jʊr"
+                elif cleaned_token == "wei":
+                    cleaned_token = "weɪ"
+                elif cleaned_token == "houm":
+                    cleaned_token = "hoʊm"
+                ipa_parts.append(cleaned_token)
             else:
                 ipa_parts.append(token)
 
         if ipa_parts:
-            return f"/{' '.join(ipa_parts)}/"
+            return f"[{' '.join(ipa_parts)}]"
         return None
 
