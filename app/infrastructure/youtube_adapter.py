@@ -3,6 +3,8 @@ import json
 import logging
 import urllib.request
 from typing import List, Optional, Tuple
+import requests
+from http.cookiejar import MozillaCookieJar
 from youtube_transcript_api import YouTubeTranscriptApi
 from app.domain.models import SubtitleSnippet
 from app.domain.exceptions import TranscriptNotFoundException
@@ -21,26 +23,42 @@ class YouTubeTranscriptAdapter(ITranscriptService):
         )
         self.proxy = os.getenv("YOUTUBE_PROXY")
         self.cookie_file = os.getenv("YOUTUBE_COOKIE_FILE")
-        if not self.cookie_file:
-            for candidate in ["cookies.txt", "data/cookies.txt", "/app/data/cookies.txt"]:
+        if not self.cookie_file or not os.path.isfile(self.cookie_file):
+            for candidate in ["/app/data/cookies.txt", "/app/cookies.txt", "data/cookies.txt", "cookies.txt"]:
                 if os.path.isfile(candidate):
                     self.cookie_file = candidate
                     break
-        if self.cookie_file:
+        if self.cookie_file and os.path.isfile(self.cookie_file):
             logger.info(f"YouTubeTranscriptAdapter initialized with cookie file: {self.cookie_file}")
         if self.proxy:
             logger.info("YouTubeTranscriptAdapter initialized with configured proxy.")
 
     def _get_api(self) -> YouTubeTranscriptApi:
-        kwargs = {}
+        session = requests.Session()
+        session.headers.update({"User-Agent": self.user_agent})
+
         if self.proxy:
-            kwargs["proxies"] = {"http": self.proxy, "https": self.proxy}
-        if self.cookie_file and os.path.isfile(self.cookie_file):
-            kwargs["cookies"] = self.cookie_file
-        try:
-            return YouTubeTranscriptApi(**kwargs)
-        except Exception:
-            return YouTubeTranscriptApi()
+            session.proxies = {"http": self.proxy, "https": self.proxy}
+
+        # Check candidate locations dynamically if cookie file was copied after start
+        active_cookie = self.cookie_file
+        if not active_cookie or not os.path.isfile(active_cookie):
+            for candidate in ["/app/data/cookies.txt", "/app/cookies.txt", "data/cookies.txt", "cookies.txt"]:
+                if os.path.isfile(candidate):
+                    active_cookie = candidate
+                    self.cookie_file = candidate
+                    break
+
+        if active_cookie and os.path.isfile(active_cookie):
+            try:
+                jar = MozillaCookieJar()
+                jar.load(active_cookie, ignore_discard=True, ignore_expires=True)
+                session.cookies = jar
+                logger.info(f"Successfully loaded {len(jar)} cookies from {active_cookie} into session")
+            except Exception as err:
+                logger.warning(f"Could not load cookies from {active_cookie}: {err}")
+
+        return YouTubeTranscriptApi(http_client=session)
 
     def fetch_transcripts(
         self,
