@@ -60,15 +60,16 @@ warp-cli status
 # → phải in: Status update: Connected
 ```
 
-### Bước 3: Cài socat + tạo systemd service
+### Bước 3: Cài socat + tạo systemd services (tự chạy khi reboot)
 
 ```bash
 apt install -y socat
 
+# Service 1: socat bridge — forward Docker → WARP
 cat << 'EOF' > /etc/systemd/system/warp-docker.service
 [Unit]
 Description=Bridge Cloudflare WARP SOCKS5 Proxy to Docker Bridge Network
-After=network.target
+After=network.target cloudflare-warp.service
 
 [Service]
 Type=simple
@@ -80,11 +81,29 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF
 
+# Service 2: tự động connect WARP sau boot (không cần bấm tay)
+cat << 'EOF' > /etc/systemd/system/warp-autoconnect.service
+[Unit]
+Description=Auto-connect Cloudflare WARP on boot
+After=network-online.target cloudflare-warp.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/warp-cli connect
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 systemctl daemon-reload
+systemctl enable --now warp-autoconnect
 systemctl enable --now warp-docker
 
-# Kiểm tra service đang chạy
-systemctl status warp-docker
+# Kiểm tra cả hai service
+systemctl status warp-autoconnect --no-pager
+systemctl status warp-docker --no-pager
 ```
 
 ### Bước 4: Cấu hình `.env` trong project
