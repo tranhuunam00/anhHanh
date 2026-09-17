@@ -1,11 +1,14 @@
-"""Infrastructure adapter for YouTube transcripts and metadata."""
+import os
 import json
+import logging
 import urllib.request
 from typing import List, Optional, Tuple
 from youtube_transcript_api import YouTubeTranscriptApi
 from app.domain.models import SubtitleSnippet
 from app.domain.exceptions import TranscriptNotFoundException
 from app.application.interfaces import ITranscriptService
+
+logger = logging.getLogger(__name__)
 
 
 class YouTubeTranscriptAdapter(ITranscriptService):
@@ -16,6 +19,28 @@ class YouTubeTranscriptAdapter(ITranscriptService):
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
             "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
+        self.proxy = os.getenv("YOUTUBE_PROXY")
+        self.cookie_file = os.getenv("YOUTUBE_COOKIE_FILE")
+        if not self.cookie_file:
+            for candidate in ["cookies.txt", "data/cookies.txt", "/app/data/cookies.txt"]:
+                if os.path.isfile(candidate):
+                    self.cookie_file = candidate
+                    break
+        if self.cookie_file:
+            logger.info(f"YouTubeTranscriptAdapter initialized with cookie file: {self.cookie_file}")
+        if self.proxy:
+            logger.info("YouTubeTranscriptAdapter initialized with configured proxy.")
+
+    def _get_api(self) -> YouTubeTranscriptApi:
+        kwargs = {}
+        if self.proxy:
+            kwargs["proxies"] = {"http": self.proxy, "https": self.proxy}
+        if self.cookie_file and os.path.isfile(self.cookie_file):
+            kwargs["cookies"] = self.cookie_file
+        try:
+            return YouTubeTranscriptApi(**kwargs)
+        except Exception:
+            return YouTubeTranscriptApi()
 
     def fetch_transcripts(
         self,
@@ -35,7 +60,7 @@ class YouTubeTranscriptAdapter(ITranscriptService):
     def get_available_languages(self, video_id: str) -> dict:
         """Returns available subtitle tracks and detected source language for a video."""
         try:
-            api = YouTubeTranscriptApi()
+            api = self._get_api()
             transcript_list = api.list(video_id)
             tracks = []
             detected_lang = "en"
@@ -95,7 +120,7 @@ class YouTubeTranscriptAdapter(ITranscriptService):
         """Fetch source transcript (manual preferred, or auto-generated, or translated)."""
         src = (source_lang or "auto").strip().lower()
         try:
-            api = YouTubeTranscriptApi()
+            api = self._get_api()
             transcript_list = api.list(video_id)
             selected_t = None
 
@@ -165,7 +190,7 @@ class YouTubeTranscriptAdapter(ITranscriptService):
             return None
 
         try:
-            api = YouTubeTranscriptApi()
+            api = self._get_api()
             transcript_list = api.list(video_id)
 
             # 1. Try finding native transcript for target_lang
