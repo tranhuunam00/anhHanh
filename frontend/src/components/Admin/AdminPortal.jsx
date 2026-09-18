@@ -3,7 +3,8 @@ import {
   fetchAdminOverview,
   fetchAdminUsers,
   fetchAdminFeedbacks,
-  updateFeedbackStatus
+  updateFeedbackStatus,
+  updateUserRole
 } from '../../services/adminService';
 
 export const AdminPortal = ({ user, token, showToast }) => {
@@ -16,6 +17,7 @@ export const AdminPortal = ({ user, token, showToast }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [expandedUserId, setExpandedUserId] = useState(null);
   const [updatingFbId, setUpdatingFbId] = useState(null);
+  const [updatingRoleId, setUpdatingRoleId] = useState(null);
 
   // Security check: Only role === 'ADMIN'
   const isAdmin = user && user.role === 'ADMIN';
@@ -79,6 +81,30 @@ export const AdminPortal = ({ user, token, showToast }) => {
       showToast && showToast(err.message, 'error');
     } finally {
       setUpdatingFbId(null);
+    }
+  };
+
+  const handleUpdateRole = async (userId, currentRole) => {
+    const newRole = currentRole === 'ADMIN' ? 'USER' : 'ADMIN';
+    const confirmMsg = newRole === 'ADMIN'
+      ? `Cấp quyền ADMIN cho người dùng này?`
+      : `Hạ quyền người dùng này về USER?`;
+    if (!window.confirm(confirmMsg)) return;
+    try {
+      setUpdatingRoleId(userId);
+      await updateUserRole(userId, newRole, token);
+      showToast && showToast(
+        newRole === 'ADMIN' ? '✅ Đã cấp quyền ADMIN' : '✅ Đã hạ về USER',
+        'success'
+      );
+      // Optimistic update
+      setUsers((prev) =>
+        prev.map((u) => u.id === userId ? { ...u, role: newRole } : u)
+      );
+    } catch (err) {
+      showToast && showToast(err.message, 'error');
+    } finally {
+      setUpdatingRoleId(null);
     }
   };
 
@@ -308,6 +334,20 @@ export const AdminPortal = ({ user, token, showToast }) => {
                         <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
                           {isExpanded ? '▲ Thu gọn' : '▼ Chi tiết'}
                         </span>
+                        {/* Role management button */}
+                        <button
+                          type="button"
+                          className={`btn ${u.role === 'ADMIN' ? 'btn-danger-outline' : 'btn-primary-outline'}`}
+                          style={{ fontSize: '0.75rem', padding: '4px 10px', minWidth: 110 }}
+                          disabled={updatingRoleId === u.id}
+                          onClick={(e) => { e.stopPropagation(); handleUpdateRole(u.id, u.role); }}
+                          title={u.role === 'ADMIN' ? 'Hạ xuống USER' : 'Nâng lên ADMIN'}
+                        >
+                          {updatingRoleId === u.id
+                            ? '⏳ Đang xử lý...'
+                            : u.role === 'ADMIN' ? '🔽 Hạ về USER' : '🔼 Cấp ADMIN'
+                          }
+                        </button>
                       </div>
                     </div>
 

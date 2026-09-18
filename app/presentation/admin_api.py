@@ -30,6 +30,10 @@ class UpdateFeedbackStatusRequest(BaseModel):
     status: str = Field(..., description="Trạng thái: PENDING, REVIEWED, RESOLVED")
 
 
+class UpdateUserRoleRequest(BaseModel):
+    role: str = Field(..., description="Quyền: USER hoặc ADMIN")
+
+
 @router.get("/overview")
 async def get_admin_overview(
     admin: User = Depends(require_admin),
@@ -212,4 +216,50 @@ async def list_admin_users(
     return {
         "total": len(user_list),
         "users": user_list,
+    }
+
+
+@router.patch("/users/{user_id}/role")
+async def update_user_role(
+    user_id: str,
+    payload: UpdateUserRoleRequest,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Admin promotes or demotes a user's role (USER ↔ ADMIN).
+
+    Guard: Admin cannot change their own role.
+    """
+    new_role = payload.role.strip().upper()
+    if new_role not in {"USER", "ADMIN"}:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Quyền không hợp lệ. Chỉ chấp nhận: USER, ADMIN."
+        )
+
+    if user_id == admin.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Không thể thay đổi quyền của chính bạn."
+        )
+
+    res = await db.execute(select(User).where(User.id == user_id))
+    target_user = res.scalar_one_or_none()
+    if not target_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy người dùng.")
+
+    old_role = target_user.role
+    target_user.role = new_role
+    await db.commit()
+    await db.refresh(target_user)
+
+    logger.info(f"Admin {admin.email} changed user {target_user.email} role: {old_role} → {new_role}")
+    return {
+        "message": f"Đã cập nhật quyền thành {new_role}",
+        "user": {
+            "id": target_user.id,
+            "email": target_user.email,
+            "name": target_user.name,
+            "role": target_user.role,
+        }
     }

@@ -1,6 +1,7 @@
 """Lesson Session and Video Preview API Endpoints for DailyDictation Studio.
 Enables Video Preview Cards, Start Session, and In-progress Sentence Resume.
 """
+import re
 import logging
 from datetime import datetime, date, timedelta, timezone
 from typing import Optional, List, Dict, Any
@@ -19,6 +20,16 @@ from app.infrastructure.lesson_subtitle_repo import LessonSubtitleRepo
 from app.presentation.security_middleware import limiter
 
 logger = logging.getLogger(__name__)
+
+# Language code whitelist: e.g. "en", "vi", "zh-TW", "pt-BR"
+_LANG_CODE_RE = re.compile(r'^[a-z]{2,5}(-[a-zA-Z]{2,4})?$')
+
+def _validate_lang(lang: Optional[str], default: str = 'en') -> str:
+    """Validate and normalize language code. Raises 400 if invalid."""
+    code = (lang or default).strip().lower()
+    if not _LANG_CODE_RE.match(code):
+        raise HTTPException(status_code=400, detail=f"Mã ngôn ngữ không hợp lệ: '{lang}'")
+    return code
 
 router = APIRouter(prefix='/api/lesson', tags=['Lessons'])
 
@@ -112,11 +123,12 @@ async def preview_video(
     """Return video preview metadata before starting dictation session.
 
     Checks DB subtitle cache first; only calls YouTube when uncached.
+    Rolls back DB transaction if YouTube fetch fails mid-way.
     """
     try:
         vid = extract_youtube_id(payload.url_or_id)
-        source_lang = (payload.source_lang or 'en').lower()
-        target_lang = (payload.target_lang or 'vi').lower()
+        source_lang = _validate_lang(payload.source_lang, 'en')
+        target_lang = _validate_lang(payload.target_lang, 'vi')
 
         subtitle_repo = LessonSubtitleRepo(db)
         req = GetLessonRequest(
@@ -125,8 +137,12 @@ async def preview_video(
             source_lang=source_lang,
             target_lang=target_lang,
         )
-        lesson_dto, lesson_record = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
-        await db.commit()
+        try:
+            lesson_dto, lesson_record = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
+            await db.commit()
+        except Exception as fetch_err:
+            await db.rollback()
+            raise fetch_err
 
         total_challenges = len(lesson_dto.challenges)
         est_minutes = max(1, round(total_challenges * 0.25))
@@ -167,15 +183,17 @@ async def preview_video(
 
 
 @router.post('/start')
+@limiter.limit('15/minute')
 async def start_lesson_session(
+    request: Request,
     payload: StartLessonRequest,
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
     """Start a study session: ensure lesson + subtitles cached in DB, return resume position."""
     vid = extract_youtube_id(payload.video_id)
-    source_lang = (payload.source_lang or 'en').lower()
-    target_lang = (payload.target_lang or 'vi').lower()
+    source_lang = _validate_lang(payload.source_lang, 'en')
+    target_lang = _validate_lang(payload.target_lang, 'vi')
 
     subtitle_repo = LessonSubtitleRepo(db)
     req = GetLessonRequest(
@@ -217,15 +235,17 @@ async def start_lesson_session(
 
 
 @router.post('/progress')
+@limiter.limit('60/minute')
 async def update_lesson_progress(
+    request: Request,
     payload: ProgressApiRequest,
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
     """Update active sentence current_position and update daily streak & words counter."""
     vid = extract_youtube_id(payload.video_id)
-    source_lang = (payload.source_lang or 'en').lower()
-    target_lang = (payload.target_lang or 'vi').lower()
+    source_lang = _validate_lang(payload.source_lang, 'en')
+    target_lang = _validate_lang(payload.target_lang, 'vi')
     streak_info = {'current_streak': 0, 'words_today': payload.words_typed}
 
     if current_user:

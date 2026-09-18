@@ -58,3 +58,20 @@ export async function updateFeedbackStatus(feedbackId, newStatus, token) {
   }
   return await response.json();
 }
+
+/** Promote or demote a user's role (USER ↔ ADMIN). */
+export async function updateUserRole(userId, newRole, token) {
+  const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/role`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ role: newRole })
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.detail || 'Không thể cập nhật quyền người dùng.');
+  }
+  return await response.json();
+}
