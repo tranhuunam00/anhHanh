@@ -6,6 +6,7 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
   const { token, refreshStreak, showToast } = useAuth();
   const [position, setPosition] = useState(null);
   const [selectedWord, setSelectedWord] = useState("");
+  const [selectedSentence, setSelectedSentence] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -13,9 +14,10 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
       const selection = window.getSelection();
       const text = selection?.toString().trim();
 
-      if (!text || text.length > 50 || text.includes("\n")) {
+      if (!text || text.length > 120 || text.includes("\n")) {
         setPosition(null);
         setSelectedWord("");
+        setSelectedSentence("");
         return;
       }
 
@@ -24,6 +26,24 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
       const rect = range.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
+      // Extract exact parent sentence of the highlighted text
+      let extractedSentence = "";
+      if (range && range.commonAncestorContainer) {
+        const node = range.commonAncestorContainer;
+        const element = node.nodeType === 3 ? node.parentElement : node;
+        const sentenceEl = element.closest(
+          ".sentence-card, .sentence-item, .transcript-item, .transcript-sentence, .dictation-sentence-text, .transcript-line, p, li"
+        );
+        if (sentenceEl) {
+          const rawText = sentenceEl.innerText || sentenceEl.textContent || "";
+          extractedSentence = rawText
+            .replace(/^\[\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\]\s*/, "")
+            .replace(/Luyện câu này\s*➔?/gi, "")
+            .trim();
+        }
+      }
+
+      setSelectedSentence(extractedSentence || currentSentence || "");
       setPosition({
         top: rect.top + window.scrollY - 8,
         left: rect.left + window.scrollX + rect.width / 2,
@@ -35,6 +55,7 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
       if (e.target.closest(".floating-vocab-btn")) return;
       setPosition(null);
       setSelectedWord("");
+      setSelectedSentence("");
     };
 
     document.addEventListener("mouseup", handleMouseUp);
@@ -44,7 +65,7 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
       document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("mousedown", handleMouseDown);
     };
-  }, []);
+  }, [currentSentence]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -58,7 +79,7 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
       await createVocabWord(
         {
           word: selectedWord,
-          context_sentence: currentSentence || "",
+          context_sentence: selectedSentence || currentSentence || "",
           video_id: currentVideoId || "",
           timestamp: currentTimestamp || 0,
         },
@@ -68,6 +89,7 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
       refreshStreak();
       setPosition(null);
       setSelectedWord("");
+      setSelectedSentence("");
       window.getSelection()?.removeAllRanges();
     } catch (err) {
       showToast(err.message || "Không thể lưu từ này", "error");

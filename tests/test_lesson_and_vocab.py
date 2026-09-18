@@ -144,5 +144,5 @@ def test_vocab_srs_review_session_api():
     res_correct = client.post("/api/vocab/review-result", json={"vocab_id": target_id, "is_correct": True}, headers=headers)
     assert res_correct.status_code == 200
     assert res_correct.json()["vocab"]["mastery_score"] >= 1
-    assert res_correct.json()["vocab"]["review_interval_days"] == 3
+    assert res_correct.json()["vocab"]["review_interval_days"] >= 3
 

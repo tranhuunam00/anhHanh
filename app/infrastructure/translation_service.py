@@ -78,9 +78,11 @@ class TranslationService:
 
         cache_key = f"{src}_{tgt}_{cleaned}"
 
-        # Check cache
+        # Check cache (ignore bad cache where cached value equals source text)
         if cache_key in self.memory_cache:
-            return self.memory_cache[cache_key]
+            cached_val = self.memory_cache[cache_key]
+            if cached_val and cached_val.lower().strip() != cleaned.lower().strip():
+                return cached_val
 
         # Call translation provider: 1. Primary Google Translate (standard, natural)
         pair_src = "en" if src == "auto" else src

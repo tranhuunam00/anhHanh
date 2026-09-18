@@ -119,7 +119,10 @@ async def save_vocabulary_word(
         image_url=image_url,
         video_id=payload.video_id,
         video_timestamp=payload.effective_timestamp,
-        status='NEW'
+        status='NEW',
+        next_review_at=datetime.now(timezone.utc),
+        review_interval_days=1,
+        mastery_score=0
     )
     db.add(new_vocab)
     await db.commit()
@@ -242,9 +245,9 @@ async def refresh_vocabulary_meaning(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Re-fetch Vietnamese meaning for an existing vocabulary word.
+    """Re-fetch Vietnamese meaning for an existing vocabulary word or phrase.
 
-    Useful when old words were saved without translation (meaning == word in English).
+    Useful when old words were saved without translation or cached with bad fallback.
     """
     res = await db.execute(
         select(UserVocabulary).where(
@@ -254,19 +257,34 @@ async def refresh_vocabulary_meaning(
     )
     vocab = res.scalar_one_or_none()
     if not vocab:
-        raise HTTPException(status_code=404, detail='Tu vung khong ton tai')
+        raise HTTPException(status_code=404, detail='Từ vựng không tồn tại')
+
+    clean_word = _translation_service.clean_text(vocab.word)
+
+    # Invalidate bad cache entry if present
+    cache_key = f"en_vi_{clean_word}"
+    if cache_key in _translation_service.memory_cache:
+        del _translation_service.memory_cache[cache_key]
 
     try:
-        translated = _translation_service.translate(vocab.word, source_lang='en', target_lang='vi')
-        if translated and translated.lower().strip() != vocab.word.lower().strip():
+        # Force fresh translation via Google Translate
+        translated = _translation_service._fetch_google(clean_word, source_lang='en', target_lang='vi')
+        if not translated:
+            translated = _translation_service._fetch_mymemory(clean_word, source_lang='en', target_lang='vi')
+
+        if translated and translated.lower().strip() != clean_word.lower().strip():
             vocab.meaning = translated
+            _translation_service.memory_cache[cache_key] = translated
+            _translation_service._save_cache()
             await db.commit()
             await db.refresh(vocab)
-            return {'message': f'Da cap nhat nghia: {translated}', 'vocab': vocab.to_dict()}
+            return {'message': f'Đã cập nhật nghĩa: {translated}', 'vocab': vocab.to_dict()}
         else:
-            return {'message': 'Khong tim duoc nghia tieng Viet', 'vocab': vocab.to_dict()}
+            raise HTTPException(status_code=400, detail='Không tìm được nghĩa tiếng Việt cho từ/cụm từ này')
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f'Loi khi dich: {str(e)}')
+        raise HTTPException(status_code=500, detail=f'Lỗi khi dịch: {str(e)}')
 
 
 @router.delete('/{vocab_id}')
@@ -316,7 +334,7 @@ async def get_due_vocab_session(
     """Retrieve words due for review today, enriched with multiple-choice distractors."""
     now = datetime.now(timezone.utc)
 
-    # Query words due for review (next_review_at <= now OR next_review_at IS NULL OR status == 'NEW')
+    # Query words due for review (next_review_at <= now OR next_review_at IS NULL OR status != 'MASTERED')
     stmt = (
         select(UserVocabulary)
         .where(
@@ -324,7 +342,7 @@ async def get_due_vocab_session(
             or_(
                 UserVocabulary.next_review_at == None,
                 UserVocabulary.next_review_at <= now,
-                UserVocabulary.status == 'NEW'
+                UserVocabulary.status != 'MASTERED'
             )
         )
         .order_by(UserVocabulary.created_at.desc())
@@ -332,6 +350,17 @@ async def get_due_vocab_session(
     )
     res = await db.execute(stmt)
     due_words = res.scalars().all()
+
+    # Fallback: if no strict due words, return latest notebook words for practice
+    if not due_words:
+        stmt_fallback = (
+            select(UserVocabulary)
+            .where(UserVocabulary.user_id == current_user.id)
+            .order_by(UserVocabulary.created_at.desc())
+            .limit(limit)
+        )
+        res_fb = await db.execute(stmt_fallback)
+        due_words = res_fb.scalars().all()
 
     # Also fetch user's other meanings for realistic distractors (exclude English words where meaning == word)
     all_meanings_res = await db.execute(
