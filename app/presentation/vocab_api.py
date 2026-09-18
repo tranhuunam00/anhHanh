@@ -65,7 +65,7 @@ async def save_vocabulary_word(
     meaning = payload.meaning
     if not meaning:
         try:
-            translated = _translation_service.translate(clean_word, source_lang='en', target_lang='vi')
+            translated = _translation_service.translate(clean_word, source_lang='auto', target_lang='vi')
             # Only accept translation if it's different from the source word (i.e., actually translated)
             if translated and translated.lower().strip() != clean_word.lower().strip():
                 meaning = translated
@@ -261,21 +261,22 @@ async def refresh_vocabulary_meaning(
 
     clean_word = _translation_service.clean_text(vocab.word)
 
-    # Invalidate bad cache entry if present
-    cache_key = f"en_vi_{clean_word}"
-    if cache_key in _translation_service.memory_cache:
-        del _translation_service.memory_cache[cache_key]
+    # Invalidate cache entries across possible source language keys
+    for prefix in ['auto', 'en', 'ja', 'fr', 'de', 'es', 'zh', 'ko']:
+        cache_key = f"{prefix}_vi_{clean_word}"
+        if cache_key in _translation_service.memory_cache:
+            del _translation_service.memory_cache[cache_key]
 
     try:
-        # Force fresh translation via Google Translate
-        translated = _translation_service._fetch_google(clean_word, source_lang='en', target_lang='vi')
+        # Force fresh translation via Google Translate (auto-detect source language to Vietnamese)
+        translated = _translation_service.translate(clean_word, source_lang='auto', target_lang='vi')
+        if not translated:
+            translated = _translation_service._fetch_google(clean_word, source_lang='auto', target_lang='vi')
         if not translated:
             translated = _translation_service._fetch_mymemory(clean_word, source_lang='en', target_lang='vi')
 
         if translated and translated.lower().strip() != clean_word.lower().strip():
             vocab.meaning = translated
-            _translation_service.memory_cache[cache_key] = translated
-            _translation_service._save_cache()
             await db.commit()
             await db.refresh(vocab)
             return {'message': f'Đã cập nhật nghĩa: {translated}', 'vocab': vocab.to_dict()}
@@ -384,7 +385,7 @@ async def get_due_vocab_session(
         # Guard: If meaning is missing or identical to the English word (old data fallback), translate to Vietnamese
         if not correct_meaning or correct_meaning.lower().strip() == w.word.lower().strip():
             try:
-                translated = _translation_service.translate(w.word, source_lang='en', target_lang='vi')
+                translated = _translation_service.translate(w.word, source_lang='auto', target_lang='vi')
                 if translated and translated.lower().strip() != w.word.lower().strip():
                     correct_meaning = translated
                     w.meaning = translated

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { createVocabWord } from "../../services/authVocabService";
+import { splitContextSentence } from "../../utils/textNormalizer";
 
 export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", currentTimestamp = 0 }) => {
   const { token, refreshStreak, showToast } = useAuth();
@@ -35,11 +36,24 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
           ".sentence-card, .sentence-item, .transcript-item, .transcript-sentence, .dictation-sentence-text, .transcript-line, p, li"
         );
         if (sentenceEl) {
-          const rawText = sentenceEl.innerText || sentenceEl.textContent || "";
-          extractedSentence = rawText
-            .replace(/^\[\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\]\s*/, "")
-            .replace(/Luyện câu này\s*➔?/gi, "")
-            .trim();
+          const origEl = sentenceEl.querySelector(".transcript-en, .transcript-orig, .orig-text, .sentence-en, [data-lang='en']");
+          const transEl = sentenceEl.querySelector(".transcript-vi, .transcript-trans, .vi-text, .sentence-vi, [data-lang='vi']");
+          if (origEl && transEl) {
+            const orig = (origEl.innerText || origEl.textContent || "").trim();
+            const trans = (transEl.innerText || transEl.textContent || "").trim();
+            if (orig) {
+              extractedSentence = trans ? `${orig}\n${trans}` : orig;
+            }
+          }
+          if (!extractedSentence) {
+            const rawText = sentenceEl.innerText || sentenceEl.textContent || "";
+            const cleanText = rawText
+              .replace(/^\[\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\]\s*/, "")
+              .replace(/Luyện câu này\s*➔?/gi, "")
+              .trim();
+            const { orig, trans } = splitContextSentence(cleanText);
+            extractedSentence = trans ? `${orig}\n${trans}` : (orig || cleanText);
+          }
         }
       }
 

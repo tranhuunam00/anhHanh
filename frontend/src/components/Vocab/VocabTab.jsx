@@ -9,6 +9,7 @@ import {
   fetchDueVocabSession,
 } from "../../services/authVocabService";
 import VocabReviewModal from "./VocabReviewModal";
+import { splitContextSentence } from "../../utils/textNormalizer";
 
 export const VocabTab = ({ isActive = false }) => {
   const { token, isAuthenticated, showToast } = useAuth();
@@ -400,9 +401,23 @@ export const VocabTab = ({ isActive = false }) => {
                   }
                 </div>
 
-                {v.context_sentence && (
-                  <div className="vocab-context-box">"{v.context_sentence}"</div>
-                )}
+                {v.context_sentence && (() => {
+                  const { orig, trans } = splitContextSentence(v.context_sentence);
+                  return (
+                    <div className="vocab-context-box">
+                      {orig && (
+                        <div className="vocab-context-orig">
+                          "{orig.replace(/^"+|"+$/g, '')}"
+                        </div>
+                      )}
+                      {trans && (
+                        <div className="vocab-context-trans">
+                          {trans.replace(/^"+|"+$/g, '')}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 <div className="vocab-card-footer">
                   <select

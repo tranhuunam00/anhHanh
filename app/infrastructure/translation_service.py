@@ -85,12 +85,13 @@ class TranslationService:
                 return cached_val
 
         # Call translation provider: 1. Primary Google Translate (standard, natural)
-        pair_src = "en" if src == "auto" else src
+        pair_src = src
         translated = self._fetch_google(cleaned, pair_src, tgt)
 
-        # 2. Secondary fallback: MyMemory
+        # 2. Secondary fallback: MyMemory (requires explicit language code pair)
         if not translated:
-            translated = self._fetch_mymemory(cleaned, pair_src, tgt)
+            mymemory_src = "en" if pair_src == "auto" else pair_src
+            translated = self._fetch_mymemory(cleaned, mymemory_src, tgt)
 
         if translated:
             cleaned_trans = self.clean_credits(translated)

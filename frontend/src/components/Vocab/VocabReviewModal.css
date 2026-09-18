@@ -225,12 +225,31 @@
 .context-box {
   background: rgba(0, 0, 0, 0.25);
   border-left: 4px solid #3b82f6;
-  padding: 16px;
+  padding: 14px 16px;
   border-radius: 8px;
-  font-size: 1.1rem;
-  font-style: italic;
-  color: #cbd5e1;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.context-orig {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #f1f5f9;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.context-trans {
+  font-size: 0.95rem;
+  color: #34d399;
+  font-style: normal;
+  line-height: 1.4;
+  font-weight: 500;
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  padding-top: 8px;
 }
 
 .quiz-meaning-hint {
@@ -374,10 +393,28 @@
   margin: 0;
 }
 
-.fc-context {
+.fc-context-box {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.fc-context-orig {
   font-style: italic;
-  color: #cbd5e1;
+  color: #f1f5f9;
   font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.fc-context-trans {
+  font-style: normal;
+  color: #34d399;
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.35;
 }
 
 .flashcard-actions {

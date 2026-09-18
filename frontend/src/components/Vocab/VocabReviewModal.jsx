@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { submitVocabReviewResult } from "../../services/authVocabService";
+import { splitContextSentence } from "../../utils/textNormalizer";
 import "./VocabReviewModal.css";
 
 // Styled Modern Vector Icons
@@ -318,14 +319,18 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
           {questionType === 2 && (
             <div className="quiz-container context-mode">
               <span className="quiz-badge"><SvgEdit size={14} /> Điền từ vào câu ví dụ</span>
-              <div className="context-box">
-                "{currentItem.context_sentence
-                  ? currentItem.context_sentence.replace(
-                      new RegExp(currentItem.word, "gi"),
-                      " [ ________ ] "
-                    )
-                  : ` [ ________ ] `}"
-              </div>
+              {(() => {
+                const { orig, trans } = splitContextSentence(currentItem.context_sentence || "");
+                const maskedOrig = orig
+                  ? orig.replace(new RegExp(currentItem.word, "gi"), " [ ________ ] ")
+                  : " [ ________ ] ";
+                return (
+                  <div className="context-box">
+                    <div className="context-orig">"{maskedOrig}"</div>
+                    {trans && <div className="context-trans">{trans}</div>}
+                  </div>
+                );
+              })()}
               <div className="quiz-meaning-hint">Gợi ý nghĩa: <strong>{currentItem.meaning || "Chưa có nghĩa"}</strong></div>
 
               <form onSubmit={handleSubmitText} className="text-quiz-form">
@@ -371,9 +376,15 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
                 ) : (
                   <div className="card-back">
                     <h3 className="fc-meaning">{currentItem.meaning || "Chưa có nghĩa tiếng Việt"}</h3>
-                    {currentItem.context_sentence && (
-                      <p className="fc-context">"{currentItem.context_sentence}"</p>
-                    )}
+                    {currentItem.context_sentence && (() => {
+                      const { orig, trans } = splitContextSentence(currentItem.context_sentence);
+                      return (
+                        <div className="fc-context-box">
+                          {orig && <p className="fc-context-orig">"{orig}"</p>}
+                          {trans && <p className="fc-context-trans">{trans}</p>}
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
