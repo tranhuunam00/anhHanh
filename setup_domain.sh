@@ -2,12 +2,17 @@
 # Script tự động cấu hình Nginx + SSL HTTPS cho shotlang.io.vn trên VPS
 set -e
 
+# Đảm bảo chuyển về đúng thư mục chứa dự án
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 DOMAIN="shotlang.io.vn"
 WWW_DOMAIN="www.shotlang.io.vn"
 PORT="5100"
 
 echo "=================================================="
 echo "🚀 Đang tự động cấu hình Nginx + SSL cho $DOMAIN"
+echo "Thư mục dự án: $SCRIPT_DIR"
 echo "=================================================="
 
 # Check root / sudo
@@ -19,7 +24,7 @@ fi
 # 1. Cài đặt Nginx & Certbot
 echo "📦 [1/5] Cài đặt Nginx và Certbot..."
 apt update -y
-apt install -y nginx certbot python3-certbot-nginx
+apt install -y nginx certbot python3-certbot-nginx curl
 
 # 2. Tạo Nginx site configuration
 echo "🌐 [2/5] Tạo cấu hình Reverse Proxy Nginx..."
@@ -65,13 +70,29 @@ if [ -f ".env" ]; then
     fi
 fi
 
-# 6. Khởi động lại Docker containers
-echo "🐳 [5/5] Khởi động Docker container..."
+# 6. Build & Khởi động Docker containers trong đúng thư mục dự án
+echo "🐳 [5/5] Khởi động Docker container ứng dụng..."
 if command -v docker &> /dev/null; then
-    docker compose up -d --build || true
+    if docker compose version &> /dev/null; then
+        docker compose up -d --build
+    elif command -v docker-compose &> /dev/null; then
+        docker-compose up -d --build
+    fi
+fi
+
+# 7. Kiểm tra ứng dụng nội bộ (port 5100)
+echo "🔍 Kiểm tra trạng thái ứng dụng ở port 5100..."
+sleep 3
+if curl -s http://127.0.0.1:5100/ > /dev/null; then
+    echo "✅ Backend 5100 đang hoạt động bình thường!"
+else
+    echo "⚠️ Cảnh báo: Chưa kết nối được http://127.0.0.1:5100."
+    echo "📋 Đang kiểm tra log của container..."
+    docker ps
+    docker logs --tail 30 dailydictation_web || true
 fi
 
 echo "=================================================="
 echo "✅ HOÀN TẤT CẤU HÌNH DOMAIN & SSL!"
-echo "👉 Bạn có thể truy cập website ngay tại: https://$DOMAIN"
+echo "👉 Hãy kiểm tra trang web tại: https://$DOMAIN"
 echo "=================================================="
