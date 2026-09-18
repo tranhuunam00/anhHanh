@@ -170,16 +170,28 @@ export const VocabTab = ({ isActive = false }) => {
           {/* Filter Pills */}
           <div className="vocab-filter-group">
             {[
-              { key: "ALL", label: "Tất cả" },
-              { key: "NEW", label: "🔴 Mới lưu" },
-              { key: "LEARNING", label: "🟡 Đang nhớ" },
-              { key: "MASTERED", label: "🟢 Đã thuộc" },
+              { key: "ALL", label: "Tất cả", color: null },
+              { key: "NEW", label: "Mới lưu", color: "#ef4444" },
+              { key: "LEARNING", label: "Đang học", color: "#f59e0b" },
+              { key: "MASTERED", label: "Đã thuộc", color: "#10b981" },
             ].map((f) => (
               <button
                 key={f.key}
                 className={`vocab-filter-btn ${filterStatus === f.key ? "active" : ""}`}
                 onClick={() => setFilterStatus(f.key)}
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
               >
+                {f.color && (
+                  <span
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      backgroundColor: f.color,
+                      display: "inline-block",
+                    }}
+                  />
+                )}
                 {f.label}
               </button>
             ))}
@@ -202,8 +214,26 @@ export const VocabTab = ({ isActive = false }) => {
             gap: "12px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <span style={{ fontSize: "1.8rem" }}>🎯</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "12px",
+                background: "rgba(56, 189, 248, 0.15)",
+                border: "1px solid rgba(56, 189, 248, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#38bdf8",
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="6" />
+                <circle cx="12" cy="12" r="2" />
+              </svg>
+            </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--text, #f8fafc)" }}>
                 Hôm nay bạn có <span style={{ color: "#38bdf8" }}>{dueItems.length} từ</span> đến hạn ôn tập!
@@ -225,10 +255,16 @@ export const VocabTab = ({ isActive = false }) => {
               color: "#fff",
               cursor: "pointer",
               boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
             }}
             onClick={() => setIsReviewModalOpen(true)}
           >
-            🚀 Bắt đầu Ôn tập ({dueItems.length} từ)
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            Bắt đầu Ôn tập ({dueItems.length} từ)
           </button>
         </div>
       )}
