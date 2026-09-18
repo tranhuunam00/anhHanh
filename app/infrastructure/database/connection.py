@@ -66,6 +66,17 @@ async def init_db() -> None:
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            # Ensure columns exist on legacy tables
+            from sqlalchemy import text
+            for sql in [
+                "ALTER TABLE lessons ADD COLUMN youtube_url TEXT NULL;",
+                "ALTER TABLE user_lessons ADD COLUMN source_lang VARCHAR(20) NOT NULL DEFAULT 'en';",
+                "ALTER TABLE user_lessons ADD COLUMN target_lang VARCHAR(20) NOT NULL DEFAULT 'vi';",
+            ]:
+                try:
+                    await conn.execute(text(sql))
+                except Exception:
+                    pass
         logger.info("Database tables verified/created successfully.")
     except Exception as e:
         logger.warning(f"Failed to connect to primary DB ({e}). Falling back to SQLite...")
