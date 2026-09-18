@@ -165,6 +165,16 @@ export const deleteVocabWord = async (vocabId, token) => {
   return await safeParseResponse(res, "Không thể xóa từ này");
 };
 
+export const refreshVocabMeaning = async (vocabId, token) => {
+  const headers = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`/api/vocab/${vocabId}/meaning`, {
+    method: "PATCH",
+    headers,
+  });
+  return await safeParseResponse(res, "Không thể lấy nghĩa tiếng Việt");
+};
+
 export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang = "vi", token = null) => {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;

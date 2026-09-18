@@ -5,6 +5,7 @@ import {
   updateVocabStatus,
   rotateVocabImage,
   deleteVocabWord,
+  refreshVocabMeaning,
 } from "../../services/authVocabService";
 
 export const VocabTab = ({ isActive = false }) => {
@@ -14,6 +15,7 @@ export const VocabTab = ({ isActive = false }) => {
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshingMeaningId, setRefreshingMeaningId] = useState(null);
 
   const loadWords = useCallback(async () => {
     setIsLoading(true);
@@ -73,6 +75,27 @@ export const VocabTab = ({ isActive = false }) => {
       setTotal((prev) => Math.max(0, prev - 1));
     } catch (e) {
       showToast(e.message || "Lỗi khi xóa từ", "error");
+    }
+  };
+
+  const handleRefreshMeaning = async (vocabId) => {
+    try {
+      setRefreshingMeaningId(vocabId);
+      showToast("Đang tìm nghĩa tiếng Việt...", "info");
+      const res = await refreshVocabMeaning(vocabId, token);
+      const newMeaning = res?.vocab?.meaning;
+      if (newMeaning) {
+        setItems((prev) =>
+          prev.map((item) => item.id === vocabId ? { ...item, meaning: newMeaning } : item)
+        );
+        showToast(`✅ Đã lấy nghĩa: "${newMeaning}"`, "success");
+      } else {
+        showToast("Không tìm được nghĩa tiếng Việt cho từ này", "warning");
+      }
+    } catch (e) {
+      showToast(e.message || "Lỗi khi lấy nghĩa", "error");
+    } finally {
+      setRefreshingMeaningId(null);
     }
   };
 
@@ -250,7 +273,26 @@ export const VocabTab = ({ isActive = false }) => {
                 <div className="vocab-meaning-text">
                   {v.meaning && v.meaning.toLowerCase().trim() !== v.word.toLowerCase().trim()
                     ? v.meaning
-                    : <span style={{ color: 'var(--text-secondary, #94a3b8)', fontStyle: 'italic', fontSize: '0.85em' }}>Chưa có nghĩa tiếng Việt</span>
+                    : (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span style={{ color: 'var(--text-secondary, #94a3b8)', fontStyle: 'italic', fontSize: '0.85em' }}>
+                          Chưa có nghĩa tiếng Việt
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleRefreshMeaning(v.id)}
+                          disabled={refreshingMeaningId === v.id}
+                          style={{
+                            fontSize: '0.75rem', padding: '2px 8px', borderRadius: 6,
+                            background: 'var(--primary, #6366f1)', color: 'white',
+                            border: 'none', cursor: 'pointer', opacity: refreshingMeaningId === v.id ? 0.6 : 1
+                          }}
+                          title="Lấy nghĩa tiếng Việt cho từ này"
+                        >
+                          {refreshingMeaningId === v.id ? '⏳...' : '🔄 Lấy nghĩa VN'}
+                        </button>
+                      </span>
+                    )
                   }
                 </div>
 

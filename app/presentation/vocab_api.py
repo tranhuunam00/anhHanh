@@ -235,6 +235,39 @@ async def update_vocabulary_image(
     return {'message': 'Đã đổi ảnh minh họa', 'vocab': vocab.to_dict()}
 
 
+@router.patch('/{vocab_id}/meaning')
+async def refresh_vocabulary_meaning(
+    vocab_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Re-fetch Vietnamese meaning for an existing vocabulary word.
+
+    Useful when old words were saved without translation (meaning == word in English).
+    """
+    res = await db.execute(
+        select(UserVocabulary).where(
+            UserVocabulary.id == vocab_id,
+            UserVocabulary.user_id == current_user.id
+        )
+    )
+    vocab = res.scalar_one_or_none()
+    if not vocab:
+        raise HTTPException(status_code=404, detail='Tu vung khong ton tai')
+
+    try:
+        translated = _translation_service.translate(vocab.word, source_lang='en', target_lang='vi')
+        if translated and translated.lower().strip() != vocab.word.lower().strip():
+            vocab.meaning = translated
+            await db.commit()
+            await db.refresh(vocab)
+            return {'message': f'Da cap nhat nghia: {translated}', 'vocab': vocab.to_dict()}
+        else:
+            return {'message': 'Khong tim duoc nghia tieng Viet', 'vocab': vocab.to_dict()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'Loi khi dich: {str(e)}')
+
+
 @router.delete('/{vocab_id}')
 async def delete_vocabulary_word(
     vocab_id: str,
