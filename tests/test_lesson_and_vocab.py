@@ -114,3 +114,35 @@ def test_lesson_history_api():
     # Verify deleted
     hist_after = client.get("/api/lesson/history", headers=headers).json()
     assert not any(item["videoId"] == "qe9QSCF-d88" for item in hist_after)
+
+
+def test_vocab_srs_review_session_api():
+    """Verify SRS due-session querying and review-result submission."""
+    login_res = client.post("/api/auth/login", json={"email": "vocab_tester@example.com", "password": "Password123!"})
+    token = login_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Save a word
+    save_res = client.post("/api/vocab", json={"word": "resilience", "meaning": "sự kiên cường"}, headers=headers)
+    assert save_res.status_code == 200
+    v_id = save_res.json()["vocab"]["id"]
+
+    # Fetch due session
+    due_res = client.get("/api/vocab/due-session", headers=headers)
+    assert due_res.status_code == 200
+    due_data = due_res.json()
+    assert "items" in due_data
+    assert len(due_data["items"]) >= 1
+
+    # Check options field on due item
+    target_item = next(item for item in due_data["items"] if item["id"] == v_id)
+    assert "options" in target_item
+    assert len(target_item["options"]) == 4
+    assert "sự kiên cường" in target_item["options"]
+
+    # Submit correct review result
+    res_correct = client.post("/api/vocab/review-result", json={"vocab_id": v_id, "is_correct": True}, headers=headers)
+    assert res_correct.status_code == 200
+    assert res_correct.json()["vocab"]["mastery_score"] >= 1
+    assert res_correct.json()["vocab"]["review_interval_days"] == 3
+

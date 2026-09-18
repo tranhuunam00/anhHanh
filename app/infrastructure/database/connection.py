@@ -72,6 +72,9 @@ async def init_db() -> None:
                 "ALTER TABLE lessons ADD COLUMN youtube_url TEXT NULL;",
                 "ALTER TABLE user_lessons ADD COLUMN source_lang VARCHAR(20) NOT NULL DEFAULT 'en';",
                 "ALTER TABLE user_lessons ADD COLUMN target_lang VARCHAR(20) NOT NULL DEFAULT 'vi';",
+                "ALTER TABLE user_vocabulary ADD COLUMN next_review_at DATETIME NULL;",
+                "ALTER TABLE user_vocabulary ADD COLUMN review_interval_days INTEGER NOT NULL DEFAULT 1;",
+                "ALTER TABLE user_vocabulary ADD COLUMN mastery_score INTEGER NOT NULL DEFAULT 0;",
             ]:
                 try:
                     await conn.execute(text(sql))

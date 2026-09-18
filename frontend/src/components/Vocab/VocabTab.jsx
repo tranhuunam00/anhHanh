@@ -6,7 +6,9 @@ import {
   rotateVocabImage,
   deleteVocabWord,
   refreshVocabMeaning,
+  fetchDueVocabSession,
 } from "../../services/authVocabService";
+import VocabReviewModal from "./VocabReviewModal";
 
 export const VocabTab = ({ isActive = false }) => {
   const { token, isAuthenticated, showToast } = useAuth();
@@ -16,6 +18,8 @@ export const VocabTab = ({ isActive = false }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [refreshingMeaningId, setRefreshingMeaningId] = useState(null);
+  const [dueItems, setDueItems] = useState([]);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const loadWords = useCallback(async () => {
     setIsLoading(true);
@@ -24,6 +28,10 @@ export const VocabTab = ({ isActive = false }) => {
       const list = data?.items || data?.vocabulary || [];
       setItems(list);
       setTotal(data?.total !== undefined ? data.total : (data?.stats?.total || list.length));
+
+      // Also load due review session items
+      const dueRes = await fetchDueVocabSession(20, token);
+      setDueItems(dueRes?.items || []);
     } catch (e) {
       console.error("Failed to load vocab:", e);
     } finally {
@@ -178,6 +186,66 @@ export const VocabTab = ({ isActive = false }) => {
           </div>
         </div>
       </div>
+
+      {dueItems.length > 0 && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15))",
+            border: "1px solid rgba(59, 130, 246, 0.3)",
+            borderRadius: "14px",
+            padding: "16px 20px",
+            marginBottom: "1.5rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "12px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "1.8rem" }}>🎯</span>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--text, #f8fafc)" }}>
+                Hôm nay bạn có <span style={{ color: "#38bdf8" }}>{dueItems.length} từ</span> đến hạn ôn tập!
+              </div>
+              <div style={{ fontSize: "0.85rem", color: "var(--text-secondary, #94a3b8)", marginTop: "2px" }}>
+                Thực hành qua 4 dạng bài tập tương tác (Trắc nghiệm, Nghe đoán từ, Điền câu, Flashcard)
+              </div>
+            </div>
+          </div>
+          <button
+            className="btn-primary"
+            style={{
+              padding: "10px 20px",
+              borderRadius: "10px",
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              background: "linear-gradient(90deg, #3b82f6, #10b981)",
+              border: "none",
+              color: "#fff",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
+            }}
+            onClick={() => setIsReviewModalOpen(true)}
+          >
+            🚀 Bắt đầu Ôn tập ({dueItems.length} từ)
+          </button>
+        </div>
+      )}
+
+      {isReviewModalOpen && (
+        <VocabReviewModal
+          dueItems={dueItems}
+          token={token}
+          onClose={() => {
+            setIsReviewModalOpen(false);
+            loadWords();
+          }}
+          onFinished={() => {
+            loadWords();
+          }}
+        />
+      )}
 
       {!isAuthenticated && (
         <div

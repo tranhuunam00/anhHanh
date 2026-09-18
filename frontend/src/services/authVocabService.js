@@ -175,6 +175,31 @@ export const refreshVocabMeaning = async (vocabId, token) => {
   return await safeParseResponse(res, "Không thể lấy nghĩa tiếng Việt");
 };
 
+export const fetchDueVocabSession = async (limit = 20, token = null) => {
+  try {
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`/api/vocab/due-session?limit=${limit}`, { headers });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (e) {
+    console.error("Error fetching due vocab session:", e);
+  }
+  return { total_due: 0, items: [] };
+};
+
+export const submitVocabReviewResult = async (vocabId, isCorrect, token = null) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch("/api/vocab/review-result", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ vocab_id: vocabId, is_correct: isCorrect }),
+  });
+  return await safeParseResponse(res, "Không thể cập nhật kết quả ôn tập");
+};
+
 export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang = "vi", token = null) => {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;

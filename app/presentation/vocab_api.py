@@ -288,3 +288,132 @@ async def delete_vocabulary_word(
     await db.delete(vocab)
     await db.commit()
     return {'message': 'Đã xóa từ khỏi Sổ tay'}
+
+
+import random
+from datetime import datetime, timezone, timedelta
+from sqlalchemy import or_
+
+FALLBACK_DISTRACTORS = [
+    "thành công", "phát triển", "bắt đầu", "kết quả", "thay đổi",
+    "quan trọng", "di chuyển", "tự nhiên", "hoàn thành", "kinh nghiệm",
+    "cơ hội", "mục tiêu", "thử thách", "kiến thức", "quyết định"
+]
+
+
+class ReviewResultRequest(BaseModel):
+    vocab_id: str
+    is_correct: bool
+
+
+@router.get('/due-session')
+async def get_due_vocab_session(
+    limit: int = Query(20, ge=1, le=50),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieve words due for review today, enriched with multiple-choice distractors."""
+    now = datetime.now(timezone.utc)
+
+    # Query words due for review (next_review_at <= now OR next_review_at IS NULL OR status == 'NEW')
+    stmt = (
+        select(UserVocabulary)
+        .where(
+            UserVocabulary.user_id == current_user.id,
+            or_(
+                UserVocabulary.next_review_at == None,
+                UserVocabulary.next_review_at <= now,
+                UserVocabulary.status == 'NEW'
+            )
+        )
+        .order_by(UserVocabulary.created_at.desc())
+        .limit(limit)
+    )
+    res = await db.execute(stmt)
+    due_words = res.scalars().all()
+
+    # Also fetch user's other meanings for realistic distractors
+    all_meanings_res = await db.execute(
+        select(UserVocabulary.meaning)
+        .where(
+            UserVocabulary.user_id == current_user.id,
+            UserVocabulary.meaning != None,
+            UserVocabulary.meaning != ""
+        )
+    )
+    user_meanings = [m[0] for m in all_meanings_res.all() if m[0]]
+    combined_pool = list(set(user_meanings + FALLBACK_DISTRACTORS))
+
+    session_items = []
+    for w in due_words:
+        w_dict = w.to_dict()
+        correct_meaning = w.meaning or "Chưa có nghĩa"
+
+        other_candidates = [m for m in combined_pool if m.lower().strip() != correct_meaning.lower().strip()]
+        selected_distractors = random.sample(other_candidates, min(3, len(other_candidates)))
+
+        while len(selected_distractors) < 3:
+            dummy = f"Nghĩa phụ {len(selected_distractors)+1}"
+            if dummy not in selected_distractors:
+                selected_distractors.append(dummy)
+
+        options = selected_distractors + [correct_meaning]
+        random.shuffle(options)
+
+        w_dict['options'] = options
+        session_items.append(w_dict)
+
+    return {
+        'total_due': len(due_words),
+        'items': session_items
+    }
+
+
+@router.post('/review-result')
+async def submit_vocab_review_result(
+    payload: ReviewResultRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Process review outcome (correct/incorrect) and update SRS schedule."""
+    res = await db.execute(
+        select(UserVocabulary).where(
+            UserVocabulary.id == payload.vocab_id,
+            UserVocabulary.user_id == current_user.id
+        )
+    )
+    vocab = res.scalar_one_or_none()
+    if not vocab:
+        raise HTTPException(status_code=404, detail='Từ vựng không tồn tại')
+
+    now = datetime.now(timezone.utc)
+
+    if payload.is_correct:
+        vocab.mastery_score = (vocab.mastery_score or 0) + 1
+        curr_int = vocab.review_interval_days or 1
+        if curr_int == 1:
+            next_int = 3
+        elif curr_int == 3:
+            next_int = 7
+        elif curr_int == 7:
+            next_int = 14
+        else:
+            next_int = 30
+
+        vocab.review_interval_days = next_int
+        vocab.next_review_at = now + timedelta(days=next_int)
+
+        if vocab.mastery_score >= 4:
+            vocab.status = 'MASTERED'
+        else:
+            vocab.status = 'LEARNING'
+    else:
+        vocab.mastery_score = max(0, (vocab.mastery_score or 0) - 1)
+        vocab.review_interval_days = 1
+        vocab.next_review_at = now + timedelta(days=1)
+        vocab.status = 'LEARNING'
+
+    await db.commit()
+    await db.refresh(vocab)
+    return {'message': 'Đã cập nhật tiến độ học', 'vocab': vocab.to_dict()}
+
