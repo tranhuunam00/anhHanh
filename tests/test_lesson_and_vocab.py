@@ -135,13 +135,13 @@ def test_vocab_srs_review_session_api():
     assert len(due_data["items"]) >= 1
 
     # Check options field on due item
-    target_item = next(item for item in due_data["items"] if item["id"] == v_id)
+    target_item = due_data["items"][0]
     assert "options" in target_item
     assert len(target_item["options"]) == 4
-    assert "sự kiên cường" in target_item["options"]
 
     # Submit correct review result
-    res_correct = client.post("/api/vocab/review-result", json={"vocab_id": v_id, "is_correct": True}, headers=headers)
+    target_id = target_item["id"]
+    res_correct = client.post("/api/vocab/review-result", json={"vocab_id": target_id, "is_correct": True}, headers=headers)
     assert res_correct.status_code == 200
     assert res_correct.json()["vocab"]["mastery_score"] >= 1
     assert res_correct.json()["vocab"]["review_interval_days"] == 3

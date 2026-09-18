@@ -2,6 +2,7 @@
 Handles word selection saving, automatic image fetching, IPA phonetic querying,
 Vietnamese translation, flashcard status management, and alternative image rotation.
 """
+import re
 import logging
 from typing import Optional, List
 from pydantic import BaseModel, Field
@@ -332,7 +333,7 @@ async def get_due_vocab_session(
     res = await db.execute(stmt)
     due_words = res.scalars().all()
 
-    # Also fetch user's other meanings for realistic distractors
+    # Also fetch user's other meanings for realistic distractors (exclude English words where meaning == word)
     all_meanings_res = await db.execute(
         select(UserVocabulary.meaning)
         .where(
@@ -341,20 +342,46 @@ async def get_due_vocab_session(
             UserVocabulary.meaning != ""
         )
     )
-    user_meanings = [m[0] for m in all_meanings_res.all() if m[0]]
+    user_meanings = [
+        m[0] for m in all_meanings_res.all() 
+        if m[0] and not re.match(r'^[a-zA-Z\s\-]+$', m[0].strip())
+    ]
     combined_pool = list(set(user_meanings + FALLBACK_DISTRACTORS))
 
     session_items = []
     for w in due_words:
-        w_dict = w.to_dict()
-        correct_meaning = w.meaning or "Chưa có nghĩa"
+        correct_meaning = w.meaning or ""
 
-        other_candidates = [m for m in combined_pool if m.lower().strip() != correct_meaning.lower().strip()]
+        # Guard: If meaning is missing or identical to the English word (old data fallback), translate to Vietnamese
+        if not correct_meaning or correct_meaning.lower().strip() == w.word.lower().strip():
+            try:
+                translated = _translation_service.translate(w.word, source_lang='en', target_lang='vi')
+                if translated and translated.lower().strip() != w.word.lower().strip():
+                    correct_meaning = translated
+                    w.meaning = translated
+                    await db.commit()
+                else:
+                    correct_meaning = "Chưa có nghĩa tiếng Việt"
+            except Exception:
+                correct_meaning = "Chưa có nghĩa tiếng Việt"
+
+        w_dict = w.to_dict()
+        w_dict['meaning'] = correct_meaning
+
+        # Filter candidates so distractors are strictly Vietnamese and distinct from correct_meaning & word
+        other_candidates = [
+            m for m in combined_pool 
+            if m.lower().strip() != correct_meaning.lower().strip() 
+            and m.lower().strip() != w.word.lower().strip()
+            and not re.match(r'^[a-zA-Z\s\-]+$', m.strip())
+        ]
         selected_distractors = random.sample(other_candidates, min(3, len(other_candidates)))
 
+        fallback_idx = 0
         while len(selected_distractors) < 3:
-            dummy = f"Nghĩa phụ {len(selected_distractors)+1}"
-            if dummy not in selected_distractors:
+            dummy = FALLBACK_DISTRACTORS[fallback_idx % len(FALLBACK_DISTRACTORS)]
+            fallback_idx += 1
+            if dummy.lower().strip() != correct_meaning.lower().strip() and dummy not in selected_distractors:
                 selected_distractors.append(dummy)
 
         options = selected_distractors + [correct_meaning]

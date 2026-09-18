@@ -17,17 +17,17 @@
 }
 
 .vocab-review-modal {
-  background: var(--bg-card, #1e293b);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   width: 100%;
   max-width: 580px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
-  color: var(--text-main, #f8fafc);
+  color: #f8fafc !important;
 }
 
 .review-header {
