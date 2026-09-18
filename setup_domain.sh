@@ -59,8 +59,10 @@ systemctl reload nginx
 # 4. Cài đặt SSL HTTPS miễn phí (Certbot)
 echo "🔒 [4/5] Đăng ký chứng chỉ SSL HTTPS (Let's Encrypt)..."
 EMAIL="${1:-admin@$DOMAIN}"
-certbot --nginx -d "$DOMAIN" -d "$WWW_DOMAIN" --non-interactive --agree-tos -m "$EMAIL" --redirect || \
-certbot --nginx -d "$DOMAIN" -d "$WWW_DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email --redirect || true
+certbot --nginx -d "$DOMAIN" -d "$WWW_DOMAIN" --non-interactive --agree-tos -m "$EMAIL" --redirect --reinstall || \
+certbot --nginx -d "$DOMAIN" -d "$WWW_DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email --redirect --reinstall || \
+certbot --nginx -d "$DOMAIN" -d "$WWW_DOMAIN" || true
+systemctl reload nginx
 
 # 5. Cập nhật ALLOWED_ORIGINS trong .env nếu có
 if [ -f ".env" ]; then
