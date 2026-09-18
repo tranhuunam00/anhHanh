@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 import uvicorn
 
 from app.infrastructure.database.connection import init_db
@@ -42,9 +43,13 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# 1. Rate Limiting setup (web-security-auditor)
+# 1. Rate Limiting setup
+# - SlowAPIMiddleware applies limiter.default_limits to ALL endpoints automatically
+# - SecurityHeadersMiddleware adds IP sliding-window limits per route group
+# - Individual @limiter.limit() decorators can override for stricter per-endpoint limits
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)   # global default_limits: 200/minute on every route
 
 
 @app.exception_handler(Exception)
