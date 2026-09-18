@@ -247,7 +247,12 @@ export const VocabTab = ({ isActive = false }) => {
                   </div>
                 )}
 
-                <div className="vocab-meaning-text">{v.meaning}</div>
+                <div className="vocab-meaning-text">
+                  {v.meaning && v.meaning.toLowerCase().trim() !== v.word.toLowerCase().trim()
+                    ? v.meaning
+                    : <span style={{ color: 'var(--text-secondary, #94a3b8)', fontStyle: 'italic', fontSize: '0.85em' }}>Chưa có nghĩa tiếng Việt</span>
+                  }
+                </div>
 
                 {v.context_sentence && (
                   <div className="vocab-context-box">"{v.context_sentence}"</div>
