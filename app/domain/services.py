@@ -138,12 +138,12 @@ class SentenceGrouperService:
 
     def __init__(
         self,
-        max_pause_seconds: float = 1.2,
-        max_sentence_duration: float = 10.0,
+        max_pause_seconds: float = 1,
+        max_sentence_duration: float = 8.0,
         max_words_per_challenge: int = 25,
-        min_sentence_duration: float = 1.2,
+        min_sentence_duration: float = 1.0,
         min_words_per_challenge: int = 2,
-        max_duration_seconds: float = 20.0,  # force-split any challenge longer than this
+        max_duration_seconds: float = 8.0,
     ):
         self.max_pause_seconds = max_pause_seconds
         self.max_sentence_duration = max_sentence_duration
@@ -213,22 +213,15 @@ class SentenceGrouperService:
         snippets: List[SubtitleSnippet],
         translations: Optional[List[SubtitleSnippet]] = None,
     ) -> List[Challenge]:
-        """Group raw subtitle snippets into dictation challenges.
+        """Group raw subtitle snippets into dictation challenges with a strict 8.0s maximum limit.
 
         Algorithm:
           1. Clean & normalise snippets.
-          2. Build a word-level timeline so sentence boundaries can be detected
-             across snippet boundaries (YouTube cuts snippets at fixed intervals,
-             not at sentence ends).
-          3. Segment words into COMPLETE sentences:
-             - ends when a word ends with terminal punctuation (.!?) and the
-               sentence already has >= 3 words, OR
-             - ends on a large inter-snippet pause (>= max_pause_seconds) even
-               without terminal punctuation (speaker stopped talking).
-          4. Turn each complete sentence into a challenge:
-             - <= max_words  → one challenge, never split mid-sentence.
-             - >  max_words  → split at commas/semicolons; fallback: hard-cut at
-               max_words boundary.
+          2. Build a word-level timeline with timing and inter-snippet pauses.
+          3. Segment words into complete phrases/sentences (ends on .!?, big pause >= 0.65s,
+             or max duration threshold 8.0s).
+          4. Turn each phrase into challenges <= 8.0s by splitting intelligently at
+             clause punctuation, natural conjunctions/connectors, or audio pauses.
           5. Attach translations via maximum-overlap assignment.
         """
         if not snippets:
@@ -256,9 +249,6 @@ class SentenceGrouperService:
             return []
 
         # ── Phase 2: Build word timeline ─────────────────────────────────────
-        # word_tl entries: word text, approximate start/end time,
-        # which snippet it belongs to, whether it is the last word in its snippet,
-        # and the gap (pause) after its snippet.
         word_tl: List[dict] = []
         for si, snip in enumerate(cleaned):
             words = snip.text.split()
@@ -280,54 +270,52 @@ class SentenceGrouperService:
                     "start": w_s,
                     "end": w_e,
                     "is_last_in_snip": is_last_in_snip,
-                    # pause to next snippet is only meaningful on the last word of a snippet
                     "inter_pause": inter_pause if is_last_in_snip else 0.0,
                 })
 
-        # ── Phase 3: Segment into complete sentences ──────────────────────────
+        # ── Phase 3: Segment into sentences ──────────────────────────────────
         sentences: List[List[dict]] = []
         cur_sent: List[dict] = []
 
         for i, wd in enumerate(word_tl):
             cur_sent.append(wd)
             n_cur = len(cur_sent)
+            cur_dur = cur_sent[-1]["end"] - cur_sent[0]["start"]
             is_last_word = i == len(word_tl) - 1
 
-            ends_terminal = bool(re.search(r'[.!?]["\u2019\u201d\'"]?$', wd["word"]))
-            big_pause = wd["inter_pause"] > self.max_pause_seconds
+            ends_terminal = bool(re.search(r'[.!?…]["\u2019\u201d\'»"]?$', wd["word"]))
+            big_pause = wd["inter_pause"] >= self.max_pause_seconds
 
             if is_last_word:
                 sentences.append(cur_sent)
                 cur_sent = []
-            elif ends_terminal and n_cur >= 3:
-                # Complete sentence found
+            elif ends_terminal and n_cur >= self.min_words_per_challenge:
                 sentences.append(cur_sent)
                 cur_sent = []
-            elif big_pause and n_cur >= 2:
-                # Speaker paused long enough — treat as sentence boundary even
-                # without terminal punctuation (e.g. mid-sentence in audio)
+            elif big_pause and n_cur >= self.min_words_per_challenge:
+                sentences.append(cur_sent)
+                cur_sent = []
+            elif cur_dur >= self.max_sentence_duration:
                 sentences.append(cur_sent)
                 cur_sent = []
 
         if cur_sent:
             sentences.append(cur_sent)
 
-        # ── Phase 3.5: Merge short consecutive sentences ──────────────────────
-        # A short complete sentence (< 10 words) can be merged with the next if:
-        #   - combined word count stays <= max_words (20)
-        #   - pause between the last word of current and first word of next is small
+        # ── Phase 3.5: Merge short consecutive fragments ─────────────────────
         merged: List[List[dict]] = []
         buf: List[dict] = list(sentences[0]) if sentences else []
 
         for s_list in sentences[1:]:
             buf_n = len(buf)
-            s_n = len(s_list)
-            # Pause = gap between last word of buf and first word of next sentence
+            buf_dur = buf[-1]["end"] - buf[0]["start"] if buf else 0.0
+            s_dur = s_list[-1]["end"] - s_list[0]["start"] if s_list else 0.0
             pause = s_list[0]["start"] - buf[-1]["end"] if buf else 0.0
+            
             can_merge = (
-                buf_n < 10
-                and pause <= self.max_pause_seconds
-                and buf_n + s_n <= self.max_words_per_challenge
+                buf_n < 5
+                and pause <= 0.4
+                and (buf_dur + pause + s_dur) <= self.max_sentence_duration
             )
             if can_merge:
                 buf.extend(s_list)
@@ -340,33 +328,70 @@ class SentenceGrouperService:
 
         sentences = merged
 
-        # ── Phase 4: Build challenges ─────────────────────────────────────────
+        # ── Phase 4: Build challenges (Strictly <= 8.0s) ──────────────────────
         challenges: List[Challenge] = []
+        
+        # Multilingual natural clause connectors
+        CONNECTORS = {
+            # French
+            "alors", "parce", "puisque", "mais", "car", "donc", "quand", "lorsque",
+            "qui", "que", "dont", "où", "comme", "après", "avant", "pour", "si", "et",
+            # English
+            "and", "but", "so", "because", "although", "when", "if", "which", "that",
+            "who", "where", "then",
+            # Vietnamese
+            "và", "nhưng", "vì", "nên", "nếu", "khi", "mà", "để"
+        }
 
         def commit_words(wds: List[dict]) -> None:
             if not wds:
                 return
-            # Force-split at comma if duration exceeds max_duration_seconds
             duration = wds[-1]["end"] - wds[0]["start"]
             if duration > self.max_duration_seconds and len(wds) > 1:
-                comma_splits = [
-                    i for i, w in enumerate(wds[:-1]) if w["word"].endswith(",")
-                ]
-                if comma_splits:
-                    mid = len(wds) // 2
-                    best = min(comma_splits, key=lambda i: abs(i - mid))
-                    commit_words(wds[: best + 1])
-                    commit_words(wds[best + 1 :])
-                    return
-                # No comma — split at time midpoint
                 half_time = wds[0]["start"] + duration / 2
-                pivot = max(1, next(
-                    (i for i, w in enumerate(wds) if w["start"] >= half_time),
+
+                # 1. Punctuation / clause splits (, ; : — –) near half_time
+                clause_splits = [
+                    idx for idx, w in enumerate(wds[:-1])
+                    if re.search(r'[,;:\-—–]["\u2019\u201d\'»"]?$', w["word"]) or w["word"] in [",", ";", ":", "—", "–"]
+                ]
+                if clause_splits:
+                    best_idx = min(clause_splits, key=lambda idx: abs(wds[idx]["start"] - half_time))
+                    commit_words(wds[: best_idx + 1])
+                    commit_words(wds[best_idx + 1 :])
+                    return
+
+                # 2. Natural conjunctions & connectors near half_time
+                conns = [
+                    idx for idx, w in enumerate(wds[1:-1], 1)
+                    if TextNormalizer.clean_word(w["word"]) in CONNECTORS
+                ]
+                if conns:
+                    best_idx = min(conns, key=lambda idx: abs(wds[idx]["start"] - half_time))
+                    commit_words(wds[:best_idx])
+                    commit_words(wds[best_idx:])
+                    return
+
+                # 3. Micro-pause splits near half_time
+                pauses = [
+                    (idx, w["inter_pause"]) for idx, w in enumerate(wds[:-1])
+                    if w.get("inter_pause", 0) > 0.15
+                ]
+                if pauses:
+                    best_idx = min(pauses, key=lambda x: abs(wds[x[0]]["start"] - half_time))[0]
+                    commit_words(wds[: best_idx + 1])
+                    commit_words(wds[best_idx + 1 :])
+                    return
+
+                # 4. Fallback midpoint by time
+                pivot = max(1, min(len(wds) - 1, next(
+                    (idx for idx, w in enumerate(wds) if w["start"] >= half_time),
                     len(wds) // 2,
-                ))
+                )))
                 commit_words(wds[:pivot])
                 commit_words(wds[pivot:])
                 return
+
             txt = re.sub(r"\s+", " ", " ".join(w["word"] for w in wds)).strip()
             if not txt:
                 return
@@ -381,8 +406,6 @@ class SentenceGrouperService:
             ))
 
         for sent in sentences:
-            # Every complete sentence → one challenge, always kept whole.
-            # Real speech sentences are naturally bounded; no need to hard-cut.
             commit_words(sent)
 
         # ── Phase 5: Attach translations ─────────────────────────────────────
