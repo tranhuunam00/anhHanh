@@ -133,6 +133,43 @@ class WordComparatorService:
         return TextNormalizer.clean_word(target) == TextNormalizer.clean_word(user)
 
 
+DANGLING_WORDS_BY_LANG = {
+    "fr": {
+        # Pronouns & subject elisions
+        "je", "j'", "tu", "il", "elle", "on", "nous", "vous", "ils", "elles",
+        "j'ai", "j'étais", "j'avais", "c'est", "ce", "cet", "cette", "ces", "qu'il", "qu'elle", "qu'on", "d'un", "d'une",
+        # Articles & determiners
+        "le", "la", "les", "l'", "un", "une", "des", "du", "de", "d'", "au", "aux",
+        "mon", "ton", "son", "ma", "ta", "sa", "mes", "tes", "ses", "notre", "votre", "leur", "leurs",
+        # Prepositions
+        "à", "en", "pour", "dans", "sur", "sous", "avec", "sans", "par", "vers", "chez", "après", "avant", "entre",
+        # Conjunctions & connectors
+        "et", "mais", "ou", "donc", "or", "ni", "car", "alors", "parce", "que", "qu'", "qui", "dont", "où", "si", "comme", "quand", "lorsque", "puisque"
+    },
+    "en": {
+        # Pronouns
+        "i", "you", "he", "she", "it", "we", "they", "i'm", "i've", "i'll", "i'd", "it's", "there's", "that's",
+        # Articles & determiners
+        "the", "a", "an", "this", "that", "these", "those", "my", "your", "his", "her", "its", "our", "their",
+        # Prepositions
+        "to", "for", "with", "in", "on", "at", "by", "from", "of", "about", "into", "through", "during", "before", "after", "between",
+        # Conjunctions & connectors
+        "and", "but", "or", "so", "because", "although", "while", "when", "if", "which", "that", "who", "whom", "whose", "where", "then", "as"
+    },
+    "de": {
+        "ich", "du", "er", "sie", "es", "wir", "ihr", "der", "die", "das", "ein", "eine", "einen", "einem", "einer", "eines", "dem", "den",
+        "und", "aber", "oder", "denn", "weil", "dass", "wenn", "als", "mit", "zu", "in", "von", "auf", "für", "bei", "nach"
+    },
+    "es": {
+        "yo", "tú", "él", "ella", "nosotros", "vosotros", "ellos", "ellas", "el", "la", "los", "las", "un", "una", "unos", "unas",
+        "mi", "tu", "su", "nuestro", "vuestro", "y", "pero", "o", "porque", "que", "si", "como", "cuando", "de", "a", "en", "con", "por", "para"
+    },
+    "vi": {
+        "và", "nhưng", "hoặc", "vì", "nên", "nếu", "khi", "mà", "để", "với", "của", "tại", "trong", "cho", "tôi", "bạn", "chúng", "anh", "chị", "em", "là"
+    },
+}
+
+
 class SentenceGrouperService:
     """Domain service to group raw subtitle snippets into coherent sentences for dictation."""
 
@@ -151,6 +188,21 @@ class SentenceGrouperService:
         self.min_sentence_duration = min_sentence_duration
         self.min_words_per_challenge = min_words_per_challenge
         self.max_duration_seconds = max_duration_seconds
+
+    @staticmethod
+    def is_dangling_word(word: str, lang: str = "en") -> bool:
+        """Check if a word is an open-ended/dangling connector or pronoun that should not end a sentence."""
+        if not word:
+            return False
+        clean = TextNormalizer.clean_word(word)
+        lang_code = (lang or "en").split("-")[0].lower()
+        lang_set = DANGLING_WORDS_BY_LANG.get(lang_code)
+        if lang_set and clean in lang_set:
+            return True
+        for s in DANGLING_WORDS_BY_LANG.values():
+            if clean in s:
+                return True
+        return False
 
     @staticmethod
     def clean_credits(text: str) -> str:
@@ -212,16 +264,17 @@ class SentenceGrouperService:
         self,
         snippets: List[SubtitleSnippet],
         translations: Optional[List[SubtitleSnippet]] = None,
+        lang: str = "en",
     ) -> List[Challenge]:
         """Group raw subtitle snippets into dictation challenges with a strict 8.0s maximum limit.
 
         Algorithm:
           1. Clean & normalise snippets.
           2. Build a word-level timeline with timing and inter-snippet pauses.
-          3. Segment words into complete phrases/sentences (ends on .!?, big pause >= 0.65s,
-             or max duration threshold 8.0s).
+          3. Segment words into complete phrases/sentences (ends on .!?, big pause >= 1s,
+             or max duration threshold 8.0s without trailing dangling words).
           4. Turn each phrase into challenges <= 8.0s by splitting intelligently at
-             clause punctuation, natural conjunctions/connectors, or audio pauses.
+             clause punctuation, audio pauses, or midpoints without cutting dangling words.
           5. Attach translations via maximum-overlap assignment.
         """
         if not snippets:
@@ -296,8 +349,12 @@ class SentenceGrouperService:
                 sentences.append(cur_sent)
                 cur_sent = []
             elif cur_dur >= self.max_sentence_duration:
+                # Trim trailing dangling words so sentence doesn't end on an open-ended token
+                popped = []
+                while len(cur_sent) > 2 and self.is_dangling_word(cur_sent[-1]["word"], lang):
+                    popped.insert(0, cur_sent.pop())
                 sentences.append(cur_sent)
-                cur_sent = []
+                cur_sent = list(popped)
 
         if cur_sent:
             sentences.append(cur_sent)
@@ -330,18 +387,6 @@ class SentenceGrouperService:
 
         # ── Phase 4: Build challenges (Strictly <= 8.0s) ──────────────────────
         challenges: List[Challenge] = []
-        
-        # Multilingual natural clause connectors
-        CONNECTORS = {
-            # French
-            "alors", "parce", "puisque", "mais", "car", "donc", "quand", "lorsque",
-            "qui", "que", "dont", "où", "comme", "après", "avant", "pour", "si", "et",
-            # English
-            "and", "but", "so", "because", "although", "when", "if", "which", "that",
-            "who", "where", "then",
-            # Vietnamese
-            "và", "nhưng", "vì", "nên", "nếu", "khi", "mà", "để"
-        }
 
         def commit_words(wds: List[dict]) -> None:
             if not wds:
@@ -361,33 +406,26 @@ class SentenceGrouperService:
                     commit_words(wds[best_idx + 1 :])
                     return
 
-                # 2. Natural conjunctions & connectors near half_time
-                conns = [
-                    idx for idx, w in enumerate(wds[1:-1], 1)
-                    if TextNormalizer.clean_word(w["word"]) in CONNECTORS
-                ]
-                if conns:
-                    best_idx = min(conns, key=lambda idx: abs(wds[idx]["start"] - half_time))
-                    commit_words(wds[:best_idx])
-                    commit_words(wds[best_idx:])
-                    return
-
-                # 3. Micro-pause splits near half_time
+                # 2. Micro-pause splits near half_time (avoid dangling word at split)
                 pauses = [
                     (idx, w["inter_pause"]) for idx, w in enumerate(wds[:-1])
                     if w.get("inter_pause", 0) > 0.15
                 ]
                 if pauses:
                     best_idx = min(pauses, key=lambda x: abs(wds[x[0]]["start"] - half_time))[0]
+                    while best_idx > 1 and self.is_dangling_word(wds[best_idx]["word"], lang):
+                        best_idx -= 1
                     commit_words(wds[: best_idx + 1])
                     commit_words(wds[best_idx + 1 :])
                     return
 
-                # 4. Fallback midpoint by time
+                # 3. Fallback midpoint by time (avoid dangling word at split)
                 pivot = max(1, min(len(wds) - 1, next(
                     (idx for idx, w in enumerate(wds) if w["start"] >= half_time),
                     len(wds) // 2,
                 )))
+                while pivot > 1 and self.is_dangling_word(wds[pivot - 1]["word"], lang):
+                    pivot -= 1
                 commit_words(wds[:pivot])
                 commit_words(wds[pivot:])
                 return
