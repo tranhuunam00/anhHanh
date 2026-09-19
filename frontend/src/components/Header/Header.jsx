@@ -73,7 +73,7 @@ export const Header = ({
 
           {/* Language Selector Group */}
           <div className="lang-selector-group" title="Chọn ngôn ngữ bài nghe và ngôn ngữ dịch">
-            <div className="lang-select-wrapper">
+            <div className="lang-select-wrapper" title="Ngôn ngữ bài nghe">
               <span className="lang-select-label">Nghe:</span>
               <select
                 className="header-lang-select"
@@ -84,7 +84,7 @@ export const Header = ({
                 {SOURCE_LANGUAGES.map((lang) => (
                   <option key={lang.code} value={lang.code}>
                     {lang.code === "auto" && autoDetectedLang
-                      ? `🌐 Tự động phát hiện (${autoDetectedLang.toUpperCase()})`
+                      ? `🌐 Tự động (${autoDetectedLang.toUpperCase()})`
                       : lang.label}
                   </option>
                 ))}
@@ -93,7 +93,7 @@ export const Header = ({
 
             <span className="lang-arrow">➔</span>
 
-            <div className="lang-select-wrapper">
+            <div className="lang-select-wrapper" title="Ngôn ngữ dịch">
               <span className="lang-select-label">Dịch:</span>
               <select
                 className="header-lang-select"

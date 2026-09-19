@@ -92,30 +92,33 @@ body {
 
 .url-input-form {
   display: flex;
-  flex: 1;
-  min-width: 300px;
+  flex: 1 1 auto;
+  min-width: 0;
   gap: 8px;
+  align-items: center;
 }
 .url-input-container {
   position: relative;
-  flex: 1;
+  flex: 1 1 300px;
+  min-width: 140px;
   display: flex;
   align-items: center;
 }
 .input-url-icon {
   position: absolute;
-  left: 12px;
+  left: 10px;
   color: var(--text-muted);
   pointer-events: none;
+  flex-shrink: 0;
 }
 .url-input {
   width: 100%;
-  padding: 7px 12px 7px 36px;
+  padding: 7px 12px 7px 34px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-family: var(--font-family);
   outline: none;
   transition: all 0.2s;
@@ -126,16 +129,18 @@ body {
   background: var(--bg-card);
 }
 
-/* Header Language Selectors */
+/* Header Language Selectors (Ultra-Compact) */
 .lang-selector-group {
-  display: flex;
+  flex-shrink: 0;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 3px 10px;
+  padding: 3px 8px;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 .lang-selector-group:hover,
 .lang-selector-group:focus-within {
@@ -143,36 +148,44 @@ body {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
 }
 .lang-select-wrapper {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 .lang-select-label {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 .header-lang-select {
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 0.83rem;
+  font-size: 0.8rem;
   font-weight: 600;
   font-family: var(--font-family);
   cursor: pointer;
   outline: none;
-  padding: 4px 0;
+  padding: 2px 0;
+  max-width: 95px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .header-lang-select option {
   background: var(--bg-card);
   color: var(--text-primary);
 }
 .lang-arrow {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   opacity: 0.7;
+  padding: 0 1px;
+}
+.url-input-form .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 @media (max-width: 900px) {
