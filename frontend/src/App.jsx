@@ -689,6 +689,8 @@ export default function App() {
         currentSentence={currentChallenge?.text || ""}
         currentVideoId={currentLesson?.video_id || ""}
         currentTimestamp={currentChallenge?.time_start || 0}
+        sourceLang={currentLesson?.source_lang || sourceLang || "en"}
+        targetLang={targetLang || "vi"}
       />
 
       {/* Feedback Modal */}

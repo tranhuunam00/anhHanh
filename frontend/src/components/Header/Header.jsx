@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   Link2,
   Play,
+  Flame,
   BookOpen,
   Shield,
   LogOut,
@@ -35,7 +36,7 @@ export const Header = React.memo(({
   onOpenAdminTab,
 }) => {
 
-  const { user, isAuthenticated, unlearnedWords, logout } = useAuth();
+  const { user, isAuthenticated, streak, unlearnedWords, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -137,17 +138,31 @@ export const Header = React.memo(({
           </button>
         </form>
 
-        {/* Unlearned Vocab Badge */}
-        <div
-          className="header-streak-badge header-vocab-badge"
-          title="Số từ vựng chưa học xong trong Sổ tay (Nhấp để mở Sổ tay)"
-          onClick={() => onOpenVocabTab && onOpenVocabTab()}
-          style={{ cursor: "pointer", userSelect: "none" }}
-        >
-          <BookOpen size={15} color="#6366f1" />
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            <strong style={{ color: "#6366f1", fontWeight: 700 }}>{unlearnedWords}</strong> từ chưa học xong
+        {/* Daily Streak & Unlearned Vocab Badge */}
+        <div className="header-streak-badge" title="Chuỗi ngày học liên tục và số từ chưa học xong">
+          <span className="streak-fire" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }} title="Chuỗi ngày học liên tục">
+            <Flame size={15} color="#f97316" fill="#f97316" />
+            <span>{streak}</span> ngày
           </span>
+          <div
+            className="header-vocab-badge"
+            title="Số từ vựng chưa học xong trong Sổ tay (Nhấp để mở Sổ tay)"
+            onClick={() => onOpenVocabTab && onOpenVocabTab()}
+            style={{
+              cursor: "pointer",
+              userSelect: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              borderLeft: "1px solid var(--border, #e2e8f0)",
+              paddingLeft: "8px",
+            }}
+          >
+            <BookOpen size={15} color="#6366f1" />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <strong style={{ color: "#6366f1", fontWeight: 700 }}>{unlearnedWords}</strong> từ chưa học xong
+            </span>
+          </div>
         </div>
 
         {/* User Auth Container */}

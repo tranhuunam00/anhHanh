@@ -3,7 +3,13 @@ import { useAuth } from "../../context/AuthContext";
 import { createVocabWord } from "../../services/authVocabService";
 import { splitContextSentence } from "../../utils/textNormalizer";
 
-export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", currentTimestamp = 0 }) => {
+export const FloatingVocabSaver = ({
+  currentSentence = "",
+  currentVideoId = "",
+  currentTimestamp = 0,
+  sourceLang = "en",
+  targetLang = "vi"
+}) => {
   const { token, refreshStreak, showToast } = useAuth();
   const [position, setPosition] = useState(null);
   const [selectedWord, setSelectedWord] = useState("");
@@ -101,6 +107,8 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
           context_sentence: selectedSentence || currentSentence || "",
           video_id: currentVideoId || "",
           timestamp: currentTimestamp || 0,
+          source_lang: sourceLang || "en",
+          target_lang: "vi",
         },
         token
       );

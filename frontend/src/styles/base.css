@@ -99,8 +99,8 @@ body {
 }
 .url-input-container {
   position: relative;
-  flex: 1 1 300px;
-  min-width: 140px;
+  flex: 2 1 450px;
+  min-width: 200px;
   display: flex;
   align-items: center;
 }
@@ -134,11 +134,11 @@ body {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 3px 8px;
+  padding: 3px 6px;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
@@ -150,26 +150,26 @@ body {
 .lang-select-wrapper {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 .lang-select-label {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
 }
 .header-lang-select {
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   font-family: var(--font-family);
   cursor: pointer;
   outline: none;
-  padding: 2px 0;
-  max-width: 95px;
+  padding: 1px 0;
+  max-width: 65px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

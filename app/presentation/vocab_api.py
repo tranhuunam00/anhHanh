@@ -31,6 +31,8 @@ class CreateVocabRequest(BaseModel):
     video_id: Optional[str] = None
     video_timestamp: Optional[float] = None
     timestamp: Optional[float] = None
+    source_lang: Optional[str] = "en"
+    target_lang: Optional[str] = "vi"
 
     @property
     def effective_timestamp(self) -> Optional[float]:
@@ -62,14 +64,16 @@ async def save_vocabulary_word(
         phonetic = ImageSearchService.get_word_phonetic(clean_word)
 
     # 2. Auto-translate meaning to Vietnamese if not provided
+    src_lang = (payload.source_lang or 'en').strip().lower()
+    tgt_lang = 'vi'  # Mặc định dịch sang tiếng Việt
     meaning = payload.meaning
     if not meaning:
         try:
-            translated = _translation_service.translate(clean_word, source_lang='auto', target_lang='vi')
+            translated = _translation_service.translate(clean_word, source_lang=src_lang, target_lang=tgt_lang)
             if translated and translated.strip():
                 meaning = translated.strip()
         except Exception as e:
-            logger.warning(f"Translation failed for word '{clean_word}': {e}")
+            logger.warning(f"Translation failed for word '{clean_word}' ({src_lang}->{tgt_lang}): {e}")
             meaning = None
 
     # Guarantee meaning is never null/empty to satisfy DB constraints
