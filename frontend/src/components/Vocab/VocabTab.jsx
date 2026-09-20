@@ -366,7 +366,7 @@ export const VocabTab = ({ isActive = false }) => {
                       onClick={() => speakWord(v.word, "en-GB")}
                       title="Nghe phát âm giọng UK"
                     >
-                      <Volume2 size={15} strokeWidth={2.2} />
+                      <Volume2 size={13} strokeWidth={2.2} />
                     </button>
                     <span className="vocab-pron-ipa-text">
                       {formatCleanIpa(v.phonetic)}
@@ -378,8 +378,8 @@ export const VocabTab = ({ isActive = false }) => {
                   {v.meaning && v.meaning.toLowerCase().trim() !== v.word.toLowerCase().trim()
                     ? v.meaning
                     : (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                        <span style={{ color: 'var(--text-secondary, #94a3b8)', fontStyle: 'italic', fontSize: '0.85em' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+                        <span style={{ color: 'var(--text-secondary, #94a3b8)', fontStyle: 'italic', fontSize: '0.8em' }}>
                           Chưa có nghĩa tiếng Việt
                         </span>
                         <button
@@ -387,14 +387,14 @@ export const VocabTab = ({ isActive = false }) => {
                           onClick={() => handleRefreshMeaning(v.id)}
                           disabled={refreshingMeaningId === v.id}
                           style={{
-                            fontSize: '0.75rem', padding: '2px 8px', borderRadius: 6,
+                            fontSize: '0.68rem', padding: '2px 6px', borderRadius: 4,
                             background: 'var(--primary, #6366f1)', color: 'white',
                             border: 'none', cursor: 'pointer', opacity: refreshingMeaningId === v.id ? 0.6 : 1,
-                            display: 'inline-flex', alignItems: 'center', gap: 4
+                            display: 'inline-flex', alignItems: 'center', gap: 3
                           }}
                           title="Lấy nghĩa tiếng Việt cho từ này"
                         >
-                          <RotateCw size={12} className={refreshingMeaningId === v.id ? 'spinning' : ''} />
+                          <RotateCw size={10} className={refreshingMeaningId === v.id ? 'spinning' : ''} />
                           <span>{refreshingMeaningId === v.id ? 'Đang lấy...' : 'Lấy nghĩa VN'}</span>
                         </button>
                       </span>
@@ -431,13 +431,13 @@ export const VocabTab = ({ isActive = false }) => {
                     <option value="MASTERED">Đã thuộc</option>
                   </select>
 
-                  <div style={{ display: "flex", gap: "6px" }}>
+                  <div style={{ display: "flex", gap: "4px" }}>
                     <button
                       className="vocab-audio-btn"
                       onClick={() => speakWord(v.word)}
                       title="Phát âm từ này"
                     >
-                      <Volume2 size={16} strokeWidth={2} />
+                      <Volume2 size={14} strokeWidth={2} />
                     </button>
                     <button
                       className="vocab-audio-btn"
@@ -445,7 +445,7 @@ export const VocabTab = ({ isActive = false }) => {
                       onClick={() => handleDelete(v.id)}
                       title="Xóa từ khỏi sổ tay"
                     >
-                      <Trash2 size={16} strokeWidth={2} />
+                      <Trash2 size={14} strokeWidth={2} />
                     </button>
                   </div>
                 </div>

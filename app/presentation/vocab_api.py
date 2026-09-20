@@ -64,12 +64,17 @@ async def save_vocabulary_word(
         phonetic = ImageSearchService.get_word_phonetic(clean_word)
 
     # 2. Auto-translate meaning to Vietnamese if not provided
-    src_lang = (payload.source_lang or 'en').strip().lower()
+    src_lang = (payload.source_lang or 'auto').strip().lower()
     tgt_lang = 'vi'  # Mặc định dịch sang tiếng Việt
     meaning = payload.meaning
     if not meaning:
         try:
             translated = _translation_service.translate(clean_word, source_lang=src_lang, target_lang=tgt_lang)
+            if (not translated or translated.lower().strip() == clean_word.lower().strip()) and src_lang != 'auto':
+                auto_trans = _translation_service.translate(clean_word, source_lang='auto', target_lang=tgt_lang)
+                if auto_trans and auto_trans.lower().strip() != clean_word.lower().strip():
+                    translated = auto_trans
+
             if translated and translated.strip():
                 meaning = translated.strip()
         except Exception as e:

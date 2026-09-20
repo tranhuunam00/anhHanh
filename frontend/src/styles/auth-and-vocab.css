@@ -309,30 +309,30 @@
 
 .vocab-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 12px;
 }
 
 .vocab-card {
   background: var(--card-bg, #fff);
   border: 1px solid var(--border, #e2e8f0);
-  border-radius: 12px;
+  border-radius: 9px;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .vocab-card:hover {
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
   border-color: #cbd5e1;
 }
 
 .vocab-card-img-wrap {
   position: relative;
   width: 100%;
-  height: 160px;
+  height: 105px;
   background: #f1f5f9;
   overflow: hidden;
 }
@@ -345,24 +345,24 @@
 
 .vocab-img-rotate-btn {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: 5px;
+  right: 5px;
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
   color: #fff;
   border: none;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 0.68rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .vocab-card-body {
-  padding: 1rem;
+  padding: 0.65rem 0.75rem;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -370,21 +370,14 @@
 
 .vocab-word-row {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 4px;
-}
-
-.vocab-word-row {
-  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
 }
 
 .vocab-word-text {
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--text, #0f172a);
   letter-spacing: -0.01em;
@@ -393,13 +386,13 @@
 .vocab-pronunciation-row {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin: 2px 0 8px 0;
+  gap: 4px;
+  margin: 1px 0 4px 0;
   user-select: none;
 }
 
 .vocab-pron-tag {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #475569;
   letter-spacing: 0.02em;
@@ -413,8 +406,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 4px;
-  border-radius: 4px;
+  padding: 1px 3px;
+  border-radius: 3px;
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 
@@ -427,67 +420,68 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-style: italic;
   font-weight: 500;
-  font-size: 0.98rem;
+  font-size: 0.78rem;
   color: #334155;
   letter-spacing: 0.01em;
 }
 
 .vocab-meaning-text {
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #15803d;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
+  line-height: 1.35;
 }
 
 .vocab-context-box {
   background: var(--hover-bg, #f8fafc);
-  border-left: 3px solid #3b82f6;
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  margin-bottom: 12px;
+  border-left: 2.5px solid #3b82f6;
+  padding: 5px 7px;
+  border-radius: 5px;
+  font-size: 0.72rem;
+  margin-bottom: 7px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
 }
 
 .vocab-context-orig {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   color: var(--text, #334155);
   font-style: italic;
-  line-height: 1.45;
+  line-height: 1.35;
   font-weight: 500;
 }
 
 .vocab-context-trans {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: #15803d;
   font-style: normal;
-  line-height: 1.4;
+  line-height: 1.35;
   font-weight: 500;
   border-top: 1px dashed var(--border, #cbd5e1);
-  padding-top: 5px;
+  padding-top: 3px;
 }
 
 .vocab-card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
+  padding-top: 6px;
   border-top: 1px solid var(--border, #f1f5f9);
 }
 
 .vocab-status-select {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 20px;
+  padding: 3px 8px;
+  border-radius: 14px;
   cursor: pointer;
   outline: none;
   border: 1.5px solid transparent;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  min-width: 118px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  min-width: 90px;
   transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -522,7 +516,7 @@
   background-color: #ffffff;
   color: #1e293b;
   font-weight: 600;
-  padding: 8px 12px;
+  padding: 6px 10px;
 }
 
 .vocab-audio-btn {
@@ -530,7 +524,7 @@
   border: none;
   color: #3b82f6;
   cursor: pointer;
-  padding: 4px;
+  padding: 2px;
   display: flex;
   align-items: center;
 }
