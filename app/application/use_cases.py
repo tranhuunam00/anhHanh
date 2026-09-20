@@ -187,7 +187,9 @@ class GetLessonUseCase:
             ]
         else:
             challenges = self.sentence_grouper.group_into_challenges(
-                snippets=src_snippets, translations=tgt_snippets
+                snippets=src_snippets,
+                translations=tgt_snippets,
+                language=detected_source_lang,
             )
 
         # Clean subtitle credits

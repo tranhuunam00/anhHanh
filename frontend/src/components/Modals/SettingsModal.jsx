@@ -1,4 +1,5 @@
 import React from "react";
+import { SlidersHorizontal, X, RefreshCw } from "lucide-react";
 
 export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting, onResetSettings }) => {
   if (!isOpen) return null;
@@ -7,12 +8,12 @@ export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting, onRe
     <div className={`modal-overlay ${isOpen ? "active" : ""}`} onClick={onClose}>
       <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3 className="modal-title">Cài đặt luyện tập</h3>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <SlidersHorizontal size={20} strokeWidth={2} />
+            <h3 className="modal-title" style={{ margin: 0 }}>Cài đặt luyện tập</h3>
+          </div>
           <button className="btn btn-secondary btn-icon" onClick={onClose}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
@@ -150,10 +151,7 @@ export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting, onRe
                 }
               }}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                <path d="M3 3v5h5" />
-              </svg>
+              <RefreshCw size={14} strokeWidth={2} />
               <span>Khôi phục mặc định</span>
             </button>
           </div>
@@ -162,3 +160,4 @@ export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting, onRe
     </div>
   );
 };
+

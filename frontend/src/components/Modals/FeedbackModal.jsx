@@ -1,4 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import {
+  MessageSquarePlus,
+  PenLine,
+  History,
+  Lock,
+  AlertCircle,
+  Lightbulb,
+  Bug,
+  BookOpen,
+  MessageCircle,
+  CheckCircle2,
+  Eye,
+  Clock,
+  Send,
+  X,
+  Star,
+} from 'lucide-react';
 import { submitFeedback, fetchMyFeedbacks } from '../../services/feedbackService';
 
 export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showToast }) => {
@@ -70,20 +87,41 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
   const getStatusBadge = (status) => {
     switch (status) {
       case 'RESOLVED':
-        return <span className="badge badge-resolved">✓ Đã giải quyết</span>;
+        return (
+          <span className="badge badge-resolved" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <CheckCircle2 size={13} /> Đã giải quyết
+          </span>
+        );
       case 'REVIEWED':
-        return <span className="badge badge-reviewed">👁 Đã tiếp nhận</span>;
+        return (
+          <span className="badge badge-reviewed" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <Eye size={13} /> Đã tiếp nhận
+          </span>
+        );
       default:
-        return <span className="badge badge-pending">⏳ Chờ xem xét</span>;
+        return (
+          <span className="badge badge-pending" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <Clock size={13} /> Chờ xem xét
+          </span>
+        );
+    }
+  };
+
+  const getCategoryIcon = (cat) => {
+    switch (cat) {
+      case 'BUG': return <Bug size={14} color="#ef4444" />;
+      case 'SUGGESTION': return <Lightbulb size={14} color="#f59e0b" />;
+      case 'CONTENT': return <BookOpen size={14} color="#3b82f6" />;
+      default: return <MessageCircle size={14} color="#8b5cf6" />;
     }
   };
 
   const getCategoryLabel = (cat) => {
     switch (cat) {
-      case 'BUG': return '🐛 Báo lỗi';
-      case 'SUGGESTION': return '💡 Đề xuất ý tưởng';
-      case 'CONTENT': return '📖 Nội dung bài học';
-      default: return '💬 Góp ý chung';
+      case 'BUG': return 'Báo lỗi kỹ thuật';
+      case 'SUGGESTION': return 'Đề xuất ý tưởng';
+      case 'CONTENT': return 'Nội dung bài học';
+      default: return 'Góp ý chung';
     }
   };
 
@@ -91,15 +129,12 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
     <div className="feedback-modal-overlay" onClick={onClose}>
       <div className="feedback-modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="feedback-modal-header">
-          <h3 className="feedback-modal-title">
-            <span>💬</span>
+          <h3 className="feedback-modal-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <MessageSquarePlus size={20} color="#3b82f6" />
             <span>Hòm thư Góp ý & Báo lỗi</span>
           </h3>
           <button className="feedback-close-btn" onClick={onClose} aria-label="Đóng">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
@@ -109,9 +144,10 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
             type="button"
             className={`admin-tab-btn ${activeSubTab === 'new' ? 'active' : ''}`}
             onClick={() => setActiveSubTab('new')}
-            style={{ borderRadius: '8px 8px 0 0', borderBottom: activeSubTab === 'new' ? '2px solid #3b82f6' : 'none' }}
+            style={{ borderRadius: '8px 8px 0 0', borderBottom: activeSubTab === 'new' ? '2px solid #3b82f6' : 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
-            ✏️ Gửi phản hồi mới
+            <PenLine size={15} />
+            <span>Gửi phản hồi mới</span>
           </button>
           {user && (
             <button
@@ -121,9 +157,10 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
                 setActiveSubTab('history');
                 loadHistory();
               }}
-              style={{ borderRadius: '8px 8px 0 0', borderBottom: activeSubTab === 'history' ? '2px solid #3b82f6' : 'none' }}
+              style={{ borderRadius: '8px 8px 0 0', borderBottom: activeSubTab === 'history' ? '2px solid #3b82f6' : 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
-              📋 Lịch sử đóng góp
+              <History size={15} />
+              <span>Lịch sử đóng góp</span>
             </button>
           )}
         </div>
@@ -131,7 +168,11 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
         <div className="feedback-modal-body">
           {!user ? (
             <div style={{ textAlign: 'center', padding: '30px 10px' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>🔒</div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+                <div style={{ width: 50, height: 50, borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
+                  <Lock size={26} />
+                </div>
+              </div>
               <h4 style={{ margin: '0 0 8px', fontSize: '1.1rem' }}>Yêu cầu đăng nhập</h4>
               <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>
                 Để đảm bảo chất lượng phản hồi và bảo vệ hệ thống khỏi spam, vui lòng đăng nhập trước khi gửi góp ý.
@@ -150,8 +191,9 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
           ) : activeSubTab === 'new' ? (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {errorMsg && (
-                <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#dc2626', fontSize: '0.85rem' }}>
-                  ⚠️ {errorMsg}
+                <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#dc2626', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <AlertCircle size={16} />
+                  <span>{errorMsg}</span>
                 </div>
               )}
 
@@ -162,18 +204,20 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
                 </label>
                 <div className="feedback-type-pills">
                   {[
-                    { id: 'SUGGESTION', label: '💡 Đề xuất mới' },
-                    { id: 'BUG', label: '🐛 Báo lỗi kỹ thuật' },
-                    { id: 'CONTENT', label: '📖 Nội dung bài học' },
-                    { id: 'GENERAL', label: '💬 Ý kiến khác' }
+                    { id: 'SUGGESTION', label: 'Đề xuất mới', icon: <Lightbulb size={14} /> },
+                    { id: 'BUG', label: 'Báo lỗi kỹ thuật', icon: <Bug size={14} /> },
+                    { id: 'CONTENT', label: 'Nội dung bài học', icon: <BookOpen size={14} /> },
+                    { id: 'GENERAL', label: 'Ý kiến khác', icon: <MessageCircle size={14} /> }
                   ].map((item) => (
                     <button
                       key={item.id}
                       type="button"
                       className={`type-pill ${category === item.id ? 'active' : ''}`}
                       onClick={() => setCategory(item.id)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                     >
-                      {item.label}
+                      {item.icon}
+                      <span>{item.label}</span>
                     </button>
                   ))}
                 </div>
@@ -233,10 +277,7 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
                     <span>Đang gửi...</span>
                   ) : (
                     <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="22" y1="2" x2="11" y2="13" />
-                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                      </svg>
+                      <Send size={15} />
                       <span>Gửi góp ý</span>
                     </>
                   )}
@@ -255,7 +296,8 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
                 myFeedbacks.map((item) => (
                   <div key={item.id} className="my-feedback-card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                      <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>
+                      <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        {getCategoryIcon(item.feedback_type)}
                         {getCategoryLabel(item.feedback_type)}
                       </span>
                       {getStatusBadge(item.status)}
@@ -277,3 +319,4 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
     </div>
   );
 };
+

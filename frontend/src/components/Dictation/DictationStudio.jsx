@@ -1,4 +1,20 @@
 import React, { useMemo } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  RotateCcw,
+  ListFilter,
+  RefreshCw,
+  Mic,
+  Check,
+  SkipForward,
+  Volume2,
+  Lightbulb,
+  KeyRound,
+  ArrowRight,
+} from "lucide-react";
 import { evaluateMasked } from "../../utils/diffCalculator";
 
 export const DictationStudio = ({
@@ -58,46 +74,27 @@ export const DictationStudio = ({
 
         <div className="challenge-nav-buttons">
           <button className="btn btn-secondary btn-icon" title="Câu trước (Alt+←)" onClick={onPrev} disabled={currentIndex === 0}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
+            <ChevronLeft size={18} strokeWidth={2.2} />
           </button>
 
           <button className="btn btn-secondary btn-icon" title={isPlaying ? "Tạm dừng (Space / Shift+Space)" : "Phát / Tiếp tục (Space / Shift+Space)"} onClick={onPlayPause}>
             {isPlaying ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="6" y="4" width="4" height="16" rx="1" />
-                <rect x="14" y="4" width="4" height="16" rx="1" />
-              </svg>
+              <Pause size={17} fill="currentColor" />
             ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: "2px" }}>
-                <polygon points="5 3 19 12 5 21 5 3" />
-              </svg>
+              <Play size={17} fill="currentColor" style={{ marginLeft: "2px" }} />
             )}
           </button>
 
           <button className="btn btn-secondary btn-icon" title="Phát lại câu hiện tại (Ctrl)" onClick={onReplay}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="1 4 1 10 7 10" />
-              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-            </svg>
+            <RotateCcw size={16} strokeWidth={2.2} />
           </button>
 
           <button className="btn btn-secondary btn-icon" title="Câu sau (Alt+→)" onClick={onNext} disabled={currentIndex >= totalChallenges - 1}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
+            <ChevronRight size={18} strokeWidth={2.2} />
           </button>
 
           <button className="btn btn-secondary btn-with-icon" title="Danh sách tất cả các câu" onClick={onOpenDrawer}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="8" y1="6" x2="21" y2="6" />
-              <line x1="8" y1="12" x2="21" y2="12" />
-              <line x1="8" y1="18" x2="21" y2="18" />
-              <line x1="3" y1="6" x2="3.01" y2="6" />
-              <line x1="3" y1="12" x2="3.01" y2="12" />
-              <line x1="3" y1="18" x2="3.01" y2="18" />
-            </svg>
+            <ListFilter size={16} strokeWidth={2} />
             <span>Danh sách câu</span>
           </button>
 
@@ -108,10 +105,7 @@ export const DictationStudio = ({
               onClick={onRestartLesson}
               style={{ color: "#ef4444", borderColor: "#fecaca" }}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                <path d="M3 3v5h5" />
-              </svg>
+              <RefreshCw size={14} strokeWidth={2} />
               <span>Làm lại bài này</span>
             </button>
           )}
@@ -165,52 +159,39 @@ export const DictationStudio = ({
           title="Nói để chuyển thành chữ (Speech to text)"
           onClick={onToggleMic}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-            <line x1="12" y1="19" x2="12" y2="22" />
-          </svg>
+          <Mic size={18} strokeWidth={2.2} />
         </button>
       </div>
 
       {/* Action Buttons Toolbar */}
       <div className="dictation-actions">
         <button className="btn btn-secondary btn-with-icon" title="Kiểm tra câu vừa gõ (Enter)" onClick={onCheck}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+          <Check size={16} strokeWidth={2.5} />
           <span>Kiểm tra</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Bỏ qua (Esc + Enter)" onClick={onSkip}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polygon points="5 4 15 12 5 20 5 4" />
-            <line x1="19" y1="5" x2="19" y2="19" />
-          </svg>
+          <SkipForward size={15} strokeWidth={2.2} />
           <span>Bỏ qua</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Phát lại câu hiện tại (Ctrl)" onClick={onReplay}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="1 4 1 10 7 10" />
-            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-          </svg>
+          <RotateCcw size={15} strokeWidth={2.2} />
           <span>Lặp lại</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Nghe phát âm giọng mẫu câu này" onClick={onSpeakSentence}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-          </svg>
+          <Volume2 size={16} strokeWidth={2} />
           <span>Nghe câu</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (Enter 2 lần / Ctrl+H / Alt+H)" onClick={onHintLetter}>
+          <KeyRound size={15} strokeWidth={2} />
           <span>Gợi ý chữ</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Mở 1 từ tiếp theo (Tab / Alt+W / Ctrl+Shift+H)" onClick={onHintWord}>
+          <Lightbulb size={15} strokeWidth={2} />
           <span>Gợi ý từ</span>
         </button>
       </div>
@@ -225,15 +206,10 @@ export const DictationStudio = ({
           <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
             <button className="btn btn-primary btn-with-icon" style={{ padding: "7px 18px" }} onClick={onNextChallenge}>
               <span>Sang câu tiếp theo</span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
+              <ArrowRight size={16} strokeWidth={2.2} />
             </button>
             <button className="btn btn-secondary btn-with-icon" style={{ padding: "7px 14px", fontSize: "0.85rem" }} onClick={onRetryChallenge}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                <path d="M3 3v5h5" />
-              </svg>
+              <RotateCcw size={14} strokeWidth={2} />
               <span>Luyện lại câu này</span>
             </button>
             {onRestartLesson && (
@@ -242,7 +218,8 @@ export const DictationStudio = ({
                 style={{ padding: "7px 14px", fontSize: "0.85rem", color: "#ef4444", borderColor: "#fecaca" }}
                 onClick={onRestartLesson}
               >
-                <span>🔄 Làm lại bài này từ đầu</span>
+                <RefreshCw size={14} strokeWidth={2} />
+                <span>Làm lại bài này từ đầu</span>
               </button>
             )}
           </div>
@@ -251,3 +228,4 @@ export const DictationStudio = ({
     </section>
   );
 };
+

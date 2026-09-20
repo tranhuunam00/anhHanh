@@ -1,4 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
+import {
+  Link2,
+  Play,
+  Flame,
+  FileEdit,
+  BookOpen,
+  Shield,
+  LogOut,
+  LogIn,
+  MessageSquarePlus,
+  Sun,
+  Moon,
+  ArrowRight,
+  Globe,
+  Settings,
+} from "lucide-react";
 import { SOURCE_LANGUAGES, TARGET_LANGUAGES } from "../../constants/languages";
 import { useAuth } from "../../context/AuthContext";
 
@@ -57,10 +73,7 @@ export const Header = ({
         {/* URL Input Form */}
         <form className="url-input-form" onSubmit={handleSubmit}>
           <div className="url-input-container">
-            <svg className="input-url-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-            </svg>
+            <Link2 className="input-url-icon" size={17} strokeWidth={2.2} />
             <input
               type="text"
               className="url-input"
@@ -84,14 +97,14 @@ export const Header = ({
                 {SOURCE_LANGUAGES.map((lang) => (
                   <option key={lang.code} value={lang.code}>
                     {lang.code === "auto" && autoDetectedLang
-                      ? `🌐 Tự động (${autoDetectedLang.toUpperCase()})`
+                      ? `Tự động (${autoDetectedLang.toUpperCase()})`
                       : lang.label}
                   </option>
                 ))}
               </select>
             </div>
 
-            <span className="lang-arrow">➔</span>
+            <ArrowRight size={14} className="lang-arrow-icon" style={{ color: "var(--text-muted, #94a3b8)", flexShrink: 0 }} />
 
             <div className="lang-select-wrapper" title="Ngôn ngữ dịch">
               <span className="lang-select-label">Dịch:</span>
@@ -118,9 +131,7 @@ export const Header = ({
               </>
             ) : (
               <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>
+                <Play size={16} fill="currentColor" />
                 <span>Tải bài tập</span>
               </>
             )}
@@ -129,8 +140,14 @@ export const Header = ({
 
         {/* Daily Streak & Words Badge */}
         <div className="header-streak-badge" title="Chuỗi ngày học liên tục và tổng từ hôm nay">
-          <span className="streak-fire">🔥 <span>{streak}</span> ngày</span>
-          <span className="streak-words">📝 <span>{wordsToday}</span> từ</span>
+          <span className="streak-fire" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <Flame size={15} color="#f97316" fill="#f97316" />
+            <span>{streak}</span> ngày
+          </span>
+          <span className="streak-words" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <FileEdit size={14} color="#3b82f6" />
+            <span>{wordsToday}</span> từ
+          </span>
         </div>
 
         {/* User Auth Container */}
@@ -164,35 +181,39 @@ export const Header = ({
                   </div>
                   <div
                     className="user-dropdown-item"
+                    style={{ display: "flex", alignItems: "center", gap: "8px" }}
                     onClick={() => {
                       setIsMenuOpen(false);
                       onOpenVocabTab && onOpenVocabTab();
                     }}
                   >
-                    📚 Sổ tay từ vựng
+                    <BookOpen size={15} color="#6366f1" />
+                    <span>Sổ tay từ vựng</span>
                   </div>
                   {user.role === "ADMIN" && (
                     <div
                       className="user-dropdown-item"
-                      style={{ color: "#0284c7", fontWeight: 700 }}
+                      style={{ color: "#0284c7", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" }}
                       onClick={() => {
                         setIsMenuOpen(false);
                         onOpenAdminTab && onOpenAdminTab();
                       }}
                     >
-                      ⚙️ Bảng Quản trị
+                      <Shield size={15} color="#0284c7" />
+                      <span>Bảng Quản trị</span>
                     </div>
                   )}
                   <div className="user-dropdown-divider"></div>
                   <div
                     className="user-dropdown-item"
-                    style={{ color: "#dc2626" }}
+                    style={{ color: "#dc2626", display: "flex", alignItems: "center", gap: "8px" }}
                     onClick={() => {
                       setIsMenuOpen(false);
                       logout();
                     }}
                   >
-                    🚪 Đăng xuất
+                    <LogOut size={15} color="#dc2626" />
+                    <span>Đăng xuất</span>
                   </div>
                 </div>
               )}
@@ -203,11 +224,7 @@ export const Header = ({
               onClick={onOpenAuth}
               style={{ padding: "6px 14px", fontSize: "0.85rem" }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                <polyline points="10 17 15 12 10 7" />
-                <line x1="15" y1="12" x2="3" y2="12" />
-              </svg>
+              <LogIn size={15} />
               <span>Đăng nhập / Đăng ký</span>
             </button>
           )}
@@ -220,9 +237,7 @@ export const Header = ({
           title="Gửi góp ý & báo lỗi"
           style={{ padding: "6px 12px", fontSize: "0.85rem" }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
+          <MessageSquarePlus size={15} />
           <span>Góp ý</span>
         </button>
 
@@ -232,16 +247,11 @@ export const Header = ({
           onClick={onToggleTheme}
           title="Chuyển chế độ Sáng / Tối"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            {theme === "dark" ? (
-              <circle cx="12" cy="12" r="5" />
-            ) : (
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            )}
-          </svg>
+          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           <span>{theme === "dark" ? "Sáng" : "Tối"}</span>
         </button>
       </div>
     </header>
   );
 };
+

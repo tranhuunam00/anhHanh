@@ -1,4 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
+import {
+  BookOpen,
+  Search,
+  Target,
+  Zap,
+  RotateCw,
+  Volume2,
+  Trash2,
+  Sparkles,
+  Info,
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import {
   fetchVocabList,
@@ -97,7 +108,7 @@ export const VocabTab = ({ isActive = false }) => {
         setItems((prev) =>
           prev.map((item) => item.id === vocabId ? { ...item, meaning: newMeaning } : item)
         );
-        showToast(`✅ Đã lấy nghĩa: "${newMeaning}"`, "success");
+        showToast(`Đã lấy nghĩa: "${newMeaning}"`, "success");
       } else {
         showToast("Không tìm được nghĩa tiếng Việt cho từ này", "warning");
       }
@@ -128,9 +139,10 @@ export const VocabTab = ({ isActive = false }) => {
   return (
     <div className="vocab-tab-wrapper">
       <div className="vocab-header-bar">
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <BookOpen size={22} color="#6366f1" />
           <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800, color: "var(--text, #0f172a)" }}>
-            📚 Sổ Tay Từ Vựng Thông Minh
+            Sổ Tay Từ Vựng Thông Minh
           </h2>
           <span style={{ fontSize: "0.85rem", color: "var(--text-muted, #64748b)" }}>
             ({total} từ đã lưu)
@@ -154,18 +166,10 @@ export const VocabTab = ({ isActive = false }) => {
                 color: "var(--text, #1e293b)",
               }}
             />
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+            <Search
+              size={14}
               style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }}
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
+            />
           </div>
 
           {/* Filter Pills */}
@@ -229,11 +233,7 @@ export const VocabTab = ({ isActive = false }) => {
                 color: "#38bdf8",
               }}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <circle cx="12" cy="12" r="6" />
-                <circle cx="12" cy="12" r="2" />
-              </svg>
+              <Target size={24} strokeWidth={2} />
             </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--text, #f8fafc)" }}>
@@ -262,9 +262,7 @@ export const VocabTab = ({ isActive = false }) => {
             }}
             onClick={() => setIsReviewModalOpen(true)}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-            </svg>
+            <Zap size={18} fill="currentColor" />
             Bắt đầu Ôn tập ({dueItems.length} từ)
           </button>
         </div>
@@ -299,7 +297,7 @@ export const VocabTab = ({ isActive = false }) => {
             gap: "8px",
           }}
         >
-          <span>💡</span>
+          <Info size={18} color="#2563eb" />
           <span>
             Bạn đang xem Sổ từ vựng mẫu hoặc khách. Hãy <strong>Đăng nhập</strong> để lưu giữ từ vựng vĩnh viễn trên tài khoản đám mây của bạn!
           </span>
@@ -322,10 +320,10 @@ export const VocabTab = ({ isActive = false }) => {
             color: "var(--text-muted, #64748b)",
           }}
         >
-          <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>📖</div>
+          <BookOpen size={40} color="#94a3b8" style={{ marginBottom: "0.75rem" }} />
           <h3 style={{ margin: "0 0 0.5rem 0", color: "var(--text, #1e293b)" }}>Chưa có từ vựng nào trong mục này</h3>
           <p style={{ margin: 0, fontSize: "0.9rem" }}>
-            Khi luyện nghe chính tả, hãy bôi đen bất kỳ từ nào bạn chưa biết để lưu ngay kèm ảnh minh họa AI!
+            Khi luyện nghe chính tả, hãy bôi đen bất kỳ từ nào bạn chưa biết để lưu ngay kèm ảnh minh họa!
           </p>
         </div>
       ) : (
@@ -346,7 +344,8 @@ export const VocabTab = ({ isActive = false }) => {
                   onClick={() => handleRotateImage(v.id, v.word, v.image_url, v.context_sentence)}
                   title="Tìm ảnh minh họa khác theo ngữ cảnh"
                 >
-                  🔄 Đổi ảnh
+                  <RotateCw size={13} style={{ marginRight: 4 }} />
+                  Đổi ảnh
                 </button>
               </div>
 
@@ -363,11 +362,7 @@ export const VocabTab = ({ isActive = false }) => {
                       onClick={() => speakWord(v.word, "en-GB")}
                       title="Nghe phát âm giọng UK"
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                      </svg>
+                      <Volume2 size={15} strokeWidth={2.2} />
                     </button>
                     <span className="vocab-pron-ipa-text">
                       {formatCleanIpa(v.phonetic)}
@@ -390,11 +385,13 @@ export const VocabTab = ({ isActive = false }) => {
                           style={{
                             fontSize: '0.75rem', padding: '2px 8px', borderRadius: 6,
                             background: 'var(--primary, #6366f1)', color: 'white',
-                            border: 'none', cursor: 'pointer', opacity: refreshingMeaningId === v.id ? 0.6 : 1
+                            border: 'none', cursor: 'pointer', opacity: refreshingMeaningId === v.id ? 0.6 : 1,
+                            display: 'inline-flex', alignItems: 'center', gap: 4
                           }}
                           title="Lấy nghĩa tiếng Việt cho từ này"
                         >
-                          {refreshingMeaningId === v.id ? '⏳...' : '🔄 Lấy nghĩa VN'}
+                          <RotateCw size={12} className={refreshingMeaningId === v.id ? 'spinning' : ''} />
+                          <span>{refreshingMeaningId === v.id ? 'Đang lấy...' : 'Lấy nghĩa VN'}</span>
                         </button>
                       </span>
                     )
@@ -425,9 +422,9 @@ export const VocabTab = ({ isActive = false }) => {
                     value={v.status}
                     onChange={(e) => handleStatusChange(v.id, e.target.value)}
                   >
-                    <option value="NEW">🔴 Mới lưu</option>
-                    <option value="LEARNING">🟡 Đang nhớ</option>
-                    <option value="MASTERED">🟢 Đã thuộc</option>
+                    <option value="NEW">Mới lưu</option>
+                    <option value="LEARNING">Đang nhớ</option>
+                    <option value="MASTERED">Đã thuộc</option>
                   </select>
 
                   <div style={{ display: "flex", gap: "6px" }}>
@@ -436,10 +433,7 @@ export const VocabTab = ({ isActive = false }) => {
                       onClick={() => speakWord(v.word)}
                       title="Phát âm từ này"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-                      </svg>
+                      <Volume2 size={16} strokeWidth={2} />
                     </button>
                     <button
                       className="vocab-audio-btn"
@@ -447,10 +441,7 @@ export const VocabTab = ({ isActive = false }) => {
                       onClick={() => handleDelete(v.id)}
                       title="Xóa từ khỏi sổ tay"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                      </svg>
+                      <Trash2 size={16} strokeWidth={2} />
                     </button>
                   </div>
                 </div>
@@ -462,3 +453,4 @@ export const VocabTab = ({ isActive = false }) => {
     </div>
   );
 };
+

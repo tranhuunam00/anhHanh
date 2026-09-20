@@ -1,0 +1,80 @@
+import React from "react";
+import { Code2, PhoneCall, Keyboard, MessageSquareHeart } from "lucide-react";
+import "./footer.css";
+
+export function Footer({ onOpenShortcuts, onOpenFeedback }) {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="shotlang-footer">
+      <div className="shotlang-footer-container">
+        {/* Left: Brand Identity & Logo */}
+        <div className="shotlang-footer-brand">
+          <a href="/" className="footer-brand-link" onClick={(e) => e.preventDefault()}>
+            <img
+              src="/linguagun_logo.jpg"
+              alt="ShotLang Logo"
+              className="footer-brand-logo"
+            />
+            <span className="footer-brand-name">
+              Shot<strong>Lang</strong>
+            </span>
+          </a>
+          <p className="shotlang-footer-desc">
+            Smart YouTube Dictation & Multi-Language Mastery Platform
+          </p>
+        </div>
+
+        {/* Center: Developer & Contact */}
+        <div className="shotlang-footer-center">
+          <div className="footer-author-card">
+            <div className="author-row">
+              <Code2 className="footer-icon-dev" size={15} strokeWidth={2.2} />
+              <span className="author-title">Developed by</span>
+              <span className="author-badge-name">Namth</span>
+            </div>
+            
+            <a href="tel:0961766816" className="footer-contact-link" title="Call or Zalo Namth">
+              <PhoneCall className="footer-icon-phone" size={14} strokeWidth={2.2} />
+              <span className="contact-number">0961.766.816</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Right: Quick Action Buttons & Copyright */}
+        <div className="shotlang-footer-right">
+          <div className="footer-actions-row">
+            {onOpenShortcuts && (
+              <button
+                type="button"
+                className="footer-action-btn"
+                onClick={onOpenShortcuts}
+                title="Keyboard Shortcuts"
+              >
+                <Keyboard size={14} strokeWidth={2} />
+                <span>Shortcuts</span>
+              </button>
+            )}
+
+            {onOpenFeedback && (
+              <button
+                type="button"
+                className="footer-action-btn"
+                onClick={onOpenFeedback}
+                title="Send Feedback"
+              >
+                <MessageSquareHeart size={14} strokeWidth={2} />
+                <span>Feedback</span>
+              </button>
+            )}
+          </div>
+
+          <div className="footer-copyright-text">
+            © {currentYear} ShotLang. All rights reserved.
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+

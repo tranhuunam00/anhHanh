@@ -13,6 +13,7 @@ import { AdminPortal } from "./components/Admin/AdminPortal";
 import { VocabTab } from "./components/Vocab/VocabTab";
 import { HistoryTab } from "./components/History/HistoryTab";
 import { FloatingVocabSaver } from "./components/Vocab/FloatingVocabSaver";
+import { Footer } from "./components/Footer/Footer";
 import { TranscriptPage } from "./pages/TranscriptPage";
 import "./styles/admin-and-feedback.css";
 
@@ -660,6 +661,12 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* Professional ShotLang Footer */}
+      <Footer
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        onOpenFeedback={() => setIsFeedbackOpen(true)}
+      />
 
       {/* Floating Vocab Selection Saver Tooltip */}
       <FloatingVocabSaver

@@ -1,4 +1,5 @@
 import React from "react";
+import { ListOrdered, X, RefreshCw } from "lucide-react";
 
 export const QuestionsDrawer = ({
   isOpen,
@@ -19,21 +20,11 @@ export const QuestionsDrawer = ({
       <aside className={`drawer ${isOpen ? "active" : ""}`}>
         <div className="drawer-header">
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="8" y1="6" x2="21" y2="6" />
-              <line x1="8" y1="12" x2="21" y2="12" />
-              <line x1="8" y1="18" x2="21" y2="18" />
-              <line x1="3" y1="6" x2="3.01" y2="6" />
-              <line x1="3" y1="12" x2="3.01" y2="12" />
-              <line x1="3" y1="18" x2="3.01" y2="18" />
-            </svg>
+            <ListOrdered size={20} strokeWidth={2} />
             <h3>Danh sách tất cả các câu</h3>
           </div>
           <button className="btn btn-secondary btn-icon" onClick={onClose}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
@@ -85,10 +76,7 @@ export const QuestionsDrawer = ({
                   onRestartLesson();
                 }}
               >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                  <path d="M3 3v5h5" />
-                </svg>
+                <RefreshCw size={15} strokeWidth={2} />
                 <span>Làm lại bài này từ câu số 1</span>
               </button>
             </div>
@@ -98,3 +86,4 @@ export const QuestionsDrawer = ({
     </>
   );
 };
+
