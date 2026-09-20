@@ -33,15 +33,16 @@ class YouTubeTranscriptAdapter(ITranscriptService):
         if self.proxy:
             logger.info("YouTubeTranscriptAdapter initialized with configured proxy.")
 
-    def _get_api(self) -> YouTubeTranscriptApi:
+    def _get_api(self, use_proxy: bool = True) -> YouTubeTranscriptApi:
         session = requests.Session()
         session.headers.update({"User-Agent": self.user_agent})
 
-        proxy = os.getenv("YOUTUBE_PROXY") or self.proxy
-        if proxy:
-            session.proxies = {"http": proxy, "https": proxy}
-            safe_proxy = proxy.split("@")[-1] if "@" in proxy else proxy
-            logger.info(f"YouTube requests routing via proxy: {safe_proxy}")
+        if use_proxy:
+            proxy = os.getenv("YOUTUBE_PROXY") or self.proxy
+            if proxy:
+                session.proxies = {"http": proxy, "https": proxy}
+                safe_proxy = proxy.split("@")[-1] if "@" in proxy else proxy
+                logger.info(f"YouTube requests routing via proxy: {safe_proxy}")
 
         # Check candidate locations dynamically if cookie file was copied after start
         active_cookie = self.cookie_file
@@ -62,6 +63,7 @@ class YouTubeTranscriptAdapter(ITranscriptService):
                 logger.warning(f"Could not load cookies from {active_cookie}: {err}")
 
         return YouTubeTranscriptApi(http_client=session)
+
 
     def fetch_transcripts(
         self,
@@ -125,85 +127,138 @@ class YouTubeTranscriptAdapter(ITranscriptService):
         oembed_url = (
             f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
         )
-        try:
-            proxy = os.getenv("YOUTUBE_PROXY") or self.proxy
-            proxies = {"http": proxy, "https": proxy} if proxy else None
-            resp = requests.get(
-                oembed_url,
-                headers={"User-Agent": self.user_agent},
-                proxies=proxies,
-                timeout=5,
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                return data.get("title", f"YouTube Video ({video_id})")
-        except Exception as e:
-            logger.warning(f"Could not fetch video title for {video_id}: {e}")
+        proxy = os.getenv("YOUTUBE_PROXY") or self.proxy
+        for use_proxy in ([True, False] if proxy else [False]):
+            try:
+                proxies = {"http": proxy, "https": proxy} if (use_proxy and proxy) else None
+                resp = requests.get(
+                    oembed_url,
+                    headers={"User-Agent": self.user_agent},
+                    proxies=proxies,
+                    timeout=5,
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    return data.get("title", f"YouTube Video ({video_id})")
+            except Exception as e:
+                logger.warning(f"Fetch title attempt (use_proxy={use_proxy}) for {video_id} failed: {e}")
         return f"YouTube Video ({video_id})"
+
+    def _trigger_warp_rotate(self) -> bool:
+        """Trigger WARP proxy rotation on the host VPS if the rotation webhook is active."""
+        rotate_url = os.getenv("WARP_ROTATE_URL", "http://host.docker.internal:40002/rotate")
+        try:
+            logger.info(f"Triggering automatic WARP IP rotation via {rotate_url}...")
+            resp = requests.post(rotate_url, timeout=4.0)
+            if resp.status_code == 200:
+                logger.info("WARP IP rotated successfully. Waiting 1.5s for handshake...")
+                import time
+                time.sleep(1.5)
+                return True
+        except Exception as e:
+            logger.warning(f"Could not trigger WARP rotation via {rotate_url}: {e}")
+        return False
 
     def _fetch_source_transcript(
         self, video_id: str, source_lang: Optional[str] = "auto"
     ) -> Tuple[List[SubtitleSnippet], str]:
-        """Fetch source transcript (manual preferred, or auto-generated, or translated)."""
+        """Fetch source transcript with auto-rotation on IP block and proxy fallback."""
         src = (source_lang or "auto").strip().lower()
-        try:
-            api = self._get_api()
-            transcript_list = api.list(video_id)
-            selected_t = None
+        has_proxy = bool(os.getenv("YOUTUBE_PROXY") or self.proxy)
+        rotated = False
+        last_error = None
 
-            if src == "auto":
-                # 1. Prefer manual transcript
-                for t in transcript_list:
-                    if not t.is_generated:
-                        selected_t = t
-                        break
-                # 2. Fall back to first available transcript (often auto-generated)
-                if not selected_t:
+        # Try proxy -> rotate proxy if blocked -> direct connection fallback
+        for attempt_idx in range(3 if has_proxy else 1):
+            use_proxy = has_proxy if attempt_idx < 2 else False
+            try:
+                api = self._get_api(use_proxy=use_proxy)
+                transcript_list = api.list(video_id)
+                selected_t = None
+
+                if src == "auto":
+                    # 1. Prefer manual transcript
                     for t in transcript_list:
-                        selected_t = t
-                        break
-            else:
-                # Specific language requested
-                candidates = [
-                    t
-                    for t in transcript_list
-                    if t.language_code.lower() == src
-                    or t.language_code.lower().startswith(f"{src}-")
-                ]
-                if candidates:
-                    # Prefer manual transcript if available
-                    selected_t = next(
-                        (t for t in candidates if not t.is_generated), candidates[0]
-                    )
+                        if not t.is_generated:
+                            selected_t = t
+                            break
+                    # 2. Fall back to first available transcript (often auto-generated)
+                    if not selected_t:
+                        for t in transcript_list:
+                            selected_t = t
+                            break
                 else:
-                    # Try translating any translatable transcript to src
-                    for t in transcript_list:
-                        if t.is_translatable:
-                            try:
-                                selected_t = t.translate(src)
-                                break
-                            except Exception:
-                                pass
+                    # Specific language requested
+                    candidates = [
+                        t
+                        for t in transcript_list
+                        if t.language_code.lower() == src
+                        or t.language_code.lower().startswith(f"{src}-")
+                    ]
+                    if candidates:
+                        selected_t = next(
+                            (t for t in candidates if not t.is_generated), candidates[0]
+                        )
+                    else:
+                        for t in transcript_list:
+                            if t.is_translatable:
+                                try:
+                                    selected_t = t.translate(src)
+                                    break
+                                except Exception:
+                                    pass
 
-            if not selected_t:
-                selected_t = next(iter(transcript_list))
+                if not selected_t:
+                    selected_t = next(iter(transcript_list))
 
-            detected_lang = selected_t.language_code.split("-")[0].lower()
-            raw_data = selected_t.fetch()
-            snippets = [
-                SubtitleSnippet(
-                    text=item.text,
-                    start=float(item.start),
-                    duration=float(item.duration),
+                detected_lang = selected_t.language_code.split("-")[0].lower()
+                raw_data = selected_t.fetch()
+                snippets = [
+                    SubtitleSnippet(
+                        text=item.text,
+                        start=float(item.start),
+                        duration=float(item.duration),
+                    )
+                    for item in raw_data
+                    if item.text and item.text.strip()
+                ]
+                return snippets, detected_lang
+            except Exception as e:
+                last_error = e
+                err_str = str(e).lower()
+                is_blocked_or_conn = any(
+                    kw in err_str
+                    for kw in [
+                        "ipblocked",
+                        "blocking requests from your ip",
+                        "socks",
+                        "proxy",
+                        "connection closed",
+                        "failed to establish",
+                        "max retries",
+                        "too many requests",
+                    ]
                 )
-                for item in raw_data
-                if item.text and item.text.strip()
-            ]
-            return snippets, detected_lang
-        except Exception as e:
-            raise TranscriptNotFoundException(
-                f"Không thể tải phụ đề cho video {video_id}: {str(e)}"
-            )
+
+                if has_proxy and is_blocked_or_conn and not rotated and attempt_idx == 0:
+                    logger.warning(
+                        f"YouTube blocked or proxy error on {video_id} ({e}). Triggering WARP auto-rotation..."
+                    )
+                    if self._trigger_warp_rotate():
+                        rotated = True
+                        continue  # Retry with the newly rotated proxy IP!
+
+                if attempt_idx < (2 if has_proxy else 0):
+                    logger.warning(
+                        f"Attempt {attempt_idx + 1} failed ({e}). Retrying next strategy..."
+                    )
+                    continue
+                break
+
+        raise TranscriptNotFoundException(
+            f"Không thể tải phụ đề cho video {video_id}: {str(last_error)}"
+        )
+
 
     def _fetch_target_transcript(
         self,
@@ -216,52 +271,59 @@ class YouTubeTranscriptAdapter(ITranscriptService):
         if not tgt or tgt == "none" or tgt == detected_source_lang:
             return None
 
-        try:
-            api = self._get_api()
-            transcript_list = api.list(video_id)
+        has_proxy = bool(os.getenv("YOUTUBE_PROXY") or self.proxy)
+        attempts = [True, False] if has_proxy else [False]
 
-            # 1. Try finding native transcript for target_lang
-            target_t = None
-            for t in transcript_list:
-                if t.language_code.lower() == tgt or t.language_code.lower().startswith(f"{tgt}-"):
-                    target_t = t
-                    break
+        for use_proxy in attempts:
+            try:
+                api = self._get_api(use_proxy=use_proxy)
+                transcript_list = api.list(video_id)
 
-            # 2. Try translating from detected source transcript
-            if not target_t:
+                target_t = None
                 for t in transcript_list:
-                    if (
-                        t.language_code.lower() == detected_source_lang
-                        or t.language_code.lower().startswith(f"{detected_source_lang}-")
-                    ) and t.is_translatable:
-                        try:
-                            target_t = t.translate(tgt)
-                            break
-                        except Exception:
-                            pass
+                    if t.language_code.lower() == tgt or t.language_code.lower().startswith(f"{tgt}-"):
+                        target_t = t
+                        break
 
-            # 3. Try translating from any translatable transcript
-            if not target_t:
-                for t in transcript_list:
-                    if t.is_translatable:
-                        try:
-                            target_t = t.translate(tgt)
-                            break
-                        except Exception:
-                            pass
+                if not target_t:
+                    for t in transcript_list:
+                        if (
+                            t.language_code.lower() == detected_source_lang
+                            or t.language_code.lower().startswith(f"{detected_source_lang}-")
+                        ) and t.is_translatable:
+                            try:
+                                target_t = t.translate(tgt)
+                                break
+                            except Exception:
+                                pass
 
-            if target_t:
-                raw_data = target_t.fetch()
-                return [
-                    SubtitleSnippet(
-                        text=item.text,
-                        start=float(item.start),
-                        duration=float(item.duration),
-                    )
-                    for item in raw_data
-                    if item.text and item.text.strip()
-                ]
-        except Exception:
-            pass
+                if not target_t:
+                    for t in transcript_list:
+                        if t.is_translatable:
+                            try:
+                                target_t = t.translate(tgt)
+                                break
+                            except Exception:
+                                pass
+
+                if target_t:
+                    raw_data = target_t.fetch()
+                    return [
+                        SubtitleSnippet(
+                            text=item.text,
+                            start=float(item.start),
+                            duration=float(item.duration),
+                        )
+                        for item in raw_data
+                        if item.text and item.text.strip()
+                    ]
+            except Exception as e:
+                err_str = str(e).lower()
+                is_conn_error = any(kw in err_str for kw in ["socks", "proxy", "connection closed", "failed to establish", "max retries"])
+                if use_proxy and is_conn_error:
+                    logger.warning(f"Proxy error in target transcript ({e}). Retrying direct connection...")
+                    continue
+                break
 
         return None
+
