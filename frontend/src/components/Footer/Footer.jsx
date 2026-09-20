@@ -15,6 +15,14 @@ export function Footer({ onOpenShortcuts, onOpenFeedback }) {
               src="/linguagun_logo.jpg"
               alt="ShotLang Logo"
               className="footer-brand-logo"
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "6px",
+                objectFit: "cover",
+                flexShrink: 0,
+                boxShadow: "0 0 8px rgba(37, 99, 235, 0.35)",
+              }}
             />
             <span className="footer-brand-name">
               Shot<strong>Lang</strong>
@@ -77,4 +85,5 @@ export function Footer({ onOpenShortcuts, onOpenFeedback }) {
     </footer>
   );
 }
+
 
