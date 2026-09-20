@@ -17,7 +17,34 @@ import {
 } from "lucide-react";
 import { evaluateMasked } from "../../utils/diffCalculator";
 
-export const DictationStudio = ({
+// Sub-component: Masked Character & Word Preview (Memoized to prevent DOM thrashing)
+const MaskedPreview = React.memo(({ maskedWords, hasInput }) => {
+  if (!hasInput && (!maskedWords || maskedWords.length === 0)) {
+    return (
+      <div className="diff-preview-container">
+        <span className="token-missing">Gõ những gì bạn nghe được vào ô bên dưới...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="diff-preview-container">
+      <div className="masked-sentence">
+        {maskedWords.map((word, wIdx) => (
+          <span key={wIdx} className="masked-word">
+            {word.map((item, cIdx) => (
+              <span key={cIdx} className={`char-box char-${item.status}`}>
+                {item.display}
+              </span>
+            ))}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+export const DictationStudio = React.memo(({
   currentChallenge,
   currentIndex,
   totalChallenges,
@@ -119,29 +146,13 @@ export const DictationStudio = ({
 
       {/* Live Diff / Masked Card */}
       <div className="masked-card">
-        <div className="diff-preview-container">
-          {!userInput && maskedEvaluation.words.length === 0 ? (
-            <span className="token-missing">Gõ những gì bạn nghe được vào ô bên dưới...</span>
-          ) : (
-            <div className="masked-sentence">
-              {maskedEvaluation.words.map((word, wIdx) => (
-                <span key={wIdx} className="masked-word">
-                  {word.map((item, cIdx) => (
-                    <span
-                      key={cIdx}
-                      className={`char-box char-${item.status}`}
-                    >
-                      {item.display}
-                    </span>
-                  ))}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+        <MaskedPreview
+          maskedWords={maskedEvaluation.words}
+          hasInput={Boolean(userInput)}
+        />
       </div>
 
-      {/* Textarea Input (Default 3 rows, vertical resize, mic button) */}
+      {/* Textarea Input */}
       <div className="input-wrapper">
         <textarea
           id="dictation-input"
@@ -227,5 +238,6 @@ export const DictationStudio = ({
       )}
     </section>
   );
-};
+});
+
 

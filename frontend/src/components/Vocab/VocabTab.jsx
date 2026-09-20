@@ -23,7 +23,7 @@ import VocabReviewModal from "./VocabReviewModal";
 import { splitContextSentence } from "../../utils/textNormalizer";
 
 export const VocabTab = ({ isActive = false }) => {
-  const { token, isAuthenticated, showToast } = useAuth();
+  const { token, isAuthenticated, refreshStreak, showToast } = useAuth();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [filterStatus, setFilterStatus] = useState("ALL");
@@ -68,6 +68,7 @@ export const VocabTab = ({ isActive = false }) => {
       setItems((prev) =>
         prev.map((item) => (item.id === vocabId ? { ...item, status: newStatus } : item))
       );
+      if (refreshStreak) refreshStreak();
     } catch (e) {
       showToast(e.message || "Không thể cập nhật trạng thái", "error");
     }
@@ -93,6 +94,7 @@ export const VocabTab = ({ isActive = false }) => {
       showToast("Đã xóa từ khỏi Sổ tay", "info");
       setItems((prev) => prev.filter((item) => item.id !== vocabId));
       setTotal((prev) => Math.max(0, prev - 1));
+      if (refreshStreak) refreshStreak();
     } catch (e) {
       showToast(e.message || "Lỗi khi xóa từ", "error");
     }
@@ -275,9 +277,11 @@ export const VocabTab = ({ isActive = false }) => {
           onClose={() => {
             setIsReviewModalOpen(false);
             loadWords();
+            if (refreshStreak) refreshStreak();
           }}
           onFinished={() => {
             loadWords();
+            if (refreshStreak) refreshStreak();
           }}
         />
       )}

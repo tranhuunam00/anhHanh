@@ -10,7 +10,7 @@ import {
   Repeat,
 } from "lucide-react";
 
-export const PlayerCard = ({
+export const PlayerCard = React.memo(({
   playerController,
   isEmbedRestricted,
   currentSentenceText,
@@ -104,5 +104,6 @@ export const PlayerCard = ({
       </div>
     </section>
   );
-};
+});
+
 

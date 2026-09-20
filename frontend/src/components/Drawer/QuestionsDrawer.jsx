@@ -1,7 +1,7 @@
 import React from "react";
 import { ListOrdered, X, RefreshCw } from "lucide-react";
 
-export const QuestionsDrawer = ({
+export const QuestionsDrawer = React.memo(({
   isOpen,
   onClose,
   totalChallenges,
@@ -85,5 +85,6 @@ export const QuestionsDrawer = ({
       </aside>
     </>
   );
-};
+});
+
 

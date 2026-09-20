@@ -2,7 +2,7 @@ import React from "react";
 import { Code2, PhoneCall, Keyboard, MessageSquareHeart } from "lucide-react";
 import "./footer.css";
 
-export function Footer({ onOpenShortcuts, onOpenFeedback }) {
+export const Footer = React.memo(function Footer({ onOpenShortcuts, onOpenFeedback }) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -84,6 +84,7 @@ export function Footer({ onOpenShortcuts, onOpenFeedback }) {
       </div>
     </footer>
   );
-}
+});
+
 
 

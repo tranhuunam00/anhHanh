@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   Link2,
   Play,
-  Flame,
-  FileEdit,
   BookOpen,
   Shield,
   LogOut,
@@ -18,7 +16,7 @@ import {
 import { SOURCE_LANGUAGES, TARGET_LANGUAGES } from "../../constants/languages";
 import { useAuth } from "../../context/AuthContext";
 
-export const Header = ({
+export const Header = React.memo(({
   urlInput,
   setUrlInput,
   sourceLang,
@@ -36,7 +34,8 @@ export const Header = ({
   onOpenFeedback,
   onOpenAdminTab,
 }) => {
-  const { user, isAuthenticated, streak, wordsToday, logout } = useAuth();
+
+  const { user, isAuthenticated, unlearnedWords, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -138,15 +137,16 @@ export const Header = ({
           </button>
         </form>
 
-        {/* Daily Streak & Words Badge */}
-        <div className="header-streak-badge" title="Chuỗi ngày học liên tục và tổng từ hôm nay">
-          <span className="streak-fire" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            <Flame size={15} color="#f97316" fill="#f97316" />
-            <span>{streak}</span> ngày
-          </span>
-          <span className="streak-words" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            <FileEdit size={14} color="#3b82f6" />
-            <span>{wordsToday}</span> từ
+        {/* Unlearned Vocab Badge */}
+        <div
+          className="header-streak-badge header-vocab-badge"
+          title="Số từ vựng chưa học xong trong Sổ tay (Nhấp để mở Sổ tay)"
+          onClick={() => onOpenVocabTab && onOpenVocabTab()}
+          style={{ cursor: "pointer", userSelect: "none" }}
+        >
+          <BookOpen size={15} color="#6366f1" />
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <strong style={{ color: "#6366f1", fontWeight: 700 }}>{unlearnedWords}</strong> từ chưa học xong
           </span>
         </div>
 
@@ -253,5 +253,6 @@ export const Header = ({
       </div>
     </header>
   );
-};
+});
+
 

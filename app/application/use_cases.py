@@ -14,6 +14,7 @@ from app.application.dtos import (
     EvaluateResponse,
     WordEvaluationDTO,
 )
+
 from app.infrastructure.translation_service import TranslationService
 
 logger = logging.getLogger(__name__)
@@ -102,24 +103,8 @@ class GetLessonUseCase:
         detected_source_lang = source_lang
         title = lesson.title
 
-        # Check alternative common language codes in DB before calling YouTube
         if src_snippets is None:
-            for alt in ["auto", "en"]:
-                if alt != source_lang:
-                    src_snippets = await subtitle_repo.get_raw(lesson.id, alt)
-                    if src_snippets:
-                        detected_source_lang = alt
-                        break
-
-        # If still None, check if ANY source subtitle is cached in DB
-        if src_snippets is None:
-            any_cached = await subtitle_repo.get_any_cached_raw(lesson.id)
-            if any_cached:
-                cached_lang, src_snippets = any_cached
-                detected_source_lang = cached_lang
-
-        if src_snippets is None:
-            logger.info(f"No cached source subtitles for {video_id} lang={source_lang} in DB — fetching YouTube")
+            logger.info(f"No cached source subtitles for {video_id} lang={source_lang} — fetching YouTube")
             title, src_snippets, tgt_snippets_from_yt, detected_source_lang = (
                 self.transcript_service.fetch_transcripts(
                     video_id, source_lang=source_lang, target_lang=target_lang
@@ -129,9 +114,8 @@ class GetLessonUseCase:
             if tgt_snippets_from_yt:
                 await subtitle_repo.save_raw(lesson.id, tgt_key, tgt_snippets_from_yt)
         else:
-            logger.info(f"Using cached source subtitles for {video_id} (detected lang={detected_source_lang}) from DB (0 YouTube calls)")
+            logger.info(f"Using cached source subtitles for {video_id} lang={source_lang} from DB")
             tgt_snippets_from_yt = None
-
 
         # 3. Check DB for target subtitle cache
         tgt_snippets = await subtitle_repo.get_raw(lesson.id, tgt_key)

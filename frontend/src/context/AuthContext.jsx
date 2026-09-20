@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
   });
   const [streak, setStreak] = useState(0);
   const [wordsToday, setWordsToday] = useState(0);
+  const [unlearnedWords, setUnlearnedWords] = useState(0);
   const [googleClientId, setGoogleClientId] = useState("1010771231278-42hd59gesjf8ts5ta7nra9qrfkmobgrt.apps.googleusercontent.com");
   const [toasts, setToasts] = useState([]);
 
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }) => {
     if (data) {
       setStreak(data.current_streak || 0);
       setWordsToday(data.words_today || 0);
+      setUnlearnedWords(data.unlearned_words ?? 0);
     }
   }, [token]);
 
@@ -163,6 +165,8 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!token && !!user,
         streak,
         wordsToday,
+        unlearnedWords,
+        setUnlearnedWords,
         googleClientId,
         loginEmail,
         registerEmail,

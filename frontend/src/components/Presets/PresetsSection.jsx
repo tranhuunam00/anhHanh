@@ -2,7 +2,7 @@ import React from "react";
 import { PRESET_CARDS } from "../../constants/presets";
 import { extractYouTubeId } from "../../utils/textNormalizer";
 
-export const PresetsSection = ({ activeUrl, onSelectPreset, isLoading }) => {
+export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading }) => {
   const activeId = extractYouTubeId(activeUrl);
 
   return (
@@ -47,4 +47,5 @@ export const PresetsSection = ({ activeUrl, onSelectPreset, isLoading }) => {
       </div>
     </section>
   );
-};
+});
+
