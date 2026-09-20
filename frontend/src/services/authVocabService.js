@@ -216,7 +216,7 @@ export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang 
   return await safeParseResponse(res, "Không thể tải xem trước bài học");
 };
 
-export const startLessonSession = async (videoId, token) => {
+export const startLessonSession = async (videoId, token, sourceLang = "en", targetLang = "vi") => {
   try {
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -224,7 +224,11 @@ export const startLessonSession = async (videoId, token) => {
     const res = await fetch("/api/lesson/start", {
       method: "POST",
       headers,
-      body: JSON.stringify({ video_id: videoId }),
+      body: JSON.stringify({
+        video_id: videoId,
+        source_lang: sourceLang,
+        target_lang: targetLang,
+      }),
     });
     if (res.ok) {
       return await res.json();
@@ -235,7 +239,15 @@ export const startLessonSession = async (videoId, token) => {
   return null;
 };
 
-export const updateLessonProgress = async (videoId, currentPosition, isCompleted = false, token, wordsTyped = 0) => {
+export const updateLessonProgress = async (
+  videoId,
+  currentPosition,
+  isCompleted = false,
+  token,
+  wordsTyped = 0,
+  sourceLang = "en",
+  targetLang = "vi"
+) => {
   try {
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -248,6 +260,8 @@ export const updateLessonProgress = async (videoId, currentPosition, isCompleted
         current_position: Math.max(1, currentPosition),
         is_completed: isCompleted,
         words_typed: wordsTyped,
+        source_lang: sourceLang,
+        target_lang: targetLang,
       }),
     });
     if (res.ok) {
@@ -274,10 +288,11 @@ export const fetchLessonHistory = async (token) => {
   return [];
 };
 
-export const deleteLessonHistory = async (videoId, token) => {
+export const deleteLessonHistory = async (videoId, token, sourceLang = "en", targetLang = "vi") => {
   if (!token) return false;
   try {
-    const res = await fetch(`/api/lesson/history/${encodeURIComponent(videoId)}`, {
+    const query = new URLSearchParams({ source_lang: sourceLang, target_lang: targetLang });
+    const res = await fetch(`/api/lesson/history/${encodeURIComponent(videoId)}?${query.toString()}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

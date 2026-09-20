@@ -66,25 +66,31 @@ async def save_vocabulary_word(
     if not meaning:
         try:
             translated = _translation_service.translate(clean_word, source_lang='auto', target_lang='vi')
-            # Only accept translation if it's different from the source word (i.e., actually translated)
-            if translated and translated.lower().strip() != clean_word.lower().strip():
-                meaning = translated
-            else:
-                meaning = None  # Will display nothing rather than English word
-        except Exception:
+            if translated and translated.strip():
+                meaning = translated.strip()
+        except Exception as e:
+            logger.warning(f"Translation failed for word '{clean_word}': {e}")
             meaning = None
+
+    # Guarantee meaning is never null/empty to satisfy DB constraints
+    if not meaning or not meaning.strip():
+        meaning = clean_word
 
     # 3. Auto-fetch image if not provided
     image_url = payload.image_url
     if not image_url:
-        candidates = ImageSearchService.get_image_candidates(
-            word=clean_word,
-            context_sentence=payload.context_sentence or "",
-            meaning=meaning or "",
-            max_results=3
-        )
-        if candidates:
-            image_url = candidates[0]
+        try:
+            candidates = ImageSearchService.get_image_candidates(
+                word=clean_word,
+                context_sentence=payload.context_sentence or "",
+                meaning=meaning or "",
+                max_results=3
+            )
+            if candidates:
+                image_url = candidates[0]
+        except Exception as img_err:
+            logger.warning(f"Image search failed for '{clean_word}': {img_err}")
+            image_url = None
 
     # Check if word already saved by this user for the same video
     query = select(UserVocabulary).where(
@@ -95,7 +101,7 @@ async def save_vocabulary_word(
         query = query.where(UserVocabulary.video_id == payload.video_id)
 
     res = await db.execute(query)
-    existing = res.scalar_one_or_none()
+    existing = res.scalars().first()
 
     if existing:
         # Update existing record

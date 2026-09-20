@@ -35,14 +35,15 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
     }
   }, [isActive, loadHistory]);
 
-  const handleDelete = async (videoId, title, e) => {
+  const handleDelete = async (id, videoId, title, sourceLang, targetLang, e) => {
     e.stopPropagation();
-    if (!window.confirm(`Bạn có chắc muốn xóa "${title || videoId}" khỏi lịch sử học tập?`)) {
+    const langLabel = `${(sourceLang || "en").toUpperCase()} ➔ ${(targetLang || "vi").toUpperCase()}`;
+    if (!window.confirm(`Bạn có chắc muốn xóa "${title || videoId}" (${langLabel}) khỏi lịch sử học tập?`)) {
       return;
     }
-    const success = await deleteLessonHistory(videoId, token);
+    const success = await deleteLessonHistory(videoId, token, sourceLang, targetLang);
     if (success) {
-      setHistoryList((prev) => prev.filter((item) => item.videoId !== videoId));
+      setHistoryList((prev) => prev.filter((item) => item.id !== id));
       showToast("Đã xóa bài khỏi lịch sử học tập", "info");
     } else {
       showToast("Không thể xóa bài học này", "error");
@@ -210,7 +211,7 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
                   transition: "transform 0.15s ease, box-shadow 0.15s ease",
                   cursor: "pointer"
                 }}
-                onClick={() => onSelectLesson(item.videoId, item.currentPosition)}
+                onClick={() => onSelectLesson(item.videoId, item.currentPosition, item.sourceLang, item.targetLang)}
               >
                 {/* Thumbnail Header */}
                 <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", background: "#000" }}>
@@ -226,6 +227,29 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
                       objectFit: "cover"
                     }}
                   />
+                  {/* Language pair badge */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "8px",
+                      left: "8px",
+                      background: "rgba(15, 23, 42, 0.88)",
+                      color: "#38bdf8",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      padding: "2px 8px",
+                      borderRadius: "6px",
+                      backdropFilter: "blur(4px)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      border: "1px solid rgba(56, 189, 248, 0.35)",
+                      letterSpacing: "0.5px"
+                    }}
+                  >
+                    <span>{(item.sourceLang || "en").toUpperCase()} ➔ {(item.targetLang || "vi").toUpperCase()}</span>
+                  </div>
+
                   <div
                     style={{
                       position: "absolute",
@@ -294,7 +318,7 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
                           className="btn btn-secondary"
                           style={{ padding: "4px 8px", fontSize: "0.8rem", color: "#ef4444", border: "none", background: "transparent" }}
                           title="Xóa khỏi lịch sử"
-                          onClick={(e) => handleDelete(item.videoId, item.title, e)}
+                          onClick={(e) => handleDelete(item.id, item.videoId, item.title, item.sourceLang, item.targetLang, e)}
                         >
                           🗑️
                         </button>
@@ -303,7 +327,7 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
                           style={{ padding: "5px 12px", fontSize: "0.8rem", borderRadius: "6px", fontWeight: 600 }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            onSelectLesson(item.videoId, item.currentPosition);
+                            onSelectLesson(item.videoId, item.currentPosition, item.sourceLang, item.targetLang);
                           }}
                         >
                           {item.isCompleted ? "Học lại" : "Tiếp tục ▶"}

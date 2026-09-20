@@ -86,6 +86,11 @@ export const FloatingVocabSaver = ({ currentSentence = "", currentVideoId = "", 
     e.stopPropagation();
     if (!selectedWord || isSaving) return;
 
+    if (!token) {
+      showToast("Vui lòng đăng nhập để lưu từ vào Sổ tay từ vựng", "warning");
+      return;
+    }
+
     setIsSaving(true);
     showToast(`Đang tìm nghĩa & ảnh AI cho "${selectedWord}"...`, "info");
 

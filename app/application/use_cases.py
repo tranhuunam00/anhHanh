@@ -99,9 +99,21 @@ class GetLessonUseCase:
         lesson = await subtitle_repo.get_or_create_lesson(video_id, youtube_url=youtube_url)
 
         # 2. Check DB for source subtitle cache
-        src_snippets = await subtitle_repo.get_raw(lesson.id, source_lang)
+        src_snippets = None
+        tgt_snippets_from_yt = None
         detected_source_lang = source_lang
         title = lesson.title
+
+        if source_lang and source_lang != "auto":
+            src_snippets = await subtitle_repo.get_raw(lesson.id, source_lang)
+            if src_snippets:
+                detected_source_lang = source_lang
+        else:
+            # If source_lang is 'auto', check if DB already has any cached source subtitle
+            cached = await subtitle_repo.get_any_cached_raw(lesson.id)
+            if cached:
+                detected_source_lang, src_snippets = cached
+                logger.info(f"Using cached source subtitles from DB for {video_id} (detected lang={detected_source_lang})")
 
         if src_snippets is None:
             logger.info(f"No cached source subtitles for {video_id} lang={source_lang} — fetching YouTube")
@@ -110,23 +122,26 @@ class GetLessonUseCase:
                     video_id, source_lang=source_lang, target_lang=target_lang
                 )
             )
-            await subtitle_repo.save_raw(lesson.id, source_lang, src_snippets)
+            save_lang = detected_source_lang if (detected_source_lang and detected_source_lang != "auto") else source_lang
+            await subtitle_repo.save_raw(lesson.id, save_lang, src_snippets)
             if tgt_snippets_from_yt:
-                await subtitle_repo.save_raw(lesson.id, tgt_key, tgt_snippets_from_yt)
+                await subtitle_repo.save_raw(lesson.id, f"{save_lang}_tgt_{target_lang}", tgt_snippets_from_yt)
         else:
-            logger.info(f"Using cached source subtitles for {video_id} lang={source_lang} from DB")
-            tgt_snippets_from_yt = None
+            logger.info(f"Using cached source subtitles for {video_id} lang={detected_source_lang} from DB")
 
         # 3. Check DB for target subtitle cache
+        effective_src = detected_source_lang or source_lang or "en"
+        tgt_key = f"{effective_src}_tgt_{target_lang}"
         tgt_snippets = await subtitle_repo.get_raw(lesson.id, tgt_key)
+
         if tgt_snippets is None and tgt_snippets_from_yt is not None:
             tgt_snippets = tgt_snippets_from_yt
-        elif tgt_snippets is None and target_lang not in ("none", "", source_lang, detected_source_lang):
+        elif tgt_snippets is None and target_lang not in ("none", "", effective_src):
             # Target not cached and not fetched yet — fetch separately
             logger.info(f"Fetching target subtitles for {video_id} lang={target_lang}")
             try:
                 _, _, tgt_snippets, _ = self.transcript_service.fetch_transcripts(
-                    video_id, source_lang=source_lang, target_lang=target_lang
+                    video_id, source_lang=effective_src, target_lang=target_lang
                 )
                 if tgt_snippets:
                     await subtitle_repo.save_raw(lesson.id, tgt_key, tgt_snippets)

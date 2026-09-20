@@ -89,6 +89,19 @@ def test_vocabulary_crud_flow():
     assert status_res.status_code == 200
     assert status_res.json()["vocab"]["status"] == "MASTERED"
 
+    # 5. Save word WITHOUT meaning (floating saver scenario)
+    save_no_meaning_res = client.post(
+        "/api/vocab",
+        json={
+            "word": "resilience",
+            "context_sentence": "She showed great resilience in tough times.",
+            "video_id": "qe9QSCF-d88"
+        },
+        headers=headers
+    )
+    assert save_no_meaning_res.status_code == 200
+    assert save_no_meaning_res.json()["vocab"]["word"] == "resilience"
+
 
 def test_lesson_history_api():
     """Verify GET and DELETE /api/lesson/history endpoints."""

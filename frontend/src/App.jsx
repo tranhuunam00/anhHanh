@@ -206,7 +206,7 @@ export default function App() {
       // 3. Record session start in backend and retrieve saved currentPosition
       let effectivePos = Number(startPos) || 0;
       try {
-        const sessionData = await startLessonSession(lessonData.video_id, token);
+        const sessionData = await startLessonSession(lessonData.video_id, token, effectiveSourceLang, tLang);
         if (effectivePos <= 0 && sessionData && sessionData.currentPosition) {
           effectivePos = Number(sessionData.currentPosition);
         }
@@ -215,7 +215,7 @@ export default function App() {
       }
 
       // 4. Load progress map from localStorage as fallback
-      const prog = loadLessonProgress(lessonData.video_id);
+      const prog = loadLessonProgress(lessonData.video_id, effectiveSourceLang, tLang);
       setProgressMap(prog);
 
       if (effectivePos <= 0 && prog && prog.lastPosition) {
@@ -305,7 +305,15 @@ export default function App() {
     // Sync progress with backend (never downgrade saved position if user is just reviewing earlier questions)
     if (currentLesson.video_id) {
       const posToSync = Math.max(index + 1, maxReachedIndex + 1);
-      updateLessonProgress(currentLesson.video_id, posToSync, false, token);
+      updateLessonProgress(
+        currentLesson.video_id,
+        posToSync,
+        false,
+        token,
+        0,
+        currentLesson.source_lang || sourceLang,
+        currentLesson.target_lang || targetLang
+      );
     }
   };
 
@@ -320,10 +328,12 @@ export default function App() {
     setUserInput("");
     setIsCompleted(false);
 
+    const sL = currentLesson.source_lang || sourceLang;
+    const tL = currentLesson.target_lang || targetLang;
     const newProg = { challenges: {}, lastPosition: 1 };
     setProgressMap(newProg);
-    saveLessonProgress(currentLesson.video_id, newProg);
-    updateLessonProgress(currentLesson.video_id, 1, false, token);
+    saveLessonProgress(currentLesson.video_id, newProg, sL, tL);
+    updateLessonProgress(currentLesson.video_id, 1, false, token, 0, sL, tL);
     playChallengeAtIndex(currentLesson, 0);
   };
 
@@ -358,15 +368,18 @@ export default function App() {
         const newMax = Math.max(maxReachedIndex, currentIndex + 1);
         setMaxReachedIndex(newMax);
 
+        const sL = currentLesson.source_lang || sourceLang;
+        const tL = currentLesson.target_lang || targetLang;
+
         const newProg = { ...progressMap };
         if (!newProg.challenges) newProg.challenges = {};
         newProg.challenges[currentIndex + 1] = { isCompleted: true, lastUpdated: Date.now() };
         newProg.lastPosition = Math.max(nextPos, (newProg.lastPosition || 1));
         setProgressMap(newProg);
-        saveLessonProgress(currentLesson.video_id, newProg);
+        saveLessonProgress(currentLesson.video_id, newProg, sL, tL);
 
         // Record progress in backend DB
-        updateLessonProgress(currentLesson.video_id, nextPos, isAllDone, token);
+        updateLessonProgress(currentLesson.video_id, nextPos, isAllDone, token, 0, sL, tL);
         refreshStreak();
       }
 
@@ -405,14 +418,17 @@ export default function App() {
     const newMax = Math.max(maxReachedIndex, currentIndex + 1);
     setMaxReachedIndex(newMax);
 
+    const sL = currentLesson.source_lang || sourceLang;
+    const tL = currentLesson.target_lang || targetLang;
+
     const newProg = { ...progressMap };
     if (!newProg.challenges) newProg.challenges = {};
     newProg.challenges[currentIndex + 1] = { isCompleted: true, lastUpdated: Date.now() };
     newProg.lastPosition = Math.max(nextPos, (newProg.lastPosition || 1));
     setProgressMap(newProg);
-    saveLessonProgress(currentLesson.video_id, newProg);
+    saveLessonProgress(currentLesson.video_id, newProg, sL, tL);
 
-    updateLessonProgress(currentLesson.video_id, nextPos, false, token);
+    updateLessonProgress(currentLesson.video_id, nextPos, false, token, 0, sL, tL);
   };
 
   const handleHintLetter = () => {
@@ -646,9 +662,9 @@ export default function App() {
         <div style={{ display: activeTab === "tab-history" ? "block" : "none" }}>
           <HistoryTab
             isActive={activeTab === "tab-history"}
-            onSelectLesson={(videoId, targetPos) => {
+            onSelectLesson={(videoId, targetPos, srcLang, tgtLang) => {
               setActiveTab("tab-dictation");
-              executeLoadLesson(videoId, undefined, undefined, targetPos);
+              executeLoadLesson(videoId, srcLang, tgtLang, targetPos);
             }}
             onOpenAuth={() => setIsAuthOpen(true)}
           />

@@ -254,22 +254,13 @@ async def update_lesson_progress(
         lesson = l_res.scalar_one_or_none()
 
         if lesson:
-            ul_res = await db.execute(
-                select(UserLesson).where(
-                    and_(
-                        UserLesson.user_id == current_user.id,
-                        UserLesson.lesson_id == lesson.id,
-                        UserLesson.source_lang == source_lang,
-                        UserLesson.target_lang == target_lang,
-                    )
-                )
+            user_lesson, _ = await _get_or_create_user_lesson(
+                db, current_user.id, lesson.id, source_lang, target_lang
             )
-            user_lesson = ul_res.scalar_one_or_none()
-            if user_lesson:
-                user_lesson.current_position = payload.target_position
-                if payload.is_completed:
-                    user_lesson.is_completed = True
-                user_lesson.last_studied_at = datetime.now(timezone.utc)
+            user_lesson.current_position = payload.target_position
+            if payload.is_completed:
+                user_lesson.is_completed = True
+            user_lesson.last_studied_at = datetime.now(timezone.utc)
 
         # 2. Update UserStreak
         s_res = await db.execute(select(UserStreak).where(UserStreak.user_id == current_user.id))
