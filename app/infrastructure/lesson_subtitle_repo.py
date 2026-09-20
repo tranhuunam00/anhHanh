@@ -61,6 +61,34 @@ class LessonSubtitleRepo:
             logger.warning(f"Failed to deserialize subtitles for lesson {lesson_id} lang {lang_code}: {e}")
             return None
 
+    async def get_any_cached_raw(
+        self, lesson_id: str
+    ) -> Optional[Tuple[str, List[SubtitleSnippet]]]:
+        """Return the first available cached raw source subtitle for a lesson, ignoring target translations."""
+        res = await self.db.execute(
+            select(LessonSubtitle).where(
+                LessonSubtitle.lesson_id == lesson_id,
+                ~LessonSubtitle.lang_code.contains("_tgt_"),
+            )
+        )
+        row = res.scalars().first()
+        if not row:
+            return None
+        try:
+            snippets = [
+                SubtitleSnippet(
+                    text=item["text"],
+                    start=float(item["start"]),
+                    duration=float(item["duration"]),
+                )
+                for item in (row.raw_data or [])
+            ]
+            return row.lang_code, snippets
+        except Exception as e:
+            logger.warning(f"Failed to deserialize any subtitle for lesson {lesson_id}: {e}")
+            return None
+
+
     async def save_raw(
         self, lesson_id: str, lang_code: str, snippets: List[SubtitleSnippet]
     ) -> None:

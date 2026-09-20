@@ -1,7 +1,8 @@
 """FastAPI Presentation Layer / API Router."""
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.exceptions import (
     InvalidVideoIdException,
@@ -19,6 +20,8 @@ from app.application.use_cases import (
 )
 from app.infrastructure.youtube_adapter import YouTubeTranscriptAdapter
 from app.infrastructure.cache_repository import FileCacheRepository
+from app.infrastructure.database.connection import get_db
+from app.infrastructure.lesson_subtitle_repo import LessonSubtitleRepo
 
 api_router = APIRouter(prefix="/api")
 
@@ -53,8 +56,11 @@ class EvaluateApiRequest(BaseModel):
 
 
 @api_router.post("/lesson", response_model=LessonResponse)
-def get_or_create_lesson(body: LessonApiRequest):
-    """Trích xuất bài tập chép chính tả theo từng câu từ link YouTube."""
+async def get_or_create_lesson(
+    body: LessonApiRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Trích xuất bài tập chép chính tả theo từng câu từ CSDL (chỉ gọi YouTube khi bài chưa từng có)."""
     try:
         req = GetLessonRequest(
             url_or_id=body.url_or_id,
@@ -62,15 +68,22 @@ def get_or_create_lesson(body: LessonApiRequest):
             source_lang=body.source_lang,
             target_lang=body.target_lang,
         )
-        return _get_lesson_uc.execute(req)
+        subtitle_repo = LessonSubtitleRepo(db)
+        lesson_response, _ = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
+        await db.commit()
+        return lesson_response
     except InvalidVideoIdException as e:
+        await db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
     except TranscriptNotFoundException as e:
+        await db.rollback()
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
+        await db.rollback()
         raise HTTPException(
             status_code=500, detail=f"Lỗi khi xử lý video: {str(e)}"
         )
+
 
 
 @api_router.get("/video-languages")
