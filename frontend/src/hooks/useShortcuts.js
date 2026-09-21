@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export const useShortcuts = ({
   replayKey = "Control",
@@ -13,13 +13,29 @@ export const useShortcuts = ({
   onHintWord,
   enabled = true,
 }) => {
+  const modifierStateRef = useRef({ key: null, comboUsed: false, time: 0 });
+
   useEffect(() => {
     if (!enabled) return;
+
+    const isModifierReplay = replayKey === "Control" || replayKey === "Alt";
 
     const handleKeyDown = (e) => {
       const activeEl = document.activeElement;
       const isInputOrTextarea =
         activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.isContentEditable);
+
+      // Nếu replayKey là phím bổ trợ (Ctrl hoặc Alt):
+      // Khi nhấn xuống, chỉ ghi nhận state và KHÔNG gọi preventDefault để không chặn các phím tắt hệ thống (Ctrl+A, C, V, Z...)
+      if (isModifierReplay) {
+        if (e.key === replayKey) {
+          modifierStateRef.current = { key: e.key, comboUsed: false, time: Date.now() };
+          return;
+        } else if (modifierStateRef.current.key) {
+          // Bất kỳ phím nào được bấm kèm trong lúc đang giữ modifier -> đánh dấu là combo
+          modifierStateRef.current.comboUsed = true;
+        }
+      }
 
       // Tab -> Hint 1 Word (Gợi ý 1 từ)
       if (e.key === "Tab" || e.code === "Tab") {
@@ -28,9 +44,9 @@ export const useShortcuts = ({
         return;
       }
 
-      // Replay Key (Control / Alt / KeyR / Space)
-      if (e.key === replayKey || e.code === replayKey) {
-        if (!isInputOrTextarea || replayKey === "Control" || replayKey === "Alt") {
+      // Replay Key nếu là phím thông thường (không phải Ctrl/Alt, ví dụ KeyR hoặc Space khi không ở ô gõ)
+      if (!isModifierReplay && (e.key === replayKey || e.code === replayKey)) {
+        if (!isInputOrTextarea) {
           e.preventDefault();
           if (onReplay) onReplay();
           return;
@@ -100,7 +116,22 @@ export const useShortcuts = ({
       }
     };
 
+    const handleKeyUp = (e) => {
+      // Khi nhả phím modifier (Ctrl / Alt): nếu được ấn nhả đơn lẻ (không bấm kèm phím khác) -> Tua lại audio
+      if (isModifierReplay && e.key === modifierStateRef.current.key) {
+        const { comboUsed, time } = modifierStateRef.current;
+        modifierStateRef.current = { key: null, comboUsed: false, time: 0 };
+        if (!comboUsed && Date.now() - time < 800) {
+          if (onReplay) onReplay();
+        }
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
   }, [replayKey, playPauseKey, onReplay, onPlayPause, onPrev, onNext, onCheck, onSkip, onHintLetter, onHintWord, enabled]);
 };

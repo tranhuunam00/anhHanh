@@ -471,6 +471,32 @@ export default function App() {
     }
   };
 
+  const isAnyModalOpen =
+    isSettingsOpen ||
+    isShortcutsOpen ||
+    isDrawerOpen ||
+    isAuthOpen ||
+    isPreviewOpen ||
+    isFeedbackOpen;
+
+  // Đóng popup/modal đang mở khi ấn phím Escape (không làm nhảy/skip câu của bài học)
+  useEffect(() => {
+    if (!isAnyModalOpen) return;
+    const handleModalEsc = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setIsSettingsOpen(false);
+        setIsShortcutsOpen(false);
+        setIsDrawerOpen(false);
+        setIsAuthOpen(false);
+        setIsPreviewOpen(false);
+        setIsFeedbackOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleModalEsc);
+    return () => window.removeEventListener("keydown", handleModalEsc);
+  }, [isAnyModalOpen]);
+
   // Keyboard Shortcuts Hook
   useShortcuts({
     replayKey: settings.replayKey,
@@ -483,7 +509,7 @@ export default function App() {
     onSkip: handleSkip,
     onHintLetter: handleHintLetter,
     onHintWord: handleHintWord,
-    enabled: activeTab === "tab-dictation",
+    enabled: activeTab === "tab-dictation" && !isAnyModalOpen,
   });
 
   return (
