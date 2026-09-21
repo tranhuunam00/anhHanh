@@ -18,7 +18,7 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio:RELEASE.2024-01-18T22-58-43Z
+    image: quay.io/minio/minio:latest
     container_name: dailydictation_minio
     restart: always
     command: server /data --address ":9100" --console-address ":9101"
@@ -28,25 +28,27 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      MC_HOST_local: "http://${MINIO_ROOT_USER:-minioadmin}:${MINIO_ROOT_PASSWORD:-minioadmin123}@localhost:9100"
     volumes:
       - miniodata:/data
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9100/minio/health/live || exit 1"]
+      test: ["CMD", "mc", "ready", "local"]
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   minio-init:
-    image: minio/mc:RELEASE.2024-01-16T16-06-34Z
+    image: quay.io/minio/mc:latest
     container_name: dailydictation_minio_init
     depends_on:
       minio:
         condition: service_healthy
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9100 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin123};
-      /usr/bin/mc mb --ignore-existing myminio/feedback-images;
-      /usr/bin/mc anonymous set download myminio/feedback-images;
+      mc alias set myminio http://minio:9100 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin123};
+      mc mb --ignore-existing myminio/feedback-images;
+      mc anonymous set download myminio/feedback-images;
       echo 'MinIO bucket feedback-images initialized with public download policy!';
       exit 0;
       "
@@ -71,13 +73,13 @@ services:
       - HOST=${HOST:-0.0.0.0}
       - RUNNING_IN_DOCKER=1
       - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@db:5432/dailydictation}
-      - ADMIN_EMAIL_ADDRESS=${ADMIN_EMAIL_ADDRESS}
-      - ADMIN_DEFAULT_PASSWORD=${ADMIN_DEFAULT_PASSWORD}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_MAILER_CLIENT_ID=${GOOGLE_MAILER_CLIENT_ID}
-      - GOOGLE_MAILER_CLIENT_SECRET=${GOOGLE_MAILER_CLIENT_SECRET}
-      - GOOGLE_MAILER_REFRESH_TOKEN=${GOOGLE_MAILER_REFRESH_TOKEN}
-      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_EMAIL_ADDRESS=${ADMIN_EMAIL_ADDRESS:-}
+      - ADMIN_DEFAULT_PASSWORD=${ADMIN_DEFAULT_PASSWORD:-}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_MAILER_CLIENT_ID=${GOOGLE_MAILER_CLIENT_ID:-}
+      - GOOGLE_MAILER_CLIENT_SECRET=${GOOGLE_MAILER_CLIENT_SECRET:-}
+      - GOOGLE_MAILER_REFRESH_TOKEN=${GOOGLE_MAILER_REFRESH_TOKEN:-}
+      - JWT_SECRET=${JWT_SECRET:-}
       - YOUTUBE_PROXY=${YOUTUBE_PROXY:-}
       - YOUTUBE_COOKIE_FILE=${YOUTUBE_COOKIE_FILE:-/app/data/cookies.txt}
       - MINIO_ENDPOINT=${MINIO_ENDPOINT:-minio:9100}
