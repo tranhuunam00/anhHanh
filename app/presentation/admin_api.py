@@ -18,6 +18,7 @@ from app.infrastructure.database.models import (
     UserVocabulary,
     UserStreak,
     Feedback,
+    FeedbackMessage,
 )
 from app.application.auth_service import require_admin
 
@@ -119,7 +120,7 @@ async def list_admin_feedbacks(
             select(Feedback)
             .options(
                 selectinload(Feedback.user),
-                selectinload(Feedback.messages),
+                selectinload(Feedback.messages).selectinload(FeedbackMessage.user),
             )
             .order_by(desc(Feedback.created_at))
         )

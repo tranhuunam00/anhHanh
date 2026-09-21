@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Header } from "./components/Header/Header";
 import { PlayerCard } from "./components/Player/PlayerCard";
 import { DictationStudio } from "./components/Dictation/DictationStudio";
@@ -42,8 +42,49 @@ export default function App() {
   const { settings, updateSetting, resetSettings } = useSettings();
   const { token, user, refreshStreak, showToast, streak } = useAuth();
 
+  // Helper to map URL path to active tab
+  const getTabFromPath = () => {
+    if (typeof window === "undefined") return "tab-dictation";
+    const path = window.location.pathname.toLowerCase();
+    if (path === "/admin" || path.startsWith("/admin/")) return "tab-admin";
+    if (path === "/vocab" || path.startsWith("/vocab/")) return "tab-vocab";
+    if (path === "/transcript" || path.startsWith("/transcript/")) return "tab-transcript";
+    if (path === "/history" || path.startsWith("/history/")) return "tab-history";
+    return "tab-dictation";
+  };
+
+  const getPathFromTab = (tab) => {
+    switch (tab) {
+      case "tab-admin": return "/admin";
+      case "tab-vocab": return "/vocab";
+      case "tab-transcript": return "/transcript";
+      case "tab-history": return "/history";
+      default: return "/";
+    }
+  };
+
   // Navigation & Modal State
-  const [activeTab, setActiveTab] = useState("tab-dictation");
+  const [activeTab, setActiveTabState] = useState(getTabFromPath);
+
+  const setActiveTab = useCallback((tabOrFn) => {
+    setActiveTabState((prev) => {
+      const nextTab = typeof tabOrFn === "function" ? tabOrFn(prev) : tabOrFn;
+      const targetPath = getPathFromTab(nextTab);
+      if (typeof window !== "undefined" && window.location.pathname !== targetPath) {
+        window.history.pushState({ tab: nextTab }, "", targetPath);
+      }
+      return nextTab;
+    });
+  }, []);
+
+  // Listen to browser Back/Forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveTabState(getTabFromPath());
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -698,7 +739,7 @@ export default function App() {
               <span>Lịch sử học tập</span>
             </button>
 
-            {user?.role === "ADMIN" && (
+            {(user?.role === "ADMIN" || activeTab === "tab-admin") && (
               <button
                 className={`tab-btn ${activeTab === "tab-admin" ? "active" : ""}`}
                 onClick={() => setActiveTab("tab-admin")}
@@ -870,11 +911,14 @@ export default function App() {
         </div>
 
         {/* TAB 5: Admin Management Portal */}
-        {user?.role === "ADMIN" && (
-          <div style={{ display: activeTab === "tab-admin" ? "block" : "none" }}>
-            <AdminPortal user={user} token={token} showToast={showToast} />
-          </div>
-        )}
+        <div style={{ display: activeTab === "tab-admin" ? "block" : "none" }}>
+          <AdminPortal
+            user={user}
+            token={token}
+            showToast={showToast}
+            onOpenAuth={() => setIsAuthOpen(true)}
+          />
+        </div>
       </main>
 
       {/* Professional ShotLang Footer */}

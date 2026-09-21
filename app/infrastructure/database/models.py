@@ -11,7 +11,8 @@ from sqlalchemy import (
     Date,
     ForeignKey,
     JSON,
-    func
+    func,
+    inspect
 )
 from sqlalchemy.orm import relationship
 from app.infrastructure.database.connection import Base
@@ -208,25 +209,34 @@ class Feedback(Base):
     def to_dict(self):
         user_name = None
         user_email = None
+        user_avatar = None
         messages_list = []
         unread_replies = 0
         try:
-            from sqlalchemy.orm import inspect
             ins = inspect(self)
             if "user" in ins.dict and self.user is not None:
                 user_name = self.user.name
                 user_email = self.user.email
+                user_avatar = self.user.avatar_url
             if "messages" in ins.dict and self.messages is not None:
                 messages_list = [m.to_dict() for m in self.messages]
                 unread_replies = sum(1 for m in self.messages if not m.is_read)
         except Exception:
             pass
 
+        user_obj = {
+            'id': self.user_id,
+            'name': user_name or 'Học viên',
+            'email': user_email or '',
+            'avatar_url': user_avatar,
+        } if (user_name or user_email or self.user_id) else None
+
         return {
             'id': self.id,
             'user_id': self.user_id,
             'user_name': user_name,
             'user_email': user_email,
+            'user': user_obj,
             'feedback_type': self.feedback_type,
             'rating': self.rating,
             'content': self.content,
@@ -258,7 +268,6 @@ class FeedbackMessage(Base):
         user_name = None
         user_avatar = None
         try:
-            from sqlalchemy.orm import inspect
             ins = inspect(self)
             if "user" in ins.dict and self.user is not None:
                 user_name = self.user.name

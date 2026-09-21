@@ -25,7 +25,7 @@ import {
   uploadFeedbackImage
 } from '../../services/feedbackService';
 
-export const AdminPortal = ({ user, token, showToast }) => {
+export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'users' | 'feedbacks'
   const [overview, setOverview] = useState(null);
   const [users, setUsers] = useState([]);
@@ -278,6 +278,16 @@ export const AdminPortal = ({ user, token, showToast }) => {
         <p style={{ color: '#64748b', maxWidth: '460px', margin: '0 auto 20px', lineHeight: 1.5 }}>
           Bạn cần đăng nhập bằng tài khoản Quản trị viên (Admin) để có quyền truy cập dữ liệu và công cụ quản trị hệ thống.
         </p>
+        {!user && onOpenAuth && (
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={onOpenAuth}
+            style={{ marginTop: '4px', padding: '8px 22px', fontSize: '0.9rem', fontWeight: 600 }}
+          >
+            Đăng nhập tài khoản Admin
+          </button>
+        )}
       </div>
     );
   }
@@ -625,8 +635,14 @@ export const AdminPortal = ({ user, token, showToast }) => {
                   <div className="feedback-admin-top">
                     <div>
                       <div className="feedback-sender-info">
-                        <span>{fb.user?.name || fb.user?.email || 'Người dùng ẩn danh'}</span>
-                        <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 400 }}>({fb.user?.email})</span>
+                        <span style={{ fontWeight: 700 }}>
+                          {fb.user?.name || fb.user_name || fb.user?.email || fb.user_email || 'Học viên'}
+                        </span>
+                        {(fb.user?.email || fb.user_email) && (
+                          <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 400 }}>
+                            ({fb.user?.email || fb.user_email})
+                          </span>
+                        )}
                         <span className="badge badge-admin">{getCategoryLabel(fb.feedback_type)}</span>
                       </div>
                       <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '3px' }}>
@@ -766,12 +782,15 @@ export const AdminPortal = ({ user, token, showToast }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <span className="badge badge-admin">{getCategoryLabel(chatFeedback.feedback_type)}</span>
                   <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>
-                    Trao đổi với {chatFeedback.user?.name || chatFeedback.user?.email || 'Học viên'}
+                    Trao đổi với {chatFeedback.user?.name || chatFeedback.user_name || chatFeedback.user?.email || chatFeedback.user_email || 'Học viên'}
                   </span>
                   {getStatusBadge(chatFeedback.status)}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '4px' }}>
-                  Email: {chatFeedback.user?.email} • Gửi lúc: {chatFeedback.created_at ? new Date(chatFeedback.created_at).toLocaleString('vi-VN') : ''}
+                  {(chatFeedback.user?.email || chatFeedback.user_email) ? (
+                    <span>Email: {chatFeedback.user?.email || chatFeedback.user_email} • </span>
+                  ) : null}
+                  Gửi lúc: {chatFeedback.created_at ? new Date(chatFeedback.created_at).toLocaleString('vi-VN') : ''}
                 </div>
               </div>
               <button
