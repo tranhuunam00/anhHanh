@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { SOURCE_LANGUAGES, TARGET_LANGUAGES } from "../../constants/languages";
 import { useAuth } from "../../context/AuthContext";
+import { fetchAdminFeedbackCount } from "../../services/adminService";
 
 export const Header = React.memo(({
   urlInput,
@@ -36,9 +37,46 @@ export const Header = React.memo(({
   onOpenAdminTab,
 }) => {
 
-  const { user, isAuthenticated, streak, unlearnedWords, logout } = useAuth();
+  const { user, token, isAuthenticated, streak, unlearnedWords, logout } = useAuth();
+  const isAdmin = user && user.role === "ADMIN";
+  const [adminFeedbackStats, setAdminFeedbackStats] = useState({ pending: 0, in_progress: 0, total_active: 0 });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  // Fetch feedback count for Admin badge
+  useEffect(() => {
+    if (!isAdmin || !token) return;
+
+    let isMounted = true;
+    const loadStats = async () => {
+      try {
+        const stats = await fetchAdminFeedbackCount(token);
+        if (isMounted && stats) {
+          setAdminFeedbackStats({
+            pending: stats.pending || 0,
+            in_progress: stats.in_progress || 0,
+            total_active: stats.total_active || 0,
+          });
+        }
+      } catch (err) {
+        console.debug("Error fetching admin feedback count:", err);
+      }
+    };
+
+    loadStats();
+
+    const handleUpdated = () => {
+      loadStats();
+    };
+    window.addEventListener("shotlang:feedback-updated", handleUpdated);
+    const interval = setInterval(loadStats, 45000);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("shotlang:feedback-updated", handleUpdated);
+      clearInterval(interval);
+    };
+  }, [isAdmin, token]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -247,13 +285,25 @@ export const Header = React.memo(({
 
         {/* Feedback Button */}
         <button
-          className="btn btn-secondary btn-icon-text"
+          className={`btn btn-secondary btn-icon-text btn-feedback ${isAdmin ? "has-admin-badge" : ""}`}
           onClick={onOpenFeedback}
-          title="Gửi góp ý & báo lỗi"
-          style={{ padding: "6px 12px", fontSize: "0.85rem" }}
+          title={
+            isAdmin
+              ? `Góp ý: ${adminFeedbackStats.total_active} cần xử lý (${adminFeedbackStats.pending} mới, ${adminFeedbackStats.in_progress} đang xử lý)`
+              : "Gửi góp ý & báo lỗi"
+          }
+          style={{ padding: "6px 12px", fontSize: "0.85rem", position: "relative" }}
         >
           <MessageSquarePlus size={15} />
           <span>Góp ý</span>
+          {isAdmin && (
+            <span
+              className={`admin-feedback-badge ${adminFeedbackStats.total_active > 0 ? "active-badge" : "zero-badge"}`}
+              title={`${adminFeedbackStats.pending} góp ý mới, ${adminFeedbackStats.in_progress} đang xử lý`}
+            >
+              {adminFeedbackStats.total_active}
+            </span>
+          )}
         </button>
 
         {/* Theme Toggle */}

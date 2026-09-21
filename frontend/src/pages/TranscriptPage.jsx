@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Headphones, ChevronsDown, Play, Pause, ArrowRight } from "lucide-react";
+import { Headphones, ChevronsDown, Play, Pause, ArrowRight, Sparkles } from "lucide-react";
 
 export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) => {
   const [isPlayingFull, setIsPlayingFull] = useState(false);
@@ -136,6 +136,14 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
             title="Kéo để tua thời gian audio"
           />
         </div>
+      </div>
+
+      {/* Vocab Tip Banner */}
+      <div className="vocab-save-hint-card" style={{ marginTop: "12px", marginBottom: "6px" }}>
+        <Sparkles size={15} color="#6366f1" style={{ flexShrink: 0 }} />
+        <span>
+          💡 <strong>Mẹo lưu từ mới:</strong> Bạn có thể dùng chuột <strong>bôi đen bất kỳ từ hoặc cụm từ nào</strong> trong lời thoại bên dưới để hiện nút <strong>✨ Lưu từ</strong> vào Sổ tay từ vựng!
+        </span>
       </div>
 
       {/* Transcript Items List */}

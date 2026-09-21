@@ -750,6 +750,7 @@ export default function App() {
         user={user}
         token={token}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAdminTab={() => setActiveTab("tab-admin")}
         showToast={showToast}
       />
 

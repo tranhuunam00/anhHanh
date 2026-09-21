@@ -50,14 +50,20 @@ async def get_admin_overview(
         await db.execute(select(func.count(UserLesson.id)).where(UserLesson.is_completed == True))
     ).scalar() or 0
 
-    # 3. Total feedbacks & pending
+    # 3. Total feedbacks & pending/in-progress
     feedbacks_total = (await db.execute(select(func.count(Feedback.id)))).scalar() or 0
     feedbacks_pending = (
         await db.execute(select(func.count(Feedback.id)).where(Feedback.status == "PENDING"))
     ).scalar() or 0
+    feedbacks_reviewed = (
+        await db.execute(
+            select(func.count(Feedback.id)).where(Feedback.status.in_(["REVIEWED", "IN_PROGRESS"]))
+        )
+    ).scalar() or 0
     feedbacks_resolved = (
         await db.execute(select(func.count(Feedback.id)).where(Feedback.status == "RESOLVED"))
     ).scalar() or 0
+    feedbacks_active = feedbacks_pending + feedbacks_reviewed
 
     # 4. Total vocabulary saved
     vocab_total = (await db.execute(select(func.count(UserVocabulary.id)))).scalar() or 0
@@ -69,8 +75,31 @@ async def get_admin_overview(
         "completed_sessions_count": completed_sessions_count,
         "feedbacks_total": feedbacks_total,
         "feedbacks_pending": feedbacks_pending,
+        "feedbacks_reviewed": feedbacks_reviewed,
+        "feedbacks_active": feedbacks_active,
         "feedbacks_resolved": feedbacks_resolved,
         "vocab_total": vocab_total,
+    }
+
+
+@router.get("/feedback-count")
+async def get_admin_feedback_count(
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Retrieve count of new (PENDING) and in-progress (REVIEWED/IN_PROGRESS) feedbacks for admin notification badge."""
+    pending_count = (
+        await db.execute(select(func.count(Feedback.id)).where(Feedback.status == "PENDING"))
+    ).scalar() or 0
+    in_progress_count = (
+        await db.execute(
+            select(func.count(Feedback.id)).where(Feedback.status.in_(["REVIEWED", "IN_PROGRESS"]))
+        )
+    ).scalar() or 0
+    return {
+        "pending": pending_count,
+        "in_progress": in_progress_count,
+        "total_active": pending_count + in_progress_count,
     }
 
 
@@ -119,10 +148,10 @@ async def update_feedback_status(
 ):
     """Admin updates feedback handling status: PENDING, REVIEWED, RESOLVED."""
     new_status = payload.status.strip().upper()
-    if new_status not in {"PENDING", "REVIEWED", "RESOLVED"}:
+    if new_status not in {"PENDING", "REVIEWED", "IN_PROGRESS", "RESOLVED"}:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Trạng thái không hợp lệ. Cho phép: PENDING, REVIEWED, RESOLVED."
+            detail="Trạng thái không hợp lệ. Cho phép: PENDING, REVIEWED, IN_PROGRESS, RESOLVED."
         )
 
     res = await db.execute(

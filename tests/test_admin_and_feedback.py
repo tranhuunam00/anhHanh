@@ -131,7 +131,18 @@ def test_admin_portal_data_and_status_update():
     overview = overview_res.json()
     assert "users_count" in overview
     assert "feedbacks_total" in overview
+    assert "feedbacks_pending" in overview
+    assert "feedbacks_active" in overview
     assert "lessons_count" in overview
+
+    # 1b. Feedback count for badge
+    count_res = client.get("/api/admin/feedback-count", headers=admin_headers)
+    assert count_res.status_code == 200
+    count_data = count_res.json()
+    assert "pending" in count_data
+    assert "in_progress" in count_data
+    assert "total_active" in count_data
+    assert count_data["total_active"] == count_data["pending"] + count_data["in_progress"]
 
     # 2. Users list with lesson breakdown
     users_res = client.get("/api/admin/users", headers=admin_headers)

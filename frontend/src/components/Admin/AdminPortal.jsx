@@ -77,6 +77,7 @@ export const AdminPortal = ({ user, token, showToast }) => {
       setFeedbacks((prev) =>
         prev.map((fb) => (fb.id === fbId ? { ...fb, status: newStatus } : fb))
       );
+      window.dispatchEvent(new CustomEvent('shotlang:feedback-updated'));
     } catch (err) {
       showToast && showToast(err.message, 'error');
     } finally {

@@ -9,6 +9,9 @@ import {
   Trash2,
   Sparkles,
   Info,
+  ChevronDown,
+  ChevronUp,
+  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -32,6 +35,15 @@ export const VocabTab = ({ isActive = false }) => {
   const [refreshingMeaningId, setRefreshingMeaningId] = useState(null);
   const [dueItems, setDueItems] = useState([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [showGuide, setShowGuide] = useState(() => localStorage.getItem("shotlang_vocab_guide_expanded") !== "false");
+
+  const toggleGuide = () => {
+    setShowGuide((prev) => {
+      const next = !prev;
+      localStorage.setItem("shotlang_vocab_guide_expanded", String(next));
+      return next;
+    });
+  };
 
   const loadWords = useCallback(async () => {
     setIsLoading(true);
@@ -204,6 +216,92 @@ export const VocabTab = ({ isActive = false }) => {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* VOCABULARY SAVING INSTRUCTIONS & GUIDE */}
+      <div className="vocab-guide-banner">
+        <div className="vocab-guide-header">
+          <div className="vocab-guide-title">
+            <Sparkles size={18} color="#6366f1" />
+            <span>Hướng dẫn: Cách lưu từ mới vào Sổ tay</span>
+          </div>
+          <button
+            type="button"
+            className="vocab-guide-toggle-btn"
+            onClick={toggleGuide}
+          >
+            {showGuide ? (
+              <>
+                <ChevronUp size={14} />
+                <span>Thu gọn hướng dẫn</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown size={14} />
+                <span>Xem hướng dẫn lưu từ</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {showGuide && (
+          <>
+            <div className="vocab-guide-steps">
+              {/* Step 1 */}
+              <div className="vocab-guide-step-card">
+                <div className="vocab-step-number">1</div>
+                <div className="vocab-step-content">
+                  <h4>Quét chọn (bôi đen) từ</h4>
+                  <p>
+                    Khi luyện nghe (Dictation) hoặc đọc lời thoại (Transcript), hãy <strong>dùng chuột bôi đen</strong> bất kỳ từ hoặc cụm từ tiếng Anh nào bạn muốn lưu.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="vocab-guide-step-card">
+                <div className="vocab-step-number">2</div>
+                <div className="vocab-step-content">
+                  <h4>Nhấp nút "✨ Lưu từ"</h4>
+                  <p>
+                    Nút nổi thông minh <strong>✨ Lưu [từ đã chọn]</strong> sẽ lập tức xuất hiện ngay phía trên con trỏ chuột. Nhấp vào để lưu từ vào sổ tay.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="vocab-guide-step-card">
+                <div className="vocab-step-number">3</div>
+                <div className="vocab-step-content">
+                  <h4>AI tự động phân tích</h4>
+                  <p>
+                    Hệ thống tự động tra <strong>nghĩa tiếng Việt</strong>, phiên âm chuẩn <strong>IPA</strong>, lưu lại <strong>ngữ cảnh câu gốc</strong> và tìm <strong>ảnh minh họa AI</strong>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="vocab-guide-interactive-hint">
+              <span>💡 <strong>Thử ngay tại đây:</strong> Hãy dùng chuột quét chọn (bôi đen) từ này 👉</span>
+              <mark
+                style={{
+                  background: "#fef08a",
+                  color: "#854d0e",
+                  padding: "2px 8px",
+                  borderRadius: "5px",
+                  fontWeight: 700,
+                  userSelect: "all",
+                  cursor: "text",
+                }}
+              >
+                extraordinary
+              </mark>
+              <span style={{ fontSize: "0.8rem", color: "var(--text-muted, #64748b)" }}>
+                để thấy nút "✨ Lưu từ" nổi lên ngay lập tức!
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
       {dueItems.length > 0 && (

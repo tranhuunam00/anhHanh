@@ -43,6 +43,18 @@ export async function fetchAdminFeedbacks(statusFilter = 'ALL', limit = 50, offs
   return await response.json();
 }
 
+/** Fetch active feedback counts (pending + in_progress) for admin notification badge */
+export async function fetchAdminFeedbackCount(token) {
+  const response = await fetch(`${API_BASE_URL}/api/admin/feedback-count`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.detail || 'Không thể tải số lượng phản hồi cần xử lý.');
+  }
+  return await response.json();
+}
+
 export async function updateFeedbackStatus(feedbackId, newStatus, token) {
   const response = await fetch(`${API_BASE_URL}/api/admin/feedbacks/${feedbackId}/status`, {
     method: 'PATCH',

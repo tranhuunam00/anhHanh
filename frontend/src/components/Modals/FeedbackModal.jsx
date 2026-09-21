@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { submitFeedback, fetchMyFeedbacks } from '../../services/feedbackService';
 
-export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showToast }) => {
+export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpenAdminTab, showToast }) => {
   const [activeSubTab, setActiveSubTab] = useState('new'); // 'new' | 'history'
   const [category, setCategory] = useState('SUGGESTION');
   const [rating, setRating] = useState(5);
@@ -74,6 +74,7 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
       );
 
       showToast && showToast('Cảm ơn bạn! Phản hồi đã được gửi thành công.', 'success');
+      window.dispatchEvent(new CustomEvent('shotlang:feedback-updated'));
       setContent('');
       setActiveSubTab('history');
       loadHistory();
@@ -190,6 +191,22 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, showTo
             </div>
           ) : activeSubTab === 'new' ? (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {user?.role === 'ADMIN' && (
+                <div className="admin-feedback-banner-hint">
+                  <span>👑 <strong>Quản trị viên:</strong> Bạn có thể duyệt & xử lý tất cả góp ý tại Bảng Quản trị.</span>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ padding: '4px 10px', fontSize: '0.78rem', whiteSpace: 'nowrap', marginLeft: '10px' }}
+                    onClick={() => {
+                      onClose();
+                      onOpenAdminTab && onOpenAdminTab();
+                    }}
+                  >
+                    Mở Bảng Quản trị ➔
+                  </button>
+                </div>
+              )}
               {errorMsg && (
                 <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#dc2626', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <AlertCircle size={16} />
