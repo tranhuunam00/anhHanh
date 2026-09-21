@@ -323,9 +323,13 @@ class YouTubeTranscriptAdapter(ITranscriptService):
                     ]
             except Exception as e:
                 err_str = str(e).lower()
+                is_blocked = any(kw in err_str for kw in ["ipblocked", "blocking requests from your ip", "too many requests"])
+                if has_proxy and is_blocked:
+                    logger.warning(f"YouTube blocked in target transcript ({e}). Triggering WARP auto-rotation...")
+                    self._trigger_warp_rotate()
                 is_conn_error = any(kw in err_str for kw in ["socks", "proxy", "connection closed", "failed to establish", "max retries"])
-                if use_proxy and is_conn_error:
-                    logger.warning(f"Proxy error in target transcript ({e}). Retrying direct connection...")
+                if use_proxy and (is_conn_error or is_blocked):
+                    logger.warning(f"Proxy or block error in target transcript ({e}). Retrying direct connection...")
                     continue
                 break
 

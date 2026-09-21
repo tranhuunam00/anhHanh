@@ -623,6 +623,8 @@ export default function App() {
               currentChallenge={currentChallenge}
               currentIndex={currentIndex}
               totalChallenges={currentLesson?.total_challenges || 0}
+              targetLang={currentLesson?.target_lang || targetLang}
+              sourceLang={currentLesson?.source_lang || sourceLang}
               userInput={userInput}
               setUserInput={setUserInput}
               onInputChange={(val) => {

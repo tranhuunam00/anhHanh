@@ -16,6 +16,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { evaluateMasked } from "../../utils/diffCalculator";
+import { translateText } from "../../services/api";
 
 // Sub-component: Masked Character & Word Preview (Memoized to prevent DOM thrashing)
 const MaskedPreview = React.memo(({ maskedWords, hasInput }) => {
@@ -48,6 +49,8 @@ export const DictationStudio = React.memo(({
   currentChallenge,
   currentIndex,
   totalChallenges,
+  targetLang = "vi",
+  sourceLang = "en",
   userInput = "",
   setUserInput,
   onInputChange,
@@ -71,6 +74,36 @@ export const DictationStudio = React.memo(({
   onRetryChallenge,
 }) => {
   const targetText = currentChallenge ? currentChallenge.text : "";
+
+  const [dynamicTranslation, setDynamicTranslation] = React.useState(null);
+
+  React.useEffect(() => {
+    setDynamicTranslation(null);
+  }, [currentChallenge?.id, currentChallenge?.text]);
+
+  React.useEffect(() => {
+    if (
+      isCompleted &&
+      currentChallenge &&
+      !currentChallenge.translation &&
+      !dynamicTranslation &&
+      targetLang &&
+      targetLang !== "none"
+    ) {
+      let isMounted = true;
+      translateText(currentChallenge.text, sourceLang || "auto", targetLang)
+        .then((res) => {
+          if (isMounted && res?.translation) {
+            setDynamicTranslation(res.translation);
+            currentChallenge.translation = res.translation;
+          }
+        })
+        .catch(() => {});
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [isCompleted, currentChallenge, targetLang, sourceLang, dynamicTranslation]);
 
   // Cô lập local state để khi gõ phím CHỈ re-render DictationStudio, không re-render toàn bộ App
   const [localInput, setLocalInput] = React.useState(userInput || "");
@@ -246,8 +279,8 @@ export const DictationStudio = React.memo(({
       {isCompleted && (
         <div className="completion-card active">
           <div className="original-sentence">{currentChallenge?.text}</div>
-          {currentChallenge?.translation && (
-            <div className="translation-sentence">{currentChallenge.translation}</div>
+          {(currentChallenge?.translation || dynamicTranslation) && (
+            <div className="translation-sentence">{currentChallenge?.translation || dynamicTranslation}</div>
           )}
           <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
             <button className="btn btn-primary btn-with-icon" style={{ padding: "7px 18px" }} onClick={onNextChallenge}>
