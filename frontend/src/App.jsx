@@ -9,6 +9,7 @@ import { ShortcutsModal } from "./components/Modals/ShortcutsModal";
 import { AuthModal } from "./components/Modals/AuthModal";
 import { PreviewModal } from "./components/Modals/PreviewModal";
 import { FeedbackModal } from "./components/Modals/FeedbackModal";
+import { LessonCompleteModal } from "./components/Modals/LessonCompleteModal";
 import { AdminPortal } from "./components/Admin/AdminPortal";
 import { VocabTab } from "./components/Vocab/VocabTab";
 import { HistoryTab } from "./components/History/HistoryTab";
@@ -39,7 +40,7 @@ import { SPEECH_LANG_MAP } from "./constants/languages";
 export default function App() {
   const { theme, toggleTheme } = useTheme();
   const { settings, updateSetting, resetSettings } = useSettings();
-  const { token, user, refreshStreak, showToast } = useAuth();
+  const { token, user, refreshStreak, showToast, streak } = useAuth();
 
   // Navigation & Modal State
   const [activeTab, setActiveTab] = useState("tab-dictation");
@@ -49,6 +50,7 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isLessonCompleteModalOpen, setIsLessonCompleteModalOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
 
   // Lesson & Player State
@@ -288,9 +290,42 @@ export default function App() {
     );
   };
 
+  // Trigger lesson completion celebration & persist completion status
+  const handleCompleteLesson = () => {
+    if (!currentLesson) return;
+    setIsCompleted(true);
+
+    const sL = currentLesson.source_lang || sourceLang;
+    const tL = currentLesson.target_lang || targetLang;
+    const totalCount = currentLesson.challenges?.length || 1;
+
+    // Save completion state in local storage progress
+    const newProg = { ...progressMap };
+    if (!newProg.challenges) newProg.challenges = {};
+    newProg.challenges[totalCount] = { isCompleted: true, lastUpdated: Date.now() };
+    newProg.lastPosition = totalCount;
+    newProg.isCompleted = true;
+    setProgressMap(newProg);
+    saveLessonProgress(currentLesson.video_id, newProg, sL, tL);
+
+    // Sync completion with backend
+    updateLessonProgress(currentLesson.video_id, totalCount, true, token, 0, sL, tL);
+    refreshStreak();
+
+    // Show celebration modal
+    setIsLessonCompleteModalOpen(true);
+  };
+
   // Navigate to specific challenge index
   const goToChallenge = (index) => {
-    if (!currentLesson || index < 0 || index >= currentLesson.challenges.length) return;
+    if (!currentLesson) return;
+    if (index >= currentLesson.challenges.length) {
+      if (isCompleted || maxReachedIndex >= currentLesson.challenges.length - 1) {
+        handleCompleteLesson();
+      }
+      return;
+    }
+    if (index < 0) return;
     setCurrentIndex(index);
     playChallengeAtIndex(currentLesson, index);
 
@@ -360,6 +395,8 @@ export default function App() {
       enterTrackerRef.current = { count: 0, lastTime: 0, lastInput: "" };
       if (currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
         goToChallenge(currentIndex + 1);
+      } else {
+        handleCompleteLesson();
       }
       return;
     }
@@ -395,10 +432,16 @@ export default function App() {
         refreshStreak();
       }
 
-      if (settings.autoAdvance === "yes" && currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
-        setTimeout(() => {
-          goToChallenge(currentIndex + 1);
-        }, 800);
+      if (settings.autoAdvance === "yes") {
+        if (currentIndex < (currentLesson?.challenges?.length || 0) - 1) {
+          setTimeout(() => {
+            goToChallenge(currentIndex + 1);
+          }, 800);
+        } else {
+          setTimeout(() => {
+            handleCompleteLesson();
+          }, 800);
+        }
       }
     } else {
       const now = Date.now();
@@ -426,6 +469,7 @@ export default function App() {
     setUserInput(currentChallenge.text);
     setIsCompleted(true);
 
+    const isAllDone = currentIndex === (currentLesson?.challenges?.length || 0) - 1;
     const nextPos = Math.min((currentLesson.challenges?.length || 1), currentIndex + 2);
     const newMax = Math.max(maxReachedIndex, currentIndex + 1);
     setMaxReachedIndex(newMax);
@@ -437,10 +481,16 @@ export default function App() {
     if (!newProg.challenges) newProg.challenges = {};
     newProg.challenges[currentIndex + 1] = { isCompleted: true, lastUpdated: Date.now() };
     newProg.lastPosition = Math.max(nextPos, (newProg.lastPosition || 1));
+    if (isAllDone) {
+      newProg.isCompleted = true;
+    }
     setProgressMap(newProg);
     saveLessonProgress(currentLesson.video_id, newProg, sL, tL);
 
-    updateLessonProgress(currentLesson.video_id, nextPos, false, token, 0, sL, tL);
+    updateLessonProgress(currentLesson.video_id, nextPos, isAllDone, token, 0, sL, tL);
+    if (isAllDone) {
+      refreshStreak();
+    }
   };
 
   const handleHintLetter = () => {
@@ -477,7 +527,8 @@ export default function App() {
     isDrawerOpen ||
     isAuthOpen ||
     isPreviewOpen ||
-    isFeedbackOpen;
+    isFeedbackOpen ||
+    isLessonCompleteModalOpen;
 
   // Đóng popup/modal đang mở khi ấn phím Escape (không làm nhảy/skip câu của bài học)
   useEffect(() => {
@@ -491,6 +542,7 @@ export default function App() {
         setIsAuthOpen(false);
         setIsPreviewOpen(false);
         setIsFeedbackOpen(false);
+        setIsLessonCompleteModalOpen(false);
       }
     };
     window.addEventListener("keydown", handleModalEsc);
@@ -672,7 +724,14 @@ export default function App() {
               onRestartLesson={handleRestartLesson}
               isCompleted={isCompleted}
               strictPunctuation={settings.strictPunctuation}
-              onNextChallenge={() => goToChallenge(currentIndex + 1)}
+              onNextChallenge={() => {
+                if (currentIndex >= (currentLesson?.challenges?.length || 1) - 1) {
+                  handleCompleteLesson();
+                } else {
+                  goToChallenge(currentIndex + 1);
+                }
+              }}
+              onCompleteLesson={handleCompleteLesson}
               onRetryChallenge={() => {
                 userInputRef.current = "";
                 setUserInput("");
@@ -798,6 +857,23 @@ export default function App() {
       <ShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      {/* Lesson Complete Celebration Modal */}
+      <LessonCompleteModal
+        isOpen={isLessonCompleteModalOpen}
+        onClose={() => setIsLessonCompleteModalOpen(false)}
+        lesson={currentLesson}
+        streak={{ current_streak: streak }}
+        onRestartLesson={handleRestartLesson}
+        onViewTranscript={() => {
+          setIsLessonCompleteModalOpen(false);
+          setActiveTab("tab-transcript");
+        }}
+        onOpenVocab={() => {
+          setIsLessonCompleteModalOpen(false);
+          setActiveTab("tab-vocab");
+        }}
       />
     </div>
   );

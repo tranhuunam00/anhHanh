@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Sparkles,
   BookOpen,
+  Trophy,
 } from "lucide-react";
 import { evaluateMasked } from "../../utils/diffCalculator";
 import { translateText } from "../../services/api";
@@ -74,7 +75,9 @@ export const DictationStudio = React.memo(({
   strictPunctuation = false,
   onNextChallenge,
   onRetryChallenge,
+  onCompleteLesson,
 }) => {
+  const isLastChallenge = totalChallenges > 0 && currentIndex >= totalChallenges - 1;
   const targetText = currentChallenge ? currentChallenge.text : "";
 
   const [dynamicTranslation, setDynamicTranslation] = React.useState(null);
@@ -188,7 +191,12 @@ export const DictationStudio = React.memo(({
             <RotateCcw size={16} strokeWidth={2.2} />
           </button>
 
-          <button className="btn btn-secondary btn-icon" title="Câu sau (Alt+→)" onClick={onNext} disabled={currentIndex >= totalChallenges - 1}>
+          <button
+            className="btn btn-secondary btn-icon"
+            title={isLastChallenge ? (isCompleted ? "Hoàn thành bài học 🎉" : "Đã đến câu cuối cùng") : "Câu sau (Alt+→)"}
+            onClick={isLastChallenge ? (isCompleted ? (onCompleteLesson || onNextChallenge) : undefined) : onNext}
+            disabled={isLastChallenge && !isCompleted}
+          >
             <ChevronRight size={18} strokeWidth={2.2} />
           </button>
 
@@ -296,16 +304,38 @@ export const DictationStudio = React.memo(({
             <span>💡 Bôi đen từ bất kỳ để lưu vào Sổ tay</span>
           </div>
           <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-            <button
-              className="btn btn-primary btn-with-icon"
-              style={{ padding: "7px 18px" }}
-              onClick={onNextChallenge}
-              title="Sang câu tiếp theo (hoặc ấn Enter)"
-            >
-              <span>Sang câu tiếp theo</span>
-              <ArrowRight size={16} strokeWidth={2.2} />
-              <kbd style={{ fontSize: "0.72rem", opacity: 0.85, padding: "1px 6px", background: "rgba(255,255,255,0.25)", borderRadius: "4px", marginLeft: "4px" }}>Enter</kbd>
-            </button>
+            {isLastChallenge ? (
+              <button
+                className="btn btn-primary btn-with-icon"
+                style={{
+                  padding: "8px 22px",
+                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  border: "none",
+                  color: "#ffffff",
+                  fontWeight: 600,
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 14px rgba(16, 185, 129, 0.4)",
+                  cursor: "pointer",
+                }}
+                onClick={onCompleteLesson || onNextChallenge}
+                title="Hoàn thành bài học (hoặc ấn Enter)"
+              >
+                <Trophy size={17} strokeWidth={2.4} style={{ color: "#fef08a" }} />
+                <span>Hoàn thành bài học 🎉</span>
+                <kbd style={{ fontSize: "0.72rem", opacity: 0.9, padding: "1px 6px", background: "rgba(255,255,255,0.25)", borderRadius: "4px", marginLeft: "6px" }}>Enter</kbd>
+              </button>
+            ) : (
+              <button
+                className="btn btn-primary btn-with-icon"
+                style={{ padding: "7px 18px" }}
+                onClick={onNextChallenge}
+                title="Sang câu tiếp theo (hoặc ấn Enter)"
+              >
+                <span>Sang câu tiếp theo</span>
+                <ArrowRight size={16} strokeWidth={2.2} />
+                <kbd style={{ fontSize: "0.72rem", opacity: 0.85, padding: "1px 6px", background: "rgba(255,255,255,0.25)", borderRadius: "4px", marginLeft: "4px" }}>Enter</kbd>
+              </button>
+            )}
             <button className="btn btn-secondary btn-with-icon" style={{ padding: "7px 14px", fontSize: "0.85rem" }} onClick={onRetryChallenge}>
               <RotateCcw size={14} strokeWidth={2} />
               <span>Luyện lại câu này</span>
