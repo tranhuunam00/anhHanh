@@ -39,32 +39,33 @@ async def run_migrations(target_engine=None) -> int:
         res = await conn.execute(text("SELECT id FROM schema_migrations;"))
         applied_set = {row[0] for row in res.fetchall()}
 
-        # 3. Discover migration files
-        migration_files = sorted(glob.glob(os.path.join(migrations_dir, "[0-9]*.py")))
+    # 3. Discover migration files
+    migration_files = sorted(glob.glob(os.path.join(migrations_dir, "[0-9]*.py")))
 
-        for filepath in migration_files:
-            filename = os.path.basename(filepath)
-            mod_name = filename[:-3]  # strip .py
+    for filepath in migration_files:
+        filename = os.path.basename(filepath)
+        mod_name = filename[:-3]  # strip .py
 
-            if mod_name in applied_set:
-                continue
+        if mod_name in applied_set:
+            continue
 
-            logger.info(f"Running database migration: {mod_name}...")
+        logger.info(f"Running database migration: {mod_name}...")
 
-            # Import module dynamically
-            spec = importlib.util.spec_from_file_location(f"app.infrastructure.database.migrations.{mod_name}", filepath)
-            if spec and spec.loader:
-                mod = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(mod)
+        # Import module dynamically
+        spec = importlib.util.spec_from_file_location(f"app.infrastructure.database.migrations.{mod_name}", filepath)
+        if spec and spec.loader:
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
 
-                if hasattr(mod, "upgrade"):
+            if hasattr(mod, "upgrade"):
+                async with target_engine.begin() as conn:
                     await mod.upgrade(conn)
                     await conn.execute(
                         text("INSERT INTO schema_migrations (id) VALUES (:mid);"),
                         {"mid": mod_name}
                     )
-                    applied_count += 1
-                    logger.info(f"Migration {mod_name} completed successfully.")
+                applied_count += 1
+                logger.info(f"Migration {mod_name} completed successfully.")
 
     if applied_count > 0:
         logger.info(f"All database migrations applied. Total: {applied_count} new migration(s).")

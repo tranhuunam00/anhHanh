@@ -63,26 +63,43 @@ async def init_db() -> None:
     from app.infrastructure.database.seed import seed_super_admin
 
     global engine, async_session_factory
+    is_sqlite = "sqlite" in active_url
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-            # Ensure columns exist on legacy tables
             from sqlalchemy import text
-            for sql in [
-                "ALTER TABLE lessons ADD COLUMN youtube_url TEXT NULL;",
-                "ALTER TABLE user_lessons ADD COLUMN source_lang VARCHAR(20) NOT NULL DEFAULT 'en';",
-                "ALTER TABLE user_lessons ADD COLUMN target_lang VARCHAR(20) NOT NULL DEFAULT 'vi';",
-                "ALTER TABLE user_vocabulary ADD COLUMN next_review_at DATETIME NULL;",
-                "ALTER TABLE user_vocabulary ADD COLUMN review_interval_days INTEGER NOT NULL DEFAULT 1;",
-                "ALTER TABLE user_vocabulary ADD COLUMN mastery_score INTEGER NOT NULL DEFAULT 0;",
-                "ALTER TABLE feedbacks ADD COLUMN image_url TEXT NULL;",
-            ]:
-                try:
+            if not is_sqlite:
+                # PostgreSQL natively supports IF NOT EXISTS for ADD COLUMN
+                pg_sqls = [
+                    "ALTER TABLE lessons ADD COLUMN IF NOT EXISTS youtube_url TEXT;",
+                    "ALTER TABLE user_lessons ADD COLUMN IF NOT EXISTS source_lang VARCHAR(20) NOT NULL DEFAULT 'en';",
+                    "ALTER TABLE user_lessons ADD COLUMN IF NOT EXISTS target_lang VARCHAR(20) NOT NULL DEFAULT 'vi';",
+                    "ALTER TABLE user_vocabulary ADD COLUMN IF NOT EXISTS next_review_at TIMESTAMP WITH TIME ZONE NULL;",
+                    "ALTER TABLE user_vocabulary ADD COLUMN IF NOT EXISTS review_interval_days INTEGER NOT NULL DEFAULT 1;",
+                    "ALTER TABLE user_vocabulary ADD COLUMN IF NOT EXISTS mastery_score INTEGER NOT NULL DEFAULT 0;",
+                    "ALTER TABLE feedbacks ADD COLUMN IF NOT EXISTS image_url TEXT NULL;",
+                ]
+                for sql in pg_sqls:
                     await conn.execute(text(sql))
-                except Exception:
-                    pass
+            else:
+                for sql in [
+                    "ALTER TABLE lessons ADD COLUMN youtube_url TEXT NULL;",
+                    "ALTER TABLE user_lessons ADD COLUMN source_lang VARCHAR(20) NOT NULL DEFAULT 'en';",
+                    "ALTER TABLE user_lessons ADD COLUMN target_lang VARCHAR(20) NOT NULL DEFAULT 'vi';",
+                    "ALTER TABLE user_vocabulary ADD COLUMN next_review_at DATETIME NULL;",
+                    "ALTER TABLE user_vocabulary ADD COLUMN review_interval_days INTEGER NOT NULL DEFAULT 1;",
+                    "ALTER TABLE user_vocabulary ADD COLUMN mastery_score INTEGER NOT NULL DEFAULT 0;",
+                    "ALTER TABLE feedbacks ADD COLUMN image_url TEXT NULL;",
+                ]:
+                    try:
+                        await conn.execute(text(sql))
+                    except Exception:
+                        pass
         logger.info("Database tables verified/created successfully.")
     except Exception as e:
+        if is_in_docker() and "postgres" in DATABASE_URL:
+            logger.error(f"PostgreSQL database error during startup: {e}", exc_info=True)
+            raise
         logger.warning(f"Failed to connect to primary DB ({e}). Falling back to SQLite...")
         fallback_url = LOCAL_DATABASE_URL
         engine = create_async_engine(fallback_url, connect_args={"check_same_thread": False})
