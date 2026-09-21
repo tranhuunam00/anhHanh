@@ -75,6 +75,7 @@ async def init_db() -> None:
                 "ALTER TABLE user_vocabulary ADD COLUMN next_review_at DATETIME NULL;",
                 "ALTER TABLE user_vocabulary ADD COLUMN review_interval_days INTEGER NOT NULL DEFAULT 1;",
                 "ALTER TABLE user_vocabulary ADD COLUMN mastery_score INTEGER NOT NULL DEFAULT 0;",
+                "ALTER TABLE feedbacks ADD COLUMN image_url TEXT NULL;",
             ]:
                 try:
                     await conn.execute(text(sql))

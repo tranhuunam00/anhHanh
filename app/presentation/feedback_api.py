@@ -27,7 +27,7 @@ VALID_FEEDBACK_TYPES = {"SUGGESTION", "BUG", "CONTENT", "GENERAL"}
 
 
 class CreateFeedbackRequest(BaseModel):
-    content: str = Field(..., min_length=5, max_length=2000, description="Nội dung phản hồi hoặc báo lỗi")
+    content: Optional[str] = Field("", max_length=2000, description="Nội dung phản hồi hoặc mô tả lỗi")
     feedback_type: Optional[str] = Field("GENERAL", max_length=50, description="Loại phản hồi")
     category: Optional[str] = Field(None, max_length=50, description="Alias cho feedback_type")
     rating: Optional[int] = Field(None, ge=1, le=5, description="Đánh giá 1 - 5 sao")
@@ -104,7 +104,7 @@ async def get_image(filename: str):
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
-@limiter.limit("5/minute")
+@limiter.limit("20/minute")
 async def submit_feedback(
     request: Request,
     payload: CreateFeedbackRequest,
@@ -112,51 +112,70 @@ async def submit_feedback(
     db: AsyncSession = Depends(get_db),
 ):
     """Submit user feedback with strict authentication, rate-limiting, and MinIO image attachment."""
-    cleaned_content = sanitize_text(payload.content)
-    if len(cleaned_content) < 5:
+    cleaned_content = sanitize_text(payload.content or "")
+    if not payload.image_url and len(cleaned_content) < 2:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nội dung phản hồi phải có ít nhất 5 ký tự hợp lệ."
+            detail="Vui lòng nhập nội dung góp ý ít nhất 2 ký tự hoặc đính kèm ảnh minh họa."
         )
+    if not cleaned_content and payload.image_url:
+        cleaned_content = "Đính kèm ảnh phản hồi / báo lỗi"
 
     fb_type_raw = payload.category or payload.feedback_type or "GENERAL"
     fb_type = fb_type_raw.strip().upper()
     if fb_type not in VALID_FEEDBACK_TYPES:
         fb_type = "GENERAL"
 
-    # Daily anti-abuse check: Max 15 submissions per user per 24 hours
-    since_24h = datetime.now(timezone.utc) - timedelta(hours=24)
-    count_res = await db.execute(
-        select(func.count(Feedback.id)).where(
-            Feedback.user_id == current_user.id,
-            Feedback.created_at >= since_24h,
+    # Daily anti-abuse check: Max 30 submissions per user per 24 hours
+    try:
+        since_24h = datetime.now(timezone.utc) - timedelta(hours=24)
+        count_res = await db.execute(
+            select(func.count(Feedback.id)).where(
+                Feedback.user_id == current_user.id,
+                Feedback.created_at >= since_24h,
+            )
         )
-    )
-    daily_count = count_res.scalar() or 0
-    if daily_count >= 15:
+        daily_count = count_res.scalar() or 0
+        if daily_count >= 30:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Bạn đã gửi tối đa phản hồi cho phép trong 24 giờ. Cảm ơn bạn đã đóng góp!"
+            )
+    except HTTPException:
+        raise
+    except Exception as count_err:
+        logger.warning(f"Could not verify 24h feedback limit (proceeding): {count_err}")
+
+    try:
+        new_feedback = Feedback(
+            user_id=current_user.id,
+            feedback_type=fb_type,
+            rating=payload.rating,
+            content=cleaned_content,
+            image_url=payload.image_url,
+            status="PENDING",
+        )
+        db.add(new_feedback)
+        await db.commit()
+        await db.refresh(new_feedback)
+
+        logger.info(f"User {current_user.email} submitted feedback [{fb_type}]: {new_feedback.id}")
+
+        fb_dict = new_feedback.to_dict()
+        fb_dict["user_name"] = current_user.name
+        fb_dict["user_email"] = current_user.email
+
+        return {
+            "message": "Cảm ơn bạn đã gửi phản hồi! Đội ngũ phát triển sẽ ghi nhận và xử lý sớm nhất.",
+            "feedback": fb_dict,
+        }
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Error saving feedback to database: {e}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Bạn đã gửi tối đa 15 phản hồi trong vòng 24 giờ. Cảm ơn bạn đã đóng góp!"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi khi lưu phản hồi vào cơ sở dữ liệu: {str(e)}"
         )
-
-    new_feedback = Feedback(
-        user_id=current_user.id,
-        feedback_type=fb_type,
-        rating=payload.rating,
-        content=cleaned_content,
-        image_url=payload.image_url,
-        status="PENDING",
-    )
-    db.add(new_feedback)
-    await db.commit()
-    await db.refresh(new_feedback)
-
-    logger.info(f"User {current_user.email} submitted feedback [{fb_type}]: {new_feedback.id}")
-
-    return {
-        "message": "Cảm ơn bạn đã gửi phản hồi! Đội ngũ phát triển sẽ ghi nhận và xử lý sớm nhất.",
-        "feedback": new_feedback.to_dict(),
-    }
 
 
 @router.get("/my")

@@ -204,11 +204,22 @@ class Feedback(Base):
     user = relationship('User', back_populates='feedbacks')
 
     def to_dict(self):
+        user_name = None
+        user_email = None
+        try:
+            from sqlalchemy.orm import inspect
+            ins = inspect(self)
+            if "user" in ins.dict and self.user is not None:
+                user_name = self.user.name
+                user_email = self.user.email
+        except Exception:
+            pass
+
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'user_name': self.user.name if self.user else None,
-            'user_email': self.user.email if self.user else None,
+            'user_name': user_name,
+            'user_email': user_email,
             'feedback_type': self.feedback_type,
             'rating': self.rating,
             'content': self.content,

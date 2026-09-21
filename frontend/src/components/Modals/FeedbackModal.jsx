@@ -115,8 +115,9 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
       return;
     }
 
-    if (content.trim().length < 5) {
-      setErrorMsg('Vui lòng nhập nội dung ít nhất 5 ký tự.');
+    const hasImage = !!selectedImageFile;
+    if (!hasImage && content.trim().length < 2) {
+      setErrorMsg('Vui lòng nhập nội dung góp ý ít nhất 2 ký tự hoặc đính kèm ảnh chụp màn hình.');
       return;
     }
 
@@ -136,7 +137,7 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
         {
           category,
           rating,
-          content: content.trim(),
+          content: content.trim() || 'Đính kèm ảnh phản hồi / báo lỗi',
           image_url: uploadedImageUrl,
         },
         token
@@ -345,10 +346,17 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
                     maxLength={2000}
                     onChange={(e) => setContent(e.target.value)}
                     rows={4}
-                    required
                   />
                   <div className="feedback-footer-info">
-                    <span>Tối thiểu 5 ký tự</span>
+                    {selectedImageFile ? (
+                      <span style={{ color: '#10b981', fontWeight: 600 }}>
+                        📸 Đã đính kèm ảnh (nội dung có thể để ngắn hoặc mô tả thêm)
+                      </span>
+                    ) : (
+                      <span style={{ color: content.trim().length > 0 && content.trim().length < 2 ? '#ef4444' : '#64748b' }}>
+                        {content.trim().length > 0 && content.trim().length < 2 ? 'Cần tối thiểu 2 ký tự' : 'Tối thiểu 2 ký tự'}
+                      </span>
+                    )}
                     <span>{content.length}/2000 ký tự</span>
                   </div>
                 </div>
@@ -428,7 +436,7 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
                   <button
                     type="submit"
                     className="btn btn-primary btn-with-icon"
-                    disabled={isSubmitting || content.trim().length < 5}
+                    disabled={isSubmitting || (!selectedImageFile && content.trim().length < 2)}
                   >
                     {isSubmitting ? (
                       <>
