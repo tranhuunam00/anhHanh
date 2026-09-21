@@ -20,6 +20,19 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
+  .exercise-split-container {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .exercise-pane-left,
+  .exercise-pane-right {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .split-divider {
+    display: none !important;
+  }
   .player-card {
     position: static;
   }

@@ -1,45 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Plus,
+  Pencil,
   X,
   Sparkles,
-  BookOpen,
-  Loader2,
   Volume2,
   Image as ImageIcon,
   RotateCw,
+  Check,
+  Loader2,
+  AlertCircle,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import {
-  createVocabWord,
+  updateVocabWord,
   fetchPhoneticLookup,
   fetchWordTranslation,
   fetchImageCandidates,
 } from "../../services/authVocabService";
 
-export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
+export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
   const { token, refreshStreak, refreshSavedVocab, showToast } = useAuth();
+
   const [word, setWord] = useState("");
   const [phonetic, setPhonetic] = useState("");
   const [meaning, setMeaning] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [contextSentence, setContextSentence] = useState("");
+  const [vocabStatus, setVocabStatus] = useState("LEARNING");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAutoEnriching, setIsAutoEnriching] = useState(false);
   const [isSearchingImages, setIsSearchingImages] = useState(false);
+  const [imageCandidates, setImageCandidates] = useState([]);
   const [imgLoadError, setImgLoadError] = useState(false);
 
-  if (!isOpen) return null;
+  // Sync form inputs when active vocab item changes
+  useEffect(() => {
+    if (vocab) {
+      setWord(vocab.word || "");
+      setPhonetic(vocab.phonetic || "");
+      setMeaning(vocab.meaning || "");
+      setImageUrl(vocab.image_url || "");
+      setContextSentence(vocab.context_sentence || "");
+      setVocabStatus(vocab.status || "LEARNING");
+      setImageCandidates([]);
+      setImgLoadError(false);
+    }
+  }, [vocab]);
 
-  const handleTestPronounce = (textToSpeak) => {
+  if (!isOpen || !vocab) return null;
+
+  // Audio preview helper using browser Speech Synthesis
+  const handleTestPronounce = (textToSpeak, lang = "en-US") => {
     if (!textToSpeak || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = "en-US";
+    utterance.lang = lang;
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   };
 
+  // 1-Click Auto Enrich: Re-fetch IPA, Meaning, and Images for the word
   const handleAutoEnrich = async () => {
     const clean = word.trim();
     if (!clean) {
@@ -48,7 +70,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
     }
 
     setIsAutoEnriching(true);
-    showToast(`Đang tra cứu phiên âm, nghĩa và ảnh cho "${clean}"...`, "info");
+    showToast(`Đang tra cứu phiên âm, dịch và ảnh cho "${clean}"...`, "info");
 
     try {
       const [phoneticRes, transRes, candidates] = await Promise.all([
@@ -64,19 +86,23 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
         setMeaning(transRes.meaning);
       }
       if (candidates && candidates.length > 0) {
-        setImageUrl(candidates[0]);
-        setImgLoadError(false);
+        setImageCandidates(candidates);
+        if (!imageUrl || imageUrl.includes("unsplash.com/photo-1456513080510")) {
+          setImageUrl(candidates[0]);
+          setImgLoadError(false);
+        }
       }
 
-      showToast(`✨ Đã tự động điền phiên âm, dịch & ảnh cho "${clean}"!`, "success");
+      showToast(`✨ Đã tự động cập nhật phiên âm & dịch cho "${clean}"!`, "success");
     } catch (e) {
       console.warn("Auto enrich failed:", e);
-      showToast("Không thể tự động tra cứu, bạn hãy nhập thủ công nhé", "warning");
+      showToast("Không thể tự động tra cứu, hãy nhập thủ công nhé", "warning");
     } finally {
       setIsAutoEnriching(false);
     }
   };
 
+  // Cycle or search alternative images
   const handleFindAlternativeImages = async () => {
     const clean = word.trim();
     if (!clean) return;
@@ -85,15 +111,16 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       const candidates = await fetchImageCandidates(clean, contextSentence, token);
       if (candidates && candidates.length > 0) {
+        setImageCandidates(candidates);
         const available = candidates.filter((u) => u !== imageUrl);
         const nextImg = available[Math.floor(Math.random() * available.length)] || candidates[0];
         setImageUrl(nextImg);
         setImgLoadError(false);
-        showToast("Đã chọn ảnh gợi ý mới", "info");
+        showToast("Đã đổi sang ảnh gợi ý mới", "info");
       } else {
-        showToast("Không tìm thấy ảnh gợi ý", "info");
+        showToast("Không tìm thấy thêm ảnh gợi ý nào khác", "info");
       }
-    } catch {
+    } catch (e) {
       showToast("Lỗi khi tìm ảnh gợi ý", "error");
     } finally {
       setIsSearchingImages(false);
@@ -104,42 +131,30 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
     e.preventDefault();
     const cleanWord = word.trim();
     if (!cleanWord) {
-      showToast("Vui lòng nhập từ vựng tiếng Anh", "warning");
-      return;
-    }
-
-    if (!token) {
-      showToast("Vui lòng đăng nhập để lưu từ vựng", "warning");
+      showToast("Từ tiếng Anh không được để trống", "warning");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await createVocabWord(
-        {
-          word: cleanWord,
-          phonetic: phonetic.trim() || undefined,
-          meaning: meaning.trim() || undefined,
-          image_url: imageUrl.trim() || undefined,
-          context_sentence: contextSentence.trim() || "",
-          source_lang: "en",
-          target_lang: "vi",
-        },
-        token
-      );
+      const updatePayload = {
+        word: cleanWord,
+        phonetic: phonetic.trim() || undefined,
+        meaning: meaning.trim() || cleanWord,
+        image_url: imageUrl.trim() || undefined,
+        context_sentence: contextSentence.trim() || "",
+        status: vocabStatus,
+      };
 
-      showToast(`✨ Đã thêm "${cleanWord}" vào Sổ tay từ vựng!`, "success");
-      setWord("");
-      setPhonetic("");
-      setMeaning("");
-      setImageUrl("");
-      setContextSentence("");
+      const res = await updateVocabWord(vocab.id, updatePayload, token);
+
+      showToast(`✨ Đã cập nhật từ "${cleanWord}" thành công!`, "success");
       if (refreshStreak) refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
-      if (onSuccess) onSuccess();
+      if (onSuccess) onSuccess(res?.vocab);
       onClose();
     } catch (err) {
-      showToast(err.message || "Không thể thêm từ này", "error");
+      showToast(err.message || "Không thể cập nhật từ vựng này", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -148,10 +163,10 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
   return (
     <div className={`modal-overlay ${isOpen ? "active" : ""}`} onClick={onClose}>
       <div
-        className="settings-modal add-vocab-modal"
+        className="settings-modal edit-vocab-modal"
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "520px",
+          width: "540px",
           maxWidth: "94vw",
           borderRadius: "16px",
           overflow: "hidden",
@@ -162,27 +177,28 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
       >
         {/* Header */}
         <div className="modal-header" style={{ padding: "16px 20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div
               style={{
-                width: "34px",
-                height: "34px",
-                borderRadius: "8px",
-                background: "rgba(99, 102, 241, 0.15)",
+                width: "36px",
+                height: "36px",
+                borderRadius: "10px",
+                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(59, 130, 246, 0.2))",
+                border: "1px solid rgba(99, 102, 241, 0.3)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#6366f1",
               }}
             >
-              <Plus size={18} strokeWidth={2.5} />
+              <Pencil size={18} strokeWidth={2.5} />
             </div>
             <div>
               <h3 className="modal-title" style={{ margin: 0, fontSize: "1.1rem" }}>
-                Thêm từ mới vào Sổ tay
+                Chỉnh sửa thẻ từ vựng
               </h3>
               <div style={{ fontSize: "0.78rem", color: "var(--text-muted, #64748b)" }}>
-                Đồng bộ tự động phiên âm IPA, nghĩa tiếng Việt & ảnh minh họa
+                Cập nhật từ gốc, phiên âm IPA, nghĩa tiếng Việt và link ảnh
               </div>
             </div>
           </div>
@@ -191,7 +207,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
           </button>
         </div>
 
-        {/* Body Form */}
+        {/* Scrollable Form Body */}
         <form
           onSubmit={handleSubmit}
           style={{
@@ -202,7 +218,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
             gap: "14px",
           }}
         >
-          {/* Word & Auto Enrich Button */}
+          {/* Row 1: Word & Auto Enrich Button */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
               <label
@@ -231,7 +247,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                   alignItems: "center",
                   gap: "4px",
                 }}
-                title="Tự động tra cứu phiên âm, dịch nghĩa và tìm ảnh"
+                title="Tự động tra cứu phiên âm IPA, dịch nghĩa và tìm ảnh"
               >
                 {isAutoEnriching ? <Loader2 size={12} className="spinning" /> : <Sparkles size={12} />}
                 <span>{isAutoEnriching ? "Đang tra..." : "⚡ Tra cứu tự động cả 3"}</span>
@@ -247,46 +263,44 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                 border: "1px solid var(--border-color, #e2e8f0)",
                 background: "var(--bg-input, #fff)",
                 color: "var(--text-primary, #0f172a)",
-                fontSize: "1rem",
+                fontSize: "1.05rem",
                 fontWeight: 600,
                 boxSizing: "border-box",
               }}
-              placeholder="Ví dụ: flourishing, resilience, perseverance..."
               value={word}
               onChange={(e) => setWord(e.target.value)}
-              autoFocus
+              placeholder="Nhập từ gốc..."
               required
             />
           </div>
 
-          {/* Phonetic & Meaning (2 Columns) */}
+          {/* Row 2: Phonetic IPA & Meaning (2 Columns) */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "12px" }}>
+            {/* Phonetic */}
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                 <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
                   Phiên âm IPA
                 </label>
-                {word.trim() && (
-                  <button
-                    type="button"
-                    onClick={() => handleTestPronounce(word)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "#2563eb",
-                      cursor: "pointer",
-                      padding: "2px 4px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "3px",
-                      fontSize: "0.72rem",
-                    }}
-                    title="Nghe thử phát âm Web Speech"
-                  >
-                    <Volume2 size={13} />
-                    <span>Nghe</span>
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => handleTestPronounce(word)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#2563eb",
+                    cursor: "pointer",
+                    padding: "2px 4px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "3px",
+                    fontSize: "0.72rem",
+                  }}
+                  title="Nghe thử phát âm Web Speech"
+                >
+                  <Volume2 size={13} />
+                  <span>Nghe thử</span>
+                </button>
               </div>
               <input
                 type="text"
@@ -302,18 +316,18 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                   fontFamily: "monospace",
                   boxSizing: "border-box",
                 }}
-                placeholder="Tự động nếu để trống"
                 value={phonetic}
                 onChange={(e) => setPhonetic(e.target.value)}
+                placeholder="/ˈflʌr.ɪ.ʃɪŋ/"
               />
             </div>
 
+            {/* Meaning */}
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                 <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
-                  Nghĩa tiếng Việt
+                  Nghĩa tiếng Việt <span style={{ color: "#ef4444" }}>*</span>
                 </label>
-                <span style={{ fontSize: "0.72rem", color: "#6366f1" }}>Tự động nếu để trống</span>
               </div>
               <input
                 type="text"
@@ -329,18 +343,19 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                   fontSize: "0.9rem",
                   boxSizing: "border-box",
                 }}
-                placeholder="Ví dụ: sự kiên cường..."
                 value={meaning}
                 onChange={(e) => setMeaning(e.target.value)}
+                placeholder="Nghĩa tiếng Việt..."
+                required
               />
             </div>
           </div>
 
-          {/* Image URL & Live Preview */}
+          {/* Row 3: Image URL & Live Preview */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
               <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
-                Link ảnh minh họa (Tùy chọn)
+                Link ảnh minh họa (Image URL)
               </label>
               <button
                 type="button"
@@ -357,19 +372,20 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                   fontSize: "0.75rem",
                   fontWeight: 600,
                 }}
-                title="Tìm ảnh minh họa liên quan"
+                title="Tìm ảnh minh họa liên quan khác"
               >
                 <RotateCw size={12} className={isSearchingImages ? "spinning" : ""} />
-                <span>{isSearchingImages ? "Đang tìm..." : "Tìm ảnh gợi ý"}</span>
+                <span>{isSearchingImages ? "Đang tìm..." : "Đổi ảnh khác"}</span>
               </button>
             </div>
 
             <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+              {/* Thumbnail Live Preview */}
               <div
                 style={{
-                  width: "64px",
-                  height: "64px",
-                  borderRadius: "8px",
+                  width: "72px",
+                  height: "72px",
+                  borderRadius: "10px",
                   border: "1px solid var(--border-color, #cbd5e1)",
                   overflow: "hidden",
                   flexShrink: 0,
@@ -377,6 +393,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  position: "relative",
                 }}
               >
                 {imageUrl && !imgLoadError ? (
@@ -388,12 +405,13 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                   />
                 ) : (
                   <div style={{ textAlign: "center", color: "#94a3b8" }}>
-                    <ImageIcon size={20} />
-                    <div style={{ fontSize: "0.58rem" }}>{imgLoadError ? "Lỗi link" : "Tự tìm"}</div>
+                    <ImageIcon size={22} />
+                    <div style={{ fontSize: "0.6rem" }}>{imgLoadError ? "Lỗi link" : "Chưa có"}</div>
                   </div>
                 )}
               </div>
 
+              {/* URL Input */}
               <div style={{ flex: 1 }}>
                 <input
                   type="url"
@@ -413,16 +431,46 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                     setImageUrl(e.target.value);
                     setImgLoadError(false);
                   }}
-                  placeholder="Dán link ảnh hoặc để trống để AI tự động tìm"
+                  placeholder="https://... dán link ảnh trực tiếp tại đây"
                 />
                 <div style={{ fontSize: "0.72rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
-                  💡 Để trống hệ thống sẽ tự động gán ảnh minh họa phù hợp với nghĩa của từ.
+                  💡 Bạn có thể dán trực tiếp bất kỳ link ảnh nào (PNG, JPG, WebP) hoặc bấm nút "Đổi ảnh khác".
                 </div>
               </div>
             </div>
+
+            {/* Candidate image thumbnails strip if available */}
+            {imageCandidates.length > 1 && (
+              <div style={{ display: "flex", gap: "6px", marginTop: "8px", overflowX: "auto", paddingBottom: "4px" }}>
+                {imageCandidates.slice(0, 5).map((candidate, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setImageUrl(candidate);
+                      setImgLoadError(false);
+                    }}
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "6px",
+                      border: imageUrl === candidate ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                      padding: 0,
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      flexShrink: 0,
+                      opacity: imageUrl === candidate ? 1 : 0.7,
+                    }}
+                    title={`Chọn ảnh gợi ý #${idx + 1}`}
+                  >
+                    <img src={candidate} alt="option" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Context Sentence */}
+          {/* Row 4: Context Sentence */}
           <div>
             <label
               style={{
@@ -433,7 +481,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                 marginBottom: "6px",
               }}
             >
-              Câu ví dụ minh họa (Tùy chọn)
+              Câu ví dụ ngữ cảnh (Context sentence)
             </label>
             <textarea
               className="dict-input"
@@ -446,23 +494,58 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                 background: "var(--bg-input, #fff)",
                 color: "var(--text-primary, #0f172a)",
                 fontSize: "0.85rem",
-                resize: "vertical",
                 boxSizing: "border-box",
+                resize: "vertical",
                 fontFamily: "inherit",
               }}
-              placeholder="Ví dụ: She showed remarkable resilience throughout the project."
               value={contextSentence}
               onChange={(e) => setContextSentence(e.target.value)}
+              placeholder="Câu văn chứa từ vựng này..."
             />
           </div>
 
-          {/* Footer Buttons */}
+          {/* Row 5: Status */}
+          <div>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.83rem",
+                fontWeight: 600,
+                color: "var(--text-primary, #1e293b)",
+                marginBottom: "6px",
+              }}
+            >
+              Trạng thái ghi nhớ
+            </label>
+            <select
+              className="dict-input"
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: "8px",
+                border: "1px solid var(--border-color, #e2e8f0)",
+                background: "var(--bg-input, #fff)",
+                color: "var(--text-primary, #0f172a)",
+                fontSize: "0.88rem",
+                boxSizing: "border-box",
+                cursor: "pointer",
+              }}
+              value={vocabStatus}
+              onChange={(e) => setVocabStatus(e.target.value)}
+            >
+              <option value="NEW">Mới lưu (NEW)</option>
+              <option value="LEARNING">Đang nhớ (LEARNING)</option>
+              <option value="MASTERED">Đã thuộc (MASTERED)</option>
+            </select>
+          </div>
+
+          {/* Footer Actions */}
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
               gap: "10px",
-              marginTop: "4px",
+              marginTop: "8px",
               paddingTop: "12px",
               borderTop: "1px solid var(--border-color, #e2e8f0)",
             }}
@@ -470,33 +553,27 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
             <button
               type="button"
               className="btn btn-secondary"
-              style={{ padding: "8px 16px", borderRadius: "8px" }}
               onClick={onClose}
               disabled={isSubmitting}
+              style={{ padding: "8px 16px", fontSize: "0.88rem" }}
             >
               Hủy
             </button>
             <button
               type="submit"
               className="btn btn-primary btn-with-icon"
-              style={{
-                padding: "8px 20px",
-                borderRadius: "8px",
-                background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
-                border: "none",
-                fontWeight: 600,
-              }}
-              disabled={isSubmitting || !word.trim()}
+              disabled={isSubmitting}
+              style={{ padding: "8px 20px", fontSize: "0.88rem", fontWeight: 700 }}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={16} className="spinner" />
+                  <Loader2 size={16} className="spinning" />
                   <span>Đang lưu...</span>
                 </>
               ) : (
                 <>
-                  <Plus size={16} strokeWidth={2.5} />
-                  <span>Lưu từ vựng</span>
+                  <Check size={16} strokeWidth={2.5} />
+                  <span>Lưu thay đổi</span>
                 </>
               )}
             </button>

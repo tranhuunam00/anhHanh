@@ -18,6 +18,7 @@ import {
   Layers,
   Mic,
   CheckCircle2,
+  Pencil,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -30,6 +31,7 @@ import {
 } from "../../services/authVocabService";
 import VocabReviewModal from "./VocabReviewModal";
 import { AddVocabModal } from "../Modals/AddVocabModal";
+import { EditVocabModal } from "../Modals/EditVocabModal";
 import { exportVocabToCSV, exportVocabToAnki } from "../../utils/vocabExporter";
 import { splitContextSentence } from "../../utils/textNormalizer";
 
@@ -44,6 +46,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [dueItems, setDueItems] = useState([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingVocab, setEditingVocab] = useState(null);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [listeningWordId, setListeningWordId] = useState(null);
   const [pronounceResults, setPronounceResults] = useState({});
@@ -549,14 +552,25 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                   className="vocab-card-img"
                   alt={v.word}
                 />
-                <button
-                  className="vocab-img-rotate-btn"
-                  onClick={() => handleRotateImage(v.id, v.word, v.image_url, v.context_sentence)}
-                  title="Tìm ảnh minh họa khác theo ngữ cảnh"
-                >
-                  <RotateCw size={13} style={{ marginRight: 4 }} />
-                  Đổi ảnh
-                </button>
+                <div style={{ position: "absolute", bottom: 8, right: 8, display: "flex", gap: "6px" }}>
+                  <button
+                    className="vocab-img-rotate-btn"
+                    onClick={() => handleRotateImage(v.id, v.word, v.image_url, v.context_sentence)}
+                    title="Tìm ảnh minh họa khác theo ngữ cảnh"
+                  >
+                    <RotateCw size={13} style={{ marginRight: 4 }} />
+                    Đổi ảnh
+                  </button>
+                  <button
+                    className="vocab-img-rotate-btn"
+                    onClick={() => setEditingVocab(v)}
+                    title="Chỉnh sửa chi tiết từ vựng, link ảnh, phiên âm & nghĩa"
+                    style={{ background: "rgba(15, 23, 42, 0.82)" }}
+                  >
+                    <Pencil size={12} style={{ marginRight: 4 }} />
+                    Sửa
+                  </button>
+                </div>
               </div>
 
               <div className="vocab-card-body">
@@ -686,6 +700,14 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                     </button>
                     <button
                       className="vocab-audio-btn"
+                      style={{ color: "#2563eb" }}
+                      onClick={() => setEditingVocab(v)}
+                      title="Chỉnh sửa từ vựng, phiên âm, nghĩa & ảnh"
+                    >
+                      <Pencil size={13} strokeWidth={2.2} />
+                    </button>
+                    <button
+                      className="vocab-audio-btn"
                       style={{ color: "#dc2626" }}
                       onClick={() => handleDelete(v.id)}
                       title="Xóa từ khỏi sổ tay"
@@ -704,6 +726,18 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
       <AddVocabModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        onSuccess={() => {
+          loadWords();
+          if (refreshStreak) refreshStreak();
+          if (refreshSavedVocab) refreshSavedVocab();
+        }}
+      />
+
+      {/* Full Edit Vocab Modal */}
+      <EditVocabModal
+        isOpen={!!editingVocab}
+        vocab={editingVocab}
+        onClose={() => setEditingVocab(null)}
         onSuccess={() => {
           loadWords();
           if (refreshStreak) refreshStreak();

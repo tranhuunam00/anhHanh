@@ -49,6 +49,15 @@ class UpdateImageRequest(BaseModel):
     image_url: str
 
 
+class UpdateVocabDetailsRequest(BaseModel):
+    word: Optional[str] = None
+    meaning: Optional[str] = None
+    phonetic: Optional[str] = None
+    image_url: Optional[str] = None
+    context_sentence: Optional[str] = None
+    status: Optional[str] = None
+
+
 @router.post('')
 async def save_vocabulary_word(
     payload: CreateVocabRequest,
@@ -206,6 +215,29 @@ async def get_image_candidates(
     return {'word': word, 'candidates': candidates}
 
 
+@router.get('/phonetic')
+async def get_word_phonetic_lookup(
+    word: str = Query(..., min_length=1),
+    current_user: User = Depends(get_current_user)
+):
+    """Lookup standard IPA phonetic notation for a word or phrase."""
+    clean_word = word.strip()
+    ipa = ImageSearchService.get_word_phonetic(clean_word)
+    return {'word': clean_word, 'phonetic': ipa}
+
+
+@router.get('/translate')
+async def get_word_translation_lookup(
+    word: str = Query(..., min_length=1),
+    target_lang: str = Query('vi'),
+    current_user: User = Depends(get_current_user)
+):
+    """Translate word to Vietnamese or target language."""
+    clean_word = _translation_service.clean_text(word.strip())
+    trans = _translation_service.translate(clean_word, source_lang='auto', target_lang=target_lang)
+    return {'word': clean_word, 'meaning': trans or clean_word}
+
+
 @router.patch('/{vocab_id}/status')
 async def update_vocabulary_status(
     vocab_id: str,
@@ -301,6 +333,67 @@ async def refresh_vocabulary_meaning(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Lỗi khi dịch: {str(e)}')
+
+
+@router.patch('/{vocab_id}')
+async def update_vocabulary_details(
+    vocab_id: str,
+    payload: UpdateVocabDetailsRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Comprehensive update for vocabulary item (word, IPA phonetic, meaning, image URL, context sentence)."""
+    res = await db.execute(
+        select(UserVocabulary).where(
+            UserVocabulary.id == vocab_id,
+            UserVocabulary.user_id == current_user.id
+        )
+    )
+    vocab = res.scalar_one_or_none()
+    if not vocab:
+        raise HTTPException(status_code=404, detail='Từ vựng không tồn tại')
+
+    word_changed = False
+    if payload.word is not None and payload.word.strip():
+        new_word = payload.word.strip()
+        if new_word.lower() != vocab.word.lower():
+            word_changed = True
+            vocab.word = new_word
+
+    if payload.meaning is not None:
+        clean_meaning = payload.meaning.strip()
+        vocab.meaning = clean_meaning or vocab.word
+    elif word_changed:
+        # Auto-translate if word changed and no custom meaning provided
+        try:
+            trans = _translation_service.translate(vocab.word, source_lang='auto', target_lang='vi')
+            if trans and trans.lower().strip() != vocab.word.lower().strip():
+                vocab.meaning = trans.strip()
+        except Exception as e:
+            logger.warning(f"Auto-translate error on word update: {e}")
+
+    if payload.phonetic is not None:
+        clean_ipa = payload.phonetic.strip()
+        vocab.phonetic = clean_ipa or None
+    elif word_changed:
+        # Auto-fetch new IPA if word changed and no custom phonetic provided
+        new_ipa = ImageSearchService.get_word_phonetic(vocab.word)
+        if new_ipa:
+            vocab.phonetic = new_ipa
+
+    if payload.image_url is not None:
+        clean_img = payload.image_url.strip()
+        vocab.image_url = clean_img or None
+
+    if payload.context_sentence is not None:
+        vocab.context_sentence = payload.context_sentence.strip()
+
+    if payload.status is not None and payload.status in ['NEW', 'LEARNING', 'MASTERED']:
+        vocab.status = payload.status
+
+    await db.commit()
+    await db.refresh(vocab)
+    return {'message': 'Đã cập nhật từ vựng thành công', 'vocab': vocab.to_dict()}
 
 
 @router.delete('/{vocab_id}')

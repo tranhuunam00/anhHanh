@@ -165,6 +165,68 @@ export const deleteVocabWord = async (vocabId, token) => {
   return await safeParseResponse(res, "Không thể xóa từ này");
 };
 
+export const updateVocabWord = async (vocabId, updateData, token) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(`/api/vocab/${vocabId}`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify(updateData),
+  });
+  return await safeParseResponse(res, "Không thể cập nhật từ vựng");
+};
+
+export const fetchPhoneticLookup = async (word, token = null) => {
+  try {
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`/api/vocab/phonetic?word=${encodeURIComponent(word.trim())}`, { headers });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (e) {
+    console.debug("Error fetching phonetic:", e);
+  }
+  return { word, phonetic: null };
+};
+
+export const fetchWordTranslation = async (word, targetLang = "vi", token = null) => {
+  try {
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(
+      `/api/vocab/translate?word=${encodeURIComponent(word.trim())}&target_lang=${encodeURIComponent(targetLang)}`,
+      { headers }
+    );
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (e) {
+    console.debug("Error translating word:", e);
+  }
+  return { word, meaning: word };
+};
+
+export const fetchImageCandidates = async (word, contextSentence = "", token = null) => {
+  try {
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    let url = `/api/vocab/image-candidates?word=${encodeURIComponent(word.trim())}`;
+    if (contextSentence) {
+      url += `&context_sentence=${encodeURIComponent(contextSentence.trim())}`;
+    }
+    const res = await fetch(url, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      return data.candidates || [];
+    }
+  } catch (e) {
+    console.debug("Error fetching image candidates:", e);
+  }
+  return [];
+};
+
 export const refreshVocabMeaning = async (vocabId, token) => {
   const headers = {};
   if (token) headers["Authorization"] = `Bearer ${token}`;

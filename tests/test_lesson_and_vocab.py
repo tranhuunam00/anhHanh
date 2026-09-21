@@ -159,3 +159,56 @@ def test_vocab_srs_review_session_api():
     assert res_correct.json()["vocab"]["mastery_score"] >= 1
     assert res_correct.json()["vocab"]["review_interval_days"] >= 3
 
+
+def test_vocab_update_and_lookup_api():
+    """Verify comprehensive PATCH /api/vocab/{vocab_id} and lookup endpoints."""
+    # Register/login user
+    email = f"update_tester_{uuid.uuid4().hex[:6]}@example.com"
+    client.post("/api/auth/register", json={"email": email, "password": "Password123!", "name": "Updater"})
+    login_res = client.post("/api/auth/login", json={"email": email, "password": "Password123!"})
+    token = login_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 1. Test lookup endpoints
+    phone_res = client.get("/api/vocab/phonetic?word=flourishing", headers=headers)
+    assert phone_res.status_code == 200
+    assert "phonetic" in phone_res.json()
+
+    trans_res = client.get("/api/vocab/translate?word=flourishing&target_lang=vi", headers=headers)
+    assert trans_res.status_code == 200
+    assert "meaning" in trans_res.json()
+
+    # 2. Save initial word
+    save_res = client.post(
+        "/api/vocab",
+        json={
+            "word": "flourishing",
+            "meaning": "uốn lượn như cánh",
+            "phonetic": "/ˈflɜːr.ɪ.ʃɪŋ/",
+            "image_url": "https://example.com/initial.jpg"
+        },
+        headers=headers
+    )
+    assert save_res.status_code == 200
+    vocab_id = save_res.json()["vocab"]["id"]
+
+    # 3. Update all 3 (word, meaning, image_url) + phonetic
+    update_res = client.patch(
+        f"/api/vocab/{vocab_id}",
+        json={
+            "word": "resilience",
+            "meaning": "sự kiên cường, bền bỉ",
+            "phonetic": "/rɪˈzɪl.jəns/",
+            "image_url": "https://example.com/new_resilience.jpg",
+            "status": "LEARNING"
+        },
+        headers=headers
+    )
+    assert update_res.status_code == 200
+    updated_vocab = update_res.json()["vocab"]
+    assert updated_vocab["word"] == "resilience"
+    assert updated_vocab["meaning"] == "sự kiên cường, bền bỉ"
+    assert updated_vocab["phonetic"] == "/rɪˈzɪl.jəns/"
+    assert updated_vocab["image_url"] == "https://example.com/new_resilience.jpg"
+    assert updated_vocab["status"] == "LEARNING"
+

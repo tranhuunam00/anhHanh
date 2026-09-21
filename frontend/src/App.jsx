@@ -73,6 +73,62 @@ export default function App() {
   const [isListening, setIsListening] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Draggable Split Ratio between Player and Dictation Studio (clamped 25% - 75%)
+  const [splitRatio, setSplitRatio] = useState(() => {
+    const saved = getStorageItem("shotlang_split_ratio", 50);
+    const num = Number(saved);
+    return isNaN(num) || num < 25 || num > 75 ? 50 : num;
+  });
+  const [isDraggingSplit, setIsDraggingSplit] = useState(false);
+  const splitContainerRef = useRef(null);
+  const isDraggingSplitRef = useRef(false);
+  const splitRatioRef = useRef(splitRatio);
+  splitRatioRef.current = splitRatio;
+
+  const handleSplitMouseDown = (e) => {
+    e.preventDefault();
+    setIsDraggingSplit(true);
+    isDraggingSplitRef.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
+
+  const handleResetSplitRatio = () => {
+    setSplitRatio(50);
+    setStorageItem("shotlang_split_ratio", 50);
+    showToast("Đã đặt lại tỷ lệ 2 bên 50% / 50%", "info");
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDraggingSplitRef.current || !splitContainerRef.current) return;
+      const rect = splitContainerRef.current.getBoundingClientRect();
+      if (!rect.width) return;
+      const newRatio = ((e.clientX - rect.left) / rect.width) * 100;
+      const clamped = Math.max(25, Math.min(75, Math.round(newRatio * 10) / 10));
+      setSplitRatio(clamped);
+    };
+
+    const handleMouseUp = () => {
+      if (isDraggingSplitRef.current) {
+        isDraggingSplitRef.current = false;
+        setIsDraggingSplit(false);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        setStorageItem("shotlang_split_ratio", splitRatioRef.current);
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+  }, []);
+
   // Controller Refs
   const playerRef = useRef(null);
   const speechRef = useRef(null);
@@ -683,62 +739,93 @@ export default function App() {
 
         {/* TAB 1: Dictation Practice */}
         <div style={{ display: activeTab === "tab-dictation" ? "block" : "none" }}>
-          <div className="exercise-grid">
-            <PlayerCard
-              playerController={playerController}
-              isEmbedRestricted={isEmbedRestricted}
-              currentSentenceText={currentChallenge?.text}
-              sourceLang={sourceLang}
-              isPlaying={isPlaying}
-              onReplay={() => playerController.replayCurrentSegment()}
-              onPlayPause={() => playerController.togglePlayPause()}
-              onSeekRelative={(sec) => playerController.seekRelative(sec)}
-              onSpeakSentence={handleSpeakSentence}
-              videoUrl={urlInput}
-            />
+          <div className="exercise-split-container" ref={splitContainerRef}>
+            {/* Overlay shield while dragging to prevent YouTube iframe from capturing mouse */}
+            {isDraggingSplit && <div className="split-drag-overlay" />}
 
-            <DictationStudio
-              currentChallenge={currentChallenge}
-              currentIndex={currentIndex}
-              totalChallenges={currentLesson?.total_challenges || 0}
-              targetLang={currentLesson?.target_lang || targetLang}
-              sourceLang={currentLesson?.source_lang || sourceLang}
-              userInput={userInput}
-              setUserInput={setUserInput}
-              onInputChange={(val) => {
-                userInputRef.current = val;
-              }}
-              isListening={isListening}
-              isPlaying={isPlaying}
-              onToggleMic={handleToggleMic}
-              onCheck={handleCheck}
-              onSkip={handleSkip}
-              onReplay={() => playerController.replayCurrentSegment()}
-              onPlayPause={() => playerController.togglePlayPause()}
-              onSpeakSentence={handleSpeakSentence}
-              onHintLetter={handleHintLetter}
-              onHintWord={handleHintWord}
-              onPrev={() => goToChallenge(currentIndex - 1)}
-              onNext={() => goToChallenge(currentIndex + 1)}
-              onOpenDrawer={() => setIsDrawerOpen(true)}
-              onRestartLesson={handleRestartLesson}
-              isCompleted={isCompleted}
-              strictPunctuation={settings.strictPunctuation}
-              onNextChallenge={() => {
-                if (currentIndex >= (currentLesson?.challenges?.length || 1) - 1) {
-                  handleCompleteLesson();
-                } else {
-                  goToChallenge(currentIndex + 1);
-                }
-              }}
-              onCompleteLesson={handleCompleteLesson}
-              onRetryChallenge={() => {
-                userInputRef.current = "";
-                setUserInput("");
-                setIsCompleted(false);
-                playerController.replayCurrentSegment();
-              }}
-            />
+            {/* Left Column: Player Card */}
+            <div
+              className="exercise-pane exercise-pane-left"
+              style={{ flex: `0 0 calc(${splitRatio}% - 9px)` }}
+            >
+              <PlayerCard
+                playerController={playerController}
+                isEmbedRestricted={isEmbedRestricted}
+                currentSentenceText={currentChallenge?.text}
+                sourceLang={sourceLang}
+                isPlaying={isPlaying}
+                onReplay={() => playerController.replayCurrentSegment()}
+                onPlayPause={() => playerController.togglePlayPause()}
+                onSeekRelative={(sec) => playerController.seekRelative(sec)}
+                onSpeakSentence={handleSpeakSentence}
+                videoUrl={urlInput}
+              />
+            </div>
+
+            {/* Draggable Divider Bar */}
+            <div
+              className={`split-divider ${isDraggingSplit ? "active" : ""}`}
+              onMouseDown={handleSplitMouseDown}
+              onDoubleClick={handleResetSplitRatio}
+              title="Kéo thả để điều chỉnh tỷ lệ 2 bên (Nhấp đúp để đặt lại 50/50)"
+            >
+              <div className="split-divider-line">
+                <div className="split-divider-handle">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Dictation Studio */}
+            <div
+              className="exercise-pane exercise-pane-right"
+              style={{ flex: `1 1 0` }}
+            >
+              <DictationStudio
+                currentChallenge={currentChallenge}
+                currentIndex={currentIndex}
+                totalChallenges={currentLesson?.total_challenges || 0}
+                targetLang={currentLesson?.target_lang || targetLang}
+                sourceLang={currentLesson?.source_lang || sourceLang}
+                userInput={userInput}
+                setUserInput={setUserInput}
+                onInputChange={(val) => {
+                  userInputRef.current = val;
+                }}
+                isListening={isListening}
+                isPlaying={isPlaying}
+                onToggleMic={handleToggleMic}
+                onCheck={handleCheck}
+                onSkip={handleSkip}
+                onReplay={() => playerController.replayCurrentSegment()}
+                onPlayPause={() => playerController.togglePlayPause()}
+                onSpeakSentence={handleSpeakSentence}
+                onHintLetter={handleHintLetter}
+                onHintWord={handleHintWord}
+                onPrev={() => goToChallenge(currentIndex - 1)}
+                onNext={() => goToChallenge(currentIndex + 1)}
+                onOpenDrawer={() => setIsDrawerOpen(true)}
+                onRestartLesson={handleRestartLesson}
+                isCompleted={isCompleted}
+                strictPunctuation={settings.strictPunctuation}
+                onNextChallenge={() => {
+                  if (currentIndex >= (currentLesson?.challenges?.length || 1) - 1) {
+                    handleCompleteLesson();
+                  } else {
+                    goToChallenge(currentIndex + 1);
+                  }
+                }}
+                onCompleteLesson={handleCompleteLesson}
+                onRetryChallenge={() => {
+                  userInputRef.current = "";
+                  setUserInput("");
+                  setIsCompleted(false);
+                  playerController.replayCurrentSegment();
+                }}
+              />
+            </div>
           </div>
 
           <PresetsSection
