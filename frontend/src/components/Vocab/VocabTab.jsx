@@ -12,6 +12,12 @@ import {
   ChevronDown,
   ChevronUp,
   HelpCircle,
+  Plus,
+  Download,
+  FileSpreadsheet,
+  Layers,
+  Mic,
+  CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -23,10 +29,12 @@ import {
   fetchDueVocabSession,
 } from "../../services/authVocabService";
 import VocabReviewModal from "./VocabReviewModal";
+import { AddVocabModal } from "../Modals/AddVocabModal";
+import { exportVocabToCSV, exportVocabToAnki } from "../../utils/vocabExporter";
 import { splitContextSentence } from "../../utils/textNormalizer";
 
 export const VocabTab = ({ isActive = false, onOpenGuide }) => {
-  const { token, isAuthenticated, refreshStreak, showToast } = useAuth();
+  const { token, isAuthenticated, refreshStreak, showToast, refreshSavedVocab } = useAuth();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [filterStatus, setFilterStatus] = useState("ALL");
@@ -35,6 +43,13 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [refreshingMeaningId, setRefreshingMeaningId] = useState(null);
   const [dueItems, setDueItems] = useState([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const [listeningWordId, setListeningWordId] = useState(null);
+  const [pronounceResults, setPronounceResults] = useState({});
+
+  const exportMenuRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const loadWords = useCallback(async () => {
     setIsLoading(true);
@@ -64,6 +79,101 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
     }
   }, [isActive, loadWords]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setIsExportMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+    };
+  }, []);
+
+  const handleStartPronouncePractice = (item) => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      showToast("Trình duyệt của bạn không hỗ trợ Micro nhận diện giọng nói", "warning");
+      return;
+    }
+
+    if (listeningWordId === item.id) {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      setListeningWordId(null);
+      return;
+    }
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+    }
+
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 3;
+
+    setListeningWordId(item.id);
+    showToast(`🎙️ Đang nghe... Hãy phát âm từ "${item.word}"`, "info");
+
+    recognition.onresult = (event) => {
+      const heard = event.results[0][0]?.transcript?.trim() || "";
+      const cleanTarget = item.word.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const cleanHeard = heard.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      const isMatch =
+        cleanHeard === cleanTarget ||
+        cleanHeard.includes(cleanTarget) ||
+        cleanTarget.includes(cleanHeard);
+
+      setPronounceResults((prev) => ({
+        ...prev,
+        [item.id]: {
+          isMatch,
+          heard,
+          timestamp: Date.now(),
+        },
+      }));
+
+      if (isMatch) {
+        showToast(`🎯 Xuất sắc! Phát âm từ "${item.word}" chuẩn 100%!`, "success");
+      } else {
+        showToast(`👂 Máy nghe được: "${heard}". Hãy nghe lại phát âm mẫu và thử lại nhé!`, "warning");
+      }
+      setListeningWordId(null);
+    };
+
+    recognition.onerror = (e) => {
+      console.warn("Speech recognition error:", e);
+      if (e.error !== "no-speech") {
+        showToast(`Lỗi micro: ${e.error || "Không nhận diện được giọng nói"}`, "error");
+      }
+      setListeningWordId(null);
+    };
+
+    recognition.onend = () => {
+      setListeningWordId(null);
+    };
+
+    try {
+      recognition.start();
+    } catch (err) {
+      console.error("Cannot start recognition:", err);
+      setListeningWordId(null);
+    }
+  };
+
   const handleStatusChange = async (vocabId, newStatus) => {
     try {
       await updateVocabStatus(vocabId, newStatus, token);
@@ -72,6 +182,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
         prev.map((item) => (item.id === vocabId ? { ...item, status: newStatus } : item))
       );
       if (refreshStreak) refreshStreak();
+      if (refreshSavedVocab) refreshSavedVocab();
     } catch (e) {
       showToast(e.message || "Không thể cập nhật trạng thái", "error");
     }
@@ -98,6 +209,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
       setItems((prev) => prev.filter((item) => item.id !== vocabId));
       setTotal((prev) => Math.max(0, prev - 1));
       if (refreshStreak) refreshStreak();
+      if (refreshSavedVocab) refreshSavedVocab();
     } catch (e) {
       showToast(e.message || "Lỗi khi xóa từ", "error");
     }
@@ -217,6 +329,74 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 <span>Hướng dẫn</span>
               </button>
             )}
+
+            {/* Manual Add Word Button */}
+            <button
+              className="btn btn-primary btn-with-icon"
+              onClick={() => setIsAddModalOpen(true)}
+              style={{
+                padding: "6px 14px",
+                fontSize: "0.82rem",
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                fontWeight: 600,
+                border: "none",
+              }}
+              title="Thêm từ mới thủ công vào Sổ tay"
+            >
+              <Plus size={14} strokeWidth={2.5} />
+              <span>Thêm từ mới</span>
+            </button>
+
+            {/* Export Dropdown Menu */}
+            <div className="vocab-export-container" ref={exportMenuRef}>
+              <button
+                className="btn btn-secondary btn-with-icon"
+                onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+                style={{ padding: "6px 12px", fontSize: "0.82rem", borderRadius: "20px" }}
+                title="Xuất file từ vựng"
+              >
+                <Download size={14} />
+                <span>Xuất từ vựng</span>
+                <ChevronDown size={13} />
+              </button>
+
+              {isExportMenuOpen && (
+                <div className="vocab-export-menu">
+                  <button
+                    className="vocab-export-item"
+                    onClick={() => {
+                      setIsExportMenuOpen(false);
+                      const ok = exportVocabToCSV(items);
+                      if (ok) showToast("Đã tải xuống file Excel/CSV thành công!", "success");
+                      else showToast("Chưa có từ vựng nào để xuất", "warning");
+                    }}
+                  >
+                    <FileSpreadsheet size={16} color="#10b981" />
+                    <div>
+                      <div>Xuất file Excel / CSV</div>
+                      <small style={{ color: "var(--text-muted)", fontSize: "0.72rem" }}>UTF-8 hiển thị tiếng Việt chuẩn</small>
+                    </div>
+                  </button>
+
+                  <button
+                    className="vocab-export-item"
+                    onClick={() => {
+                      setIsExportMenuOpen(false);
+                      const ok = exportVocabToAnki(items);
+                      if (ok) showToast("Đã tải xuống file Anki Deck thành công!", "success");
+                      else showToast("Chưa có từ vựng nào để xuất", "warning");
+                    }}
+                  >
+                    <Layers size={16} color="#6366f1" />
+                    <div>
+                      <div>Xuất Anki Deck (.txt)</div>
+                      <small style={{ color: "var(--text-muted)", fontSize: "0.72rem" }}>Nhập 1 chạm vào Anki Flashcards</small>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -446,6 +626,34 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                   );
                 })()}
 
+                {/* Pronunciation Practice Result Badge */}
+                {pronounceResults[v.id] && (
+                  <div
+                    className={`pronounce-result-badge ${pronounceResults[v.id].isMatch ? "success" : "retry"}`}
+                  >
+                    {pronounceResults[v.id].isMatch ? (
+                      <>
+                        <CheckCircle2 size={13} />
+                        <span>Chuẩn 100%! ("{pronounceResults[v.id].heard}")</span>
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 size={13} />
+                        <span>Nghe thành: "{pronounceResults[v.id].heard}" - Thử lại</span>
+                      </>
+                    )}
+                  </div>
+                )}
+                {listeningWordId === v.id && (
+                  <div
+                    className="pronounce-result-badge retry"
+                    style={{ background: "rgba(239, 68, 68, 0.1)", color: "#dc2626", border: "1px solid rgba(239, 68, 68, 0.3)" }}
+                  >
+                    <Mic size={13} className="spinner" />
+                    <span>Đang lắng nghe bạn nói...</span>
+                  </div>
+                )}
+
                 <div className="vocab-card-footer">
                   <select
                     className={`vocab-status-select status-${v.status}`}
@@ -461,9 +669,20 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                     <button
                       className="vocab-audio-btn"
                       onClick={() => speakWord(v.word)}
-                      title="Phát âm từ này"
+                      title="Phát âm từ này (Audio)"
                     >
                       <Volume2 size={14} strokeWidth={2} />
+                    </button>
+                    <button
+                      className={`vocab-audio-btn ${listeningWordId === v.id ? "listening" : ""}`}
+                      onClick={() => handleStartPronouncePractice(v)}
+                      title="Luyện phát âm qua Micro (AI nhận diện giọng nói)"
+                      style={{
+                        color: listeningWordId === v.id ? "#dc2626" : "#6366f1",
+                        background: listeningWordId === v.id ? "rgba(239, 68, 68, 0.15)" : undefined,
+                      }}
+                    >
+                      <Mic size={14} strokeWidth={2.2} />
                     </button>
                     <button
                       className="vocab-audio-btn"
@@ -480,6 +699,17 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
           ))}
         </div>
       )}
+
+      {/* Manual Add Vocab Modal */}
+      <AddVocabModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={() => {
+          loadWords();
+          if (refreshStreak) refreshStreak();
+          if (refreshSavedVocab) refreshSavedVocab();
+        }}
+      />
     </div>
   );
 };

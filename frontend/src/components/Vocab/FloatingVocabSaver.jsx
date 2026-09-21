@@ -10,7 +10,7 @@ export const FloatingVocabSaver = ({
   sourceLang = "en",
   targetLang = "vi"
 }) => {
-  const { token, refreshStreak, showToast } = useAuth();
+  const { token, refreshStreak, showToast, refreshSavedVocab } = useAuth();
   const [position, setPosition] = useState(null);
   const [selectedWord, setSelectedWord] = useState("");
   const [selectedSentence, setSelectedSentence] = useState("");
@@ -114,6 +114,7 @@ export const FloatingVocabSaver = ({
       );
       showToast(`✨ Đã lưu "${selectedWord}" vào Sổ tay từ vựng!`, "success");
       refreshStreak();
+      if (refreshSavedVocab) refreshSavedVocab();
       setPosition(null);
       setSelectedWord("");
       setSelectedSentence("");

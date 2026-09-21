@@ -3,6 +3,7 @@ import {
   fetchAuthConfig,
   fetchCurrentUser,
   fetchStreak,
+  fetchVocabList,
   loginWithEmail as apiLoginWithEmail,
   registerWithEmail as apiRegisterWithEmail,
   loginWithGoogle as apiLoginWithGoogle,
@@ -22,6 +23,7 @@ export const AuthProvider = ({ children }) => {
   const [streak, setStreak] = useState(0);
   const [wordsToday, setWordsToday] = useState(0);
   const [unlearnedWords, setUnlearnedWords] = useState(0);
+  const [savedVocabMap, setSavedVocabMap] = useState({});
   const [googleClientId, setGoogleClientId] = useState("1010771231278-42hd59gesjf8ts5ta7nra9qrfkmobgrt.apps.googleusercontent.com");
   const [toasts, setToasts] = useState([]);
 
@@ -75,6 +77,31 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
+  // Refresh Saved Vocab Map for real-time highlighting
+  const refreshSavedVocab = useCallback(async () => {
+    if (!token) {
+      setSavedVocabMap({});
+      return;
+    }
+    try {
+      const data = await fetchVocabList("ALL", "", token);
+      const list = data?.items || data?.vocabulary || [];
+      const map = {};
+      list.forEach((item) => {
+        if (item && item.word) {
+          map[item.word.trim().toLowerCase()] = item;
+        }
+      });
+      setSavedVocabMap(map);
+    } catch (e) {
+      console.debug("Could not refresh saved vocab:", e);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    refreshSavedVocab();
+  }, [refreshSavedVocab]);
+
   // Set session helper
   const setSession = (newToken, newUser) => {
     setToken(newToken);
@@ -87,6 +114,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setToken(null);
     setUser(null);
+    setSavedVocabMap({});
     localStorage.removeItem("shotlang_jwt_token");
     localStorage.removeItem("shotlang_user");
     showToast("Đã đăng xuất tài khoản", "info");
@@ -99,6 +127,7 @@ export const AuthProvider = ({ children }) => {
     setSession(data.access_token, data.user);
     showToast(`Xin chào ${data.user.name || data.user.email}! Đăng nhập thành công.`, "success");
     refreshStreak();
+    refreshSavedVocab();
     return data;
   };
 
@@ -108,6 +137,7 @@ export const AuthProvider = ({ children }) => {
     setSession(data.access_token, data.user);
     showToast(`Chào mừng ${data.user.name || data.user.email}! Đã tạo tài khoản thành công.`, "success");
     refreshStreak();
+    refreshSavedVocab();
     return data;
   };
 
@@ -117,6 +147,7 @@ export const AuthProvider = ({ children }) => {
     setSession(data.access_token, data.user);
     showToast(`Xin chào ${data.user.name}! Đăng nhập Google thành công.`, "success");
     refreshStreak();
+    refreshSavedVocab();
     return data;
   };
 
@@ -167,6 +198,8 @@ export const AuthProvider = ({ children }) => {
         wordsToday,
         unlearnedWords,
         setUnlearnedWords,
+        savedVocabMap,
+        refreshSavedVocab,
         googleClientId,
         loginEmail,
         registerEmail,

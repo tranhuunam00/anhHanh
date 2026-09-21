@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { evaluateMasked } from "../../utils/diffCalculator";
 import { translateText } from "../../services/api";
+import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence";
 
 // Sub-component: Masked Character & Word Preview (Memoized to prevent DOM thrashing)
 const MaskedPreview = React.memo(({ maskedWords, hasInput }) => {
@@ -295,7 +296,9 @@ export const DictationStudio = React.memo(({
       {/* Sentence Completion Card */}
       {isCompleted && (
         <div className="completion-card active">
-          <div className="original-sentence">{currentChallenge?.text}</div>
+          <div className="original-sentence">
+            <HighlightedVocabSentence text={currentChallenge?.text} />
+          </div>
           {(currentChallenge?.translation || dynamicTranslation) && (
             <div className="translation-sentence">{currentChallenge?.translation || dynamicTranslation}</div>
           )}

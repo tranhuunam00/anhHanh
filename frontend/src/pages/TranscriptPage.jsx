@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Headphones, ChevronsDown, Play, Pause, ArrowRight, Sparkles } from "lucide-react";
+import { HighlightedVocabSentence } from "../components/Vocab/HighlightedVocabSentence";
 
 export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) => {
   const [isPlayingFull, setIsPlayingFull] = useState(false);
@@ -174,7 +175,9 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
                   <ArrowRight size={13} />
                 </button>
               </div>
-              <div className="transcript-en">{c.text}</div>
+              <div className="transcript-en">
+                <HighlightedVocabSentence text={c.text} />
+              </div>
               {c.translation && <div className="transcript-vi">{c.translation}</div>}
             </div>
           );
