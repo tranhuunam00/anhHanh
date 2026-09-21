@@ -705,7 +705,10 @@ export default function App() {
 
         {/* TAB 3: Smart Vocabulary Notebook */}
         <div style={{ display: activeTab === "tab-vocab" ? "block" : "none" }}>
-          <VocabTab isActive={activeTab === "tab-vocab"} />
+          <VocabTab
+            isActive={activeTab === "tab-vocab"}
+            onOpenGuide={() => setIsShortcutsOpen(true)}
+          />
         </div>
 
         {/* TAB 4: Study History */}

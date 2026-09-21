@@ -184,7 +184,7 @@ export const Header = React.memo(({
           </span>
           <div
             className="header-vocab-badge"
-            title="Số từ vựng chưa học xong trong Sổ tay (Nhấp để mở Sổ tay)"
+            title={`${unlearnedWords} từ chưa học xong trong Sổ tay (Nhấp để mở Sổ tay)`}
             onClick={() => onOpenVocabTab && onOpenVocabTab()}
             style={{
               cursor: "pointer",
@@ -197,9 +197,7 @@ export const Header = React.memo(({
             }}
           >
             <BookOpen size={15} color="#6366f1" />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-              <strong style={{ color: "#6366f1", fontWeight: 700 }}>{unlearnedWords}</strong> từ chưa học xong
-            </span>
+            <strong style={{ color: "#6366f1", fontWeight: 700 }}>{unlearnedWords}</strong>
           </div>
         </div>
 

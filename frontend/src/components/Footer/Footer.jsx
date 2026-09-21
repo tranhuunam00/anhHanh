@@ -1,5 +1,5 @@
 import React from "react";
-import { Code2, PhoneCall, Keyboard, MessageSquareHeart } from "lucide-react";
+import { Code2, PhoneCall, Keyboard, HelpCircle, MessageSquareHeart } from "lucide-react";
 import "./footer.css";
 
 export const Footer = React.memo(function Footer({ onOpenShortcuts, onOpenFeedback }) {
@@ -57,10 +57,10 @@ export const Footer = React.memo(function Footer({ onOpenShortcuts, onOpenFeedba
                 type="button"
                 className="footer-action-btn"
                 onClick={onOpenShortcuts}
-                title="Keyboard Shortcuts"
+                title="Hướng dẫn sử dụng & Phím tắt"
               >
-                <Keyboard size={14} strokeWidth={2} />
-                <span>Shortcuts</span>
+                <HelpCircle size={14} strokeWidth={2} />
+                <span>Hướng dẫn</span>
               </button>
             )}
 
