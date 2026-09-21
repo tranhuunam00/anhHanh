@@ -37,6 +37,7 @@ class User(Base):
     vocabulary = relationship('UserVocabulary', back_populates='user', cascade='all, delete-orphan')
     streak = relationship('UserStreak', back_populates='user', uselist=False, cascade='all, delete-orphan')
     feedbacks = relationship('Feedback', back_populates='user', cascade='all, delete-orphan')
+    feedback_messages = relationship('FeedbackMessage', back_populates='user', cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
@@ -202,16 +203,22 @@ class Feedback(Base):
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     user = relationship('User', back_populates='feedbacks')
+    messages = relationship('FeedbackMessage', back_populates='feedback', cascade='all, delete-orphan', order_by='FeedbackMessage.created_at.asc()')
 
     def to_dict(self):
         user_name = None
         user_email = None
+        messages_list = []
+        unread_replies = 0
         try:
             from sqlalchemy.orm import inspect
             ins = inspect(self)
             if "user" in ins.dict and self.user is not None:
                 user_name = self.user.name
                 user_email = self.user.email
+            if "messages" in ins.dict and self.messages is not None:
+                messages_list = [m.to_dict() for m in self.messages]
+                unread_replies = sum(1 for m in self.messages if not m.is_read)
         except Exception:
             pass
 
@@ -225,6 +232,51 @@ class Feedback(Base):
             'content': self.content,
             'image_url': self.image_url,
             'status': self.status,
+            'messages_count': len(messages_list),
+            'unread_replies': unread_replies,
+            'messages': messages_list,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
+
+
+class FeedbackMessage(Base):
+    __tablename__ = 'feedback_messages'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    feedback_id = Column(String(36), ForeignKey('feedbacks.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    sender_role = Column(String(20), nullable=False)  # 'ADMIN' or 'USER'
+    message = Column(Text, nullable=False)
+    image_url = Column(Text, nullable=True)
+    is_read = Column(Boolean, default=False, nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+
+    feedback = relationship('Feedback', back_populates='messages')
+    user = relationship('User', back_populates='feedback_messages')
+
+    def to_dict(self):
+        user_name = None
+        user_avatar = None
+        try:
+            from sqlalchemy.orm import inspect
+            ins = inspect(self)
+            if "user" in ins.dict and self.user is not None:
+                user_name = self.user.name
+                user_avatar = self.user.avatar_url
+        except Exception:
+            pass
+
+        return {
+            'id': self.id,
+            'feedback_id': self.feedback_id,
+            'user_id': self.user_id,
+            'sender_role': self.sender_role,
+            'sender_name': user_name or ('Quản trị viên' if self.sender_role == 'ADMIN' else 'Học viên'),
+            'sender_avatar': user_avatar,
+            'message': self.message,
+            'image_url': self.image_url,
+            'is_read': self.is_read,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
 

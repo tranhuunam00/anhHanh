@@ -19,8 +19,16 @@ import {
   Image as ImageIcon,
   Loader2,
   ZoomIn,
+  Crown,
+  ArrowLeft,
 } from 'lucide-react';
-import { submitFeedback, fetchMyFeedbacks, uploadFeedbackImage } from '../../services/feedbackService';
+import {
+  submitFeedback,
+  fetchMyFeedbacks,
+  uploadFeedbackImage,
+  fetchFeedbackMessages,
+  sendFeedbackReply,
+} from '../../services/feedbackService';
 
 export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpenAdminTab, showToast }) => {
   const [activeSubTab, setActiveSubTab] = useState('new'); // 'new' | 'history'
@@ -40,6 +48,18 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
   const [lightboxImage, setLightboxImage] = useState(null);
   const fileInputRef = useRef(null);
 
+  // Conversation Thread State
+  const [selectedThreadFeedback, setSelectedThreadFeedback] = useState(null);
+  const [threadMessages, setThreadMessages] = useState([]);
+  const [isLoadingThread, setIsLoadingThread] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [isSendingReply, setIsSendingReply] = useState(false);
+  const [replyImageFile, setReplyImageFile] = useState(null);
+  const [replyImagePreviewUrl, setReplyImagePreviewUrl] = useState(null);
+  const [isUploadingReplyImage, setIsUploadingReplyImage] = useState(false);
+  const replyFileInputRef = useRef(null);
+  const threadEndRef = useRef(null);
+
   useEffect(() => {
     if (isOpen && token && activeSubTab === 'history') {
       loadHistory();
@@ -48,11 +68,16 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
 
   useEffect(() => {
     return () => {
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+      if (replyImagePreviewUrl) URL.revokeObjectURL(replyImagePreviewUrl);
     };
-  }, [imagePreviewUrl]);
+  }, [imagePreviewUrl, replyImagePreviewUrl]);
+
+  useEffect(() => {
+    if (selectedThreadFeedback && threadEndRef.current) {
+      threadEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [threadMessages, selectedThreadFeedback]);
 
   const loadHistory = async () => {
     try {
@@ -63,6 +88,90 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
       console.error('Error fetching feedbacks:', err);
     } finally {
       setIsLoadingHistory(false);
+    }
+  };
+
+  const handleOpenThread = async (feedbackItem) => {
+    setSelectedThreadFeedback(feedbackItem);
+    setIsLoadingThread(true);
+    try {
+      const data = await fetchFeedbackMessages(feedbackItem.id, token);
+      setThreadMessages(data.messages || []);
+      // If there were unread replies, refresh list and notify header
+      if (feedbackItem.unread_replies > 0) {
+        window.dispatchEvent(new CustomEvent('shotlang:feedback-updated'));
+        setMyFeedbacks((prev) =>
+          prev.map((f) => (f.id === feedbackItem.id ? { ...f, unread_replies: 0 } : f))
+        );
+      }
+    } catch (err) {
+      console.error('Error loading thread:', err);
+      showToast && showToast('Không thể tải cuộc hội thoại.', 'error');
+    } finally {
+      setIsLoadingThread(false);
+    }
+  };
+
+  const handleCloseThread = () => {
+    setSelectedThreadFeedback(null);
+    setThreadMessages([]);
+    setReplyText('');
+    handleRemoveReplyImage();
+  };
+
+  const handleSelectReplyFile = (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast && showToast('Vui lòng chỉ chọn tập tin ảnh.', 'error');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast && showToast('Dung lượng ảnh vượt quá 10MB.', 'error');
+      return;
+    }
+    setReplyImageFile(file);
+    if (replyImagePreviewUrl) URL.revokeObjectURL(replyImagePreviewUrl);
+    setReplyImagePreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleRemoveReplyImage = () => {
+    if (replyImagePreviewUrl) URL.revokeObjectURL(replyImagePreviewUrl);
+    setReplyImageFile(null);
+    setReplyImagePreviewUrl(null);
+    if (replyFileInputRef.current) replyFileInputRef.current.value = '';
+  };
+
+  const handleSendReply = async (e) => {
+    if (e) e.preventDefault();
+    if (!selectedThreadFeedback) return;
+    const text = replyText.trim();
+    if (!text && !replyImageFile) {
+      return;
+    }
+
+    setIsSendingReply(true);
+    let uploadedImg = null;
+    try {
+      if (replyImageFile) {
+        setIsUploadingReplyImage(true);
+        uploadedImg = await uploadFeedbackImage(replyImageFile, token);
+      }
+
+      const res = await sendFeedbackReply(
+        selectedThreadFeedback.id,
+        { message: text || 'Đính kèm ảnh minh họa', image_url: uploadedImg },
+        token
+      );
+
+      setThreadMessages((prev) => [...prev, res.reply]);
+      setReplyText('');
+      handleRemoveReplyImage();
+      window.dispatchEvent(new CustomEvent('shotlang:feedback-updated'));
+    } catch (err) {
+      showToast && showToast(err.message || 'Lỗi gửi phản hồi.', 'error');
+    } finally {
+      setIsSendingReply(false);
+      setIsUploadingReplyImage(false);
     }
   };
 
@@ -100,8 +209,13 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
       if (items[i].type.indexOf('image') !== -1) {
         const file = items[i].getAsFile();
         if (file) {
-          handleSelectFile(file);
-          showToast && showToast('Đã dán ảnh từ clipboard!', 'info');
+          if (selectedThreadFeedback) {
+            handleSelectReplyFile(file);
+            showToast && showToast('Đã dán ảnh vào phản hồi!', 'info');
+          } else {
+            handleSelectFile(file);
+            showToast && showToast('Đã dán ảnh từ clipboard!', 'info');
+          }
           break;
         }
       }
@@ -453,73 +567,251 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
                 </div>
               </form>
             ) : (
-              <div className="my-feedbacks-list">
-                {isLoadingHistory ? (
-                  <div style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>Đang tải lịch sử...</div>
-                ) : myFeedbacks.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '30px 10px', color: '#64748b' }}>
-                    <p>Bạn chưa gửi phản hồi nào. Hãy chia sẻ ý kiến để giúp ShotLang hoàn thiện hơn!</p>
+              selectedThreadFeedback ? (
+                <div className="conversation-container">
+                  {/* Top bar with back button */}
+                  <div className="conversation-header-bar">
+                    <button type="button" className="conversation-back-btn" onClick={handleCloseThread}>
+                      <ArrowLeft size={16} />
+                      <span>Danh sách góp ý</span>
+                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                        {getCategoryIcon(selectedThreadFeedback.feedback_type)}
+                        {getCategoryLabel(selectedThreadFeedback.feedback_type)}
+                      </span>
+                      {getStatusBadge(selectedThreadFeedback.status)}
+                    </div>
                   </div>
-                ) : (
-                  myFeedbacks.map((item) => (
-                    <div key={item.id} className="my-feedback-card">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                          {getCategoryIcon(item.feedback_type)}
-                          {getCategoryLabel(item.feedback_type)}
-                        </span>
-                        {getStatusBadge(item.status)}
-                      </div>
-                      <p style={{ margin: '0 0 8px', color: 'inherit', lineHeight: 1.4 }}>
-                        {item.content}
-                      </p>
 
-                      {/* Image Attachment in History */}
-                      {item.image_url && (
-                        <div style={{ marginBottom: '8px' }}>
+                  {/* Messages list */}
+                  <div className="conversation-messages-list">
+                    {/* Original Ticket Box */}
+                    <div className="conversation-original-ticket">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, fontSize: '0.76rem', color: '#64748b' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--text-color, #1e293b)' }}>Ý kiến ban đầu của bạn:</span>
+                        <span>{selectedThreadFeedback.created_at ? new Date(selectedThreadFeedback.created_at).toLocaleString('vi-VN') : ''}</span>
+                      </div>
+                      <div style={{ fontSize: '0.88rem', lineHeight: 1.45, marginBottom: selectedThreadFeedback.image_url ? 8 : 0 }}>
+                        {selectedThreadFeedback.content}
+                      </div>
+                      {selectedThreadFeedback.image_url && (
+                        <button
+                          type="button"
+                          onClick={() => setLightboxImage(selectedThreadFeedback.image_url)}
+                          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-block' }}
+                        >
+                          <img
+                            src={selectedThreadFeedback.image_url}
+                            alt="Attached screenshot"
+                            className="chat-bubble-img-preview"
+                          />
+                        </button>
+                      )}
+                    </div>
+
+                    {isLoadingThread ? (
+                      <div style={{ textAlign: 'center', padding: '24px', color: '#64748b', fontSize: '0.85rem' }}>
+                        <Loader2 size={18} className="spinning" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 6 }} />
+                        <span>Đang tải cuộc hội thoại...</span>
+                      </div>
+                    ) : threadMessages.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '20px 10px', color: '#64748b', fontSize: '0.84rem' }}>
+                        💬 Chưa có phản hồi nào. Bạn có thể gửi thêm chi tiết hoặc chờ Quản trị viên phản hồi tại đây!
+                      </div>
+                    ) : (
+                      threadMessages.map((msg) => {
+                        const isAdminMsg = msg.sender_role === 'ADMIN';
+                        return (
+                          <div
+                            key={msg.id}
+                            className={`chat-message-row ${isAdminMsg ? 'from-admin' : 'from-user'}`}
+                          >
+                            <div className={`chat-avatar-circle ${isAdminMsg ? 'admin' : 'user'}`}>
+                              {isAdminMsg ? <Crown size={16} /> : (user?.name ? user.name.slice(0, 1).toUpperCase() : 'U')}
+                            </div>
+                            <div className={`chat-bubble ${isAdminMsg ? 'admin' : 'user'}`}>
+                              <div className="chat-bubble-meta">
+                                <span className={`chat-bubble-role-tag ${isAdminMsg ? 'admin' : 'user'}`}>
+                                  {isAdminMsg ? '👑 Quản trị viên' : 'Bạn'}
+                                </span>
+                                <span>{msg.created_at ? new Date(msg.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}</span>
+                              </div>
+                              <div className="chat-bubble-content">{msg.message}</div>
+                              {msg.image_url && (
+                                <img
+                                  src={msg.image_url}
+                                  alt="MinIO chat attachment"
+                                  className="chat-bubble-img-preview"
+                                  onClick={() => setLightboxImage(msg.image_url)}
+                                />
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                    <div ref={threadEndRef} />
+                  </div>
+
+                  {/* Reply Input Bar */}
+                  <form className="conversation-reply-bar" onSubmit={handleSendReply}>
+                    <input
+                      type="file"
+                      ref={replyFileInputRef}
+                      style={{ display: 'none' }}
+                      accept="image/png, image/jpeg, image/webp, image/gif"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          handleSelectReplyFile(e.target.files[0]);
+                        }
+                      }}
+                    />
+
+                    {replyImageFile && (
+                      <div>
+                        <span className="reply-attached-mini">
+                          <ImageIcon size={13} />
+                          <span>{replyImageFile.name} ({(replyImageFile.size / 1024).toFixed(1)} KB)</span>
                           <button
                             type="button"
-                            onClick={() => setLightboxImage(item.image_url)}
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              padding: 0,
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              color: '#2563eb',
-                              fontSize: '0.8rem',
-                              fontWeight: 600,
+                            onClick={handleRemoveReplyImage}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+                          >
+                            <X size={13} />
+                          </button>
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="reply-input-group">
+                      <textarea
+                        className="reply-textarea"
+                        placeholder="Nhập phản hồi tiếp cho Quản trị viên... (Ctrl+Enter để gửi, Ctrl+V để dán ảnh)"
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                            e.preventDefault();
+                            handleSendReply();
+                          }
+                        }}
+                        rows={1}
+                      />
+                      <button
+                        type="button"
+                        className="reply-attach-btn"
+                        onClick={() => replyFileInputRef.current && replyFileInputRef.current.click()}
+                        title="Đính kèm ảnh minh họa (MinIO)"
+                      >
+                        <ImageIcon size={18} />
+                      </button>
+                      <button
+                        type="submit"
+                        className="reply-send-btn"
+                        disabled={isSendingReply || (!replyText.trim() && !replyImageFile)}
+                      >
+                        {isSendingReply ? (
+                          <Loader2 size={14} className="spinning" />
+                        ) : (
+                          <>
+                            <Send size={14} />
+                            <span>Gửi</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                <div className="my-feedbacks-list">
+                  {isLoadingHistory ? (
+                    <div style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>Đang tải lịch sử...</div>
+                  ) : myFeedbacks.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '30px 10px', color: '#64748b' }}>
+                      <p>Bạn chưa gửi phản hồi nào. Hãy chia sẻ ý kiến để giúp ShotLang hoàn thiện hơn!</p>
+                    </div>
+                  ) : (
+                    myFeedbacks.map((item) => (
+                      <div key={item.id} className="my-feedback-card" onClick={() => handleOpenThread(item)} style={{ cursor: 'pointer' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <span style={{ fontWeight: 600, fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                            {getCategoryIcon(item.feedback_type)}
+                            {getCategoryLabel(item.feedback_type)}
+                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            {item.unread_replies > 0 && (
+                              <span className="badge" style={{ background: '#ef4444', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: 3, fontWeight: 700, fontSize: '0.72rem' }}>
+                                <Crown size={12} /> Admin đã trả lời
+                              </span>
+                            )}
+                            {getStatusBadge(item.status)}
+                          </div>
+                        </div>
+                        <p style={{ margin: '0 0 8px', color: 'inherit', lineHeight: 1.4 }}>
+                          {item.content}
+                        </p>
+
+                        {/* Image Attachment in History */}
+                        {item.image_url && (
+                          <div style={{ marginBottom: '8px' }}>
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setLightboxImage(item.image_url);
+                              }}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                color: '#2563eb',
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                              }}
+                            >
+                              <img
+                                src={item.image_url}
+                                alt="MinIO attachment"
+                                style={{
+                                  width: '48px',
+                                  height: '48px',
+                                  objectFit: 'cover',
+                                  borderRadius: '6px',
+                                  border: '1px solid var(--border-color, #cbd5e1)',
+                                }}
+                              />
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                <ZoomIn size={13} />
+                                <span>Xem ảnh đính kèm</span>
+                              </span>
+                            </span>
+                          </div>
+                        )}
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: '#64748b', marginTop: 4 }}>
+                          <span>{item.created_at ? new Date(item.created_at).toLocaleDateString('vi-VN') : ''}</span>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            style={{ padding: '3px 10px', fontSize: '0.76rem', display: 'inline-flex', alignItems: 'center', gap: 5, borderRadius: 6 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenThread(item);
                             }}
                           >
-                            <img
-                              src={item.image_url}
-                              alt="MinIO attachment"
-                              style={{
-                                width: '48px',
-                                height: '48px',
-                                objectFit: 'cover',
-                                borderRadius: '6px',
-                                border: '1px solid var(--border-color, #cbd5e1)',
-                              }}
-                            />
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                              <ZoomIn size={13} />
-                              <span>Xem ảnh đính kèm (MinIO)</span>
-                            </span>
+                            <MessageCircle size={13} />
+                            <span>Hội thoại ({item.messages_count || 0}) ➔</span>
                           </button>
                         </div>
-                      )}
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64748b' }}>
-                        <span>Đánh giá: {item.rating ? `${item.rating} ★` : '—'}</span>
-                        <span>{item.created_at ? new Date(item.created_at).toLocaleDateString('vi-VN') : ''}</span>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                    ))
+                  )}
+                </div>
+              )
             )}
           </div>
         </div>

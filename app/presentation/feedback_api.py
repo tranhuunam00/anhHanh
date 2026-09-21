@@ -12,9 +12,10 @@ from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, UploadFile, File, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 
 from app.infrastructure.database.connection import get_db
-from app.infrastructure.database.models import User, Feedback
+from app.infrastructure.database.models import User, Feedback, FeedbackMessage
 from app.application.auth_service import get_current_user
 from app.presentation.security_middleware import limiter
 from app.infrastructure.minio_service import upload_feedback_image, get_feedback_image
@@ -32,6 +33,11 @@ class CreateFeedbackRequest(BaseModel):
     category: Optional[str] = Field(None, max_length=50, description="Alias cho feedback_type")
     rating: Optional[int] = Field(None, ge=1, le=5, description="Đánh giá 1 - 5 sao")
     image_url: Optional[str] = Field(None, max_length=1000, description="URL hoặc đường dẫn ảnh đính kèm từ MinIO")
+
+
+class ReplyFeedbackRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000, description="Nội dung phản hồi")
+    image_url: Optional[str] = Field(None, max_length=1000, description="URL ảnh đính kèm từ MinIO")
 
 
 def sanitize_text(text: str) -> str:
@@ -178,20 +184,159 @@ async def submit_feedback(
         )
 
 
+@router.get("/unread-count")
+async def get_feedback_unread_count(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get total unread replies count for current user or admin."""
+    try:
+        if current_user.role == "ADMIN":
+            # For admin: unread messages from USER
+            res = await db.execute(
+                select(func.count(FeedbackMessage.id)).where(
+                    FeedbackMessage.sender_role == "USER",
+                    FeedbackMessage.is_read == False,
+                )
+            )
+        else:
+            # For user: unread messages from ADMIN on user's feedbacks
+            res = await db.execute(
+                select(func.count(FeedbackMessage.id))
+                .join(Feedback, FeedbackMessage.feedback_id == Feedback.id)
+                .where(
+                    Feedback.user_id == current_user.id,
+                    FeedbackMessage.sender_role == "ADMIN",
+                    FeedbackMessage.is_read == False,
+                )
+            )
+        unread = res.scalar() or 0
+        return {"unread_count": unread, "role": current_user.role}
+    except Exception as e:
+        logger.error(f"Error fetching unread feedback count: {e}")
+        return {"unread_count": 0, "role": current_user.role}
+
+
 @router.get("/my")
 async def get_my_feedbacks(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """List feedbacks submitted by current user."""
+    """List feedbacks submitted by current user with messages preloaded."""
     res = await db.execute(
         select(Feedback)
+        .options(
+            selectinload(Feedback.messages).selectinload(FeedbackMessage.user)
+        )
         .where(Feedback.user_id == current_user.id)
         .order_by(Feedback.created_at.desc())
-        .limit(20)
+        .limit(30)
     )
     feedbacks = res.scalars().all()
     return {
         "total": len(feedbacks),
         "feedbacks": [f.to_dict() for f in feedbacks],
     }
+
+
+@router.get("/{feedback_id}/messages")
+async def get_feedback_messages(
+    feedback_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Retrieve full conversation thread for a feedback and mark as read."""
+    res = await db.execute(
+        select(Feedback)
+        .options(
+            selectinload(Feedback.user),
+            selectinload(Feedback.messages).selectinload(FeedbackMessage.user),
+        )
+        .where(Feedback.id == feedback_id)
+    )
+    fb = res.scalar_one_or_none()
+    if not fb:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy phản hồi này.")
+
+    if current_user.role != "ADMIN" and fb.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Bạn không có quyền xem phản hồi này.")
+
+    # Auto mark incoming unread messages as read
+    needs_commit = False
+    for msg in fb.messages:
+        if not msg.is_read:
+            if current_user.role == "ADMIN" and msg.sender_role == "USER":
+                msg.is_read = True
+                needs_commit = True
+            elif current_user.role != "ADMIN" and msg.sender_role == "ADMIN":
+                msg.is_read = True
+                needs_commit = True
+
+    if needs_commit:
+        await db.commit()
+
+    return {
+        "feedback": fb.to_dict(),
+        "messages": [m.to_dict() for m in fb.messages],
+    }
+
+
+@router.post("/{feedback_id}/reply", status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute")
+async def reply_to_feedback(
+    request: Request,
+    feedback_id: str,
+    payload: ReplyFeedbackRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Send reply in a feedback conversation thread (both Admin and Ticket Owner)."""
+    cleaned_msg = sanitize_text(payload.message or "")
+    if not payload.image_url and len(cleaned_msg) < 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Vui lòng nhập nội dung phản hồi."
+        )
+    if not cleaned_msg and payload.image_url:
+        cleaned_msg = "Đính kèm ảnh minh họa"
+
+    res = await db.execute(
+        select(Feedback).where(Feedback.id == feedback_id)
+    )
+    fb = res.scalar_one_or_none()
+    if not fb:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy phản hồi này.")
+
+    is_admin = current_user.role == "ADMIN"
+    if not is_admin and fb.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Bạn không có quyền trả lời phản hồi này.")
+
+    sender_role = "ADMIN" if is_admin else "USER"
+
+    # If Admin replies to a PENDING feedback, automatically update status to REVIEWED
+    if is_admin and fb.status == "PENDING":
+        fb.status = "REVIEWED"
+
+    new_msg = FeedbackMessage(
+        feedback_id=fb.id,
+        user_id=current_user.id,
+        sender_role=sender_role,
+        message=cleaned_msg,
+        image_url=payload.image_url,
+        is_read=False,
+    )
+    db.add(new_msg)
+    await db.commit()
+    await db.refresh(new_msg)
+
+    logger.info(f"Feedback {fb.id} new reply from [{sender_role}] {current_user.email}")
+    msg_dict = new_msg.to_dict()
+    msg_dict["sender_name"] = current_user.name
+    msg_dict["sender_avatar"] = current_user.avatar_url
+
+    return {
+        "message": "Đã gửi phản hồi thành công!",
+        "reply": msg_dict,
+        "feedback_status": fb.status,
+    }
+

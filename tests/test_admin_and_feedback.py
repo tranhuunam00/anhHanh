@@ -224,3 +224,65 @@ def test_feedback_with_image_attachment():
     assert data["feedback"]["image_url"] == "/api/feedback/images/feedback_test_12345.png"
 
 
+def test_feedback_conversation_flow():
+    """Test two-way conversation between Admin and User with unread notifications."""
+    user_token, user_email = create_regular_user()
+    user_headers = {"Authorization": f"Bearer {user_token}"}
+    admin_token = get_or_create_admin()
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+
+    # 1. User submits initial feedback
+    fb_res = client.post("/api/feedback", json={
+        "category": "BUG",
+        "content": "Tính năng phát âm IPA thi thoảng bị mất âm.",
+    }, headers=user_headers)
+    assert fb_res.status_code == 201
+    fb_id = fb_res.json()["feedback"]["id"]
+
+    # 2. Initially user has 0 unread replies
+    unread_res = client.get("/api/feedback/unread-count", headers=user_headers)
+    assert unread_res.status_code == 200
+    assert unread_res.json()["unread_count"] == 0
+
+    # 3. Admin replies to feedback
+    reply_res = client.post(f"/api/feedback/{fb_id}/reply", json={
+        "message": "Chào bạn, đội ngũ kỹ thuật đã kiểm tra và sửa lỗi trên bản mới. Bạn thử lại nhé!",
+    }, headers=admin_headers)
+    assert reply_res.status_code == 201
+    reply_data = reply_res.json()
+    assert reply_data["reply"]["sender_role"] == "ADMIN"
+    assert reply_data["feedback_status"] == "REVIEWED"
+
+    # 4. User now receives 1 unread notification
+    unread_after_reply = client.get("/api/feedback/unread-count", headers=user_headers)
+    assert unread_after_reply.status_code == 200
+    assert unread_after_reply.json()["unread_count"] == 1
+
+    # 5. User views conversation messages -> auto marks as read
+    msgs_res = client.get(f"/api/feedback/{fb_id}/messages", headers=user_headers)
+    assert msgs_res.status_code == 200
+    msgs_data = msgs_res.json()
+    assert len(msgs_data["messages"]) == 1
+    assert msgs_data["messages"][0]["message"].startswith("Chào bạn")
+
+    # 6. Unread count now returns to 0
+    unread_after_view = client.get("/api/feedback/unread-count", headers=user_headers)
+    assert unread_after_view.json()["unread_count"] == 0
+
+    # 7. User replies back
+    user_reply_res = client.post(f"/api/feedback/{fb_id}/reply", json={
+        "message": "Cảm ơn Admin nhiều, mình vừa thử lại đã hoạt động rất tốt!",
+    }, headers=user_headers)
+    assert user_reply_res.status_code == 201
+    assert user_reply_res.json()["reply"]["sender_role"] == "USER"
+
+    # 8. Admin views thread and sees both messages
+    admin_msgs_res = client.get(f"/api/feedback/{fb_id}/messages", headers=admin_headers)
+    assert admin_msgs_res.status_code == 200
+    admin_msgs = admin_msgs_res.json()["messages"]
+    assert len(admin_msgs) == 2
+    assert admin_msgs[0]["sender_role"] == "ADMIN"
+    assert admin_msgs[1]["sender_role"] == "USER"
+
+
+

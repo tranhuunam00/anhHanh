@@ -73,3 +73,64 @@ export async function fetchMyFeedbacks(token) {
 
   return data.feedbacks || [];
 }
+
+/** Fetch unread replies count for header badge */
+export async function fetchUnreadFeedbackCount(token) {
+  if (!token) return 0;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/feedback/unread-count`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) return 0;
+    const data = await response.json();
+    return data.unread_count || 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** Fetch full message thread for a feedback (and mark incoming replies as read) */
+export async function fetchFeedbackMessages(feedbackId, token) {
+  if (!token) throw new Error('Vui lòng đăng nhập.');
+
+  const response = await fetch(`${API_BASE_URL}/api/feedback/${feedbackId}/messages`, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || 'Không thể tải cuộc hội thoại.');
+  }
+
+  return data;
+}
+
+/** Send reply to a feedback thread (supports text and MinIO image attachment) */
+export async function sendFeedbackReply(feedbackId, { message, image_url }, token) {
+  if (!token) throw new Error('Vui lòng đăng nhập để gửi phản hồi.');
+
+  const response = await fetch(`${API_BASE_URL}/api/feedback/${feedbackId}/reply`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      message,
+      image_url: image_url || null
+    })
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || 'Không thể gửi phản hồi.');
+  }
+
+  return data;
+}
+

@@ -117,7 +117,10 @@ async def list_admin_feedbacks(
         active_filter = status_filter or status_val
         query = (
             select(Feedback)
-            .options(selectinload(Feedback.user))
+            .options(
+                selectinload(Feedback.user),
+                selectinload(Feedback.messages),
+            )
             .order_by(desc(Feedback.created_at))
         )
         if active_filter and active_filter.upper() != "ALL":

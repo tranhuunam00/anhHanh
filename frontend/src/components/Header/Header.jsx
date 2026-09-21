@@ -17,6 +17,7 @@ import {
 import { SOURCE_LANGUAGES, TARGET_LANGUAGES } from "../../constants/languages";
 import { useAuth } from "../../context/AuthContext";
 import { fetchAdminFeedbackCount } from "../../services/adminService";
+import { fetchUnreadFeedbackCount } from "../../services/feedbackService";
 
 export const Header = React.memo(({
   urlInput,
@@ -40,26 +41,34 @@ export const Header = React.memo(({
   const { user, token, isAuthenticated, streak, unlearnedWords, logout } = useAuth();
   const isAdmin = user && user.role === "ADMIN";
   const [adminFeedbackStats, setAdminFeedbackStats] = useState({ pending: 0, in_progress: 0, total_active: 0 });
+  const [userUnreadCount, setUserUnreadCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Fetch feedback count for Admin badge
+  // Fetch feedback count for Admin badge or User unread notification badge
   useEffect(() => {
-    if (!isAdmin || !token) return;
+    if (!token) return;
 
     let isMounted = true;
     const loadStats = async () => {
       try {
-        const stats = await fetchAdminFeedbackCount(token);
-        if (isMounted && stats) {
-          setAdminFeedbackStats({
-            pending: stats.pending || 0,
-            in_progress: stats.in_progress || 0,
-            total_active: stats.total_active || 0,
-          });
+        if (isAdmin) {
+          const stats = await fetchAdminFeedbackCount(token);
+          if (isMounted && stats) {
+            setAdminFeedbackStats({
+              pending: stats.pending || 0,
+              in_progress: stats.in_progress || 0,
+              total_active: stats.total_active || 0,
+            });
+          }
+        } else {
+          const unread = await fetchUnreadFeedbackCount(token);
+          if (isMounted) {
+            setUserUnreadCount(unread || 0);
+          }
         }
       } catch (err) {
-        console.debug("Error fetching admin feedback count:", err);
+        console.debug("Error fetching feedback stats:", err);
       }
     };
 
@@ -69,7 +78,7 @@ export const Header = React.memo(({
       loadStats();
     };
     window.addEventListener("shotlang:feedback-updated", handleUpdated);
-    const interval = setInterval(loadStats, 45000);
+    const interval = setInterval(loadStats, 30000);
 
     return () => {
       isMounted = false;
@@ -288,20 +297,29 @@ export const Header = React.memo(({
           title={
             isAdmin
               ? `Góp ý: ${adminFeedbackStats.total_active} cần xử lý (${adminFeedbackStats.pending} mới, ${adminFeedbackStats.in_progress} đang xử lý)`
+              : userUnreadCount > 0
+              ? `Bạn có ${userUnreadCount} phản hồi mới từ Quản trị viên!`
               : "Gửi góp ý & báo lỗi"
           }
           style={{ padding: "6px 12px", fontSize: "0.85rem", position: "relative" }}
         >
           <MessageSquarePlus size={15} />
           <span>Góp ý</span>
-          {isAdmin && (
+          {isAdmin ? (
             <span
               className={`admin-feedback-badge ${adminFeedbackStats.total_active > 0 ? "active-badge" : "zero-badge"}`}
               title={`${adminFeedbackStats.pending} góp ý mới, ${adminFeedbackStats.in_progress} đang xử lý`}
             >
               {adminFeedbackStats.total_active}
             </span>
-          )}
+          ) : userUnreadCount > 0 ? (
+            <span
+              className="user-unread-feedback-badge"
+              title={`Bạn có ${userUnreadCount} phản hồi mới từ Quản trị viên`}
+            >
+              {userUnreadCount}
+            </span>
+          ) : null}
         </button>
 
         {/* Theme Toggle */}
