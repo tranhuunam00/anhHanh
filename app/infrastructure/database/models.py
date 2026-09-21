@@ -197,6 +197,7 @@ class Feedback(Base):
     feedback_type = Column(String(50), default='GENERAL', nullable=False)
     rating = Column(Integer, nullable=True)
     content = Column(Text, nullable=False)
+    image_url = Column(Text, nullable=True)
     status = Column(String(20), default='PENDING', nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
@@ -211,6 +212,8 @@ class Feedback(Base):
             'feedback_type': self.feedback_type,
             'rating': self.rating,
             'content': self.content,
+            'image_url': self.image_url,
             'status': self.status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
+

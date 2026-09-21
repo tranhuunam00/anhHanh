@@ -12,6 +12,7 @@ from slowapi.middleware import SlowAPIMiddleware
 import uvicorn
 
 from app.infrastructure.database.connection import init_db
+from app.infrastructure.minio_service import ensure_bucket_and_policy
 from app.presentation.security_middleware import limiter, SecurityHeadersMiddleware
 from app.presentation.api import api_router
 from app.presentation.auth_api import router as auth_router
@@ -32,6 +33,12 @@ async def lifespan(app: FastAPI):
         logger.info("Application startup: Database initialized and Super Admin verified.")
     except Exception as e:
         logger.error(f"Error during startup init_db: {e}")
+
+    try:
+        ensure_bucket_and_policy()
+    except Exception as e:
+        logger.error(f"Error during startup MinIO bucket initialization: {e}")
+
     yield
     logger.info("Application shutdown.")
 

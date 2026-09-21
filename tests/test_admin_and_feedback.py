@@ -204,3 +204,23 @@ def test_quynh_trang_admin_privilege():
     res = client.get("/api/admin/overview", headers={"Authorization": f"Bearer {token}"})
     assert res.status_code == 200
 
+
+def test_feedback_with_image_attachment():
+    """Test submitting feedback with attached image URL."""
+    token, email = create_regular_user()
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Submit feedback with image URL
+    payload = {
+        "category": "BUG",
+        "rating": 4,
+        "content": "Gặp lỗi hiển thị giao diện khi mở tab Sổ từ vựng",
+        "image_url": "/api/feedback/images/feedback_test_12345.png"
+    }
+    res = client.post("/api/feedback", json=payload, headers=headers)
+    assert res.status_code == 201
+    data = res.json()
+    assert "feedback" in data
+    assert data["feedback"]["image_url"] == "/api/feedback/images/feedback_test_12345.png"
+
+
