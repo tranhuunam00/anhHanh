@@ -477,6 +477,33 @@ export const AdminPortal = ({ user, token, showToast }) => {
 
                   <div className="feedback-content-text">{fb.content}</div>
 
+                  {fb.image_url && (
+                    <div style={{ marginTop: '10px', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: '6px', fontWeight: 600 }}>
+                        📷 Ảnh đính kèm (Lưu trữ MinIO S3):
+                      </div>
+                      <a
+                        href={fb.image_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: 'inline-block',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          border: '1px solid var(--border-color, #cbd5e1)',
+                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
+                        }}
+                        title="Bấm để mở ảnh kích thước lớn trong tab mới"
+                      >
+                        <img
+                          src={fb.image_url}
+                          alt="Feedback MinIO screenshot"
+                          style={{ maxWidth: '300px', maxHeight: '180px', objectFit: 'cover', display: 'block' }}
+                        />
+                      </a>
+                    </div>
+                  )}
+
                   <div className="feedback-actions-bar">
                     {fb.status !== 'REVIEWED' && (
                       <button

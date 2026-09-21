@@ -13,7 +13,7 @@ from minio.error import S3Error
 logger = logging.getLogger(__name__)
 
 # Environment Configuration
-DEFAULT_MINIO_HOST = "minio:9000" if os.getenv("RUNNING_IN_DOCKER") else "localhost:9000"
+DEFAULT_MINIO_HOST = "minio:9100" if os.getenv("RUNNING_IN_DOCKER") else "localhost:9100"
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", DEFAULT_MINIO_HOST)
 MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
 MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "minioadmin123")
