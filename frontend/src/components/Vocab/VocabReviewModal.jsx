@@ -369,7 +369,7 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
                     <h2 className="fc-word">{currentItem.word}</h2>
                     {currentItem.phonetic && <div className="fc-ipa">{currentItem.phonetic}</div>}
                     <button className="btn-audio-fc" onClick={(e) => { e.stopPropagation(); speakWord(currentItem.word); }}>
-                      <SvgVolume size={14} /> Phổ biến âm
+                      <SvgVolume size={14} /> Nghe phát âm
                     </button>
                     <div className="fc-flip-hint"><SvgRefresh size={14} /> Chạm để lật xem nghĩa</div>
                   </div>
