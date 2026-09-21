@@ -447,7 +447,7 @@ export default function App() {
   const handleHintLetter = () => {
     if (!currentChallenge) return;
     const currentVal = userInputRef.current || userInput;
-    const nextVal = getNextLetterHint(currentChallenge.text, currentVal);
+    const nextVal = getNextLetterHint(currentChallenge.text, currentVal, settings.strictPunctuation);
     userInputRef.current = nextVal;
     setUserInput(nextVal);
   };
