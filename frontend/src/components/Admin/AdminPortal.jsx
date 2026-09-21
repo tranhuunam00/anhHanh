@@ -145,12 +145,12 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
     setIsLoadingChat(true);
     setChatMessages([]);
     try {
-      const data = await fetchFeedbackMessages(fb.id, token);
-      setChatMessages(data.messages || []);
-      // If feedback had unread messages, update optimistic feedback list
+      const msgs = data.messages || [];
+      setChatMessages(msgs);
+      // Update messages_count and clear unread state
       setFeedbacks((prev) =>
         prev.map((item) =>
-          item.id === fb.id ? { ...item, has_unread_messages: false } : item
+          item.id === fb.id ? { ...item, messages_count: msgs.length, has_unread_messages: false } : item
         )
       );
       // Trigger update for header badge
@@ -701,7 +701,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                       onClick={() => handleOpenChat(fb)}
                     >
                       <MessageCircle size={15} />
-                      <span>Trao đổi ({fb.messages_count || 0})</span>
+                      <span>Trao đổi ({fb.messages_count ?? fb.messages?.length ?? 0})</span>
                       {fb.has_unread_messages && (
                         <span
                           style={{

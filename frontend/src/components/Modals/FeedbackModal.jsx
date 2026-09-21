@@ -67,6 +67,16 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
   }, [isOpen, token, activeSubTab]);
 
   useEffect(() => {
+    const handleFeedbackUpdated = () => {
+      if (token && activeSubTab === 'history') {
+        loadHistory();
+      }
+    };
+    window.addEventListener('shotlang:feedback-updated', handleFeedbackUpdated);
+    return () => window.removeEventListener('shotlang:feedback-updated', handleFeedbackUpdated);
+  }, [token, activeSubTab]);
+
+  useEffect(() => {
     return () => {
       if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
       if (replyImagePreviewUrl) URL.revokeObjectURL(replyImagePreviewUrl);
@@ -96,13 +106,18 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
     setIsLoadingThread(true);
     try {
       const data = await fetchFeedbackMessages(feedbackItem.id, token);
-      setThreadMessages(data.messages || []);
-      // If there were unread replies, refresh list and notify header
+      const msgs = data.messages || [];
+      setThreadMessages(msgs);
+      // Update local card item with latest messages_count and clear unread_replies
+      setMyFeedbacks((prev) =>
+        prev.map((f) =>
+          f.id === feedbackItem.id
+            ? { ...f, messages_count: msgs.length, unread_replies: 0 }
+            : f
+        )
+      );
       if (feedbackItem.unread_replies > 0) {
         window.dispatchEvent(new CustomEvent('shotlang:feedback-updated'));
-        setMyFeedbacks((prev) =>
-          prev.map((f) => (f.id === feedbackItem.id ? { ...f, unread_replies: 0 } : f))
-        );
       }
     } catch (err) {
       console.error('Error loading thread:', err);
@@ -164,6 +179,13 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
       );
 
       setThreadMessages((prev) => [...prev, res.reply]);
+      setMyFeedbacks((prev) =>
+        prev.map((f) =>
+          f.id === selectedThreadFeedback.id
+            ? { ...f, messages_count: (f.messages_count || 0) + 1 }
+            : f
+        )
+      );
       setReplyText('');
       handleRemoveReplyImage();
       window.dispatchEvent(new CustomEvent('shotlang:feedback-updated'));
@@ -797,14 +819,37 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
                           <button
                             type="button"
                             className="btn btn-secondary"
-                            style={{ padding: '3px 10px', fontSize: '0.76rem', display: 'inline-flex', alignItems: 'center', gap: 5, borderRadius: 6 }}
+                            style={{
+                              padding: '3px 10px',
+                              fontSize: '0.76rem',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 5,
+                              borderRadius: 6,
+                              borderColor: item.unread_replies > 0 ? '#ef4444' : undefined,
+                              background: item.unread_replies > 0 ? 'rgba(239, 68, 68, 0.08)' : undefined,
+                              color: item.unread_replies > 0 ? '#ef4444' : undefined,
+                              fontWeight: item.unread_replies > 0 ? 700 : 500
+                            }}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleOpenThread(item);
                             }}
                           >
                             <MessageCircle size={13} />
-                            <span>Hội thoại ({item.messages_count || 0}) ➔</span>
+                            <span>Hội thoại ({item.messages_count ?? item.messages?.length ?? 0}) ➔</span>
+                            {item.unread_replies > 0 && (
+                              <span
+                                style={{
+                                  width: 7,
+                                  height: 7,
+                                  borderRadius: '50%',
+                                  background: '#ef4444',
+                                  display: 'inline-block'
+                                }}
+                                title="Có phản hồi mới từ Quản trị viên"
+                              />
+                            )}
                           </button>
                         </div>
                       </div>
