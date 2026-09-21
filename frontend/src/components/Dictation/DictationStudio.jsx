@@ -297,16 +297,6 @@ export const DictationStudio = React.memo(({
               <RotateCcw size={14} strokeWidth={2} />
               <span>Luyện lại câu này</span>
             </button>
-            {onRestartLesson && (
-              <button
-                className="btn btn-secondary btn-with-icon"
-                style={{ padding: "7px 14px", fontSize: "0.85rem", color: "#ef4444", borderColor: "#fecaca" }}
-                onClick={onRestartLesson}
-              >
-                <RefreshCw size={14} strokeWidth={2} />
-                <span>Làm lại bài này từ đầu</span>
-              </button>
-            )}
           </div>
         </div>
       )}
