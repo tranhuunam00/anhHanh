@@ -285,10 +285,8 @@ export const DictationStudio = React.memo(({
             <div className="translation-sentence">{currentChallenge?.translation || dynamicTranslation}</div>
           )}
           <div className="vocab-save-hint-card">
-            <Sparkles size={14} color="#6366f1" style={{ flexShrink: 0 }} />
-            <span>
-              💡 <strong>Lưu từ mới:</strong> Bôi đen (quét chuột) bất kỳ từ nào trong câu trên để lưu ngay vào Sổ từ vựng (+ AI dịch nghĩa & ảnh minh họa)!
-            </span>
+            <Sparkles size={13} color="#6366f1" style={{ flexShrink: 0 }} />
+            <span>💡 Bôi đen từ bất kỳ để lưu vào Sổ tay</span>
           </div>
           <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
             <button
