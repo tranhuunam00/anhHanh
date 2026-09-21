@@ -148,6 +148,13 @@ export const DictationStudio = React.memo(({
       e.preventDefault();
       e.stopPropagation();
       if (onCheck) onCheck(localInput);
+      return;
+    }
+    if (e.code === "Backquote" || e.key === "`" || e.key === "~") {
+      e.preventDefault();
+      e.stopPropagation();
+      if (onHintLetter) onHintLetter();
+      return;
     }
   };
 
@@ -266,7 +273,7 @@ export const DictationStudio = React.memo(({
           <span>Nghe câu</span>
         </button>
 
-        <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (Enter 2 lần / Ctrl+H / Alt+H)" onClick={onHintLetter}>
+        <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (~ / ` / Enter 2 lần / Ctrl+H / Alt+H)" onClick={onHintLetter}>
           <KeyRound size={15} strokeWidth={2} />
           <span>Gợi ý chữ</span>
         </button>

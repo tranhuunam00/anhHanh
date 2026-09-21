@@ -60,13 +60,20 @@ export const useShortcuts = ({
         return;
       }
 
-      // Space / Backquote / PlayPauseKey -> Play/Pause (only when NOT focused inside text input/textarea)
-      if (e.code === "Space" || e.code === playPauseKey || e.key === playPauseKey) {
+      // Space / PlayPauseKey -> Play/Pause (only when NOT focused inside text input/textarea)
+      if (e.code === "Space" || (playPauseKey !== "Backquote" && (e.code === playPauseKey || e.key === playPauseKey))) {
         if (!isInputOrTextarea) {
           e.preventDefault();
           if (onPlayPause) onPlayPause();
           return;
         }
+      }
+
+      // Backquote / Tilde (` or ~) -> Hint Letter (Gợi ý 1 chữ cái tiếp theo)
+      if (e.code === "Backquote" || e.key === "`" || e.key === "~") {
+        e.preventDefault();
+        if (onHintLetter) onHintLetter();
+        return;
       }
 
       // Alt + LeftArrow -> Prev

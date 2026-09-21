@@ -224,7 +224,7 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
                   </div>
                   <div className="shortcut-row-item">
                     <span className="shortcut-row-action">Gợi ý 1 ký tự (chữ) tiếp theo</span>
-                    <kbd>Enter 2 lần / Ctrl + H</kbd>
+                    <kbd>~ / ` / Ctrl+H / Enter 2 lần</kbd>
                   </div>
                   <div className="shortcut-row-item">
                     <span className="shortcut-row-action">Hiện nút nổi lưu từ vào Sổ tay</span>
