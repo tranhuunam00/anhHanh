@@ -12,6 +12,10 @@ export const useSettings = () => {
     if (!initial.targetLang) {
       initial.targetLang = "vi";
     }
+    if (!saved._v2_manual_advance) {
+      initial.autoAdvance = "no";
+      initial._v2_manual_advance = true;
+    }
     return initial;
   });
 

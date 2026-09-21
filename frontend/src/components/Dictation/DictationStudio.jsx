@@ -283,9 +283,15 @@ export const DictationStudio = React.memo(({
             <div className="translation-sentence">{currentChallenge?.translation || dynamicTranslation}</div>
           )}
           <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-            <button className="btn btn-primary btn-with-icon" style={{ padding: "7px 18px" }} onClick={onNextChallenge}>
+            <button
+              className="btn btn-primary btn-with-icon"
+              style={{ padding: "7px 18px" }}
+              onClick={onNextChallenge}
+              title="Sang câu tiếp theo (hoặc ấn Enter)"
+            >
               <span>Sang câu tiếp theo</span>
               <ArrowRight size={16} strokeWidth={2.2} />
+              <kbd style={{ fontSize: "0.72rem", opacity: 0.85, padding: "1px 6px", background: "rgba(255,255,255,0.25)", borderRadius: "4px", marginLeft: "4px" }}>Enter</kbd>
             </button>
             <button className="btn btn-secondary btn-with-icon" style={{ padding: "7px 14px", fontSize: "0.85rem" }} onClick={onRetryChallenge}>
               <RotateCcw size={14} strokeWidth={2} />

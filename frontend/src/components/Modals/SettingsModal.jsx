@@ -89,8 +89,8 @@ export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting, onRe
 
               <tr>
                 <td className="settings-label">
-                  <strong>Auto Advance (Tự chuyển câu)</strong>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Tự động chuyển câu tiếp khi đúng 100%</div>
+                  <strong>Tự chuyển câu (Auto Advance)</strong>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Hành vi sau khi gõ đúng 100% và hiện kết quả</div>
                 </td>
                 <td>
                   <select
@@ -98,8 +98,8 @@ export const SettingsModal = ({ isOpen, onClose, settings, onUpdateSetting, onRe
                     value={settings.autoAdvance}
                     onChange={(e) => onUpdateSetting("autoAdvance", e.target.value)}
                   >
-                    <option value="yes">Có - Tự nhảy câu</option>
-                    <option value="no">Không - Ở lại câu hiện tại</option>
+                    <option value="no">Không (Mặc định) - Hiện kết quả & dịch, ấn Enter lần nữa để sang câu</option>
+                    <option value="yes">Có - Tự động nhảy sang câu tiếp theo</option>
                   </select>
                 </td>
               </tr>
