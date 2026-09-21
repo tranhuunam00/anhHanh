@@ -131,8 +131,9 @@ class GetLessonUseCase:
 
         # 3. Check DB for target subtitle cache
         effective_src = detected_source_lang or source_lang or "en"
-        tgt_key = f"{effective_src}_tgt_{target_lang}"
         tgt_snippets = await subtitle_repo.get_raw(lesson.id, tgt_key)
+        if tgt_snippets is None and target_lang not in ("none", ""):
+            tgt_snippets = await subtitle_repo.get_any_target_raw(lesson.id, target_lang)
 
         if tgt_snippets is None and tgt_snippets_from_yt is not None:
             tgt_snippets = tgt_snippets_from_yt

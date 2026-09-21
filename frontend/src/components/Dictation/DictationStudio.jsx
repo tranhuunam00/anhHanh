@@ -111,6 +111,7 @@ export const DictationStudio = React.memo(({
   const handleInputKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      e.stopPropagation();
       if (onCheck) onCheck(localInput);
     }
   };

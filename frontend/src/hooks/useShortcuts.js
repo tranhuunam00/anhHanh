@@ -67,9 +67,9 @@ export const useShortcuts = ({
         return;
       }
 
-      // Enter -> Check (only inside dictation input or when active)
+      // Enter -> Check / Advance (when NOT typing inside text input/textarea; dictation textarea handles its own Enter)
       if (e.key === "Enter" && !e.shiftKey) {
-        if (activeEl && activeEl.id === "dictation-input") {
+        if (!isInputOrTextarea) {
           e.preventDefault();
           if (onCheck) onCheck();
           return;

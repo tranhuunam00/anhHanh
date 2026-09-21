@@ -416,7 +416,6 @@ export default function App() {
         tracker.count = 0;
       } else {
         tracker.lastInput = currentVal;
-        playerController.replayCurrentSegment();
       }
     }
   };

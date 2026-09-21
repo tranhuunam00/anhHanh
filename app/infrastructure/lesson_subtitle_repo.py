@@ -88,6 +88,32 @@ class LessonSubtitleRepo:
             logger.warning(f"Failed to deserialize any subtitle for lesson {lesson_id}: {e}")
             return None
 
+    async def get_any_target_raw(
+        self, lesson_id: str, target_lang: str
+    ) -> Optional[List[SubtitleSnippet]]:
+        """Return any cached target translation ending with _tgt_{target_lang} for this lesson."""
+        suffix = f"_tgt_{target_lang}"
+        res = await self.db.execute(
+            select(LessonSubtitle).where(
+                LessonSubtitle.lesson_id == lesson_id,
+                LessonSubtitle.lang_code.endswith(suffix),
+            )
+        )
+        row = res.scalars().first()
+        if not row:
+            return None
+        try:
+            return [
+                SubtitleSnippet(
+                    text=item["text"],
+                    start=float(item["start"]),
+                    duration=float(item["duration"]),
+                )
+                for item in (row.raw_data or [])
+            ]
+        except Exception as e:
+            logger.warning(f"Failed to deserialize target subtitle for lesson {lesson_id}: {e}")
+            return None
 
     async def save_raw(
         self, lesson_id: str, lang_code: str, snippets: List[SubtitleSnippet]

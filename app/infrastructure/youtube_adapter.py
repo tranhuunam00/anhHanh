@@ -92,9 +92,6 @@ class YouTubeTranscriptAdapter(ITranscriptService):
             for t in transcript_list:
                 if first_track is None:
                     first_track = t
-                if not t.is_generated and detected_lang == "en":
-                    detected_lang = t.language_code.split("-")[0].lower()
-
                 tracks.append(
                     {
                         "code": t.language_code,
@@ -104,10 +101,17 @@ class YouTubeTranscriptAdapter(ITranscriptService):
                     }
                 )
 
-            if first_track and detected_lang == "en":
-                first_code = first_track.language_code.split("-")[0].lower()
-                if first_code != "en":
-                    detected_lang = first_code
+            # Priority for true original spoken language:
+            # 1. Look for auto-generated track (YouTube speech-to-text ONLY generates captions in the actual spoken audio language!)
+            # 2. If no generated track, check if 'en' track exists (most common international language)
+            # 3. Otherwise default to first track
+            generated_track = next((t for t in transcript_list if t.is_generated), None)
+            if generated_track:
+                detected_lang = generated_track.language_code.split("-")[0].lower()
+            elif any(t.language_code.lower().startswith("en") for t in transcript_list):
+                detected_lang = "en"
+            elif first_track:
+                detected_lang = first_track.language_code.split("-")[0].lower()
 
             return {
                 "video_id": video_id,
