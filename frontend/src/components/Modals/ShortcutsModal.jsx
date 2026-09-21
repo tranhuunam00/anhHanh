@@ -79,7 +79,7 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
             onClick={() => setActiveTab("tips")}
           >
             <Lightbulb size={15} color="#f59e0b" />
-            <span>Mẹo luyện Dictation</span>
+            <span>Mẹo & Nguồn học hay</span>
           </button>
         </div>
 
@@ -235,9 +235,36 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
             </div>
           )}
 
-          {/* ================= TAB 3: MẸO LUYỆN DICTATION ================= */}
+          {/* ================= TAB 3: MẸO & NGUỒN HỌC HAY ================= */}
           {activeTab === "tips" && (
             <div className="tips-container">
+              <div className="tip-card" style={{ borderLeft: "3px solid #e62b1e", background: "rgba(230, 43, 30, 0.03)" }}>
+                <div className="tip-card-header">
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      background: "#e62b1e",
+                      color: "#fff",
+                      fontSize: "9px",
+                      fontWeight: 900,
+                      letterSpacing: "-0.5px",
+                      flexShrink: 0,
+                    }}
+                  >
+                    TED
+                  </span>
+                  <span>Gợi ý chọn bài: Kênh YouTube TED</span>
+                </div>
+                <p className="tip-card-body">
+                  Nên vào kênh <strong>TED</strong> trên YouTube để chọn bài: đề tài cực kỳ phong phú (khoa học, đời sống, tâm lý, công nghệ), phát âm chuẩn và phụ đề rất chính xác. Bạn chỉ cần copy link video TED bất kỳ dán vào ShotLang là học được ngay!
+                </p>
+              </div>
+
               <div className="tip-card">
                 <div className="tip-card-header">
                   <span>🎧</span>
