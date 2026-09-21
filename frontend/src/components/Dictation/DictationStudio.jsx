@@ -48,8 +48,9 @@ export const DictationStudio = React.memo(({
   currentChallenge,
   currentIndex,
   totalChallenges,
-  userInput,
+  userInput = "",
   setUserInput,
+  onInputChange,
   isListening,
   isPlaying = false,
   onToggleMic,
@@ -71,11 +72,20 @@ export const DictationStudio = React.memo(({
 }) => {
   const targetText = currentChallenge ? currentChallenge.text : "";
 
-  // Compute live masked diff evaluation
+  // Cô lập local state để khi gõ phím CHỈ re-render DictationStudio, không re-render toàn bộ App
+  const [localInput, setLocalInput] = React.useState(userInput || "");
+
+  // Đồng bộ khi cha truyền input mới (chuyển câu, gợi ý, bỏ qua, làm lại, mic nói)
+  React.useEffect(() => {
+    setLocalInput(userInput || "");
+  }, [userInput]);
+
+  // Hoãn nhẹ phần diff sang frame sau bằng useDeferredValue để ưu tiên gõ phím mượt 60fps
+  const deferredInput = React.useDeferredValue(localInput);
   const maskedEvaluation = useMemo(() => {
     if (!targetText) return { words: [], isCompleted: false };
-    return evaluateMasked(targetText, userInput, strictPunctuation);
-  }, [targetText, userInput, strictPunctuation]);
+    return evaluateMasked(targetText, deferredInput, strictPunctuation);
+  }, [targetText, deferredInput, strictPunctuation]);
 
   const progressPercent = totalChallenges > 0 ? Math.round(((currentIndex + 1) / totalChallenges) * 100) : 0;
 
@@ -84,6 +94,25 @@ export const DictationStudio = React.memo(({
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const handleInputChange = (e) => {
+    // Triệt tiêu nhiều dấu cách liên tiếp (2 space trở lên) ngay khi gõ
+    const cleanVal = e.target.value.replace(/ {2,}/g, " ");
+    setLocalInput(cleanVal);
+    if (onInputChange) {
+      onInputChange(cleanVal);
+    }
+    if (setUserInput) {
+      // Giữ tương thích nếu có component nào đọc setUserInput
+    }
+  };
+
+  const handleInputKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (onCheck) onCheck(localInput);
+    }
   };
 
   return (
@@ -148,7 +177,7 @@ export const DictationStudio = React.memo(({
       <div className="masked-card">
         <MaskedPreview
           maskedWords={maskedEvaluation.words}
-          hasInput={Boolean(userInput)}
+          hasInput={Boolean(localInput)}
         />
       </div>
 
@@ -162,8 +191,9 @@ export const DictationStudio = React.memo(({
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
+          value={localInput}
+          onChange={handleInputChange}
+          onKeyDown={handleInputKeyDown}
         />
         <button
           className={`mic-btn ${isListening ? "listening" : ""}`}
@@ -176,7 +206,11 @@ export const DictationStudio = React.memo(({
 
       {/* Action Buttons Toolbar */}
       <div className="dictation-actions">
-        <button className="btn btn-secondary btn-with-icon" title="Kiểm tra câu vừa gõ (Enter)" onClick={onCheck}>
+        <button
+          className="btn btn-secondary btn-with-icon"
+          title="Kiểm tra câu vừa gõ (Enter)"
+          onClick={() => onCheck && onCheck(localInput)}
+        >
           <Check size={16} strokeWidth={2.5} />
           <span>Kiểm tra</span>
         </button>

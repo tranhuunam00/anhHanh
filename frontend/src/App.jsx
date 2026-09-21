@@ -65,6 +65,7 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [maxReachedIndex, setMaxReachedIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
+  const userInputRef = useRef("");
   const [isCompleted, setIsCompleted] = useState(false);
   const [progressMap, setProgressMap] = useState({});
   const [isListening, setIsListening] = useState(false);
@@ -92,7 +93,10 @@ export default function App() {
   // Initialize Speech Recognition
   useEffect(() => {
     speechRef.current = new SpeechRecognitionService(
-      (transcript) => setUserInput(transcript),
+      (transcript) => {
+        userInputRef.current = transcript;
+        setUserInput(transcript);
+      },
       (status) => setIsListening(status)
     );
   }, []);
@@ -227,6 +231,7 @@ export default function App() {
       const targetIndex = finalPos <= lessonData.challenges.length ? finalPos - 1 : 0;
       setMaxReachedIndex(targetIndex);
       setCurrentIndex(targetIndex);
+      userInputRef.current = "";
       setUserInput("");
       setIsCompleted(false);
 
@@ -292,9 +297,12 @@ export default function App() {
     // If user goes back to a previously reached sentence: auto-fill and mark completed!
     // User requirement: "các câu trước đó mặc định đã điền, chỉ cần quan tâm đang đến câu nào thôi, cái đáp án đó tự fill"
     if (index < maxReachedIndex) {
-      setUserInput(currentLesson.challenges[index].text);
+      const challengeText = currentLesson.challenges[index].text;
+      userInputRef.current = challengeText;
+      setUserInput(challengeText);
       setIsCompleted(true);
     } else {
+      userInputRef.current = "";
       setUserInput("");
       setIsCompleted(false);
       if (index > maxReachedIndex) {
@@ -325,6 +333,7 @@ export default function App() {
 
     setMaxReachedIndex(0);
     setCurrentIndex(0);
+    userInputRef.current = "";
     setUserInput("");
     setIsCompleted(false);
 
@@ -344,7 +353,7 @@ export default function App() {
   const enterTrackerRef = useRef({ count: 0, lastTime: 0, lastInput: "" });
 
   // Handle checking answers
-  const handleCheck = () => {
+  const handleCheck = (inputOverride) => {
     if (!currentChallenge) return;
 
     if (isCompleted) {
@@ -355,11 +364,14 @@ export default function App() {
       return;
     }
 
-    const evalResult = evaluateMasked(currentChallenge.text, userInput, settings.strictPunctuation);
+    const currentVal = typeof inputOverride === "string" ? inputOverride : (userInputRef.current || userInput);
+    const evalResult = evaluateMasked(currentChallenge.text, currentVal, settings.strictPunctuation);
 
     if (evalResult.isCompleted) {
       enterTrackerRef.current = { count: 0, lastTime: 0, lastInput: "" };
       setIsCompleted(true);
+      userInputRef.current = currentVal;
+      setUserInput(currentVal);
 
       const isAllDone = currentIndex === (currentLesson?.challenges?.length || 0) - 1;
 
@@ -392,7 +404,7 @@ export default function App() {
       const now = Date.now();
       const tracker = enterTrackerRef.current;
 
-      if (now - tracker.lastTime < 1500 && tracker.lastInput === userInput) {
+      if (now - tracker.lastTime < 1500 && tracker.lastInput === currentVal) {
         tracker.count += 1;
       } else {
         tracker.count = 1;
@@ -403,7 +415,7 @@ export default function App() {
         handleHintLetter();
         tracker.count = 0;
       } else {
-        tracker.lastInput = userInput;
+        tracker.lastInput = currentVal;
         playerController.replayCurrentSegment();
       }
     }
@@ -411,6 +423,7 @@ export default function App() {
 
   const handleSkip = () => {
     if (!currentChallenge || !currentLesson) return;
+    userInputRef.current = currentChallenge.text;
     setUserInput(currentChallenge.text);
     setIsCompleted(true);
 
@@ -433,12 +446,18 @@ export default function App() {
 
   const handleHintLetter = () => {
     if (!currentChallenge) return;
-    setUserInput((prev) => getNextLetterHint(currentChallenge.text, prev));
+    const currentVal = userInputRef.current || userInput;
+    const nextVal = getNextLetterHint(currentChallenge.text, currentVal);
+    userInputRef.current = nextVal;
+    setUserInput(nextVal);
   };
 
   const handleHintWord = () => {
     if (!currentChallenge) return;
-    setUserInput((prev) => getNextWordHint(currentChallenge.text, prev));
+    const currentVal = userInputRef.current || userInput;
+    const nextVal = getNextWordHint(currentChallenge.text, currentVal);
+    userInputRef.current = nextVal;
+    setUserInput(nextVal);
   };
 
   const handleSpeakSentence = () => {
@@ -461,7 +480,7 @@ export default function App() {
     onPlayPause: () => playerController.togglePlayPause(),
     onPrev: () => goToChallenge(currentIndex - 1),
     onNext: () => goToChallenge(currentIndex + 1),
-    onCheck: handleCheck,
+    onCheck: () => handleCheck(userInputRef.current),
     onSkip: handleSkip,
     onHintLetter: handleHintLetter,
     onHintWord: handleHintWord,
@@ -607,6 +626,9 @@ export default function App() {
               totalChallenges={currentLesson?.total_challenges || 0}
               userInput={userInput}
               setUserInput={setUserInput}
+              onInputChange={(val) => {
+                userInputRef.current = val;
+              }}
               isListening={isListening}
               isPlaying={isPlaying}
               onToggleMic={handleToggleMic}
@@ -625,6 +647,7 @@ export default function App() {
               strictPunctuation={settings.strictPunctuation}
               onNextChallenge={() => goToChallenge(currentIndex + 1)}
               onRetryChallenge={() => {
+                userInputRef.current = "";
                 setUserInput("");
                 setIsCompleted(false);
                 playerController.replayCurrentSegment();

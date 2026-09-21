@@ -9,9 +9,11 @@ export const cleanWord = (token) => {
 };
 
 export const evaluateMasked = (targetText, userInput, strictPunctuation = false) => {
-  const rawInput = (userInput || "").trim();
+  // Triệt tiêu nhiều dấu cách liên tiếp (2 space trở lên) thành 1 dấu space duy nhất
+  const rawInput = (userInput || "").replace(/[^\S\r\n]+/g, " ").trim();
   const uChars = Array.from(rawInput);
-  const tChars = Array.from(targetText || "");
+  const tClean = (targetText || "").replace(/[^\S\r\n]+/g, " ").trim();
+  const tChars = Array.from(tClean);
 
   let uIdx = 0;
   const words = [];
@@ -32,13 +34,20 @@ export const evaluateMasked = (targetText, userInput, strictPunctuation = false)
         words.push(currentWord);
         currentWord = [];
       }
-      if (uIdx < uChars.length && /\s/.test(uChars[uIdx])) {
+      // Triệt tiêu toàn bộ các dấu space liên tiếp trong user input
+      while (uIdx < uChars.length && /\s/.test(uChars[uIdx])) {
         uIdx++;
       }
       continue;
     }
 
     if (isPunct) {
+      // Trước khi so khớp dấu câu, nếu user input có khoảng trắng thừa thì bỏ qua
+      if (!strictPunctuation) {
+        while (uIdx < uChars.length && /\s/.test(uChars[uIdx])) {
+          uIdx++;
+        }
+      }
       if (uIdx < uChars.length) {
         const uChar = uChars[uIdx];
         if (uChar === tChar) {
@@ -60,6 +69,11 @@ export const evaluateMasked = (targetText, userInput, strictPunctuation = false)
 
     // Target is alphanumeric letter/digit
     totalLetterCount++;
+
+    // Bỏ qua mọi dấu cách thừa trong user input nếu target không phải space
+    while (uIdx < uChars.length && /\s/.test(uChars[uIdx])) {
+      uIdx++;
+    }
 
     // Skip any unexpected user punctuation if not strictPunctuation
     if (!strictPunctuation) {
@@ -98,11 +112,9 @@ export const evaluateMasked = (targetText, userInput, strictPunctuation = false)
     }
   }
 
-  // Consume remaining trailing user punctuation if not strictPunctuation
-  if (!strictPunctuation) {
-    while (uIdx < uChars.length && (isPunctuation(uChars[uIdx]) || /\s/.test(uChars[uIdx]))) {
-      uIdx++;
-    }
+  // Consume remaining trailing user punctuation/whitespace
+  while (uIdx < uChars.length && (/\s/.test(uChars[uIdx]) || (!strictPunctuation && isPunctuation(uChars[uIdx])))) {
+    uIdx++;
   }
 
   if (currentWord.length > 0) {
