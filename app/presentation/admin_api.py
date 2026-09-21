@@ -105,38 +105,47 @@ async def get_admin_feedback_count(
 
 @router.get("/feedbacks")
 async def list_admin_feedbacks(
-    status_filter: Optional[str] = Query(None, alias="status"),
+    status_filter: Optional[str] = Query(None),
+    status_val: Optional[str] = Query(None, alias="status"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
     """List all submitted feedbacks with submitter user details and status filtering."""
-    query = (
-        select(Feedback)
-        .options(selectinload(Feedback.user))
-        .order_by(desc(Feedback.created_at))
-    )
-    if status_filter and status_filter.upper() != "ALL":
-        query = query.where(Feedback.status == status_filter.upper())
+    try:
+        active_filter = status_filter or status_val
+        query = (
+            select(Feedback)
+            .options(selectinload(Feedback.user))
+            .order_by(desc(Feedback.created_at))
+        )
+        if active_filter and active_filter.upper() != "ALL":
+            query = query.where(Feedback.status == active_filter.upper())
 
-    # Count total
-    count_query = select(func.count(Feedback.id))
-    if status_filter and status_filter.upper() != "ALL":
-        count_query = count_query.where(Feedback.status == status_filter.upper())
-    total = (await db.execute(count_query)).scalar() or 0
+        # Count total
+        count_query = select(func.count(Feedback.id))
+        if active_filter and active_filter.upper() != "ALL":
+            count_query = count_query.where(Feedback.status == active_filter.upper())
+        total = (await db.execute(count_query)).scalar() or 0
 
-    # Paginate
-    query = query.limit(limit).offset(offset)
-    res = await db.execute(query)
-    feedbacks = res.scalars().all()
+        # Paginate
+        query = query.limit(limit).offset(offset)
+        res = await db.execute(query)
+        feedbacks = res.scalars().all()
 
-    return {
-        "total": total,
-        "limit": limit,
-        "offset": offset,
-        "feedbacks": [f.to_dict() for f in feedbacks],
-    }
+        return {
+            "total": total,
+            "limit": limit,
+            "offset": offset,
+            "feedbacks": [f.to_dict() for f in feedbacks],
+        }
+    except Exception as e:
+        logger.error(f"Error fetching feedbacks for admin: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi khi tải danh sách phản hồi: {str(e)}"
+        )
 
 
 @router.patch("/feedbacks/{feedback_id}/status")
