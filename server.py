@@ -21,6 +21,7 @@ from app.presentation.vocab_api import router as vocab_router
 from app.presentation.streak_api import router as streak_router
 from app.presentation.feedback_api import router as feedback_router
 from app.presentation.admin_api import router as admin_router
+from app.presentation.audio_studio_api import router as audio_studio_router
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,7 @@ app.include_router(vocab_router)
 app.include_router(streak_router)
 app.include_router(feedback_router)
 app.include_router(admin_router)
+app.include_router(audio_studio_router)
 
 # 5. Mount React frontend build
 base_dir = os.path.dirname(__file__)

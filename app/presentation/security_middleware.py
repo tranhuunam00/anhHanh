@@ -27,6 +27,7 @@ limiter = Limiter(
 )
 
 MAX_PAYLOAD_BYTES = 512 * 1024  # 512 KB
+MAX_AUDIO_PAYLOAD_BYTES = 25 * 1024 * 1024  # 25 MB for custom audio uploads
 
 # ── Per-route-group hard limits (enforced at middleware, no decorator needed) ──
 # Format: (path_prefix, max_requests, window_seconds)
@@ -84,10 +85,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         content_length = request.headers.get('content-length')
         if content_length:
             try:
-                if int(content_length) > MAX_PAYLOAD_BYTES:
+                allowed_max = MAX_AUDIO_PAYLOAD_BYTES if path.startswith('/api/audio-studio/') else MAX_PAYLOAD_BYTES
+                if int(content_length) > allowed_max:
+                    max_mb = allowed_max // (1024 * 1024) or (allowed_max // 1024)
+                    unit = "MB" if allowed_max >= 1024 * 1024 else "KB"
                     return JSONResponse(
                         status_code=413,
-                        content={'detail': 'Dung luong yeu cau vuot qua gioi han cho phep (toi da 512KB).'}
+                        content={'detail': f'Dung lượng yêu cầu vượt quá giới hạn cho phép (tối đa {max_mb}{unit}).'}
                     )
             except ValueError:
                 pass

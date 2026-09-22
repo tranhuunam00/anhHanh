@@ -15,3 +15,4 @@ data/*.sqlite3
 skill_agent_namth/
 cookies.txt
 *cookies*.txt
+data/uploads/
