@@ -139,46 +139,36 @@ export class SpeechRecognitionService {
       try {
         this.recognizer && this.recognizer.stop();
       } catch (e) {
-        console.warn("Stop error:", e);
+        console.warn("[SpeechSvc] Stop error:", e);
       }
       this.isListening = false;
       if (this.onStatusChange) this.onStatusChange(false);
       return false;
     }
 
-    // 1. Check if permission was explicitly blocked
-    if (typeof navigator !== "undefined" && navigator.permissions && navigator.permissions.query) {
-      try {
-        const perm = await navigator.permissions.query({ name: "microphone" });
-        if (perm.state === "denied") {
-          this.triggerPermissionModal("denied");
-          return false;
-        }
-      } catch (e) {
-        // Query microphone might not be supported in some browser engines
-      }
-    }
-
-    // 2. Request microphone access via getUserMedia to prompt browser dialog if not yet granted
+    // 1. Request microphone access via getUserMedia
+    //    (Do NOT use navigator.permissions.query — it can return stale/wrong state for different domains)
     this._micGranted = false;
-    if (typeof navigator !== "undefined" && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach((track) => track.stop());
-        this._micGranted = true; // mic access confirmed
-      } catch (err) {
-        console.warn("Microphone access error via getUserMedia:", err);
-        if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-          this.triggerPermissionModal("denied");
-        } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-          if (this.onError) this.onError("Không tìm thấy thiết bị Microphone trên máy của bạn.");
-        }
-        return false;
+    console.log("[SpeechSvc] Requesting mic via getUserMedia...");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      this._micGranted = true;
+      console.log("[SpeechSvc] getUserMedia OK — mic access granted");
+    } catch (err) {
+      console.warn("[SpeechSvc] getUserMedia failed:", err.name, err.message);
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        this.triggerPermissionModal("denied");
+      } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+        if (this.onError) this.onError("Không tìm thấy thiết bị Microphone trên máy của bạn.");
+      } else {
+        if (this.onError) this.onError(`Lỗi microphone: ${err.name}`);
       }
+      return false;
     }
 
-    // 3. Always create a fresh recognizer instance to avoid stale state
-    //    (Chrome's SpeechRecognition gets stuck after a deny→grant cycle)
+    // 2. Always create a fresh recognizer instance to avoid stale state
+    console.log("[SpeechSvc] Creating fresh SpeechRecognition instance...");
     this.initRecognizer();
 
     if (!this.recognizer) {
@@ -188,13 +178,14 @@ export class SpeechRecognitionService {
       return false;
     }
 
-    // 4. Start fresh recognizer
+    // 3. Start fresh recognizer
     try {
       this.recognizer.lang = this.currentLang;
       this.recognizer.start();
+      console.log("[SpeechSvc] recognizer.start() called OK");
       return true;
     } catch (e) {
-      console.warn("Speech recognition start failed:", e);
+      console.warn("[SpeechSvc] recognizer.start() failed:", e);
       return false;
     }
   }
