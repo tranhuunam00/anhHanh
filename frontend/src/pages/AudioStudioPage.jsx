@@ -74,6 +74,15 @@ export function AudioStudioPage({ isActive = true }) {
     }
   };
 
+  const speakSentence = useCallback((text) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window) || !text) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = 0.9;
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
   // Pause AudioStudio playback when leaving tab or receiving pause signal from YouTube player
   useEffect(() => {
     if (!isActive && audioRef.current) {
@@ -127,7 +136,7 @@ export function AudioStudioPage({ isActive = true }) {
 
   // Audio Playback Controls
   const togglePlayPause = useCallback(() => {
-    if (!audioRef.current) return;
+    if (!isActive || !audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
@@ -136,21 +145,21 @@ export function AudioStudioPage({ isActive = true }) {
       audioRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
-  }, [isPlaying]);
+  }, [isActive, isPlaying]);
 
   const replayCurrentSegment = useCallback(() => {
-    if (!audioRef.current || !currentSentence) return;
+    if (!isActive || !audioRef.current || !currentSentence) return;
     notifyYouTubePause();
     audioRef.current.currentTime = currentSentence.start;
     audioRef.current.play().catch(() => {});
     setIsPlaying(true);
-  }, [currentSentence]);
+  }, [isActive, currentSentence]);
 
   const seekRelative = useCallback((sec) => {
-    if (!audioRef.current) return;
+    if (!isActive || !audioRef.current) return;
     const next = Math.max(0, Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + sec));
     audioRef.current.currentTime = next;
-  }, []);
+  }, [isActive]);
 
   const handleSpeedChange = useCallback((speed) => {
     setPlaybackSpeed(speed);
@@ -174,7 +183,7 @@ export function AudioStudioPage({ isActive = true }) {
 
   // Sync Audio Playhead & Local Dictation State with Current Segment
   useEffect(() => {
-    if (!audioRef.current || !currentSentence) return;
+    if (!isActive || !audioRef.current || !currentSentence) return;
     const audio = audioRef.current;
 
     // Seek to start of current sentence
@@ -193,9 +202,10 @@ export function AudioStudioPage({ isActive = true }) {
     }
 
     // Auto play segment
+    notifyYouTubePause();
     audio.play().catch(() => {});
     setIsPlaying(true);
-  }, [currentSentenceIndex, audioResult]);
+  }, [isActive, currentSentenceIndex, audioResult]);
 
   // Audio TimeUpdate Event (Loop segment logic)
   const handleTimeUpdate = () => {
@@ -307,7 +317,7 @@ export function AudioStudioPage({ isActive = true }) {
     onSkip: handleSkip,
     onHintLetter: handleHintLetter,
     onHintWord: handleHintWord,
-    enabled: activeMode === "upload" && Boolean(audioResult),
+    enabled: isActive && activeMode === "upload" && Boolean(audioResult),
   });
 
   // Upload Audio Handler
@@ -455,40 +465,81 @@ export function AudioStudioPage({ isActive = true }) {
     <div className="audio-studio-container">
       {/* Studio Header Hero */}
       <div className="audio-studio-hero">
-        <div>
-          <h1 className="audio-studio-hero-title">
-            <Headphones size={28} color="#0284c7" />
-            <span>Phòng Thu Âm & Luyện Nối Âm AI (Audio & Phonology Studio)</span>
-          </h1>
-          <p className="audio-studio-hero-subtitle">
-            Tải lên bất kỳ file ghi âm hoặc audio tiếng Anh (MP3, WAV, M4A) — AI Whisper-large-v3 sẽ tự động bóc
-            phụ đề từng câu, phân tích hiện tượng nối âm (Linking), nuốt âm (Elision), biến âm (Assimilation) và tạo bài luyện Dictation với đầy đủ phím tắt.
-          </p>
+        <h1 className="audio-studio-hero-title">
+          <Headphones size={28} color="#0284c7" />
+          <span>Phòng Thu Âm & Luyện Nối Âm AI (Audio & Phonology Studio)</span>
+        </h1>
+        <p className="audio-studio-hero-subtitle">
+          Công cụ luyện nghe thông minh: Tải file ghi âm cá nhân để AI Whisper-large-v3 bóc tách phụ đề & luyện gõ, hoặc dán câu văn bất kỳ để phân tích quy tắc nối âm ngay lập tức.
+        </p>
+      </div>
+
+      {/* Prominent 2-Feature Mode Selector Cards */}
+      <div className="studio-mode-selector-container" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px", marginBottom: "24px" }}>
+        {/* Feature 1 Card */}
+        <div
+          className={`mode-select-card ${activeMode === "upload" ? "active" : ""}`}
+          onClick={() => {
+            setActiveMode("upload");
+            if (!audioResult && fileInputRef.current) {
+              fileInputRef.current.value = "";
+              fileInputRef.current.click();
+            }
+          }}
+          style={{
+            padding: "16px 20px",
+            borderRadius: "14px",
+            border: `2px solid ${activeMode === "upload" ? "#0284c7" : "var(--border, #e2e8f0)"}`,
+            background: activeMode === "upload" ? "rgba(2, 132, 199, 0.06)" : "var(--card-bg, #ffffff)",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            display: "flex",
+            alignItems: "center",
+            gap: "14px",
+            boxShadow: activeMode === "upload" ? "0 4px 14px rgba(2, 132, 199, 0.15)" : "none",
+          }}
+        >
+          <div style={{ padding: "10px", borderRadius: "10px", background: activeMode === "upload" ? "#0284c7" : "var(--bg-subtle, #f1f5f9)", color: activeMode === "upload" ? "#fff" : "#64748b", flexShrink: 0 }}>
+            <Upload size={22} />
+          </div>
+          <div>
+            <div style={{ fontSize: "1rem", fontWeight: 700, color: activeMode === "upload" ? "#0284c7" : "var(--text-main)", marginBottom: "2px" }}>
+              Tính năng 1: Tải File Audio (.MP3 / .WAV / .M4A)
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: "1.35" }}>
+              AI Whisper-large-v3 bóc tách câu, mốc thời gian & tạo bài luyện chép chính tả Dictation.
+            </div>
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button
-            className={`btn ${activeMode === "upload" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => {
-              setActiveMode("upload");
-              setTimeout(() => {
-                if (fileInputRef.current) {
-                  fileInputRef.current.value = "";
-                  fileInputRef.current.click();
-                }
-              }, 0);
-            }}
-          >
-            <Upload size={16} />
-            <span>Tải file Audio</span>
-          </button>
-          <button
-            className={`btn ${activeMode === "text" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => setActiveMode("text")}
-          >
-            <Sparkles size={16} />
-            <span>Phân tích văn bản nhanh</span>
-          </button>
+        {/* Feature 2 Card */}
+        <div
+          className={`mode-select-card ${activeMode === "text" ? "active" : ""}`}
+          onClick={() => setActiveMode("text")}
+          style={{
+            padding: "16px 20px",
+            borderRadius: "14px",
+            border: `2px solid ${activeMode === "text" ? "#6366f1" : "var(--border, #e2e8f0)"}`,
+            background: activeMode === "text" ? "rgba(99, 102, 241, 0.06)" : "var(--card-bg, #ffffff)",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            display: "flex",
+            alignItems: "center",
+            gap: "14px",
+            boxShadow: activeMode === "text" ? "0 4px 14px rgba(99, 102, 241, 0.15)" : "none",
+          }}
+        >
+          <div style={{ padding: "10px", borderRadius: "10px", background: activeMode === "text" ? "#6366f1" : "var(--bg-subtle, #f1f5f9)", color: activeMode === "text" ? "#fff" : "#64748b", flexShrink: 0 }}>
+            <Sparkles size={22} />
+          </div>
+          <div>
+            <div style={{ fontSize: "1rem", fontWeight: 700, color: activeMode === "text" ? "#6366f1" : "var(--text-main)", marginBottom: "2px" }}>
+              Tính năng 2: Phân Tích Văn Bản Nhanh (Instant Text Analyzer)
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: "1.35" }}>
+              Nhập bất kỳ câu tiếng Anh nào để tự động vẽ sơ đồ nối âm & phiên âm IPA lập tức.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -757,8 +808,16 @@ export function AudioStudioPage({ isActive = true }) {
 
                           {/* Connected IPA Preview */}
                           {currentSentence.phonology?.connected_ipa && (
-                            <div className="connected-ipa-box">
-                              <Volume2 size={18} />
+                            <div
+                              className="connected-ipa-box"
+                              onClick={() => speakSentence(currentSentence.text)}
+                              style={{ cursor: "pointer" }}
+                              title="Bấm để nghe đọc phát âm câu này"
+                            >
+                              <div className="btn-icon-audio-play" style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)", color: "#fff", padding: "4px 12px", borderRadius: "8px", fontSize: "0.82rem", fontWeight: 600, flexShrink: 0, boxShadow: "0 2px 6px rgba(2, 132, 199, 0.3)" }}>
+                                <Volume2 size={15} />
+                                <span>Nghe câu</span>
+                              </div>
                               <span>Phiên âm nối thực tế: {currentSentence.phonology.connected_ipa}</span>
                             </div>
                           )}
@@ -864,15 +923,34 @@ export function AudioStudioPage({ isActive = true }) {
           {/* Render Result */}
           {textAnalysisResult && (
             <div style={{ marginTop: "24px" }}>
-              <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "12px" }}>
-                Kết quả phân tích ngữ âm:
-              </h3>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
+                <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: 0 }}>
+                  Kết quả phân tích ngữ âm:
+                </h3>
+                <button
+                  className="btn btn-primary btn-with-icon"
+                  style={{ padding: "6px 16px", fontSize: "0.85rem", background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)", border: "none", boxShadow: "0 3px 10px rgba(99, 102, 241, 0.35)", cursor: "pointer" }}
+                  onClick={() => speakSentence(customText)}
+                  title="Nghe phát âm toàn bộ câu bằng giọng chuẩn (Text-To-Speech)"
+                >
+                  <Volume2 size={16} />
+                  <span>Nghe phát âm</span>
+                </button>
+              </div>
 
               {renderInteractiveSentence(textAnalysisResult)}
 
               {textAnalysisResult.connected_ipa && (
-                <div className="connected-ipa-box">
-                  <Volume2 size={18} />
+                <div
+                  className="connected-ipa-box"
+                  onClick={() => speakSentence(customText)}
+                  style={{ cursor: "pointer" }}
+                  title="Bấm để nghe đọc phát âm câu này"
+                >
+                  <div className="btn-icon-audio-play" style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)", color: "#fff", padding: "4px 12px", borderRadius: "8px", fontSize: "0.82rem", fontWeight: 600, flexShrink: 0, boxShadow: "0 2px 6px rgba(99, 102, 241, 0.3)" }}>
+                    <Volume2 size={15} />
+                    <span>Nghe đọc</span>
+                  </div>
                   <span>Phiên âm nối liền mạch: {textAnalysisResult.connected_ipa}</span>
                 </div>
               )}
