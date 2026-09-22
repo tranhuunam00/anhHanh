@@ -12,7 +12,7 @@ from sqlalchemy import select, func
 
 from app.infrastructure.database.connection import get_db
 from app.infrastructure.database.models import User, UserVocabulary
-from app.application.auth_service import get_current_user
+from app.application.auth_service import get_current_user, get_current_user_optional
 from app.infrastructure.image_search_service import ImageSearchService
 from app.infrastructure.translation_service import TranslationService
 
@@ -215,10 +215,74 @@ async def get_image_candidates(
     return {'word': word, 'candidates': candidates}
 
 
+@router.get('/lookup')
+async def quick_lookup_word(
+    word: str = Query(..., min_length=1),
+    context: Optional[str] = Query(None),
+    target_lang: str = Query('vi'),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+    db: AsyncSession = Depends(get_db)
+):
+    """Instant dictionary & vocabulary lookup for interactive clicking.
+    Returns IPA phonetics (UK/US), definition, part of speech, Vietnamese translation,
+    and checks if the word is already saved in the current user's notebook.
+    """
+    clean_word = word.strip()
+    if not clean_word:
+        raise HTTPException(status_code=400, detail="Word cannot be empty")
+
+    # 1. Fetch phonetic, part of speech, and English definition
+    details = ImageSearchService.get_word_details(clean_word)
+
+    # 2. Fetch Vietnamese translation via TranslationService
+    meaning = None
+    try:
+        translated = _translation_service.translate(clean_word, source_lang='en', target_lang=target_lang)
+        if not translated or translated.lower().strip() == clean_word.lower().strip():
+            auto_trans = _translation_service.translate(clean_word, source_lang='auto', target_lang=target_lang)
+            if auto_trans and auto_trans.lower().strip() != clean_word.lower().strip():
+                translated = auto_trans
+        if translated and translated.strip():
+            meaning = translated.strip()
+    except Exception as e:
+        logger.warning(f"Translation failed for lookup '{clean_word}': {e}")
+
+    if not meaning or not meaning.strip():
+        meaning = clean_word
+
+    # 3. Check if already saved by current user
+    is_saved = False
+    saved_vocab = None
+    if current_user:
+        query = select(UserVocabulary).where(
+            UserVocabulary.user_id == current_user.id,
+            UserVocabulary.word.ilike(clean_word)
+        )
+        res = await db.execute(query)
+        existing = res.scalars().first()
+        if existing:
+            is_saved = True
+            saved_vocab = existing.to_dict()
+            if existing.meaning:
+                meaning = existing.meaning
+
+    return {
+        'word': clean_word,
+        'ipa': details.get('ipa'),
+        'ipa_uk': details.get('ipa_uk') or details.get('ipa'),
+        'ipa_us': details.get('ipa_us') or details.get('ipa'),
+        'part_of_speech': details.get('part_of_speech'),
+        'definition': details.get('definition'),
+        'meaning': meaning,
+        'is_saved': is_saved,
+        'saved_vocab': saved_vocab
+    }
+
+
 @router.get('/phonetic')
 async def get_word_phonetic_lookup(
     word: str = Query(..., min_length=1),
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     """Lookup standard IPA phonetic notation for a word or phrase."""
     clean_word = word.strip()
@@ -230,7 +294,7 @@ async def get_word_phonetic_lookup(
 async def get_word_translation_lookup(
     word: str = Query(..., min_length=1),
     target_lang: str = Query('vi'),
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     """Translate word to Vietnamese or target language."""
     clean_word = _translation_service.clean_text(word.strip())

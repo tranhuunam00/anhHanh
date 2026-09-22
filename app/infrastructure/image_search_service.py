@@ -234,3 +234,75 @@ class ImageSearchService:
             return f"/{' '.join(ipa_parts)}/"
         return None
 
+    @classmethod
+    def get_word_details(cls, word: str) -> dict:
+        """Fetch rich dictionary details including IPA (UK/US), part of speech, and English definition."""
+        clean = word.strip().lower()
+        tokens = [w for w in re.findall(r"[a-zA-Z']+", clean) if w]
+        if not tokens:
+            return {
+                "word": word,
+                "ipa": None,
+                "ipa_uk": None,
+                "ipa_us": None,
+                "part_of_speech": None,
+                "definition": None
+            }
+
+        target_token = tokens[0] if len(tokens) == 1 else clean
+        ipa = None
+        part_of_speech = None
+        definition = None
+
+        pos_map = {
+            'n': 'noun',
+            'v': 'verb',
+            'adj': 'adjective',
+            'adv': 'adverb',
+            'prep': 'preposition',
+            'conj': 'conjunction',
+            'pron': 'pronoun',
+            'interj': 'interjection',
+            'det': 'determiner',
+        }
+
+        try:
+            url = f"https://api.datamuse.com/words?sp={urllib.parse.quote(target_token)}&qe=sp&md=dr&ipa=1"
+            req = urllib.request.Request(url, headers={'User-Agent': 'DailyDictationStudio/2.0'})
+            with urllib.request.urlopen(req, timeout=2.5) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+                if data and isinstance(data, list):
+                    for item in data:
+                        if item.get('word', '').lower() == target_token.lower():
+                            for t in item.get('tags', []):
+                                if t.startswith('ipa_pron:'):
+                                    raw_ipa = t.split(':', 1)[1].strip()
+                                    raw_ipa = raw_ipa.strip("/[] ").replace("'", "ˈ").replace(",", "ˌ")
+                                    ipa = f"/{raw_ipa}/"
+                                    break
+                            defs = item.get('defs', [])
+                            if defs and isinstance(defs, list) and len(defs) > 0:
+                                first_def = defs[0]
+                                if '\t' in first_def:
+                                    raw_pos, raw_desc = first_def.split('\t', 1)
+                                    part_of_speech = pos_map.get(raw_pos.strip(), raw_pos.strip())
+                                    definition = raw_desc.strip()
+                                else:
+                                    definition = first_def.strip()
+                            break
+        except Exception:
+            pass
+
+        # Fallback to cls.get_word_phonetic if Datamuse direct call didn't yield IPA
+        if not ipa:
+            ipa = cls.get_word_phonetic(word)
+
+        return {
+            "word": word,
+            "ipa": ipa,
+            "ipa_uk": ipa,
+            "ipa_us": ipa,
+            "part_of_speech": part_of_speech,
+            "definition": definition
+        }
+

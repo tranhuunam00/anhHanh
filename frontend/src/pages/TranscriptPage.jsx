@@ -176,7 +176,13 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
                 </button>
               </div>
               <div className="transcript-en">
-                <HighlightedVocabSentence text={c.text} />
+                <HighlightedVocabSentence
+                  text={c.text}
+                  contextSentence={c.text}
+                  contextTranslation={c.translation}
+                  videoId={lesson?.video_id || ""}
+                  timestamp={c.time_start || 0}
+                />
               </div>
               {c.translation && <div className="transcript-vi">{c.translation}</div>}
             </div>

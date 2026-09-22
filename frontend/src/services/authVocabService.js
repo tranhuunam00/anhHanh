@@ -364,3 +364,112 @@ export const deleteLessonHistory = async (videoId, token, sourceLang = "en", tar
     return false;
   }
 };
+
+// In-memory cache for ultra-fast word lookups
+const lookupCache = new Map();
+
+export const quickLookupWord = async (word, contextSentence = "", token = null) => {
+  const cleanWord = (word || "").trim();
+  if (!cleanWord) return null;
+
+  const cacheKey = cleanWord.toLowerCase();
+  if (lookupCache.has(cacheKey)) {
+    return lookupCache.get(cacheKey);
+  }
+
+  try {
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const params = new URLSearchParams({ word: cleanWord });
+    if (contextSentence) params.append("context", contextSentence);
+
+    const res = await fetch(`/api/vocab/lookup?${params.toString()}`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      lookupCache.set(cacheKey, data);
+      return data;
+    }
+  } catch (err) {
+    console.debug("quickLookupWord error:", err);
+  }
+
+  // Graceful fallback
+  const fallback = {
+    word: cleanWord,
+    ipa: null,
+    ipa_uk: null,
+    ipa_us: null,
+    part_of_speech: null,
+    definition: null,
+    meaning: cleanWord,
+    is_saved: false,
+    saved_vocab: null,
+  };
+  return fallback;
+};
+
+let currentAudio = null;
+
+export const playPronunciationAudio = (word, accent = "us") => {
+  const cleanWord = (word || "").trim();
+  if (!cleanWord) return Promise.resolve();
+
+  if (currentAudio) {
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    } catch {}
+  }
+
+  return new Promise((resolve) => {
+    const isUk = accent.toLowerCase() === "uk";
+    const langCode = isUk ? "en-GB" : "en-US";
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanWord)}&tl=${langCode}&client=tw-ob`;
+
+    let resolved = false;
+    const finish = () => {
+      if (!resolved) {
+        resolved = true;
+        resolve();
+      }
+    };
+
+    const fallbackTTS = () => {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(cleanWord);
+        utter.lang = langCode;
+        utter.rate = 0.88;
+
+        const voices = window.speechSynthesis.getVoices();
+        const voice = voices.find((v) =>
+          isUk
+            ? v.lang.includes("GB") || v.name.includes("UK") || v.name.includes("British")
+            : v.lang.includes("US") || v.name.includes("United States")
+        );
+        if (voice) utter.voice = voice;
+
+        utter.onend = finish;
+        utter.onerror = finish;
+        window.speechSynthesis.speak(utter);
+      } else {
+        finish();
+      }
+    };
+
+    try {
+      const audio = new Audio(ttsUrl);
+      currentAudio = audio;
+      audio.onended = finish;
+      audio.onerror = fallbackTTS;
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => fallbackTTS());
+      }
+    } catch {
+      fallbackTTS();
+    }
+  });
+};

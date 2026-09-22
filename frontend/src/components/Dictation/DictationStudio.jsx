@@ -53,6 +53,7 @@ export const DictationStudio = React.memo(({
   currentChallenge,
   currentIndex,
   totalChallenges,
+  videoId = "",
   targetLang = "vi",
   sourceLang = "en",
   userInput = "",
@@ -297,14 +298,20 @@ export const DictationStudio = React.memo(({
       {isCompleted && (
         <div className="completion-card active">
           <div className="original-sentence">
-            <HighlightedVocabSentence text={currentChallenge?.text} />
+            <HighlightedVocabSentence
+              text={currentChallenge?.text}
+              contextSentence={currentChallenge?.text}
+              contextTranslation={currentChallenge?.translation || dynamicTranslation}
+              videoId={videoId || currentChallenge?.video_id || ""}
+              timestamp={currentChallenge?.time_start || 0}
+            />
           </div>
           {(currentChallenge?.translation || dynamicTranslation) && (
             <div className="translation-sentence">{currentChallenge?.translation || dynamicTranslation}</div>
           )}
           <div className="vocab-save-hint-card">
             <Sparkles size={13} color="#6366f1" style={{ flexShrink: 0 }} />
-            <span>💡 Bôi đen từ bất kỳ để lưu vào Sổ tay</span>
+            <span>💡 Chạm vào từ để xem phát âm & nghĩa, hoặc bôi đen cụm từ để lưu</span>
           </div>
           <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
             {isLastChallenge ? (

@@ -212,3 +212,40 @@ def test_vocab_update_and_lookup_api():
     assert updated_vocab["image_url"] == "https://example.com/new_resilience.jpg"
     assert updated_vocab["status"] == "LEARNING"
 
+
+def test_quick_lookup_word_endpoint():
+    """Verify GET /api/vocab/lookup works for both guest and authenticated users."""
+    # 1. Guest lookup
+    res = client.get("/api/vocab/lookup?word=very")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["word"] == "very"
+    assert "meaning" in data
+    assert "ipa" in data
+    assert "ipa_uk" in data
+    assert "ipa_us" in data
+    assert data["is_saved"] is False
+
+    # 2. Authenticated user lookup
+    email = "lookup_tester@example.com"
+    client.post("/api/auth/register", json={
+        "email": email,
+        "password": "Password123!",
+        "name": "Lookup Tester"
+    })
+    login_res = client.post("/api/auth/login", json={"email": email, "password": "Password123!"})
+    token = login_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Save a word first
+    client.post("/api/vocab", json={"word": "delightful", "meaning": "thú vị, tuyệt vời"}, headers=headers)
+
+    # Now lookup the saved word
+    auth_lookup_res = client.get("/api/vocab/lookup?word=delightful", headers=headers)
+    assert auth_lookup_res.status_code == 200
+    auth_data = auth_lookup_res.json()
+    assert auth_data["word"] == "delightful"
+    assert auth_data["is_saved"] is True
+    assert auth_data["saved_vocab"] is not None
+    assert auth_data["saved_vocab"]["word"] == "delightful"
+

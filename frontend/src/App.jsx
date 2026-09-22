@@ -827,6 +827,7 @@ export default function App() {
               <DictationStudio
                 currentChallenge={currentChallenge}
                 currentIndex={currentIndex}
+                videoId={currentLesson?.video_id || ""}
                 totalChallenges={currentLesson?.total_challenges || 0}
                 targetLang={currentLesson?.target_lang || targetLang}
                 sourceLang={currentLesson?.source_lang || sourceLang}
