@@ -144,7 +144,7 @@ kbd {
   box-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
 
-/* Bottom Presets Section */
+/* Bottom Presets Section - Multi-Language Mastery */
 .bottom-presets-section {
   margin-top: 48px;
   padding-top: 24px;
@@ -157,43 +157,194 @@ kbd {
 .presets-header-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1.1rem;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 .presets-header-title svg {
   color: var(--primary);
 }
+.presets-header-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(168, 85, 247, 0.15));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+  letter-spacing: 0.3px;
+}
 .presets-header-subtitle {
   font-size: 0.85rem;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 4px;
   display: block;
 }
-.presets-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 14px;
-  margin-top: 12px;
+
+/* Language Selection Tabs */
+.presets-lang-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 10px 0;
 }
-.preset-card {
+.preset-lang-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+}
+.preset-lang-tab:hover {
+  border-color: var(--primary);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  transform: translateY(-1px);
+}
+.preset-lang-tab.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+.preset-lang-flag {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Subcategory Pills (TOEIC, IELTS, General) */
+.presets-subcat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 14px 0;
+}
+.preset-subcat-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+}
+.preset-subcat-tab:hover {
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+.preset-subcat-tab.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+}
+.preset-subcat-tag {
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.preset-subcat-tab.active .preset-subcat-tag {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--primary);
+}
+
+/* Category Info & Level Stepper */
+.presets-level-overview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  margin-bottom: 14px;
+}
+.presets-category-info {
   display: flex;
   align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.presets-category-icon {
+  font-size: 1rem;
+}
+.presets-level-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+.step-tag {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+}
+.step-arrow {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+.step-tag.step-1 { color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); }
+.step-tag.step-2 { color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.25); }
+.step-tag.step-3 { color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); }
+.step-tag.step-4 { color: #f97316; border: 1px solid rgba(249, 115, 22, 0.25); }
+.step-tag.step-5 { color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); }
+
+/* 5 Cards Grid */
+.presets-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
   gap: 14px;
-  padding: 14px 18px;
+  margin-top: 10px;
+}
+@media (min-width: 1400px) {
+  .presets-cards-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px 16px;
   border-radius: 12px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
   font-family: var(--font-family);
+  min-height: 180px;
 }
 .preset-card:hover {
-  background: var(--primary-light);
+  background: var(--bg-secondary);
   border-color: var(--primary);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
 .preset-card.active {
@@ -201,32 +352,109 @@ kbd {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px var(--primary);
 }
-.preset-card-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: var(--bg-secondary);
+
+.preset-card-topbar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--primary);
-  flex-shrink: 0;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.preset-level-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  border: 1px solid;
+}
+.preset-level-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.preset-card-duration {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.preset-card-body {
+  flex: 1;
+  margin-bottom: 12px;
 }
 .preset-card-title {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 3px;
+  line-height: 1.35;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.preset-card-meta {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-.preset-card-lang {
+.preset-card-summary {
   font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.preset-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 10px;
+  margin-top: auto;
+}
+.preset-card-meta-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.preset-card-channel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.preset-card-lang-target {
+  font-size: 0.72rem;
   color: var(--primary);
-  margin-bottom: 2px;
+  font-weight: 500;
+}
+.preset-card-action-btn {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+}
+.preset-card:hover .preset-card-action-btn {
+  background: var(--primary);
+  color: #fff;
+}
+.preset-card-action-btn.btn-active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
 }
 
 /* Question Drawer / Modal */
