@@ -14,10 +14,15 @@ GROQ_TRANSCRIPTION_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
 
 class GroqWhisperService:
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key if api_key is not None else os.getenv("GROQ_API_KEY", "")
+        self.api_key = api_key
+
+    def get_api_key(self) -> str:
+        key = self.api_key or os.getenv("GROQ_API_KEY", "")
+        return key.strip() if key else ""
 
     def is_configured(self) -> bool:
-        return bool(self.api_key and self.api_key.strip().startswith("gsk_"))
+        key = self.get_api_key()
+        return bool(key and key.startswith("gsk_"))
 
     async def transcribe(
         self,
@@ -29,6 +34,7 @@ class GroqWhisperService:
         """Transcribes audio using Groq Whisper-large-v3.
         Returns parsed segments with start/end timestamps and word-level timings.
         """
+        api_key = self.get_api_key()
         if not self.is_configured():
             raise ValueError(
                 "GROQ_API_KEY chưa được cấu hình hoặc không hợp lệ. "
@@ -36,7 +42,7 @@ class GroqWhisperService:
             )
 
         headers = {
-            "Authorization": f"Bearer {self.api_key.strip()}",
+            "Authorization": f"Bearer {api_key}",
         }
 
         # Content type determination based on extension
