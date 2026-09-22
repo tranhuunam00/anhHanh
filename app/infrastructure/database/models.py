@@ -289,3 +289,33 @@ class FeedbackMessage(Base):
         }
 
 
+class DictionaryWord(Base):
+    """Global dictionary cache table storing single-word definitions, IPA phonetics, and translations.
+    Prevents repeated external API calls and delivers instant sub-millisecond lookups.
+    """
+    __tablename__ = 'dictionary_words'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    word = Column(String(100), unique=True, nullable=False, index=True)
+    ipa = Column(String(150), nullable=True)
+    ipa_uk = Column(String(150), nullable=True)
+    ipa_us = Column(String(150), nullable=True)
+    part_of_speech = Column(String(50), nullable=True)
+    definition = Column(Text, nullable=True)
+    meaning = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)
+
+    def to_dict(self):
+        return {
+            'word': self.word,
+            'ipa': self.ipa,
+            'ipa_uk': self.ipa_uk,
+            'ipa_us': self.ipa_us,
+            'part_of_speech': self.part_of_speech,
+            'definition': self.definition,
+            'meaning': self.meaning,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
+

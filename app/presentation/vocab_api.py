@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.infrastructure.database.connection import get_db
-from app.infrastructure.database.models import User, UserVocabulary
+from app.infrastructure.database.models import User, UserVocabulary, DictionaryWord
 from app.application.auth_service import get_current_user, get_current_user_optional
 from app.infrastructure.image_search_service import ImageSearchService
 from app.infrastructure.translation_service import TranslationService
@@ -152,6 +152,21 @@ async def save_vocabulary_word(
     await db.commit()
     await db.refresh(new_vocab)
 
+    # Also cache into global DictionaryWord table if not already present
+    try:
+        dict_check = await db.execute(select(DictionaryWord).where(DictionaryWord.word == clean_word.lower()))
+        if not dict_check.scalars().first():
+            db.add(DictionaryWord(
+                word=clean_word.lower(),
+                ipa=phonetic,
+                ipa_uk=phonetic,
+                ipa_us=phonetic,
+                meaning=meaning,
+            ))
+            await db.commit()
+    except Exception:
+        pass
+
     return {'message': 'Đã lưu từ vựng vào Sổ tay', 'vocab': new_vocab.to_dict()}
 
 
@@ -224,33 +239,68 @@ async def quick_lookup_word(
     db: AsyncSession = Depends(get_db)
 ):
     """Instant dictionary & vocabulary lookup for interactive clicking.
-    Returns IPA phonetics (UK/US), definition, part of speech, Vietnamese translation,
-    and checks if the word is already saved in the current user's notebook.
+    Checks persistent database table (dictionary_words) first for sub-millisecond retrieval.
+    If not cached, fetches from external providers and stores permanently in database.
     """
-    clean_word = word.strip()
+    clean_word = word.strip().lower()
     if not clean_word:
         raise HTTPException(status_code=400, detail="Word cannot be empty")
 
-    # 1. Fetch phonetic, part of speech, and English definition
-    details = ImageSearchService.get_word_details(clean_word)
+    # 1. Check persistent database cache table first (0-1ms query)
+    dict_stmt = select(DictionaryWord).where(DictionaryWord.word == clean_word)
+    dict_res = await db.execute(dict_stmt)
+    cached_dict = dict_res.scalars().first()
 
-    # 2. Fetch Vietnamese translation via TranslationService
-    meaning = None
-    try:
-        translated = _translation_service.translate(clean_word, source_lang='en', target_lang=target_lang)
-        if not translated or translated.lower().strip() == clean_word.lower().strip():
-            auto_trans = _translation_service.translate(clean_word, source_lang='auto', target_lang=target_lang)
-            if auto_trans and auto_trans.lower().strip() != clean_word.lower().strip():
-                translated = auto_trans
-        if translated and translated.strip():
-            meaning = translated.strip()
-    except Exception as e:
-        logger.warning(f"Translation failed for lookup '{clean_word}': {e}")
+    if cached_dict:
+        # Instant cache hit from database!
+        ipa = cached_dict.ipa
+        ipa_uk = cached_dict.ipa_uk
+        ipa_us = cached_dict.ipa_us
+        part_of_speech = cached_dict.part_of_speech
+        definition = cached_dict.definition
+        meaning = cached_dict.meaning
+    else:
+        # Cache miss: query Datamuse & TranslationService
+        details = ImageSearchService.get_word_details(clean_word)
+        ipa = details.get('ipa')
+        ipa_uk = details.get('ipa_uk') or ipa
+        ipa_us = details.get('ipa_us') or ipa
+        part_of_speech = details.get('part_of_speech')
+        definition = details.get('definition')
 
-    if not meaning or not meaning.strip():
-        meaning = clean_word
+        meaning = None
+        try:
+            translated = _translation_service.translate(clean_word, source_lang='en', target_lang=target_lang)
+            if not translated or translated.lower().strip() == clean_word.lower().strip():
+                auto_trans = _translation_service.translate(clean_word, source_lang='auto', target_lang=target_lang)
+                if auto_trans and auto_trans.lower().strip() != clean_word.lower().strip():
+                    translated = auto_trans
+            if translated and translated.strip():
+                meaning = translated.strip()
+        except Exception as e:
+            logger.warning(f"Translation failed for lookup '{clean_word}': {e}")
 
-    # 3. Check if already saved by current user
+        if not meaning or not meaning.strip():
+            meaning = clean_word
+
+        # Save to dictionary_words table permanently for instant subsequent lookups
+        try:
+            new_dict_word = DictionaryWord(
+                word=clean_word,
+                ipa=ipa,
+                ipa_uk=ipa_uk,
+                ipa_us=ipa_us,
+                part_of_speech=part_of_speech,
+                definition=definition,
+                meaning=meaning,
+            )
+            db.add(new_dict_word)
+            await db.commit()
+        except Exception as db_err:
+            await db.rollback()
+            logger.debug(f"Could not cache dictionary word '{clean_word}' to DB: {db_err}")
+
+    # 2. Check if already saved in current user's personal notebook
     is_saved = False
     saved_vocab = None
     if current_user:
@@ -268,11 +318,11 @@ async def quick_lookup_word(
 
     return {
         'word': clean_word,
-        'ipa': details.get('ipa'),
-        'ipa_uk': details.get('ipa_uk') or details.get('ipa'),
-        'ipa_us': details.get('ipa_us') or details.get('ipa'),
-        'part_of_speech': details.get('part_of_speech'),
-        'definition': details.get('definition'),
+        'ipa': ipa,
+        'ipa_uk': ipa_uk,
+        'ipa_us': ipa_us,
+        'part_of_speech': part_of_speech,
+        'definition': definition,
         'meaning': meaning,
         'is_saved': is_saved,
         'saved_vocab': saved_vocab
