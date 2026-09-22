@@ -40,7 +40,7 @@ export const HighlightedVocabSentence = ({
     phonologyData.phenomena.forEach((p) => {
       const tokIdx = wordIndexToTokenIdx[p.word1_index];
       if (tokIdx !== undefined) {
-        linkingMap[tokIdx] = p.symbol || "‿";
+        linkingMap[tokIdx] = p;
       }
     });
   }
@@ -86,7 +86,7 @@ export const HighlightedVocabSentence = ({
             .filter(Boolean)
             .join(" ");
 
-          const linkingSymbol = linkingMap[idx];
+          const linkingObj = linkingMap[idx];
 
           return (
             <React.Fragment key={idx}>
@@ -102,7 +102,7 @@ export const HighlightedVocabSentence = ({
                 {token}
               </span>
 
-              {linkingSymbol && (
+              {linkingObj && (
                 <span
                   className="linking-arc-symbol"
                   aria-hidden="true"
@@ -112,15 +112,45 @@ export const HighlightedVocabSentence = ({
                     MozUserSelect: "none",
                     msUserSelect: "none",
                     pointerEvents: "none",
-                    color: "#f59e0b",
-                    fontWeight: "bold",
-                    fontSize: "0.95em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     margin: "0 1px",
-                    display: "inline-block",
+                    verticalAlign: "middle",
+                    position: "relative",
                   }}
-                  title="Ký hiệu nối âm"
+                  title={`${linkingObj.name || "Nối âm"}: ${linkingObj.pair || ""} (${linkingObj.connected || ""})`}
                 >
-                  {linkingSymbol}
+                  {linkingObj.type === "LINKING" ? (
+                    <svg
+                      width="16"
+                      height="10"
+                      viewBox="0 0 16 10"
+                      style={{
+                        display: "inline-block",
+                        verticalAlign: "bottom",
+                        margin: "0 -2px",
+                      }}
+                    >
+                      <path
+                        d="M 1 2 Q 8 10 15 2"
+                        fill="none"
+                        stroke="#f59e0b"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  ) : (
+                    <span
+                      style={{
+                        color: linkingObj.type === "ELISION" ? "#ef4444" : "#f59e0b",
+                        fontWeight: "bold",
+                        fontSize: "0.95em",
+                      }}
+                    >
+                      {linkingObj.symbol || "‿"}
+                    </span>
+                  )}
                 </span>
               )}
             </React.Fragment>

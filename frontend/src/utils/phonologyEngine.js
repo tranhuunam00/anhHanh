@@ -70,6 +70,8 @@ export function analyzeSentencePhonology(sentence) {
         phenomena.push({
           type: "ASSIMILATION",
           symbol: "⚡",
+          word1_index: w1.index,
+          word2_index: w2.index,
           name: "Biến âm /t/ + /j/ ➔ /tʃ/",
           pair: `${w1.word} ${w2.word}`,
           connected: `${t1.slice(0, -1)}-ch-oo`,
@@ -80,6 +82,8 @@ export function analyzeSentencePhonology(sentence) {
         phenomena.push({
           type: "ASSIMILATION",
           symbol: "⚡",
+          word1_index: w1.index,
+          word2_index: w2.index,
           name: "Biến âm /d/ + /j/ ➔ /dʒ/",
           pair: `${w1.word} ${w2.word}`,
           connected: `${t1.slice(0, -1)}-j-oo`,
@@ -99,6 +103,8 @@ export function analyzeSentencePhonology(sentence) {
         phenomena.push({
           type: "ELISION",
           symbol: "✕",
+          word1_index: w1.index,
+          word2_index: w2.index,
           name: `Nuốt âm /${elidedChar}/`,
           pair: `${w1.word} ${w2.word}`,
           connected: `${t1.slice(0, -1)}' ${t2}`,
@@ -117,6 +123,8 @@ export function analyzeSentencePhonology(sentence) {
         phenomena.push({
           type: "GLIDE_J",
           symbol: "ᴶ",
+          word1_index: w1.index,
+          word2_index: w2.index,
           name: "Âm lướt /j/ (y-glide)",
           pair: `${w1.word} ${w2.word}`,
           connected: `${t1}-j-${t2}`,
@@ -127,6 +135,8 @@ export function analyzeSentencePhonology(sentence) {
         phenomena.push({
           type: "GLIDE_W",
           symbol: "ᵂ",
+          word1_index: w1.index,
+          word2_index: w2.index,
           name: "Âm lướt /w/ (w-glide)",
           pair: `${w1.word} ${w2.word}`,
           connected: `${t1}-w-${t2}`,
@@ -138,17 +148,21 @@ export function analyzeSentencePhonology(sentence) {
 
     // Rule 4: Consonant-to-Vowel Linking
     const lastChar = t1.slice(-1);
-    const isConsonantEnd = (!VOWELS.has(lastChar) && lastChar !== "r" && /[a-z]/i.test(lastChar)) ||
-      (lastChar === "e" && t1.length > 2 && !VOWELS.has(t1.slice(-2, -1)) && !["the", "she", "he", "be", "we"].includes(t1));
+    const prevChar = t1.length > 1 ? t1.slice(-2, -1) : "";
+    const isSilentE = lastChar === "e" && t1.length > 2 && !VOWELS.has(prevChar) && !["the", "she", "he", "be", "we", "me"].includes(t1);
+    const effectiveConsonant = isSilentE ? prevChar : lastChar;
+    const isConsonantEnd = (!VOWELS.has(lastChar) && /[a-z]/i.test(lastChar)) || isSilentE;
 
     if (isConsonantEnd && isVowelStart2) {
-      const soundC = lastChar !== "e" ? lastChar : t1.slice(-2, -1);
+      const soundC = effectiveConsonant;
       phenomena.push({
         type: "LINKING",
         symbol: "‿",
+        word1_index: w1.index,
+        word2_index: w2.index,
         name: "Nối phụ âm sang nguyên âm",
         pair: `${w1.word} ${w2.word}`,
-        connected: `${t1.endsWith("e") ? t1.slice(0, -1) : t1}-${soundC}${t2}`,
+        connected: `${isSilentE ? t1.slice(0, -1) : t1}-${soundC}${t2}`,
         desc: `Phụ âm /${soundC}/ nối sang nguyên âm của từ tiếp theo.`,
       });
     }
