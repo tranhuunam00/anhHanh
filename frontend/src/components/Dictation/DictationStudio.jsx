@@ -255,9 +255,16 @@ export const DictationStudio = React.memo(({
           onKeyDown={handleInputKeyDown}
         />
         <button
+          type="button"
           className={`mic-btn ${isListening ? "listening" : ""}`}
-          title="Nói để chuyển thành chữ (Speech to text)"
-          onClick={onToggleMic}
+          title={isListening ? "Đang nghe... Nhấp để dừng" : "Nói qua Micro để chuyển thành chữ (Speech to text)"}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (onToggleMic) {
+              onToggleMic(localInput);
+            }
+          }}
         >
           <Mic size={18} strokeWidth={2.2} />
         </button>

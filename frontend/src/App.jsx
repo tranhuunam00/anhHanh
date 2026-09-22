@@ -219,6 +219,15 @@ export default function App() {
     );
   }, []);
 
+  // Sync speech recognition language whenever source language changes
+  useEffect(() => {
+    if (speechRef.current) {
+      const activeSrc = (currentLesson?.detected_source_lang || sourceLang || "en").toLowerCase();
+      const speechLang = SPEECH_LANG_MAP[activeSrc] || "en-US";
+      speechRef.current.setLang(speechLang);
+    }
+  }, [sourceLang, currentLesson?.detected_source_lang]);
+
   // Update YouTube embed restriction callback
   useEffect(() => {
     if (playerController) {
@@ -631,9 +640,10 @@ export default function App() {
     }
   };
 
-  const handleToggleMic = () => {
+  const handleToggleMic = (currentInput) => {
     if (speechRef.current) {
-      speechRef.current.toggle();
+      const base = currentInput !== undefined ? currentInput : (userInputRef.current || userInput);
+      speechRef.current.toggle(base);
     }
   };
 

@@ -128,6 +128,7 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
               <div className="preset-card-topbar">
                 <div
                   className="preset-level-pill"
+                  title={`Cấp ${lesson.levelNumber}: ${lesson.badge}`}
                   style={{
                     backgroundColor: `${lesson.diffColor}18`,
                     color: lesson.diffColor,
@@ -138,7 +139,7 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
                     className="preset-level-dot"
                     style={{ backgroundColor: lesson.diffColor }}
                   />
-                  <span className="preset-level-text">Cấp {lesson.levelNumber} • {lesson.badge}</span>
+                  <span className="preset-level-text">Cấp {lesson.levelNumber}</span>
                 </div>
                 <span className="preset-card-duration">⏱️ {lesson.duration}</span>
               </div>
