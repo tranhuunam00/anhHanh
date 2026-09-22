@@ -23,7 +23,7 @@ import "../styles/audio-studio.css";
 
 const API_BASE = "";
 
-export function AudioStudioPage() {
+export function AudioStudioPage({ isActive = true }) {
   const { settings } = useSettings();
 
   // Mode: "upload" | "text"
@@ -41,7 +41,7 @@ export function AudioStudioPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const [isLoopingSegment, setIsLoopingSegment] = useState(true);
+  const [isLoopingSegment, setIsLoopingSegment] = useState(false);
 
   // Dictation Exercise State
   const [userInput, setUserInput] = useState("");
@@ -64,12 +64,34 @@ export function AudioStudioPage() {
   const [textAnalysisResult, setTextAnalysisResult] = useState(null);
   const [isAnalyzingText, setIsAnalyzingText] = useState(false);
 
-  // Sample phrases
-  const [samples, setSamples] = useState([]);
-
   // Refs
   const audioRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  const notifyYouTubePause = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("shotlang:pause-youtube-player"));
+    }
+  };
+
+  // Pause AudioStudio playback when leaving tab or receiving pause signal from YouTube player
+  useEffect(() => {
+    if (!isActive && audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    const handlePauseOther = () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    };
+    window.addEventListener("shotlang:pause-other-audio", handlePauseOther);
+    return () => window.removeEventListener("shotlang:pause-other-audio", handlePauseOther);
+  }, []);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -86,14 +108,6 @@ export function AudioStudioPage() {
     if (speechRef.current) {
       speechRef.current.toggle();
     }
-  }, []);
-
-  // Load sample phrases on mount
-  useEffect(() => {
-    fetch(`${API_BASE}/api/audio-studio/samples`)
-      .then((res) => res.json())
-      .then((data) => setSamples(data))
-      .catch((err) => console.warn("Failed to load sample phrases:", err));
   }, []);
 
   // Current active sentence object
@@ -118,6 +132,7 @@ export function AudioStudioPage() {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      notifyYouTubePause();
       audioRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
@@ -125,6 +140,7 @@ export function AudioStudioPage() {
 
   const replayCurrentSegment = useCallback(() => {
     if (!audioRef.current || !currentSentence) return;
+    notifyYouTubePause();
     audioRef.current.currentTime = currentSentence.start;
     audioRef.current.play().catch(() => {});
     setIsPlaying(true);
@@ -453,7 +469,15 @@ export function AudioStudioPage() {
         <div style={{ display: "flex", gap: "8px" }}>
           <button
             className={`btn ${activeMode === "upload" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => setActiveMode("upload")}
+            onClick={() => {
+              setActiveMode("upload");
+              setTimeout(() => {
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = "";
+                  fileInputRef.current.click();
+                }
+              }, 0);
+            }}
           >
             <Upload size={16} />
             <span>Tải file Audio</span>
@@ -473,6 +497,18 @@ export function AudioStudioPage() {
       {/* ====================================================================== */}
       {activeMode === "upload" && (
         <>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            accept="audio/mp3,audio/wav,audio/m4a,audio/ogg,audio/webm,audio/flac"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                handleAudioUpload(e.target.files[0]);
+              }
+            }}
+          />
+
           {/* Upload Dropzone (When no audio is loaded or user wants another) */}
           {!audioResult && (
             <div
@@ -481,17 +517,6 @@ export function AudioStudioPage() {
               onDrop={handleDrop}
               onClick={() => fileInputRef.current && fileInputRef.current.click()}
             >
-              <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                accept="audio/mp3,audio/wav,audio/m4a,audio/ogg,audio/webm,audio/flac"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files.length > 0) {
-                    handleAudioUpload(e.target.files[0]);
-                  }
-                }}
-              />
 
               <div className="upload-icon-wrapper">
                 {isUploading ? <Sparkles size={32} className="spin" /> : <Upload size={32} />}
@@ -522,30 +547,6 @@ export function AudioStudioPage() {
             </div>
           )}
 
-          {/* Sample Phrases Pill Bar */}
-          {samples.length > 0 && (
-            <div className="sample-bar">
-              <span className="sample-title">
-                <Lightbulb size={16} color="#eab308" />
-                <span>Câu mẫu ngữ âm chuẩn:</span>
-              </span>
-              {samples.map((s) => (
-                <button
-                  key={s.id}
-                  className="sample-btn"
-                  onClick={() => {
-                    setActiveMode("text");
-                    setCustomText(s.text);
-                    handleAnalyzeCustomText(s.text);
-                  }}
-                  title={s.text}
-                >
-                  <span>{s.title}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Main Studio View when Audio is Transcribed */}
           {audioResult && (
             <>
@@ -573,10 +574,10 @@ export function AudioStudioPage() {
                     className="btn btn-secondary"
                     style={{ fontSize: "0.82rem", padding: "5px 12px" }}
                     onClick={() => {
-                      setAudioResult(null);
-                      setUserInput("");
-                      setIsCompleted(false);
-                      setCompletedMap({});
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                        fileInputRef.current.click();
+                      }
                     }}
                   >
                     <span>Tải file khác</span>
@@ -739,67 +740,74 @@ export function AudioStudioPage() {
                   </div>
                 </div>
 
-                {/* Right Column: Phonology & Connected Speech Breakdown */}
+                {/* Right Column: Phonology & Connected Speech Breakdown (Only shown when sentence is completed) */}
                 <div>
                   <div className="phonology-card">
                     <div className="card-header-bar">
                       <div className="card-header-title">
-                        <Sparkles size={20} color="#8b5cf6" />
                         <span>Phân tích Nối âm & Hiện tượng Âm vị học</span>
                       </div>
-                      <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
-                        💡 Click từ để tra từ điển 5.000 từ
-                      </span>
                     </div>
 
                     {currentSentence ? (
-                      <>
-                        {/* Annotated Sentence Display */}
-                        {renderInteractiveSentence(currentSentence.phonology)}
+                      isCompleted ? (
+                        <>
+                          {/* Annotated Sentence Display */}
+                          {renderInteractiveSentence(currentSentence.phonology)}
 
-                        {/* Connected IPA Preview */}
-                        {currentSentence.phonology?.connected_ipa && (
-                          <div className="connected-ipa-box">
-                            <Volume2 size={18} />
-                            <span>Phiên âm nối thực tế: {currentSentence.phonology.connected_ipa}</span>
-                          </div>
-                        )}
-
-                        {/* Phenomena List */}
-                        <div className="phenomena-list">
-                          {currentSentence.phonology?.phenomena?.length > 0 ? (
-                            currentSentence.phonology.phenomena.map((p, pIdx) => (
-                              <div key={pIdx} className="phenomenon-item">
-                                <div className="phenomenon-header">
-                                  <span
-                                    className={`phenomenon-badge ${
-                                      p.type === "CV_LINKING"
-                                        ? "badge-cv"
-                                        : p.type.startsWith("VV_GLIDE")
-                                        ? "badge-glide"
-                                        : p.type.startsWith("ELISION")
-                                        ? "badge-elision"
-                                        : p.type.startsWith("ASSIMILATION")
-                                        ? "badge-assimilation"
-                                        : "badge-weak"
-                                    }`}
-                                  >
-                                    {p.name_vi}
-                                  </span>
-                                  <span style={{ fontWeight: 700, fontSize: "0.85rem", color: "#0284c7" }}>
-                                    {p.connected_sound || p.pair}
-                                  </span>
-                                </div>
-                                <div className="phenomenon-explanation">{p.explanation}</div>
-                              </div>
-                            ))
-                          ) : (
-                            <div style={{ color: "var(--text-muted)", fontSize: "0.9rem", padding: "12px 0" }}>
-                              Câu này phát âm với các từ tách bạch chuẩn mực, không xuất hiện hiện tượng biến âm đặc biệt.
+                          {/* Connected IPA Preview */}
+                          {currentSentence.phonology?.connected_ipa && (
+                            <div className="connected-ipa-box">
+                              <Volume2 size={18} />
+                              <span>Phiên âm nối thực tế: {currentSentence.phonology.connected_ipa}</span>
                             </div>
                           )}
+
+                          {/* Phenomena List */}
+                          <div className="phenomena-list">
+                            {currentSentence.phonology?.phenomena?.length > 0 ? (
+                              currentSentence.phonology.phenomena.map((p, pIdx) => (
+                                <div key={pIdx} className="phenomenon-item">
+                                  <div className="phenomenon-header">
+                                    <span
+                                      className={`phenomenon-badge ${
+                                        p.type === "CV_LINKING"
+                                          ? "badge-cv"
+                                          : p.type.startsWith("VV_GLIDE")
+                                          ? "badge-glide"
+                                          : p.type.startsWith("ELISION")
+                                          ? "badge-elision"
+                                          : p.type.startsWith("ASSIMILATION")
+                                          ? "badge-assimilation"
+                                          : "badge-weak"
+                                      }`}
+                                    >
+                                      {p.name_vi}
+                                    </span>
+                                    <span style={{ fontWeight: 700, fontSize: "0.85rem", color: "#0284c7" }}>
+                                      {p.connected_sound || p.pair}
+                                    </span>
+                                  </div>
+                                  <div className="phenomenon-explanation">{p.explanation}</div>
+                                </div>
+                              ))
+                            ) : (
+                              <div style={{ color: "var(--text-muted)", fontSize: "0.9rem", padding: "12px 0" }}>
+                                Câu này phát âm với các từ tách bạch chuẩn mực, không xuất hiện hiện tượng biến âm đặc biệt.
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ color: "var(--text-muted)", textAlign: "center", padding: "48px 20px" }}>
+                          <p style={{ fontWeight: 600, fontSize: "0.95rem", marginBottom: "6px", color: "var(--text-main)" }}>
+                            🔒 Chưa mở khóa phân tích
+                          </p>
+                          <p style={{ fontSize: "0.85rem" }}>
+                            Hãy hoàn thành gõ chính xác câu này để xem phân tích nối âm & hiện tượng âm vị học chi tiết.
+                          </p>
                         </div>
-                      </>
+                      )
                     ) : (
                       <div style={{ color: "var(--text-muted)", textAlign: "center", padding: "40px 0" }}>
                         Chọn một câu để xem phân tích âm vị học chi tiết.

@@ -182,15 +182,31 @@ export default function App() {
   }
   const playerController = playerRef.current;
 
-  // Sync settings with player controller
+  // Sync settings with player controller & handle audio crosstalk
   useEffect(() => {
     if (playerController) {
       playerController.setLooping(settings.autoReplay === "yes");
       playerController.setReplayInterval(settings.replayInterval);
       playerController.setAudioPadding(settings.audioPadding);
-      playerController.onStateChange((playing) => setIsPlaying(playing));
+      playerController.onStateChange((playing) => {
+        setIsPlaying(playing);
+        if (playing && typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("shotlang:pause-other-audio"));
+        }
+      });
     }
   }, [settings, playerController]);
+
+  // Listen for signal to pause YouTube when AudioStudio plays
+  useEffect(() => {
+    const handlePauseYouTube = () => {
+      if (playerController) {
+        playerController.pause();
+      }
+    };
+    window.addEventListener("shotlang:pause-youtube-player", handlePauseYouTube);
+    return () => window.removeEventListener("shotlang:pause-youtube-player", handlePauseYouTube);
+  }, [playerController]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -938,7 +954,7 @@ export default function App() {
 
         {/* TAB 6: Audio & Phonology Studio (Isolated Screen) */}
         <div style={{ display: activeTab === "tab-audio-studio" ? "block" : "none" }}>
-          <AudioStudioPage />
+          <AudioStudioPage isActive={activeTab === "tab-audio-studio"} />
         </div>
       </main>
 
