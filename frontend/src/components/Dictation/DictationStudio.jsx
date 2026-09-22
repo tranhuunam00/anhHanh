@@ -106,7 +106,7 @@ export const DictationStudio = React.memo(({
             currentChallenge.translation = res.translation;
           }
         })
-        .catch(() => {});
+        .catch(() => { });
       return () => {
         isMounted = false;
       };
@@ -310,61 +310,13 @@ export const DictationStudio = React.memo(({
               contextTranslation={currentChallenge?.translation || dynamicTranslation}
               videoId={videoId || currentChallenge?.video_id || ""}
               timestamp={currentChallenge?.time_start || 0}
+              showLinking={true}
             />
           </div>
           {(currentChallenge?.translation || dynamicTranslation) && (
             <div className="translation-sentence">{currentChallenge?.translation || dynamicTranslation}</div>
           )}
-          {/* Compact Phonology & Connected Speech Mini Bar */}
-          {phonologyData && phonologyData.phenomena && phonologyData.phenomena.length > 0 && (
-            <div
-              className="compact-phonology-bar"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                flexWrap: "wrap",
-                marginTop: "6px",
-                marginBottom: "8px",
-                padding: "4px 10px",
-                background: "rgba(2, 132, 199, 0.08)",
-                border: "1px solid rgba(2, 132, 199, 0.2)",
-                borderRadius: "6px",
-                fontSize: "0.8rem",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#0284c7", fontWeight: 700, flexShrink: 0 }}>
-                <Sparkles size={13} />
-                <span>Nối âm:</span>
-              </div>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
-                {phonologyData.phenomena.map((p, pIdx) => (
-                  <span
-                    key={pIdx}
-                    title={`${p.name}: ${p.desc}`}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      background: "var(--card-bg, #ffffff)",
-                      border: "1px solid var(--border, #cbd5e1)",
-                      padding: "2px 8px",
-                      borderRadius: "5px",
-                      fontSize: "0.78rem",
-                      color: "var(--text-main)",
-                      fontWeight: 500,
-                    }}
-                  >
-                    <strong style={{ color: "#0369a1", fontWeight: 700 }}>{p.pair}</strong>
-                    <span style={{ color: "#f59e0b", fontWeight: 700 }}>{p.symbol}</span>
-                    <span style={{ color: "#64748b", fontFamily: "monospace", fontSize: "0.75rem" }}>({p.connected})</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
           <div className="vocab-save-hint-card">
-            <Sparkles size={13} color="#6366f1" style={{ flexShrink: 0 }} />
             <span>💡 Chạm vào từ để xem phát âm & nghĩa, hoặc bôi đen cụm từ để lưu</span>
           </div>
           <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>

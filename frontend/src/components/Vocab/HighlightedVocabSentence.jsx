@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { WordLookupPopover } from "./WordLookupPopover";
+import { analyzeSentencePhonology } from "../../utils/phonologyEngine";
 
 export const HighlightedVocabSentence = ({
   text,
@@ -9,14 +10,40 @@ export const HighlightedVocabSentence = ({
   contextTranslation = "",
   videoId = "",
   timestamp = 0,
+  showLinking = false,
 }) => {
   const { savedVocabMap } = useAuth();
   const [activeWordState, setActiveWordState] = useState(null);
+
+  const phonologyData = useMemo(() => {
+    if (!showLinking || !text) return null;
+    return analyzeSentencePhonology(text);
+  }, [showLinking, text]);
 
   if (!text) return null;
 
   // Split sentence into words and non-words (punctuation, spaces)
   const tokens = text.split(/([a-zA-Z0-9'’-]+)/g);
+
+  // Map word index in token list to phonology boundary symbol
+  const linkingMap = {};
+  if (phonologyData && phonologyData.phenomena) {
+    let wordCounter = 0;
+    const wordIndexToTokenIdx = [];
+    tokens.forEach((tok, idx) => {
+      if (tok && /^[a-zA-Z0-9'’-]+$/.test(tok)) {
+        wordIndexToTokenIdx[wordCounter] = idx;
+        wordCounter++;
+      }
+    });
+
+    phonologyData.phenomena.forEach((p) => {
+      const tokIdx = wordIndexToTokenIdx[p.word1_index];
+      if (tokIdx !== undefined) {
+        linkingMap[tokIdx] = p.symbol || "‿";
+      }
+    });
+  }
 
   const handleWordClick = (word, e) => {
     // If user is selecting a multi-word phrase, let text selection / FloatingVocabSaver take precedence
@@ -59,19 +86,44 @@ export const HighlightedVocabSentence = ({
             .filter(Boolean)
             .join(" ");
 
+          const linkingSymbol = linkingMap[idx];
+
           return (
-            <span
-              key={idx}
-              className={chipClasses}
-              onClick={(e) => handleWordClick(token, e)}
-              title={
-                isSaved
-                  ? `"${token}" (Đã lưu trong Sổ tay - Bấm để tra)`
-                  : `Tra nghĩa & phát âm của "${token}"`
-              }
-            >
-              {token}
-            </span>
+            <React.Fragment key={idx}>
+              <span
+                className={chipClasses}
+                onClick={(e) => handleWordClick(token, e)}
+                title={
+                  isSaved
+                    ? `"${token}" (Đã lưu trong Sổ tay - Bấm để tra)`
+                    : `Tra nghĩa & phát âm của "${token}"`
+                }
+              >
+                {token}
+              </span>
+
+              {linkingSymbol && (
+                <span
+                  className="linking-arc-symbol"
+                  aria-hidden="true"
+                  style={{
+                    userSelect: "none",
+                    WebkitUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    pointerEvents: "none",
+                    color: "#f59e0b",
+                    fontWeight: "bold",
+                    fontSize: "0.95em",
+                    margin: "0 1px",
+                    display: "inline-block",
+                  }}
+                  title="Ký hiệu nối âm"
+                >
+                  {linkingSymbol}
+                </span>
+              )}
+            </React.Fragment>
           );
         })}
       </span>
