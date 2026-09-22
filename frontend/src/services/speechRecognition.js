@@ -163,6 +163,10 @@ export class SpeechRecognitionService {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         // Immediately release test stream so SpeechRecognition can bind to audio input
         stream.getTracks().forEach((track) => track.stop());
+        // If recognizer was previously null (e.g., due to denied permission), reinitialize it now
+        if (!this.recognizer) {
+          this.initRecognizer();
+        }
       } catch (err) {
         console.warn("Microphone access error via getUserMedia:", err);
         if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
