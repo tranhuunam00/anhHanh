@@ -4,15 +4,15 @@ services:
     container_name: dailydictation_db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: dailydictation
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-dailydictation}
     ports:
       - "${DB_PORT:-5444}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d dailydictation"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dailydictation}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -72,7 +72,7 @@ services:
       - PORT=${PORT:-5100}
       - HOST=${HOST:-0.0.0.0}
       - RUNNING_IN_DOCKER=1
-      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@db:5432/dailydictation}
+      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-dailydictation}}
       - ADMIN_EMAIL_ADDRESS=${ADMIN_EMAIL_ADDRESS:-}
       - ADMIN_DEFAULT_PASSWORD=${ADMIN_DEFAULT_PASSWORD:-}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
