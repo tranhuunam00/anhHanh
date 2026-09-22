@@ -123,16 +123,12 @@ export class SpeechRecognitionService {
   }
 
   async toggle(currentBaseText = "") {
-    if (!this.recognizer) {
-      if (this.onError) {
-        this.onError("Trình duyệt hiện tại chưa hỗ trợ nhận diện giọng nói. Vui lòng dùng Chrome, Edge hoặc Safari!");
-      }
-      return false;
-    }
+    // Save base text so spoken words append to current input
+    this.baseText = typeof currentBaseText === "string" ? currentBaseText : "";
 
     if (this.isListening) {
       try {
-        this.recognizer.stop();
+        this.recognizer && this.recognizer.stop();
       } catch (e) {
         console.warn("Stop error:", e);
       }
@@ -140,9 +136,6 @@ export class SpeechRecognitionService {
       if (this.onStatusChange) this.onStatusChange(false);
       return false;
     }
-
-    // Save base text so spoken words append to current input
-    this.baseText = typeof currentBaseText === "string" ? currentBaseText : "";
 
     // 1. Check if permission was explicitly blocked
     if (typeof navigator !== "undefined" && navigator.permissions && navigator.permissions.query) {
@@ -161,44 +154,36 @@ export class SpeechRecognitionService {
     if (typeof navigator !== "undefined" && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        // Immediately release test stream so SpeechRecognition can bind to audio input
         stream.getTracks().forEach((track) => track.stop());
-        // If recognizer was previously null (e.g., due to denied permission), reinitialize it now
-        if (!this.recognizer) {
-          this.initRecognizer();
-        }
       } catch (err) {
         console.warn("Microphone access error via getUserMedia:", err);
         if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
           this.triggerPermissionModal("denied");
         } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-          if (this.onError) {
-            this.onError("Không tìm thấy thiết bị Microphone trên máy của bạn.");
-          }
+          if (this.onError) this.onError("Không tìm thấy thiết bị Microphone trên máy của bạn.");
         }
         return false;
       }
     }
 
-    // 3. Start recognizer cleanly
+    // 3. Always create a fresh recognizer instance to avoid stale state
+    //    (Chrome's SpeechRecognition gets stuck after a deny→grant cycle)
+    this.initRecognizer();
+
+    if (!this.recognizer) {
+      if (this.onError) {
+        this.onError("Trình duyệt hiện tại chưa hỗ trợ nhận diện giọng nói. Vui lòng dùng Chrome, Edge hoặc Safari!");
+      }
+      return false;
+    }
+
+    // 4. Start fresh recognizer
     try {
       this.recognizer.lang = this.currentLang;
       this.recognizer.start();
       return true;
     } catch (e) {
       console.warn("Speech recognition start failed:", e);
-      try {
-        this.recognizer.stop();
-        setTimeout(() => {
-          try {
-            this.recognizer.start();
-          } catch (err2) {
-            console.warn("Retry start failed:", err2);
-          }
-        }, 150);
-      } catch (err3) {
-        // Ignored
-      }
       return false;
     }
   }
