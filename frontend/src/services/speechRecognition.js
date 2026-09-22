@@ -14,6 +14,7 @@ export class SpeechRecognitionService {
     this.onPermissionRequired = onPermissionRequired;
     this.currentLang = "en-US";
     this.baseText = "";
+    this._micGranted = false; // true once getUserMedia succeeds
 
     this.initRecognizer();
   }
@@ -70,12 +71,20 @@ export class SpeechRecognitionService {
         if (this.onStatusChange) this.onStatusChange(false);
 
         if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-          this.triggerPermissionModal("denied");
+          // Only show permission modal if mic was NOT already granted via getUserMedia.
+          // If _micGranted is true, this is a Chrome speech-service issue, not a permission issue.
+          if (!this._micGranted) {
+            this.triggerPermissionModal("denied");
+          } else {
+            console.warn("Speech service returned not-allowed despite mic access — Chrome speech cloud may be unavailable.");
+            if (this.onError) this.onError("Dịch vụ nhận diện giọng nói tạm thời không khả dụng. Hãy thử lại sau!");
+          }
         } else if (event.error === "audio-capture") {
           const msg = "Không tìm thấy thiết bị Microphone. Vui lòng kiểm tra lại dây cắm hoặc micro!";
           if (this.onError) this.onError(msg);
         } else if (event.error === "network") {
           console.warn("Dịch vụ nhận diện giọng nói gặp sự cố mạng.");
+          if (this.onError) this.onError("Lỗi mạng: Không thể kết nối dịch vụ nhận diện giọng nói.");
         }
       };
 
@@ -151,10 +160,12 @@ export class SpeechRecognitionService {
     }
 
     // 2. Request microphone access via getUserMedia to prompt browser dialog if not yet granted
+    this._micGranted = false;
     if (typeof navigator !== "undefined" && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         stream.getTracks().forEach((track) => track.stop());
+        this._micGranted = true; // mic access confirmed
       } catch (err) {
         console.warn("Microphone access error via getUserMedia:", err);
         if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
