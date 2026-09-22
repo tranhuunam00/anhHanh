@@ -10,6 +10,7 @@ import { AuthModal } from "./components/Modals/AuthModal";
 import { PreviewModal } from "./components/Modals/PreviewModal";
 import { FeedbackModal } from "./components/Modals/FeedbackModal";
 import { LessonCompleteModal } from "./components/Modals/LessonCompleteModal";
+import { MicrophonePermissionModal } from "./components/Modals/MicrophonePermissionModal";
 import { AdminPortal } from "./components/Admin/AdminPortal";
 import { VocabTab } from "./components/Vocab/VocabTab";
 import { HistoryTab } from "./components/History/HistoryTab";
@@ -95,6 +96,7 @@ export default function App() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isLessonCompleteModalOpen, setIsLessonCompleteModalOpen] = useState(false);
+  const [isMicPermissionModalOpen, setIsMicPermissionModalOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
 
   // Lesson & Player State
@@ -215,8 +217,16 @@ export default function App() {
         userInputRef.current = transcript;
         setUserInput(transcript);
       },
-      (status) => setIsListening(status)
+      (status) => setIsListening(status),
+      (err) => showToast(err, "error"),
+      () => setIsMicPermissionModalOpen(true)
     );
+
+    const handleMicPerm = () => setIsMicPermissionModalOpen(true);
+    window.addEventListener("shotlang:mic-permission-required", handleMicPerm);
+    return () => {
+      window.removeEventListener("shotlang:mic-permission-required", handleMicPerm);
+    };
   }, []);
 
   // Sync speech recognition language whenever source language changes
@@ -654,7 +664,8 @@ export default function App() {
     isAuthOpen ||
     isPreviewOpen ||
     isFeedbackOpen ||
-    isLessonCompleteModalOpen;
+    isLessonCompleteModalOpen ||
+    isMicPermissionModalOpen;
 
   // Đóng popup/modal đang mở khi ấn phím Escape (không làm nhảy/skip câu của bài học)
   useEffect(() => {
@@ -669,6 +680,7 @@ export default function App() {
         setIsPreviewOpen(false);
         setIsFeedbackOpen(false);
         setIsLessonCompleteModalOpen(false);
+        setIsMicPermissionModalOpen(false);
       }
     };
     window.addEventListener("keydown", handleModalEsc);
@@ -1051,6 +1063,16 @@ export default function App() {
         onOpenVocab={() => {
           setIsLessonCompleteModalOpen(false);
           setActiveTab("tab-vocab");
+        }}
+      />
+
+      {/* Microphone Permission Guide Modal */}
+      <MicrophonePermissionModal
+        isOpen={isMicPermissionModalOpen}
+        onClose={() => setIsMicPermissionModalOpen(false)}
+        onRetry={() => {
+          setIsMicPermissionModalOpen(false);
+          handleToggleMic();
         }}
       />
     </div>

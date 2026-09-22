@@ -8,6 +8,7 @@ import {
   ListFilter,
   RefreshCw,
   Mic,
+  MicOff,
   Check,
   SkipForward,
   Volume2,
@@ -257,7 +258,8 @@ export const DictationStudio = React.memo(({
         <button
           type="button"
           className={`mic-btn ${isListening ? "listening" : ""}`}
-          title={isListening ? "Đang nghe... Nhấp để dừng" : "Nói qua Micro để chuyển thành chữ (Speech to text)"}
+          title={isListening ? "Đang bật Micro (Đang nghe)... Nhấp để TẮT Micro" : "BẬT Micro để nói (Speech to text)"}
+          aria-label={isListening ? "Tắt Micro" : "Bật Micro"}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -266,8 +268,18 @@ export const DictationStudio = React.memo(({
             }
           }}
         >
-          <Mic size={18} strokeWidth={2.2} />
+          {isListening ? (
+            <MicOff size={18} strokeWidth={2.2} className="mic-icon-active" />
+          ) : (
+            <Mic size={18} strokeWidth={2.2} />
+          )}
         </button>
+        {isListening && (
+          <div className="mic-listening-pill" title="Đang ghi âm giọng nói của bạn...">
+            <span className="mic-listening-dot"></span>
+            <span>Đang nghe... Nói để gõ chữ</span>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons Toolbar */}

@@ -5,12 +5,13 @@
  */
 
 export class SpeechRecognitionService {
-  constructor(onResult, onStatusChange, onError) {
+  constructor(onResult, onStatusChange, onError, onPermissionRequired) {
     this.recognizer = null;
     this.isListening = false;
     this.onResult = onResult;
     this.onStatusChange = onStatusChange;
     this.onError = onError;
+    this.onPermissionRequired = onPermissionRequired;
     this.currentLang = "en-US";
     this.baseText = "";
 
@@ -69,12 +70,9 @@ export class SpeechRecognitionService {
         if (this.onStatusChange) this.onStatusChange(false);
 
         if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-          const msg = "Quyền truy cập Microphone bị từ chối. Vui lòng bấm vào biểu tượng Micro/Ổ khóa trên thanh địa chỉ của trình duyệt để Cho phép (Allow)!";
-          alert(msg);
-          if (this.onError) this.onError(msg);
+          this.triggerPermissionModal("denied");
         } else if (event.error === "audio-capture") {
-          const msg = "Không tìm thấy thiết bị Microphone. Vui lòng kiểm tra lại kết nối micro!";
-          alert(msg);
+          const msg = "Không tìm thấy thiết bị Microphone. Vui lòng kiểm tra lại dây cắm hoặc micro!";
           if (this.onError) this.onError(msg);
         } else if (event.error === "network") {
           console.warn("Dịch vụ nhận diện giọng nói gặp sự cố mạng.");
@@ -91,6 +89,17 @@ export class SpeechRecognitionService {
     }
   }
 
+  triggerPermissionModal(reason = "denied") {
+    if (typeof this.onPermissionRequired === "function") {
+      this.onPermissionRequired(reason);
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("shotlang:mic-permission-required", { detail: { reason } })
+      );
+    }
+  }
+
   setLang(langCode) {
     if (!langCode) return;
     this.currentLang = langCode;
@@ -99,9 +108,25 @@ export class SpeechRecognitionService {
     }
   }
 
+  async requestMicrophonePermission() {
+    if (typeof navigator !== "undefined" && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((track) => track.stop());
+        return true;
+      } catch (err) {
+        console.warn("requestMicrophonePermission denied:", err);
+        return false;
+      }
+    }
+    return false;
+  }
+
   async toggle(currentBaseText = "") {
     if (!this.recognizer) {
-      alert("Trình duyệt của bạn hiện chưa hỗ trợ Web Speech API. Vui lòng sử dụng Google Chrome hoặc Microsoft Edge để nói qua micro!");
+      if (this.onError) {
+        this.onError("Trình duyệt hiện tại chưa hỗ trợ nhận diện giọng nói. Vui lòng dùng Chrome, Edge hoặc Safari!");
+      }
       return false;
     }
 
@@ -116,29 +141,48 @@ export class SpeechRecognitionService {
       return false;
     }
 
-    // Save base text so spoken words append or complete the current input
+    // Save base text so spoken words append to current input
     this.baseText = typeof currentBaseText === "string" ? currentBaseText : "";
 
-    // Explicitly request microphone permission first if mediaDevices is available
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    // 1. Check if permission was explicitly blocked
+    if (typeof navigator !== "undefined" && navigator.permissions && navigator.permissions.query) {
+      try {
+        const perm = await navigator.permissions.query({ name: "microphone" });
+        if (perm.state === "denied") {
+          this.triggerPermissionModal("denied");
+          return false;
+        }
+      } catch (e) {
+        // Query microphone might not be supported in some browser engines
+      }
+    }
+
+    // 2. Request microphone access via getUserMedia to prompt browser dialog if not yet granted
+    if (typeof navigator !== "undefined" && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        // Immediately release stream so SpeechRecognition can bind to the audio hardware
+        // Immediately release test stream so SpeechRecognition can bind to audio input
         stream.getTracks().forEach((track) => track.stop());
       } catch (err) {
-        console.warn("Microphone permission denied via getUserMedia:", err);
-        alert("Chưa cấp quyền truy cập Microphone. Vui lòng cho phép quyền micro trên trình duyệt để sử dụng tính năng này!");
+        console.warn("Microphone access error via getUserMedia:", err);
+        if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+          this.triggerPermissionModal("denied");
+        } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+          if (this.onError) {
+            this.onError("Không tìm thấy thiết bị Microphone trên máy của bạn.");
+          }
+        }
         return false;
       }
     }
 
+    // 3. Start recognizer cleanly
     try {
       this.recognizer.lang = this.currentLang;
       this.recognizer.start();
       return true;
     } catch (e) {
       console.warn("Speech recognition start failed:", e);
-      // If already started, stop and restart cleanly
       try {
         this.recognizer.stop();
         setTimeout(() => {
