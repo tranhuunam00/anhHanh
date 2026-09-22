@@ -61,7 +61,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 1,
         levelNumber: 1,
-        badge: "A1 • Sơ cấp",
+        badge: "A1 Sơ cấp",
         difficulty: "Rất dễ",
         diffColor: "#10b981", // Emerald green
         id: "RP1AL2DU6vQ",
@@ -77,7 +77,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 2,
         levelNumber: 2,
-        badge: "A2 • Cơ bản",
+        badge: "A2 Cơ bản",
         difficulty: "Dễ",
         diffColor: "#06b6d4", // Cyan
         id: "bgfdqVmVjfk",
@@ -93,7 +93,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 3,
         levelNumber: 3,
-        badge: "B1 • Trung cấp",
+        badge: "B1 Trung cấp",
         difficulty: "Trung bình",
         diffColor: "#f59e0b", // Amber
         id: "9AVwbe4e6tI",
@@ -109,7 +109,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 4,
         levelNumber: 4,
-        badge: "B2 • Nâng cao",
+        badge: "B2 Nâng cao",
         difficulty: "Khá khó",
         diffColor: "#f97316", // Orange
         id: "h6fcK_fRYaI",
@@ -125,7 +125,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 5,
         levelNumber: 5,
-        badge: "C1 • Thử thách",
+        badge: "C1 Thử thách",
         difficulty: "Khó",
         diffColor: "#ef4444", // Red
         id: "UF8uR6Z6KLc",
@@ -148,7 +148,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 1,
         levelNumber: 1,
-        badge: "Part 1 • Tranh ảnh",
+        badge: "Part 1 Tranh",
         difficulty: "Rất dễ",
         diffColor: "#10b981",
         id: "SaV2m8jtaRI",
@@ -164,7 +164,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 2,
         levelNumber: 2,
-        badge: "Part 2 • Hỏi & Đáp",
+        badge: "Part 2 Hỏi-Đáp",
         difficulty: "Dễ",
         diffColor: "#06b6d4",
         id: "ZWFDAnY9v04",
@@ -180,7 +180,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 3,
         levelNumber: 3,
-        badge: "Part 3 • Hội thoại",
+        badge: "Part 3 Hội thoại",
         difficulty: "Trung bình",
         diffColor: "#f59e0b",
         id: "vUs0AbOfpfw",
@@ -196,7 +196,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 4,
         levelNumber: 4,
-        badge: "Part 4 • Độc thoại",
+        badge: "Part 4 Độc thoại",
         difficulty: "Khá khó",
         diffColor: "#f97316",
         id: "G-FYo1OcfQw",
@@ -212,7 +212,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 5,
         levelNumber: 5,
-        badge: "Target 800+ • Nâng cao",
+        badge: "Target 800+",
         difficulty: "Khó",
         diffColor: "#ef4444",
         id: "6HHfz6ZQJ-8",
@@ -235,7 +235,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 1,
         levelNumber: 1,
-        badge: "Section 1 • Form Filling",
+        badge: "Section 1 Form",
         difficulty: "Rất dễ",
         diffColor: "#10b981",
         id: "0-nmMAw-FMs",
@@ -251,7 +251,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 2,
         levelNumber: 2,
-        badge: "Section 2 • Đời sống",
+        badge: "Section 2 Đời sống",
         difficulty: "Dễ",
         diffColor: "#06b6d4",
         id: "C9LkYETkhg0",
@@ -267,7 +267,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 3,
         levelNumber: 3,
-        badge: "Section 3 • Thảo luận nhóm",
+        badge: "Section 3 Thảo luận",
         difficulty: "Trung bình",
         diffColor: "#f59e0b",
         id: "VExCSkDBHDA",
@@ -283,7 +283,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 4,
         levelNumber: 4,
-        badge: "Section 4 • Giảng đường",
+        badge: "Section 4 Lecture",
         difficulty: "Khá khó",
         diffColor: "#f97316",
         id: "EPgHrKRZniE",
@@ -299,7 +299,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 5,
         levelNumber: 5,
-        badge: "Band 8.0+ • Trí tuệ",
+        badge: "Band 8.0+",
         difficulty: "Khó",
         diffColor: "#ef4444",
         id: "9uZ-jeZS8d0",
@@ -496,7 +496,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 1,
         levelNumber: 1,
-        badge: "TOPIK 1 • Sơ cấp",
+        badge: "TOPIK 1",
         difficulty: "Rất dễ",
         diffColor: "#10b981",
         id: "cWcbK176lQs",
@@ -512,7 +512,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 2,
         levelNumber: 2,
-        badge: "TOPIK 2 • Cơ bản",
+        badge: "TOPIK 2",
         difficulty: "Dễ",
         diffColor: "#06b6d4",
         id: "2NDS0F3bTwk",
@@ -528,7 +528,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 3,
         levelNumber: 3,
-        badge: "TOPIK 3 • Trung cấp",
+        badge: "TOPIK 3",
         difficulty: "Trung bình",
         diffColor: "#f59e0b",
         id: "mOry_eE_OZA",
@@ -544,7 +544,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 4,
         levelNumber: 4,
-        badge: "TOPIK 4 • Phỏng vấn",
+        badge: "TOPIK 4",
         difficulty: "Khá khó",
         diffColor: "#f97316",
         id: "GbmWrEtC9h4",
@@ -560,7 +560,7 @@ export const PRESET_LESSONS_BY_CATEGORY = {
       {
         level: 5,
         levelNumber: 5,
-        badge: "TOPIK 5-6 • Thời sự",
+        badge: "TOPIK 5-6",
         difficulty: "Khó",
         diffColor: "#ef4444",
         id: "WY53J2YgqSI",

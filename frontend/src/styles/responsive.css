@@ -1,7 +1,8 @@
-/* ShotLang Responsive Design System for Mobile, Tablet & Desktop Widescreen */
+/* ShotLang Comprehensive Responsive Design System (Mobile, Tablet, Desktop) */
+/* Excludes Admin Portal (.admin-*) */
 
-/* 🖥️ Large Desktop / Widescreen (min-width: 1025px) */
-@media (min-width: 1025px) {
+/* 🖥️ Large Desktop / Widescreen (min-width: 1400px) */
+@media (min-width: 1400px) {
   .main-container {
     max-width: 1560px;
     padding: 0 24px;
@@ -12,10 +13,37 @@
     align-self: start;
     z-index: 10;
   }
+  .presets-cards-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 
-/* 📱 Tablet & Medium Screens (max-width: 1024px) */
+/* 💻 Medium Desktop & Laptops (1025px - 1399px) */
+@media (min-width: 1025px) and (max-width: 1399px) {
+  .main-container {
+    max-width: 1280px;
+    padding: 0 20px;
+  }
+  .player-card {
+    position: sticky;
+    top: 68px;
+    align-self: start;
+    z-index: 10;
+  }
+  .presets-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+    gap: 12px;
+  }
+}
+
+/* 📱 Tablet & Medium Screens (769px - 1024px) */
 @media (max-width: 1024px) {
+  .main-container {
+    padding: 0 16px;
+    margin: 12px auto;
+  }
+
+  /* Exercise Split View: Stack vertically on tablet */
   .exercise-grid {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -34,19 +62,47 @@
     display: none !important;
   }
   .player-card {
-    position: static;
+    position: static !important;
+  }
+
+  /* Bottom Presets on Tablet */
+  .presets-level-overview {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+  .presets-level-stepper {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    padding-bottom: 4px;
+  }
+  .presets-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
   }
 }
 
 /* 📱 Mobile Devices (max-width: 768px) */
 @media (max-width: 768px) {
+  /* Header */
   .app-header {
     position: relative;
     top: auto;
     padding: 8px 12px;
   }
   .header-inner {
-    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
   }
   .brand {
     font-size: 1.1rem;
@@ -55,24 +111,41 @@
     width: 26px !important;
     height: 26px !important;
   }
+
+  /* URL & Language Form */
   .url-input-form {
     width: 100%;
     flex-direction: column;
     gap: 8px;
   }
+  .url-input-row {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+  }
+  .url-input-row input {
+    flex: 1;
+    min-width: 0;
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+  }
   .lang-selector-group {
     width: 100%;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 6px;
   }
   .lang-select-wrapper {
     flex: 1;
+    min-width: 0;
   }
   .header-lang-select {
     width: 100%;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+    padding: 6px 8px;
   }
 
-  /* Main Container & Tabs */
+  /* Main Container & Tab Navigation */
   .main-container {
     padding: 0 10px;
     margin: 6px auto;
@@ -84,14 +157,21 @@
   }
   .tabs-nav-group {
     width: 100%;
-    justify-content: space-between;
+    display: flex;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 4px;
     padding-bottom: 4px;
   }
+  .tabs-nav-group::-webkit-scrollbar {
+    display: none;
+  }
   .tab-btn {
-    font-size: 0.8rem;
-    padding: 6px 8px;
+    font-size: 0.78rem;
+    padding: 6px 10px;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   /* Challenge Header & Nav Buttons */
@@ -102,20 +182,21 @@
   }
   .challenge-nav-buttons {
     width: 100%;
+    display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 4px;
   }
   .challenge-nav-buttons .btn {
     padding: 5px 8px;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
   }
 
-  /* Input Box (Font-size 16px avoids iOS webview auto-zoom) */
+  /* Dictation Textarea (16px font-size prevents iOS Safari zoom) */
   .dictation-input {
     font-size: 16px !important;
-    min-height: 80px;
-    padding: 8px 40px 8px 10px;
+    min-height: 82px;
+    padding: 10px 42px 10px 12px;
   }
   .mic-btn {
     top: 10px;
@@ -126,17 +207,19 @@
 
   /* Action Buttons Toolbar */
   .dictation-actions {
+    display: flex;
+    flex-wrap: wrap;
     gap: 6px;
   }
   .dictation-actions .btn {
-    flex: 1 1 calc(33.33% - 6px);
+    flex: 1 1 calc(50% - 4px);
     justify-content: center;
-    padding: 7px 8px;
+    padding: 8px 10px;
     font-size: 0.8rem;
-    min-height: 38px;
+    min-height: 40px;
   }
 
-  /* Full Audio Hero Bar (Tab 2) */
+  /* Full Audio Player Bar (Tab 2) */
   .full-audio-player-bar {
     flex-wrap: wrap;
     padding: 10px 12px;
@@ -149,28 +232,138 @@
     margin-top: 4px;
   }
 
-  /* Drawer / Modal */
+  /* Vocabulary Notebook (Tab 3) */
+  .vocab-header-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .vocab-filter-pills {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .vocab-filter-pill {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .vocab-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Question Drawer / Modal */
   .drawer {
-    width: 100% !important;
+    width: 100vw !important;
     max-width: 100vw !important;
   }
   .question-grid {
-    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
-    gap: 6px;
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+    gap: 5px;
   }
   .q-btn {
     padding: 8px 2px;
+    font-size: 0.78rem;
+  }
+
+  /* Bottom Presets Section Responsive */
+  .bottom-presets-section {
+    margin-top: 32px;
+    padding-top: 18px;
+  }
+  .presets-header-title {
+    font-size: 1.05rem;
+    gap: 8px;
+  }
+  .presets-lang-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+    padding-bottom: 6px;
+    margin: 10px 0 8px 0;
+  }
+  .presets-lang-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .preset-lang-tab {
+    padding: 6px 12px;
     font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .presets-subcat-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+    padding-bottom: 4px;
+    margin: 2px 0 10px 0;
+  }
+  .presets-subcat-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .preset-subcat-tab {
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .presets-level-overview {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+  }
+  .presets-category-info {
+    font-size: 0.78rem;
+  }
+  .presets-level-stepper {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    width: 100%;
+    padding-bottom: 4px;
+  }
+  .presets-level-stepper::-webkit-scrollbar {
+    display: none;
+  }
+  .step-tag {
+    font-size: 0.68rem;
+    padding: 2px 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .step-arrow {
+    font-size: 0.65rem;
+    flex-shrink: 0;
+  }
+
+  .presets-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
   }
 }
 
 /* 📱 Small Mobile Devices (max-width: 480px) */
 @media (max-width: 480px) {
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
   .dictation-actions .btn {
-    flex: 1 1 calc(50% - 6px);
+    flex: 1 1 100%;
   }
   .controls-row {
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 6px;
   }
   .speed-group {
     margin-left: 0 !important;
@@ -181,8 +374,32 @@
   .speed-btn {
     flex: 1;
     padding: 6px 4px;
+    font-size: 0.75rem;
   }
+
+  /* 1 Column for Cards on narrow phones */
   .presets-cards-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .preset-card {
+    min-height: 160px;
+    padding: 12px 14px;
+  }
+  .preset-card-title {
+    font-size: 0.88rem;
+  }
+  .preset-card-summary {
+    font-size: 0.75rem;
+  }
+
+  /* Modals on small phones */
+  .modal-card,
+  .feedback-modal-content,
+  .preview-modal-dialog {
+    width: 100% !important;
+    max-width: 95vw !important;
+    padding: 14px !important;
+    margin: 10px auto;
   }
 }
