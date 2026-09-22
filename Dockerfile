@@ -24,8 +24,9 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code, static documentation
+# Copy backend code, static documentation, and scripts
 COPY app/ ./app/
+COPY scripts/ ./scripts/
 COPY server.py ./
 COPY tai_lieu/ ./tai_lieu/
 
