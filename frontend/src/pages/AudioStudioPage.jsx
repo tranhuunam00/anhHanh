@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   Upload,
   Headphones,
@@ -9,21 +9,23 @@ import {
   RotateCw,
   Repeat,
   Volume2,
-  CheckCircle2,
-  BookOpen,
-  HelpCircle,
   FileAudio,
-  ArrowRight,
   Lightbulb,
-  Check,
   AlertCircle,
 } from "lucide-react";
+import { DictationStudio } from "../components/Dictation/DictationStudio";
 import { WordLookupPopover } from "../components/Vocab/WordLookupPopover";
+import { useShortcuts } from "../hooks/useShortcuts";
+import { useSettings } from "../hooks/useSettings";
+import { SpeechRecognitionService } from "../services/speechRecognition";
+import { evaluateMasked, getNextLetterHint, getNextWordHint } from "../utils/diffCalculator";
 import "../styles/audio-studio.css";
 
 const API_BASE = "";
 
 export function AudioStudioPage() {
+  const { settings } = useSettings();
+
   // Mode: "upload" | "text"
   const [activeMode, setActiveMode] = useState("upload");
 
@@ -43,7 +45,16 @@ export function AudioStudioPage() {
 
   // Dictation Exercise State
   const [userInput, setUserInput] = useState("");
-  const [evalResult, setEvalResult] = useState(null);
+  const userInputRef = useRef("");
+  userInputRef.current = userInput;
+
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [completedMap, setCompletedMap] = useState({});
+  const enterTrackerRef = useRef({ count: 0, lastTime: 0, lastInput: "" });
+
+  // Speech Recognition State
+  const [isListening, setIsListening] = useState(false);
+  const speechRef = useRef(null);
 
   // Word Lookup Popover State
   const [lookupTarget, setLookupTarget] = useState(null);
@@ -56,9 +67,26 @@ export function AudioStudioPage() {
   // Sample phrases
   const [samples, setSamples] = useState([]);
 
-  // Audio Element Ref
+  // Refs
   const audioRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    speechRef.current = new SpeechRecognitionService(
+      (transcript) => {
+        userInputRef.current = transcript;
+        setUserInput(transcript);
+      },
+      (status) => setIsListening(status)
+    );
+  }, []);
+
+  const handleToggleMic = useCallback(() => {
+    if (speechRef.current) {
+      speechRef.current.toggle();
+    }
+  }, []);
 
   // Load sample phrases on mount
   useEffect(() => {
@@ -71,7 +99,64 @@ export function AudioStudioPage() {
   // Current active sentence object
   const currentSentence = audioResult?.segments?.[currentSentenceIndex] || null;
 
-  // Sync Audio Playhead with Current Segment
+  // Convert currentSentence to Challenge object compatible with DictationStudio
+  const currentChallenge = useMemo(() => {
+    if (!currentSentence) return null;
+    return {
+      id: currentSentence.id,
+      text: currentSentence.text,
+      time_start: currentSentence.start,
+      time_end: currentSentence.end,
+      translation: "",
+    };
+  }, [currentSentence]);
+
+  // Audio Playback Controls
+  const togglePlayPause = useCallback(() => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    }
+  }, [isPlaying]);
+
+  const replayCurrentSegment = useCallback(() => {
+    if (!audioRef.current || !currentSentence) return;
+    audioRef.current.currentTime = currentSentence.start;
+    audioRef.current.play().catch(() => {});
+    setIsPlaying(true);
+  }, [currentSentence]);
+
+  const seekRelative = useCallback((sec) => {
+    if (!audioRef.current) return;
+    const next = Math.max(0, Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + sec));
+    audioRef.current.currentTime = next;
+  }, []);
+
+  const handleSpeedChange = useCallback((speed) => {
+    setPlaybackSpeed(speed);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  }, []);
+
+  // Sentence Navigation Handlers
+  const goToPrevSentence = useCallback(() => {
+    if (currentSentenceIndex > 0) {
+      setCurrentSentenceIndex((prev) => prev - 1);
+    }
+  }, [currentSentenceIndex]);
+
+  const goToNextSentence = useCallback(() => {
+    if (audioResult?.segments && currentSentenceIndex < audioResult.segments.length - 1) {
+      setCurrentSentenceIndex((prev) => prev + 1);
+    }
+  }, [audioResult, currentSentenceIndex]);
+
+  // Sync Audio Playhead & Local Dictation State with Current Segment
   useEffect(() => {
     if (!audioRef.current || !currentSentence) return;
     const audio = audioRef.current;
@@ -80,9 +165,20 @@ export function AudioStudioPage() {
     audio.currentTime = currentSentence.start;
     setCurrentTime(currentSentence.start);
 
-    // Reset user input for this sentence
-    setUserInput("");
-    setEvalResult(null);
+    // Restore completed state or reset input
+    if (completedMap[currentSentenceIndex]) {
+      setUserInput(currentSentence.text);
+      userInputRef.current = currentSentence.text;
+      setIsCompleted(true);
+    } else {
+      setUserInput("");
+      userInputRef.current = "";
+      setIsCompleted(false);
+    }
+
+    // Auto play segment
+    audio.play().catch(() => {});
+    setIsPlaying(true);
   }, [currentSentenceIndex, audioResult]);
 
   // Audio TimeUpdate Event (Loop segment logic)
@@ -94,47 +190,109 @@ export function AudioStudioPage() {
 
     if (currentSentence && isLoopingSegment) {
       if (now >= currentSentence.end) {
-        // Loop back to start
         audio.currentTime = currentSentence.start;
         audio.play().catch(() => {});
       }
     }
   };
 
-  // Play / Pause Toggle
-  const togglePlayPause = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+  // Hint Letter Mechanism (Identical to DictationStudio)
+  const handleHintLetter = useCallback(() => {
+    if (!currentSentence) return;
+    const currentVal = userInputRef.current || userInput;
+    const nextVal = getNextLetterHint(currentSentence.text, currentVal, settings.strictPunctuation);
+    userInputRef.current = nextVal;
+    setUserInput(nextVal);
+  }, [currentSentence, userInput, settings.strictPunctuation]);
+
+  // Hint Word Mechanism (Identical to DictationStudio)
+  const handleHintWord = useCallback(() => {
+    if (!currentSentence) return;
+    const currentVal = userInputRef.current || userInput;
+    const nextVal = getNextWordHint(currentSentence.text, currentVal);
+    userInputRef.current = nextVal;
+    setUserInput(nextVal);
+  }, [currentSentence, userInput]);
+
+  // Skip Sentence Mechanism
+  const handleSkip = useCallback(() => {
+    if (!currentSentence) return;
+    userInputRef.current = currentSentence.text;
+    setUserInput(currentSentence.text);
+    setIsCompleted(true);
+    setCompletedMap((prev) => ({ ...prev, [currentSentenceIndex]: true }));
+  }, [currentSentence, currentSentenceIndex]);
+
+  // Retry Current Sentence
+  const handleRetryCurrent = useCallback(() => {
+    if (!currentSentence) return;
+    userInputRef.current = "";
+    setUserInput("");
+    setIsCompleted(false);
+    setCompletedMap((prev) => ({ ...prev, [currentSentenceIndex]: false }));
+    replayCurrentSegment();
+  }, [currentSentence, currentSentenceIndex, replayCurrentSegment]);
+
+  // Check Answer Handler (Supports double-Enter for hint)
+  const handleCheck = useCallback((inputOverride) => {
+    if (!currentSentence) return;
+
+    if (isCompleted) {
+      enterTrackerRef.current = { count: 0, lastTime: 0, lastInput: "" };
+      if (currentSentenceIndex < (audioResult?.segments?.length || 0) - 1) {
+        goToNextSentence();
+      }
+      return;
+    }
+
+    const currentVal = typeof inputOverride === "string" ? inputOverride : (userInputRef.current || userInput);
+    const evalResult = evaluateMasked(currentSentence.text, currentVal, settings.strictPunctuation);
+
+    if (evalResult.isCompleted) {
+      enterTrackerRef.current = { count: 0, lastTime: 0, lastInput: "" };
+      setIsCompleted(true);
+      setCompletedMap((prev) => ({ ...prev, [currentSentenceIndex]: true }));
+      userInputRef.current = currentVal;
+      setUserInput(currentVal);
+
+      if (settings.autoAdvance === "yes" && currentSentenceIndex < (audioResult?.segments?.length || 0) - 1) {
+        setTimeout(() => {
+          goToNextSentence();
+        }, 800);
+      }
     } else {
-      audioRef.current.play().catch(() => {});
-      setIsPlaying(true);
+      const now = Date.now();
+      const tracker = enterTrackerRef.current;
+      if (now - tracker.lastTime < 1500 && tracker.lastInput === currentVal) {
+        tracker.count += 1;
+      } else {
+        tracker.count = 1;
+      }
+      tracker.lastTime = now;
+
+      if (tracker.count >= 2) {
+        handleHintLetter();
+        tracker.count = 0;
+      } else {
+        tracker.lastInput = currentVal;
+      }
     }
-  };
+  }, [currentSentence, isCompleted, currentSentenceIndex, audioResult, userInput, settings, goToNextSentence, handleHintLetter]);
 
-  // Replay Current Segment
-  const replayCurrentSegment = () => {
-    if (!audioRef.current || !currentSentence) return;
-    audioRef.current.currentTime = currentSentence.start;
-    audioRef.current.play().catch(() => {});
-    setIsPlaying(true);
-  };
-
-  // Seek relative
-  const seekRelative = (sec) => {
-    if (!audioRef.current) return;
-    const next = Math.max(0, Math.min(audioRef.current.duration || 0, audioRef.current.currentTime + sec));
-    audioRef.current.currentTime = next;
-  };
-
-  // Change Playback Speed
-  const handleSpeedChange = (speed) => {
-    setPlaybackSpeed(speed);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = speed;
-    }
-  };
+  // Keyboard Shortcuts Integration (100% Identical to Dictation Feature)
+  useShortcuts({
+    replayKey: settings.replayKey,
+    playPauseKey: settings.playPauseKey,
+    onReplay: replayCurrentSegment,
+    onPlayPause: togglePlayPause,
+    onPrev: goToPrevSentence,
+    onNext: goToNextSentence,
+    onCheck: () => handleCheck(userInputRef.current),
+    onSkip: handleSkip,
+    onHintLetter: handleHintLetter,
+    onHintWord: handleHintWord,
+    enabled: activeMode === "upload" && Boolean(audioResult),
+  });
 
   // Upload Audio Handler
   const handleAudioUpload = async (file) => {
@@ -164,6 +322,8 @@ export function AudioStudioPage() {
 
       setAudioResult(data);
       setCurrentSentenceIndex(0);
+      setCompletedMap({});
+      setIsCompleted(false);
       setIsUploading(false);
     } catch (err) {
       console.error("Upload error:", err);
@@ -185,23 +345,6 @@ export function AudioStudioPage() {
       const file = e.dataTransfer.files[0];
       handleAudioUpload(file);
     }
-  };
-
-  // Check Dictation Submission
-  const handleCheckDictation = () => {
-    if (!currentSentence) return;
-    const target = currentSentence.text.trim();
-    const user = userInput.trim();
-
-    const cleanTarget = target.toLowerCase().replace(/[^\w\s]/g, "");
-    const cleanUser = user.toLowerCase().replace(/[^\w\s]/g, "");
-
-    const isMatch = cleanTarget === cleanUser;
-    setEvalResult({
-      isMatch,
-      target,
-      user,
-    });
   };
 
   // Instant Text Analyzer
@@ -303,7 +446,7 @@ export function AudioStudioPage() {
           </h1>
           <p className="audio-studio-hero-subtitle">
             Tải lên bất kỳ file ghi âm hoặc audio tiếng Anh (MP3, WAV, M4A) — AI Whisper-large-v3 sẽ tự động bóc
-            phụ đề từng câu, phân tích hiện tượng nối âm (Linking), nuốt âm (Elision), biến âm (Assimilation) và biến thành bài luyện Dictation hoàn chỉnh.
+            phụ đề từng câu, phân tích hiện tượng nối âm (Linking), nuốt âm (Elision), biến âm (Assimilation) và tạo bài luyện Dictation với đầy đủ phím tắt.
           </p>
         </div>
 
@@ -432,7 +575,8 @@ export function AudioStudioPage() {
                     onClick={() => {
                       setAudioResult(null);
                       setUserInput("");
-                      setEvalResult(null);
+                      setIsCompleted(false);
+                      setCompletedMap({});
                     }}
                   >
                     <span>Tải file khác</span>
@@ -484,7 +628,7 @@ export function AudioStudioPage() {
 
                   <button
                     className="btn btn-secondary btn-icon"
-                    title="Phát lại đoạn câu này"
+                    title="Phát lại đoạn câu này (Ctrl)"
                     onClick={replayCurrentSegment}
                   >
                     <Repeat size={18} />
@@ -524,106 +668,44 @@ export function AudioStudioPage() {
 
               {/* Two-Column Studio Layout */}
               <div className="studio-split-layout">
-                {/* Left Column: Dictation Practice & Sentence Navigator */}
+                {/* Left Column: Identical Dictation Studio Component & Sentence Picker */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  {/* Dictation Box */}
-                  <div className="audio-dictation-card">
-                    <div className="card-header-bar">
-                      <div className="card-header-title">
-                        <BookOpen size={20} color="#0284c7" />
-                        <span>Luyện gõ chính tả (Câu {currentSentenceIndex + 1})</span>
-                      </div>
-                      <button
-                        className="btn btn-secondary"
-                        style={{ fontSize: "0.8rem", padding: "4px 10px" }}
-                        onClick={replayCurrentSegment}
-                      >
-                        <Volume2 size={14} style={{ marginRight: "4px" }} />
-                        <span>Nghe lại câu</span>
-                      </button>
-                    </div>
-
-                    <textarea
-                      className="dictation-input-area"
-                      placeholder="Nghe và gõ lại những gì bạn nghe được ở câu này..."
-                      value={userInput}
-                      onChange={(e) => setUserInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          handleCheckDictation();
-                        }
-                      }}
-                    />
-
-                    <div className="dictation-actions-row">
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <button
-                          className="btn btn-secondary"
-                          disabled={currentSentenceIndex === 0}
-                          onClick={() => setCurrentSentenceIndex((prev) => Math.max(0, prev - 1))}
-                        >
-                          <span>Câu trước</span>
-                        </button>
-                        <button
-                          className="btn btn-secondary"
-                          disabled={currentSentenceIndex >= audioResult.segments.length - 1}
-                          onClick={() =>
-                            setCurrentSentenceIndex((prev) =>
-                              Math.min(audioResult.segments.length - 1, prev + 1)
-                            )
-                          }
-                        >
-                          <span>Câu sau</span>
-                        </button>
-                      </div>
-
-                      <button className="btn btn-primary" onClick={handleCheckDictation}>
-                        <CheckCircle2 size={16} />
-                        <span>Kiểm tra</span>
-                      </button>
-                    </div>
-
-                    {/* Evaluation Result */}
-                    {evalResult && (
-                      <div
-                        style={{
-                          padding: "12px 16px",
-                          borderRadius: "10px",
-                          background: evalResult.isMatch
-                            ? "rgba(16, 185, 129, 0.12)"
-                            : "rgba(239, 68, 68, 0.12)",
-                          border: `1px solid ${evalResult.isMatch ? "#10b981" : "#ef4444"}`,
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontWeight: 600,
-                            color: evalResult.isMatch ? "#059669" : "#dc2626",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            marginBottom: "6px",
-                          }}
-                        >
-                          {evalResult.isMatch ? (
-                            <>
-                              <Check size={18} />
-                              <span>Xuất sắc! Bạn đã nghe và chép chính xác.</span>
-                            </>
-                          ) : (
-                            <>
-                              <AlertCircle size={18} />
-                              <span>Chưa khớp hoàn toàn. Hãy so sánh với câu mẫu bên phải:</span>
-                            </>
-                          )}
-                        </div>
-                        <div style={{ fontSize: "0.95rem", color: "var(--text-main)" }}>
-                          <strong>Câu mẫu:</strong> {evalResult.target}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {/* Full Dictation Studio Card (100% Identical shortcuts & features) */}
+                  <DictationStudio
+                    currentChallenge={currentChallenge}
+                    currentIndex={currentSentenceIndex}
+                    totalChallenges={audioResult.segments.length}
+                    targetLang="none"
+                    sourceLang="en"
+                    userInput={userInput}
+                    setUserInput={(val) => {
+                      setUserInput(val);
+                      userInputRef.current = val;
+                    }}
+                    onInputChange={(val) => {
+                      setUserInput(val);
+                      userInputRef.current = val;
+                    }}
+                    isListening={isListening}
+                    isPlaying={isPlaying}
+                    onToggleMic={handleToggleMic}
+                    onCheck={handleCheck}
+                    onSkip={handleSkip}
+                    onReplay={replayCurrentSegment}
+                    onPlayPause={togglePlayPause}
+                    onSpeakSentence={replayCurrentSegment}
+                    onHintLetter={handleHintLetter}
+                    onHintWord={handleHintWord}
+                    onPrev={goToPrevSentence}
+                    onNext={goToNextSentence}
+                    isCompleted={isCompleted}
+                    strictPunctuation={settings.strictPunctuation}
+                    onNextChallenge={goToNextSentence}
+                    onRetryChallenge={handleRetryCurrent}
+                    onCompleteLesson={() => {
+                      alert("Chúc mừng! Bạn đã hoàn thành bài nghe audio này! 🎉");
+                    }}
+                  />
 
                   {/* Sentence Picker List */}
                   <div className="phonology-card">
@@ -637,7 +719,9 @@ export function AudioStudioPage() {
                       {audioResult.segments.map((seg, idx) => (
                         <div
                           key={seg.id}
-                          className={`sentence-item-btn ${idx === currentSentenceIndex ? "active" : ""}`}
+                          className={`sentence-item-btn ${idx === currentSentenceIndex ? "active" : ""} ${
+                            completedMap[idx] ? "completed-item" : ""
+                          }`}
                           onClick={() => setCurrentSentenceIndex(idx)}
                         >
                           <div className="sentence-item-text">
@@ -835,4 +919,5 @@ export function AudioStudioPage() {
     </div>
   );
 }
+
 export default AudioStudioPage;
