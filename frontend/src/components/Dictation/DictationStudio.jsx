@@ -310,7 +310,6 @@ export const DictationStudio = React.memo(({
               contextTranslation={currentChallenge?.translation || dynamicTranslation}
               videoId={videoId || currentChallenge?.video_id || ""}
               timestamp={currentChallenge?.time_start || 0}
-              showLinking={true}
             />
           </div>
           {(currentChallenge?.translation || dynamicTranslation) && (
