@@ -1,6 +1,10 @@
 """Domain Services for Sentence Grouping and Word-by-Word Dictation Evaluation."""
 import re
+import logging
 from typing import List, Optional, Tuple, Set, Dict
+
+logger = logging.getLogger(__name__)
+
 from app.domain.models import (
     Challenge,
     SubtitleSnippet,
@@ -637,7 +641,11 @@ class SentenceGrouperService:
         challenges: List[Challenge],
         translations: Optional[List[SubtitleSnippet]],
     ) -> None:
-        """Phase 5: Attach translation snippets via maximum temporal overlap alignment."""
+        """Phase 5: Attach translation snippets via maximum temporal overlap alignment
+
+        Includes automatic timestamp desync/offset detection & correction for subtracks
+        that have shifted timestamps on YouTube (e.g. TED talks with/without intro clips).
+        """
         if not translations or not challenges:
             return
 
@@ -650,21 +658,35 @@ class SentenceGrouperService:
                     SubtitleSnippet(text=" ".join(good_lines), start=t.start, duration=t.duration)
                 )
 
-        challenge_trans_map: dict = {c.id: [] for c in challenges}
-        for t in cleaned_translations:
-            best_c, best_overlap = None, 0.0
-            for c in challenges:
-                overlap = min(c.time_end, t.end) - max(c.time_start, t.start)
-                if overlap > best_overlap:
-                    best_overlap = overlap
-                    best_c = c
-            if best_c and best_overlap > 0:
-                challenge_trans_map[best_c.id].append(t.text)
+        if not cleaned_translations:
+            return
 
+        # Automatic desync offset detection between source challenges and target snippets
+        first_c = challenges[0] if challenges else None
+        first_t = cleaned_translations[0] if cleaned_translations else None
+        if first_c and first_t:
+            time_diff = first_c.time_start - first_t.start
+            if abs(time_diff) > 2.0:
+                logger.warning(
+                    f"Detected subtitle timestamp desync offset of {time_diff:.2f}s between source audio and target captions. Applying automatic timestamp shift!"
+                )
+                cleaned_translations = [
+                    SubtitleSnippet(text=t.text, start=t.start + time_diff, duration=t.duration)
+                    for t in cleaned_translations
+                ]
+
+        # Proportional multi-overlap matching per challenge
         for c in challenges:
-            t_texts = challenge_trans_map.get(c.id, [])
-            if t_texts:
-                combined = re.sub(r"\s+", " ", " ".join(t_texts)).strip()
+            c_dur = max(0.1, c.time_end - c.time_start)
+            matched_texts: List[str] = []
+            for t in cleaned_translations:
+                overlap = min(c.time_end, t.end) - max(c.time_start, t.start)
+                t_dur = max(0.1, t.end - t.start)
+                if overlap >= 0.2 or (overlap / t_dur) >= 0.15 or (overlap / c_dur) >= 0.15:
+                    matched_texts.append(t.text)
+
+            if matched_texts:
+                combined = re.sub(r"\s+", " ", " ".join(matched_texts)).strip()
                 c.translation = self.clean_credits(combined) if combined else None
             else:
                 c.translation = None
