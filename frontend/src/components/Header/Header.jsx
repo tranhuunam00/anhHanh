@@ -10,6 +10,7 @@ import {
   MessageSquarePlus,
   Sun,
   Moon,
+  Trees,
   ArrowRight,
   Globe,
   Settings,
@@ -326,10 +327,24 @@ export const Header = React.memo(({
         <button
           className="btn btn-secondary btn-icon-text"
           onClick={onToggleTheme}
-          title="Chuyển chế độ Sáng / Tối"
+          title="Chuyển giao diện: Sáng / Tối / Cây cối"
         >
-          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-          <span>{theme === "dark" ? "Sáng" : "Tối"}</span>
+          {theme === "forest" ? (
+            <>
+              <Trees size={16} style={{ color: "#10b981" }} />
+              <span>Cây cối</span>
+            </>
+          ) : theme === "dark" ? (
+            <>
+              <Moon size={16} />
+              <span>Tối</span>
+            </>
+          ) : (
+            <>
+              <Sun size={16} />
+              <span>Sáng</span>
+            </>
+          )}
         </button>
       </div>
     </header>

@@ -314,7 +314,8 @@
   display: block;
   transition: all 0.2s ease;
 }
-[data-theme="dark"] .dictation-translation-card {
+[data-theme="dark"] .dictation-translation-card,
+[data-theme="forest"] .dictation-translation-card {
   background: #082f4922;
   border-color: #0369a1;
 }
