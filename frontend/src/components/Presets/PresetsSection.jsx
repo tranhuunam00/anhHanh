@@ -39,6 +39,9 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
           <span>Thử ngay – Luyện đa ngôn ngữ</span>
           <span className="presets-header-badge">5 Cấp độ Dễ ➔ Khó</span>
         </div>
+        <p className="presets-header-subtitle">
+          💡 Chọn bài tập mẫu sẵn có bên dưới, hoặc <strong>tự do dán bất kỳ link YouTube nào bạn thích</strong> vào ô tìm kiếm phía trên để bắt đầu luyện tập ngay!
+        </p>
       </div>
 
       {/* Main Language Selector Tabs */}
