@@ -331,7 +331,7 @@ export const Header = React.memo(({
         >
           {theme === "forest" ? (
             <>
-              <Trees size={16} style={{ color: "#10b981" }} />
+              <Trees size={16} style={{ color: "#f59e0b" }} />
               <span>Cây cối</span>
             </>
           ) : theme === "dark" ? (
