@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { getStorageItem, setStorageItem } from "../utils/storage";
 
 const TAY_BAC_WALLPAPERS = [
-  "/forest_bg.jpg",
   "/tb_mucangchai.jpg",
   "/tb_sapa.jpg",
   "/tb_hagiang.jpg",

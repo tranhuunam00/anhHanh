@@ -4,9 +4,21 @@ import "./footer.css";
 
 export const Footer = React.memo(function Footer({ onOpenShortcuts, onOpenFeedback }) {
   const currentYear = new Date().getFullYear();
-
   return (
     <footer className="shotlang-footer">
+      <div className="footer-invite-banner">
+        <span>Cần mở rộng tính năng riêng hoặc tìm &quot;cạ cứng&quot; học cùng? Cứ ới tác giả một tiếng nhé 😉</span>
+        <a
+          href="https://zalo.me/0961766816"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="footer-invite-contact-link"
+          title="Nhắn Zalo hoặc gọi tác giả (Namth: 0961.766.816)"
+        >
+          💬 Zalo/Call: 0961.766.816
+        </a>
+      </div>
+
       <div className="shotlang-footer-container">
         {/* Left: Brand Identity & Logo */}
         <div className="shotlang-footer-brand">

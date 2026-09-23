@@ -39,18 +39,6 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
           <span>Thử ngay – Luyện đa ngôn ngữ</span>
           <span className="presets-header-badge">5 Cấp độ Dễ ➔ Khó</span>
         </div>
-        <span className="presets-header-subtitle">
-          Cần mở rộng tính năng riêng hoặc tìm &quot;cạ cứng&quot; học cùng? Cứ ới tác giả một tiếng nhé 😉 •{" "}
-          <a
-            href="https://zalo.me/0961766816"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="preset-author-contact-link"
-            title="Nhắn Zalo hoặc gọi tác giả (Namth: 0961.766.816)"
-          >
-            💬 Zalo/Call: 0961.766.816
-          </a>
-        </span>
       </div>
 
       {/* Main Language Selector Tabs */}
