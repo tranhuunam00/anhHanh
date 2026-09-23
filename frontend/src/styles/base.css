@@ -91,7 +91,7 @@
   background-color: #0f1712;
   background-image: 
     linear-gradient(to bottom, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.32)),
-    var(--forest-bg-url, url("/tb_mucangchai.jpg"));
+    var(--forest-bg-url, url("/tb_forest_1.jpg"));
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;

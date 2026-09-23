@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { getStorageItem, setStorageItem } from "../utils/storage";
 
 const TAY_BAC_WALLPAPERS = [
-  "/tb_mucangchai.jpg",
+  "/tb_forest_1.jpg",
   "/tb_sapa.jpg",
   "/tb_hagiang.jpg",
+  "/tb_forest_2.jpg",
 ];
 
 export const useTheme = () => {
