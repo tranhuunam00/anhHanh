@@ -7,9 +7,21 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isAutoScroll, setIsAutoScroll] = useState(true);
+  // Đo chiều cao app-header thực tế để tính sticky top
+  const [heroTop, setHeroTop] = useState(60);
 
   const activeItemRef = useRef(null);
 
+  // Đo app-header height để set top chính xác cho hero card sticky
+  useEffect(() => {
+    const measure = () => {
+      const header = document.querySelector(".app-header");
+      if (header) setHeroTop(header.getBoundingClientRect().height);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
   useEffect(() => {
     let interval;
     if (playerController) {
@@ -49,7 +61,7 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
     if (isAutoScroll && activeIndex !== -1 && activeItemRef.current) {
       activeItemRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "nearest",
+        block: "center",
       });
     }
   }, [activeIndex, isAutoScroll]);
@@ -90,8 +102,8 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
 
   return (
     <div id="tab-transcript" className="tab-content">
-      {/* Full Audio Hero Card */}
-      <div className="card full-audio-hero-card">
+      {/* Full Audio Hero Card – sticky, không bị cuộn mất */}
+      <div className="card full-audio-hero-card" style={{ top: `${heroTop}px` }}>
         <div className="full-audio-hero-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
           <div className="hero-header-title" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Headphones size={22} color="#3b82f6" />

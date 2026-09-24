@@ -6,6 +6,10 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 22px;
+  /* Sticky: luôn hiển thị trên cùng khi scroll danh sách transcript
+     top được set động qua inline style trong TranscriptPage.jsx */
+  position: sticky;
+  z-index: 10;
 }
 .full-audio-hero-header {
   margin-bottom: 16px;
@@ -65,8 +69,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 700px;
-  overflow-y: auto;
+  /* Không giới hạn chiều cao – để trang cuộn tự nhiên,
+     hero card sticky sẽ không bị cuộn mất */
   padding-right: 4px;
 }
 .transcript-item {
