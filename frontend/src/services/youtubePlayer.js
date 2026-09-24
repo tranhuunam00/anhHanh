@@ -321,6 +321,15 @@ export class YouTubePlayerController {
     return 0;
   }
 
+  isPlaying() {
+    if (this.isReady && this.player && typeof this.player.getPlayerState === "function") {
+      try {
+        return this.player.getPlayerState() === 1; // YT.PlayerState.PLAYING = 1
+      } catch (e) {}
+    }
+    return false;
+  }
+
   seekTo(seconds) {
     if (this.isReady && this.player && typeof this.player.seekTo === "function") {
       try {

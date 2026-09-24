@@ -28,12 +28,29 @@ export const TranscriptPage = ({ lesson, playerController, onGoToChallenge }) =>
       interval = setInterval(() => {
         setCurrentTime(playerController.getCurrentTime() || 0);
         setDuration(playerController.getDuration() || 0);
+        // Sync trạng thái play/pause từ playerController
+        const playing = playerController.isPlaying?.() ?? false;
+        setIsPlayingFull(playing);
       }, 300);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [playerController]);
+
+  // Phím Space: dừng / tiếp tục audio (khi không focus vào input/textarea)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code !== "Space") return;
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable) return;
+      e.preventDefault();
+      toggleFullPlay();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playerController, isPlayingFull]);
 
   // Compute active sentence index dynamically based on current audio time
   const activeIndex = useMemo(() => {
