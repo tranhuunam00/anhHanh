@@ -80,7 +80,11 @@ export const WordLookupPopover = ({
     setLoading(true);
 
     // Check if word is already in AuthContext savedVocabMap
-    const savedItem = savedVocabMap ? savedVocabMap[cleanWord.toLowerCase()] : null;
+    const cleanLower = cleanWord.toLowerCase().replace(/\s+/g, " ");
+    const cleanNorm = cleanLower.replace(/[’']/g, "'");
+    const savedItem = savedVocabMap
+      ? (savedVocabMap[cleanLower] || savedVocabMap[cleanNorm] || null)
+      : null;
 
     quickLookupWord(cleanWord, contextSentence, token)
       .then((data) => {
