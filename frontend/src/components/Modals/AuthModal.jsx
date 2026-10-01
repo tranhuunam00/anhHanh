@@ -9,6 +9,12 @@ export const AuthModal = ({ isOpen, onClose, initialRegister = false }) => {
   const [honeypot, setHoneypot] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const rememberMeRef = useRef(true);
+
+  useEffect(() => {
+    rememberMeRef.current = rememberMe;
+  }, [rememberMe]);
 
   const { isAuthenticated, loginEmail, registerEmail, loginGoogle, googleClientId } = useAuth();
   const googleBtnRef = useRef(null);
@@ -38,7 +44,7 @@ export const AuthModal = ({ isOpen, onClose, initialRegister = false }) => {
             if (res && res.credential) {
               try {
                 setIsLoading(true);
-                await loginGoogle(res.credential);
+                await loginGoogle(res.credential, rememberMeRef.current);
                 onClose();
               } catch (e) {
                 setError(e.message || "Đăng nhập Google thất bại");
@@ -71,9 +77,9 @@ export const AuthModal = ({ isOpen, onClose, initialRegister = false }) => {
 
     try {
       if (isRegister) {
-        await registerEmail(email.trim(), password, name.trim(), honeypot);
+        await registerEmail(email.trim(), password, name.trim(), honeypot, rememberMe);
       } else {
-        await loginEmail(email.trim(), password);
+        await loginEmail(email.trim(), password, rememberMe);
       }
       onClose();
     } catch (err) {
@@ -178,11 +184,24 @@ export const AuthModal = ({ isOpen, onClose, initialRegister = false }) => {
             autoComplete="off"
           />
 
+          {/* Ghi nhớ đăng nhập 1 tháng */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", margin: "2px 0 6px 0" }}>
+            <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "0.85rem", color: "#475569", userSelect: "none" }}>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: "#2563eb" }}
+              />
+              <span>Ghi nhớ đăng nhập <strong>(1 tháng)</strong></span>
+            </label>
+          </div>
+
           <button
             type="submit"
             disabled={isLoading}
             className="btn btn-primary"
-            style={{ padding: "10px", fontWeight: 700, marginTop: "8px" }}
+            style={{ padding: "10px", fontWeight: 700, marginTop: "4px" }}
           >
             {isLoading ? "Đang xử lý..." : isRegister ? "Tạo Tài Khoản" : "Đăng Nhập"}
           </button>

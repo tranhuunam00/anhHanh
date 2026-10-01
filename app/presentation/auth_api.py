@@ -32,15 +32,18 @@ class RegisterRequest(BaseModel):
     password: str = Field(..., min_length=6, description="Mật khẩu tối thiểu 6 ký tự")
     name: Optional[str] = ''
     b_trap: Optional[str] = None  # Honeypot field
+    remember_me: Optional[bool] = True
 
 
 class LoginRequest(BaseModel):
     email: str = Field(..., min_length=3, max_length=255, description="Địa chỉ email")
     password: str = Field(..., description="Mật khẩu")
+    remember_me: Optional[bool] = True
 
 
 class GoogleAuthRequest(BaseModel):
     credential: str
+    remember_me: Optional[bool] = True
 
 
 @router.post('/register')
@@ -57,7 +60,10 @@ async def register(
         name=payload.name or '',
         honeypot=payload.b_trap
     )
-    token = create_access_token({'sub': user.id, 'email': user.email, 'role': user.role, 'name': user.name})
+    token = create_access_token(
+        {'sub': user.id, 'email': user.email, 'role': user.role, 'name': user.name},
+        remember_me=payload.remember_me if payload.remember_me is not None else True
+    )
     return {
         'message': 'Đăng ký tài khoản thành công',
         'access_token': token,
@@ -78,7 +84,10 @@ async def login(
         email=payload.email,
         password=payload.password
     )
-    token = create_access_token({'sub': user.id, 'email': user.email, 'role': user.role, 'name': user.name})
+    token = create_access_token(
+        {'sub': user.id, 'email': user.email, 'role': user.role, 'name': user.name},
+        remember_me=payload.remember_me if payload.remember_me is not None else True
+    )
     return {
         'message': 'Đăng nhập thành công',
         'access_token': token,
@@ -97,7 +106,10 @@ async def google_auth(
         db=db,
         credential=payload.credential
     )
-    token = create_access_token({'sub': user.id, 'email': user.email, 'role': user.role, 'name': user.name})
+    token = create_access_token(
+        {'sub': user.id, 'email': user.email, 'role': user.role, 'name': user.name},
+        remember_me=payload.remember_me if payload.remember_me is not None else True
+    )
     return {
         'message': 'Đăng nhập Google thành công',
         'access_token': token,

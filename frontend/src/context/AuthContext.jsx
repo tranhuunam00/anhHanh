@@ -4,6 +4,7 @@ import {
   fetchCurrentUser,
   fetchStreak,
   fetchVocabList,
+  isTokenExpired,
   loginWithEmail as apiLoginWithEmail,
   registerWithEmail as apiRegisterWithEmail,
   loginWithGoogle as apiLoginWithGoogle,
@@ -12,7 +13,18 @@ import {
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem("shotlang_jwt_token") || null);
+  const [token, setToken] = useState(() => {
+    const saved = localStorage.getItem("shotlang_jwt_token");
+    if (saved && !isTokenExpired(saved)) {
+      return saved;
+    }
+    if (saved && isTokenExpired(saved)) {
+      localStorage.removeItem("shotlang_jwt_token");
+      localStorage.removeItem("shotlang_user");
+    }
+    return null;
+  });
+
   const [user, setUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("shotlang_user") || "null");
@@ -62,17 +74,25 @@ export const AuthProvider = ({ children }) => {
   // Verify / Refresh current user profile
   useEffect(() => {
     if (token) {
-      fetchCurrentUser(token).then((userData) => {
-        if (userData) {
-          setUser(userData);
-          localStorage.setItem("shotlang_user", JSON.stringify(userData));
-        } else {
-          // Token expired or invalid
+      if (isTokenExpired(token)) {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem("shotlang_jwt_token");
+        localStorage.removeItem("shotlang_user");
+        return;
+      }
+      fetchCurrentUser(token).then((result) => {
+        if (result?.ok && result.user) {
+          setUser(result.user);
+          localStorage.setItem("shotlang_user", JSON.stringify(result.user));
+        } else if (result?.error === "unauthorized") {
+          // Token expired or invalid on server
           setToken(null);
           setUser(null);
           localStorage.removeItem("shotlang_jwt_token");
           localStorage.removeItem("shotlang_user");
         }
+        // If network error or server error, retain token & local user session
       });
     }
   }, [token]);
@@ -122,8 +142,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Login Email
-  const loginEmail = async (email, password) => {
-    const data = await apiLoginWithEmail(email, password);
+  const loginEmail = async (email, password, rememberMe = true) => {
+    const data = await apiLoginWithEmail(email, password, rememberMe);
     setSession(data.access_token, data.user);
     showToast(`Xin chào ${data.user.name || data.user.email}! Đăng nhập thành công.`, "success");
     refreshStreak();
@@ -132,8 +152,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register Email
-  const registerEmail = async (email, password, name, honeypot) => {
-    const data = await apiRegisterWithEmail(email, password, name, honeypot);
+  const registerEmail = async (email, password, name, honeypot, rememberMe = true) => {
+    const data = await apiRegisterWithEmail(email, password, name, honeypot, rememberMe);
     setSession(data.access_token, data.user);
     showToast(`Chào mừng ${data.user.name || data.user.email}! Đã tạo tài khoản thành công.`, "success");
     refreshStreak();
@@ -142,8 +162,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Login Google
-  const loginGoogle = async (credential) => {
-    const data = await apiLoginWithGoogle(credential);
+  const loginGoogle = async (credential, rememberMe = true) => {
+    const data = await apiLoginWithGoogle(credential, rememberMe);
     setSession(data.access_token, data.user);
     showToast(`Xin chào ${data.user.name}! Đăng nhập Google thành công.`, "success");
     refreshStreak();

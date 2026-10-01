@@ -33,7 +33,9 @@ if not JWT_SECRET:
     logger.warning("JWT_SECRET environment variable not configured. Using temporary dev fallback secret.")
 
 JWT_ALGORITHM = 'HS256'
-JWT_EXPIRATION_HOURS = int(os.getenv('JWT_EXPIRATION_HOURS', '12'))
+# Mặc định thời hạn token lưu trữ là 30 ngày (720 giờ = 1 tháng)
+JWT_EXPIRATION_DAYS = int(os.getenv('JWT_EXPIRATION_DAYS', '30'))
+JWT_EXPIRATION_HOURS = int(os.getenv('JWT_EXPIRATION_HOURS', str(JWT_EXPIRATION_DAYS * 24)))
 
 
 def get_google_client_id() -> str:
@@ -45,14 +47,16 @@ GOOGLE_CLIENT_ID = get_google_client_id()
 security_bearer = HTTPBearer(auto_error=False)
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None, remember_me: bool = True) -> str:
     to_encode = data.copy()
     now = datetime.now(timezone.utc)
     if expires_delta:
         expire = now + expires_delta
-    else:
+    elif remember_me:
         expire = now + timedelta(hours=JWT_EXPIRATION_HOURS)
-    to_encode.update({'exp': expire, 'iat': now})
+    else:
+        expire = now + timedelta(hours=24)
+    to_encode.update({'exp': expire, 'iat': now, 'remember_me': remember_me})
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
