@@ -16,7 +16,7 @@ from sqlalchemy.orm import selectinload
 
 from app.infrastructure.database.connection import get_db
 from app.infrastructure.database.models import User, Feedback, FeedbackMessage
-from app.application.auth_service import get_current_user
+from app.application.auth_service import get_current_user, get_current_user_optional
 from app.presentation.security_middleware import limiter
 from app.infrastructure.minio_service import upload_feedback_image, get_feedback_image
 
@@ -33,6 +33,8 @@ class CreateFeedbackRequest(BaseModel):
     category: Optional[str] = Field(None, max_length=50, description="Alias cho feedback_type")
     rating: Optional[int] = Field(None, ge=1, le=5, description="Đánh giá 1 - 5 sao")
     image_url: Optional[str] = Field(None, max_length=1000, description="URL hoặc đường dẫn ảnh đính kèm từ MinIO")
+    sender_name: Optional[str] = Field("Ẩn danh", max_length=100, description="Tên người gửi (mặc định Ẩn danh)")
+    sender_email: Optional[str] = Field(None, max_length=255, description="Email người gửi (tùy chọn)")
 
 
 class ReplyFeedbackRequest(BaseModel):
@@ -52,9 +54,9 @@ def sanitize_text(text: str) -> str:
 async def upload_image_for_feedback(
     request: Request,
     file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    """Upload screenshot/image for feedback to MinIO storage."""
+    """Upload screenshot/image for feedback to MinIO storage (available to both users and guests)."""
     try:
         content_type = file.content_type or "image/jpeg"
         file_bytes = await file.read()
@@ -114,10 +116,10 @@ async def get_image(filename: str):
 async def submit_feedback(
     request: Request,
     payload: CreateFeedbackRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ):
-    """Submit user feedback with strict authentication, rate-limiting, and MinIO image attachment."""
+    """Submit user or guest feedback with MinIO image attachment. Defaults name to 'Ẩn danh'."""
     cleaned_content = sanitize_text(payload.content or "")
     if not payload.image_url and len(cleaned_content) < 2:
         raise HTTPException(
@@ -132,29 +134,42 @@ async def submit_feedback(
     if fb_type not in VALID_FEEDBACK_TYPES:
         fb_type = "GENERAL"
 
-    # Daily anti-abuse check: Max 30 submissions per user per 24 hours
-    try:
-        since_24h = datetime.now(timezone.utc) - timedelta(hours=24)
-        count_res = await db.execute(
-            select(func.count(Feedback.id)).where(
-                Feedback.user_id == current_user.id,
-                Feedback.created_at >= since_24h,
+    # Daily anti-abuse check: Max 30 submissions per logged-in user per 24 hours
+    if current_user:
+        try:
+            since_24h = datetime.now(timezone.utc) - timedelta(hours=24)
+            count_res = await db.execute(
+                select(func.count(Feedback.id)).where(
+                    Feedback.user_id == current_user.id,
+                    Feedback.created_at >= since_24h,
+                )
             )
-        )
-        daily_count = count_res.scalar() or 0
-        if daily_count >= 30:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Bạn đã gửi tối đa phản hồi cho phép trong 24 giờ. Cảm ơn bạn đã đóng góp!"
-            )
-    except HTTPException:
-        raise
-    except Exception as count_err:
-        logger.warning(f"Could not verify 24h feedback limit (proceeding): {count_err}")
+            daily_count = count_res.scalar() or 0
+            if daily_count >= 30:
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Bạn đã gửi tối đa phản hồi cho phép trong 24 giờ. Cảm ơn bạn đã đóng góp!"
+                )
+        except HTTPException:
+            raise
+        except Exception as count_err:
+            logger.warning(f"Could not verify 24h feedback limit (proceeding): {count_err}")
+
+    # Determine sender details
+    if current_user:
+        user_id = current_user.id
+        sender_name = current_user.name or (payload.sender_name or '').strip() or 'Ẩn danh'
+        sender_email = current_user.email
+    else:
+        user_id = None
+        sender_name = (payload.sender_name or '').strip() or 'Ẩn danh'
+        sender_email = (payload.sender_email or '').strip() or None
 
     try:
         new_feedback = Feedback(
-            user_id=current_user.id,
+            user_id=user_id,
+            sender_name=sender_name,
+            sender_email=sender_email,
             feedback_type=fb_type,
             rating=payload.rating,
             content=cleaned_content,
@@ -165,11 +180,11 @@ async def submit_feedback(
         await db.commit()
         await db.refresh(new_feedback)
 
-        logger.info(f"User {current_user.email} submitted feedback [{fb_type}]: {new_feedback.id}")
+        logger.info(f"Feedback [{fb_type}] submitted by {sender_name} ({sender_email or 'guest'}): {new_feedback.id}")
 
         fb_dict = new_feedback.to_dict()
-        fb_dict["user_name"] = current_user.name
-        fb_dict["user_email"] = current_user.email
+        fb_dict["user_name"] = sender_name
+        fb_dict["user_email"] = sender_email
 
         return {
             "message": "Cảm ơn bạn đã gửi phản hồi! Đội ngũ phát triển sẽ ghi nhận và xử lý sớm nhất.",

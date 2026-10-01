@@ -35,6 +35,8 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
   const [category, setCategory] = useState('SUGGESTION');
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState('');
+  const [senderName, setSenderName] = useState('');
+  const [senderEmail, setSenderEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [myFeedbacks, setMyFeedbacks] = useState([]);
@@ -246,10 +248,6 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!token) {
-      onOpenAuth && onOpenAuth();
-      return;
-    }
 
     const hasImage = !!selectedImageFile;
     if (!hasImage && content.trim().length < 2) {
@@ -275,16 +273,27 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
           rating,
           content: content.trim() || 'Đính kèm ảnh phản hồi / báo lỗi',
           image_url: uploadedImageUrl,
+          sender_name: senderName.trim() || (user ? user.name : 'Ẩn danh'),
+          sender_email: senderEmail.trim() || (user ? user.email : null),
         },
         token
       );
 
-      showToast && showToast('Cảm ơn bạn! Phản hồi đã được gửi thành công.', 'success');
+      showToast && showToast(
+        user ? 'Cảm ơn bạn! Phản hồi đã được gửi thành công.' : 'Cảm ơn bạn! Ý kiến đóng góp ẩn danh đã được gửi đến ban quản trị.',
+        'success'
+      );
       window.dispatchEvent(new CustomEvent('shotlang:feedback-updated'));
       setContent('');
+      setSenderName('');
+      setSenderEmail('');
       handleRemoveImage();
-      setActiveSubTab('history');
-      loadHistory();
+      if (user) {
+        setActiveSubTab('history');
+        loadHistory();
+      } else {
+        onClose();
+      }
     } catch (err) {
       setErrorMsg(err.message || 'Lỗi khi gửi phản hồi. Vui lòng thử lại sau.');
     } finally {
@@ -376,29 +385,7 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
           </div>
 
           <div className="feedback-modal-body">
-            {!user ? (
-              <div style={{ textAlign: 'center', padding: '30px 10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
-                  <div style={{ width: 50, height: 50, borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
-                    <Lock size={26} />
-                  </div>
-                </div>
-                <h4 style={{ margin: '0 0 8px', fontSize: '1.1rem' }}>Yêu cầu đăng nhập</h4>
-                <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>
-                  Để đảm bảo chất lượng phản hồi và bảo vệ hệ thống khỏi spam, vui lòng đăng nhập trước khi gửi góp ý.
-                </p>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => {
-                    onClose();
-                    onOpenAuth && onOpenAuth();
-                  }}
-                  style={{ padding: '8px 20px' }}
-                >
-                  Đăng nhập / Đăng ký ngay
-                </button>
-              </div>
-            ) : activeSubTab === 'new' ? (
+            {activeSubTab === 'new' ? (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {user?.role === 'ADMIN' && (
                   <div className="admin-feedback-banner-hint">
@@ -416,6 +403,91 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
                     </button>
                   </div>
                 )}
+
+                {/* Banner Trạng thái đăng nhập / Ẩn danh */}
+                {!user ? (
+                  <div style={{
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    background: 'rgba(59, 130, 246, 0.08)',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                    fontSize: '0.84rem',
+                    color: '#2563eb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    flexWrap: 'wrap'
+                  }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <Lightbulb size={16} />
+                      <span>Bạn đang gửi phản hồi với danh xưng <strong>Ẩn danh</strong>.</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenAuth && onOpenAuth();
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#1d4ed8',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        fontSize: '0.82rem',
+                        padding: 0
+                      }}
+                    >
+                      Đăng nhập để theo dõi lịch sử ➔
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    background: 'var(--bg-secondary, #f8fafc)',
+                    border: '1px solid var(--border-color, #e2e8f0)',
+                    fontSize: '0.82rem',
+                    color: '#64748b'
+                  }}>
+                    Đang gửi với tài khoản: <strong style={{ color: 'var(--text-primary, #0f172a)' }}>{user.name || user.email}</strong> {user.email ? `(${user.email})` : ''}
+                  </div>
+                )}
+
+                {/* Tên và Email tùy chọn cho khách chưa đăng nhập */}
+                {!user && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '4px', color: '#64748b' }}>
+                        Tên / Biệt danh (Tùy chọn):
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Mặc định: Ẩn danh"
+                        value={senderName}
+                        onChange={(e) => setSenderName(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '4px', color: '#64748b' }}>
+                        Email liên hệ (Tùy chọn):
+                      </label>
+                      <input
+                        type="email"
+                        className="form-control"
+                        placeholder="email@example.com (để nhận phản hồi)"
+                        value={senderEmail}
+                        onChange={(e) => setSenderEmail(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {errorMsg && (
                   <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#dc2626', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6 }}>
                     <AlertCircle size={16} />

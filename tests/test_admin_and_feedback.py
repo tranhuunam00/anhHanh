@@ -58,14 +58,18 @@ def create_regular_user():
     return login_res.json()["access_token"], email
 
 
-def test_feedback_unauthorized():
-    """Guest users cannot submit feedback without authentication."""
+def test_guest_feedback_submission():
+    """Guest users can submit feedback without authentication, defaulting to 'Ẩn danh'."""
     res = client.post("/api/feedback", json={
         "category": "SUGGESTION",
-        "title": "Unauthenticated feedback",
-        "content": "This should fail because no token is provided."
+        "title": "Guest feedback",
+        "content": "Góp ý từ người dùng ẩn danh chưa đăng nhập."
     })
-    assert res.status_code == 401
+    assert res.status_code == 201
+    data = res.json()
+    assert "feedback" in data
+    assert data["feedback"]["user_name"] == "Ẩn danh"
+    assert data["feedback"]["status"] == "PENDING"
 
 
 def test_feedback_submit_and_view_my():

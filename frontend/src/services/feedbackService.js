@@ -5,19 +5,18 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-export async function uploadFeedbackImage(file, token) {
-  if (!token) {
-    throw new Error('Vui lòng đăng nhập để tải ảnh đính kèm.');
-  }
-
+export async function uploadFeedbackImage(file, token = null) {
   const formData = new FormData();
   formData.append('file', file);
 
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/feedback/upload`, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    },
+    headers,
     body: formData
   });
 
@@ -29,22 +28,24 @@ export async function uploadFeedbackImage(file, token) {
   return data.image_url;
 }
 
-export async function submitFeedback(feedbackData, token) {
-  if (!token) {
-    throw new Error('Vui lòng đăng nhập để gửi góp ý hoặc báo lỗi.');
+export async function submitFeedback(feedbackData, token = null) {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(`${API_BASE_URL}/api/feedback`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify({
       content: feedbackData.content,
       feedback_type: feedbackData.feedback_type || feedbackData.category || 'GENERAL',
       rating: feedbackData.rating || null,
-      image_url: feedbackData.image_url || null
+      image_url: feedbackData.image_url || null,
+      sender_name: feedbackData.sender_name || 'Ẩn danh',
+      sender_email: feedbackData.sender_email || null,
     })
   });
 

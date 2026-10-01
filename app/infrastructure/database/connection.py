@@ -78,9 +78,15 @@ async def init_db() -> None:
                     "ALTER TABLE user_vocabulary ADD COLUMN IF NOT EXISTS review_interval_days INTEGER NOT NULL DEFAULT 1;",
                     "ALTER TABLE user_vocabulary ADD COLUMN IF NOT EXISTS mastery_score INTEGER NOT NULL DEFAULT 0;",
                     "ALTER TABLE feedbacks ADD COLUMN IF NOT EXISTS image_url TEXT NULL;",
+                    "ALTER TABLE feedbacks ADD COLUMN IF NOT EXISTS sender_name VARCHAR(100) DEFAULT 'Ẩn danh';",
+                    "ALTER TABLE feedbacks ADD COLUMN IF NOT EXISTS sender_email VARCHAR(255) NULL;",
+                    "ALTER TABLE feedbacks ALTER COLUMN user_id DROP NOT NULL;",
                 ]
                 for sql in pg_sqls:
-                    await conn.execute(text(sql))
+                    try:
+                        await conn.execute(text(sql))
+                    except Exception:
+                        pass
             else:
                 for sql in [
                     "ALTER TABLE lessons ADD COLUMN youtube_url TEXT NULL;",
@@ -90,6 +96,8 @@ async def init_db() -> None:
                     "ALTER TABLE user_vocabulary ADD COLUMN review_interval_days INTEGER NOT NULL DEFAULT 1;",
                     "ALTER TABLE user_vocabulary ADD COLUMN mastery_score INTEGER NOT NULL DEFAULT 0;",
                     "ALTER TABLE feedbacks ADD COLUMN image_url TEXT NULL;",
+                    "ALTER TABLE feedbacks ADD COLUMN sender_name VARCHAR(100) DEFAULT 'Ẩn danh';",
+                    "ALTER TABLE feedbacks ADD COLUMN sender_email VARCHAR(255) NULL;",
                 ]:
                     try:
                         await conn.execute(text(sql))

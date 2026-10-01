@@ -195,7 +195,9 @@ class Feedback(Base):
     __tablename__ = 'feedbacks'
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    user_id = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=True, index=True)
+    sender_name = Column(String(100), default='Ẩn danh', nullable=True)
+    sender_email = Column(String(255), nullable=True)
     feedback_type = Column(String(50), default='GENERAL', nullable=False)
     rating = Column(Integer, nullable=True)
     content = Column(Text, nullable=False)
@@ -207,16 +209,16 @@ class Feedback(Base):
     messages = relationship('FeedbackMessage', back_populates='feedback', cascade='all, delete-orphan', order_by='FeedbackMessage.created_at.asc()')
 
     def to_dict(self):
-        user_name = None
-        user_email = None
+        user_name = self.sender_name or 'Ẩn danh'
+        user_email = self.sender_email or ''
         user_avatar = None
         messages_list = []
         unread_replies = 0
         try:
             ins = inspect(self)
             if "user" in ins.dict and self.user is not None:
-                user_name = self.user.name
-                user_email = self.user.email
+                user_name = self.user.name or user_name
+                user_email = self.user.email or user_email
                 user_avatar = self.user.avatar_url
             if "messages" in ins.dict and self.messages is not None:
                 messages_list = [m.to_dict() for m in self.messages]
@@ -226,10 +228,10 @@ class Feedback(Base):
 
         user_obj = {
             'id': self.user_id,
-            'name': user_name or 'Học viên',
+            'name': user_name or 'Ẩn danh',
             'email': user_email or '',
             'avatar_url': user_avatar,
-        } if (user_name or user_email or self.user_id) else None
+        }
 
         return {
             'id': self.id,
