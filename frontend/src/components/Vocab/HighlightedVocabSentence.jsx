@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { WordLookupPopover } from "./WordLookupPopover";
 
-export const HighlightedVocabSentence = ({
+export const HighlightedVocabSentence = React.memo(({
   text,
   className = "",
   contextSentence = "",
@@ -176,4 +176,4 @@ export const HighlightedVocabSentence = ({
       )}
     </>
   );
-};
+});

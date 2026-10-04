@@ -19,7 +19,7 @@ import {
   BookOpen,
   Trophy,
 } from "lucide-react";
-import { evaluateMasked } from "../../utils/diffCalculator";
+import { evaluateMasked, getNextLetterHint, getNextWordHint } from "../../utils/diffCalculator";
 import { analyzeSentencePhonology } from "../../utils/phonologyEngine";
 import { translateText } from "../../services/api";
 import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence";
@@ -143,15 +143,30 @@ export const DictationStudio = React.memo(({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const handleTriggerHintLetter = () => {
+    if (!targetText) return;
+    const nextVal = getNextLetterHint(targetText, localInput, strictPunctuation);
+    setLocalInput(nextVal);
+    if (onInputChange) {
+      onInputChange(nextVal);
+    }
+  };
+
+  const handleTriggerHintWord = () => {
+    if (!targetText) return;
+    const nextVal = getNextWordHint(targetText, localInput);
+    setLocalInput(nextVal);
+    if (onInputChange) {
+      onInputChange(nextVal);
+    }
+  };
+
   const handleInputChange = (e) => {
     // Triệt tiêu nhiều dấu cách liên tiếp (2 space trở lên) ngay khi gõ
     const cleanVal = e.target.value.replace(/ {2,}/g, " ");
     setLocalInput(cleanVal);
     if (onInputChange) {
       onInputChange(cleanVal);
-    }
-    if (setUserInput) {
-      // Giữ tương thích nếu có component nào đọc setUserInput
     }
   };
 
@@ -162,10 +177,39 @@ export const DictationStudio = React.memo(({
       if (onCheck) onCheck(localInput);
       return;
     }
+
+    // Tab -> Hint 1 Word
+    if (e.key === "Tab" || e.code === "Tab") {
+      e.preventDefault();
+      e.stopPropagation();
+      handleTriggerHintWord();
+      return;
+    }
+
+    // Backquote / Tilde (` or ~) -> Hint 1 Letter
     if (e.code === "Backquote" || e.key === "`" || e.key === "~") {
       e.preventDefault();
       e.stopPropagation();
-      if (onHintLetter) onHintLetter();
+      handleTriggerHintLetter();
+      return;
+    }
+
+    // Ctrl+H or Alt+H -> Hint 1 Letter
+    if (((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "h") || (e.altKey && e.key.toLowerCase() === "h")) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleTriggerHintLetter();
+      return;
+    }
+
+    // Alt+W or Ctrl+Shift+H -> Hint 1 Word
+    if (
+      ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "h") ||
+      (e.altKey && e.key.toLowerCase() === "w")
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleTriggerHintWord();
       return;
     }
   };
@@ -308,12 +352,12 @@ export const DictationStudio = React.memo(({
           <span>Nghe câu</span>
         </button>
 
-        <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (~ / ` / Enter 2 lần / Ctrl+H / Alt+H)" onClick={onHintLetter}>
+        <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (~ / ` / Enter 2 lần / Ctrl+H / Alt+H)" onClick={handleTriggerHintLetter}>
           <KeyRound size={15} strokeWidth={2} />
           <span>Gợi ý chữ</span>
         </button>
 
-        <button className="btn btn-secondary btn-with-icon" title="Mở 1 từ tiếp theo (Tab / Alt+W / Ctrl+Shift+H)" onClick={onHintWord}>
+        <button className="btn btn-secondary btn-with-icon" title="Mở 1 từ tiếp theo (Tab / Alt+W / Ctrl+Shift+H)" onClick={handleTriggerHintWord}>
           <Lightbulb size={15} strokeWidth={2} />
           <span>Gợi ý từ</span>
         </button>

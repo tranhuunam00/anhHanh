@@ -936,14 +936,17 @@ export default function App() {
 
         {/* TAB 2: Transcript & Full Audio */}
         <div style={{ display: activeTab === "tab-transcript" ? "block" : "none" }}>
-          <TranscriptPage
-            lesson={currentLesson}
-            playerController={playerController}
-            onGoToChallenge={(pos) => {
-              setActiveTab("tab-dictation");
-              goToChallenge(pos - 1);
-            }}
-          />
+          {activeTab === "tab-transcript" && (
+            <TranscriptPage
+              lesson={currentLesson}
+              playerController={playerController}
+              isActive={activeTab === "tab-transcript"}
+              onGoToChallenge={(pos) => {
+                setActiveTab("tab-dictation");
+                goToChallenge(pos - 1);
+              }}
+            />
+          )}
         </div>
 
         {/* TAB 3: Smart Vocabulary Notebook */}
