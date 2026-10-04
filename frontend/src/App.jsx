@@ -36,7 +36,7 @@ import { SpeechRecognitionService } from "./services/speechRecognition";
 
 import { evaluateMasked, getNextLetterHint, getNextWordHint } from "./utils/diffCalculator";
 import { loadLessonProgress, saveLessonProgress, getStorageItem, setStorageItem } from "./utils/storage";
-import { extractYouTubeId, toCanonicalYouTubeUrl } from "./utils/textNormalizer";
+import { extractYouTubeId, toCanonicalYouTubeUrl, cleanYouTubeUrl } from "./utils/textNormalizer";
 import { SPEECH_LANG_MAP } from "./constants/languages";
 
 export default function App() {
@@ -281,24 +281,25 @@ export default function App() {
     if (!urlOrId || isLoading) return;
     setIsLoading(true);
 
+    const cleanUrl = cleanYouTubeUrl(urlOrId);
     const sLang = reqSourceLang !== undefined ? reqSourceLang : sourceLang;
     const tLang = reqTargetLang !== undefined ? reqTargetLang : targetLang;
 
     try {
       // Async language detection check
-      fetchVideoLanguages(urlOrId).then((langData) => {
+      fetchVideoLanguages(cleanUrl).then((langData) => {
         if (langData && langData.detected_source_lang) {
           setAutoDetectedLang(langData.detected_source_lang);
         }
       });
 
-      const preview = await fetchLessonPreview(urlOrId, sLang, tLang, token);
+      const preview = await fetchLessonPreview(cleanUrl, sLang, tLang, token);
       setPreviewData(preview);
       setIsPreviewOpen(true);
     } catch (e) {
       // If preview fails, fall back to direct load
       console.warn("Preview failed, falling back to direct load:", e);
-      await executeLoadLesson(urlOrId, sLang, tLang, 0);
+      await executeLoadLesson(cleanUrl, sLang, tLang, 0);
     } finally {
       setIsLoading(false);
     }
@@ -316,12 +317,13 @@ export default function App() {
     setIsLoading(true);
     setIsEmbedRestricted(false);
 
+    const cleanUrl = cleanYouTubeUrl(urlOrId);
     const sLang = reqSourceLang !== undefined ? reqSourceLang : sourceLang;
     const tLang = reqTargetLang !== undefined ? reqTargetLang : targetLang;
 
     try {
       const lessonData = await fetchLesson({
-        urlOrId,
+        urlOrId: cleanUrl,
         sourceLang: sLang,
         targetLang: tLang,
       });

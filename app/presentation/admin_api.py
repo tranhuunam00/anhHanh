@@ -64,7 +64,15 @@ async def get_admin_overview(
     feedbacks_resolved = (
         await db.execute(select(func.count(Feedback.id)).where(Feedback.status == "RESOLVED"))
     ).scalar() or 0
-    feedbacks_active = feedbacks_pending + feedbacks_reviewed
+    feedbacks_unread_messages = (
+        await db.execute(
+            select(func.count(FeedbackMessage.id)).where(
+                FeedbackMessage.sender_role == "USER",
+                FeedbackMessage.is_read == False,
+            )
+        )
+    ).scalar() or 0
+    feedbacks_active = feedbacks_pending + feedbacks_reviewed + feedbacks_unread_messages
 
     # 4. Total vocabulary saved
     vocab_total = (await db.execute(select(func.count(UserVocabulary.id)))).scalar() or 0
@@ -79,6 +87,7 @@ async def get_admin_overview(
         "feedbacks_reviewed": feedbacks_reviewed,
         "feedbacks_active": feedbacks_active,
         "feedbacks_resolved": feedbacks_resolved,
+        "feedbacks_unread_messages": feedbacks_unread_messages,
         "vocab_total": vocab_total,
     }
 
@@ -88,7 +97,7 @@ async def get_admin_feedback_count(
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    """Retrieve count of new (PENDING) and in-progress (REVIEWED/IN_PROGRESS) feedbacks for admin notification badge."""
+    """Retrieve count of new (PENDING), in-progress, and unread replies from users for admin notification badge."""
     pending_count = (
         await db.execute(select(func.count(Feedback.id)).where(Feedback.status == "PENDING"))
     ).scalar() or 0
@@ -97,10 +106,19 @@ async def get_admin_feedback_count(
             select(func.count(Feedback.id)).where(Feedback.status.in_(["REVIEWED", "IN_PROGRESS"]))
         )
     ).scalar() or 0
+    unread_messages_count = (
+        await db.execute(
+            select(func.count(FeedbackMessage.id)).where(
+                FeedbackMessage.sender_role == "USER",
+                FeedbackMessage.is_read == False,
+            )
+        )
+    ).scalar() or 0
     return {
         "pending": pending_count,
         "in_progress": in_progress_count,
-        "total_active": pending_count + in_progress_count,
+        "unread_messages": unread_messages_count,
+        "total_active": pending_count + in_progress_count + unread_messages_count,
     }
 
 

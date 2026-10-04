@@ -331,6 +331,9 @@ async def reply_to_feedback(
     # If Admin replies to a PENDING feedback, automatically update status to REVIEWED
     if is_admin and fb.status == "PENDING":
         fb.status = "REVIEWED"
+    # If User replies to a RESOLVED feedback, reopen to IN_PROGRESS so Admin knows it needs further attention
+    elif not is_admin and fb.status in ["RESOLVED", "CLOSED"]:
+        fb.status = "IN_PROGRESS"
 
     new_msg = FeedbackMessage(
         feedback_id=fb.id,

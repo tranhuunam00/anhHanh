@@ -79,16 +79,23 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
     }
   }, [token, isAdmin, searchQuery, showToast]);
 
-  const loadFeedbacks = useCallback(async () => {
+  const loadFeedbacks = useCallback(async (silent = false) => {
     if (!token || !isAdmin) return;
     try {
-      setIsLoading(true);
+      if (!silent) setIsLoading(true);
       const data = await fetchAdminFeedbacks(feedbackFilter, 50, 0, token);
-      setFeedbacks(data.feedbacks || []);
+      const list = data.feedbacks || [];
+      // Sort feedbacks: items with unread messages from users first
+      list.sort((a, b) => {
+        if (a.has_unread_messages && !b.has_unread_messages) return -1;
+        if (!a.has_unread_messages && b.has_unread_messages) return 1;
+        return 0;
+      });
+      setFeedbacks(list);
     } catch (err) {
-      showToast && showToast(err.message, 'error');
+      if (!silent) showToast && showToast(err.message, 'error');
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   }, [token, isAdmin, feedbackFilter, showToast]);
 
@@ -97,6 +104,41 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
     if (activeTab === 'users') loadUsers();
     if (activeTab === 'feedbacks') loadFeedbacks();
   }, [activeTab, loadOverview, loadUsers, loadFeedbacks]);
+
+  // Real-time synchronization for AdminPortal
+  useEffect(() => {
+    const handleFeedbackUpdated = () => {
+      if (activeTab === 'feedbacks') loadFeedbacks(true);
+      if (activeTab === 'overview') loadOverview();
+    };
+    window.addEventListener('shotlang:feedback-updated', handleFeedbackUpdated);
+    return () => window.removeEventListener('shotlang:feedback-updated', handleFeedbackUpdated);
+  }, [activeTab, loadFeedbacks, loadOverview]);
+
+  // Polling feedbacks tab in background every 8 seconds
+  useEffect(() => {
+    if (!token || !isAdmin || activeTab !== 'feedbacks' || chatFeedback) return;
+    const interval = setInterval(() => {
+      loadFeedbacks(true);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [token, isAdmin, activeTab, chatFeedback, loadFeedbacks]);
+
+  // Polling open conversation chat in real-time every 4 seconds
+  useEffect(() => {
+    if (!token || !isAdmin || !chatFeedback) return;
+    const interval = setInterval(async () => {
+      try {
+        const data = await fetchFeedbackMessages(chatFeedback.id, token);
+        if (data && data.messages) {
+          setChatMessages(data.messages);
+        }
+      } catch (e) {
+        // silent error during background poll
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [token, isAdmin, chatFeedback]);
 
   // Handle status update
   const handleUpdateStatus = async (fbId, newStatus) => {
@@ -145,12 +187,13 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
     setIsLoadingChat(true);
     setChatMessages([]);
     try {
+      const data = await fetchFeedbackMessages(fb.id, token);
       const msgs = data.messages || [];
       setChatMessages(msgs);
       // Update messages_count and clear unread state
       setFeedbacks((prev) =>
         prev.map((item) =>
-          item.id === fb.id ? { ...item, messages_count: msgs.length, has_unread_messages: false } : item
+          item.id === fb.id ? { ...item, messages_count: msgs.length, has_unread_messages: false, unread_user_messages: 0 } : item
         )
       );
       // Trigger update for header badge
@@ -346,6 +389,15 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
             onClick={() => setActiveTab('feedbacks')}
           >
             📬 Hòm thư góp ý
+            {overview?.feedbacks_unread_messages > 0 ? (
+              <span className="badge" style={{ marginLeft: 6, background: '#ef4444', color: '#fff', fontSize: '0.72rem', padding: '2px 7px', borderRadius: 999 }}>
+                💬 {overview.feedbacks_unread_messages}
+              </span>
+            ) : overview?.feedbacks_pending > 0 ? (
+              <span className="badge" style={{ marginLeft: 6, background: '#f59e0b', color: '#fff', fontSize: '0.72rem', padding: '2px 7px', borderRadius: 999 }}>
+                {overview.feedbacks_pending}
+              </span>
+            ) : null}
           </button>
         </div>
       </div>
@@ -631,7 +683,11 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
           ) : (
             <div>
               {feedbacks.map((fb) => (
-                <div key={fb.id} className="feedback-admin-card">
+                <div
+                  key={fb.id}
+                  className={`feedback-admin-card ${fb.has_unread_messages ? 'has-unread-card' : ''}`}
+                  style={fb.has_unread_messages ? { borderColor: '#ef4444', borderWidth: 2, background: 'rgba(239, 68, 68, 0.02)' } : {}}
+                >
                   <div className="feedback-admin-top">
                     <div>
                       <div className="feedback-sender-info">
@@ -644,6 +700,11 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                           </span>
                         )}
                         <span className="badge badge-admin">{getCategoryLabel(fb.feedback_type)}</span>
+                        {fb.has_unread_messages && (
+                          <span className="badge" style={{ background: '#ef4444', color: '#ffffff', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            💬 Tin nhắn mới từ học viên {fb.unread_user_messages ? `(${fb.unread_user_messages})` : ''}
+                          </span>
+                        )}
                       </div>
                       <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '3px' }}>
                         Đánh giá: {fb.rating ? `${'★'.repeat(fb.rating)} (${fb.rating}/5)` : 'Không đánh giá'} • Gửi lúc: {fb.created_at ? new Date(fb.created_at).toLocaleString('vi-VN') : ''}

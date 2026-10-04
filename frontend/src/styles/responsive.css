@@ -89,51 +89,67 @@
 @media (max-width: 768px) {
   /* Header */
   .app-header {
-    position: relative;
-    top: auto;
+    position: sticky;
+    top: 0;
     padding: 8px 12px;
+    z-index: 100;
   }
   .header-inner {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .brand-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
+    gap: 8px;
   }
   .brand {
+    order: 1;
     font-size: 1.1rem;
+    flex-shrink: 0;
   }
   .brand img {
     width: 26px !important;
     height: 26px !important;
   }
+  .header-actions {
+    order: 2;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .header-actions .btn {
+    padding: 5px 8px !important;
+    font-size: 0.78rem !important;
+  }
 
   /* URL & Language Form */
   .url-input-form {
+    order: 3;
     width: 100%;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .url-input-row {
+    flex: 1 1 100%;
     display: flex;
-    width: 100%;
+    flex-direction: column;
     gap: 6px;
   }
-  .url-input-row input {
-    flex: 1;
+  .url-input-container {
+    width: 100%;
+    flex: 1 1 100%;
     min-width: 0;
+  }
+  .url-input {
+    width: 100% !important;
     font-size: 16px !important; /* Prevents auto-zoom on iOS */
+    padding: 8px 12px 8px 34px !important;
+    border-radius: 8px;
   }
   .lang-selector-group {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 4px;
+    padding: 4px 8px;
   }
   .lang-select-wrapper {
     flex: 1;
@@ -141,8 +157,15 @@
   }
   .header-lang-select {
     width: 100%;
+    max-width: none;
     font-size: 0.8rem;
-    padding: 6px 8px;
+    padding: 4px 6px;
+  }
+  .url-input-form .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 0.85rem;
   }
 
   /* Main Container & Tab Navigation */
@@ -355,8 +378,15 @@
 /* 📱 Small Mobile Devices (max-width: 480px) */
 @media (max-width: 480px) {
   .header-actions {
-    width: 100%;
-    justify-content: flex-end;
+    gap: 4px;
+  }
+  .header-actions .btn {
+    padding: 5px 6px !important;
+  }
+  /* Hide text label on compact header action buttons, retain icon & badges */
+  .btn-feedback > span:not([class*="badge"]),
+  .header-actions .btn-secondary > span:not([class*="badge"]) {
+    display: none;
   }
   .dictation-actions .btn {
     flex: 1 1 100%;
@@ -395,11 +425,51 @@
 
   /* Modals on small phones */
   .modal-card,
+  .feedback-modal-card,
   .feedback-modal-content,
-  .preview-modal-dialog {
+  .preview-card-modal,
+  .preview-card-content,
+  .preview-modal-dialog,
+  .settings-modal,
+  .guide-modal {
     width: 100% !important;
     max-width: 95vw !important;
-    padding: 14px !important;
-    margin: 10px auto;
+    max-height: 94vh !important;
+    margin: 8px auto !important;
+  }
+  .feedback-modal-card {
+    padding: 0 !important;
+  }
+  .feedback-modal-header {
+    padding: 12px 14px !important;
+  }
+  .feedback-modal-body {
+    padding: 12px 14px !important;
+  }
+  .preview-card-body {
+    padding: 14px 16px !important;
+  }
+  .preview-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .preview-btn-start,
+  .preview-btn-cancel {
+    width: 100% !important;
+    justify-content: center;
+  }
+  .preview-meta-row {
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  /* Input fields: prevent iOS Safari auto-zoom */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important;
   }
 }

@@ -19,6 +19,7 @@ import { SOURCE_LANGUAGES, TARGET_LANGUAGES } from "../../constants/languages";
 import { useAuth } from "../../context/AuthContext";
 import { fetchAdminFeedbackCount } from "../../services/adminService";
 import { fetchUnreadFeedbackCount } from "../../services/feedbackService";
+import { cleanYouTubeUrl } from "../../utils/textNormalizer";
 
 export const Header = React.memo(({
   urlInput,
@@ -41,7 +42,7 @@ export const Header = React.memo(({
 
   const { user, token, isAuthenticated, streak, unlearnedWords, logout } = useAuth();
   const isAdmin = user && user.role === "ADMIN";
-  const [adminFeedbackStats, setAdminFeedbackStats] = useState({ pending: 0, in_progress: 0, total_active: 0 });
+  const [adminFeedbackStats, setAdminFeedbackStats] = useState({ pending: 0, in_progress: 0, unread_messages: 0, total_active: 0 });
   const [userUnreadCount, setUserUnreadCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -59,6 +60,7 @@ export const Header = React.memo(({
             setAdminFeedbackStats({
               pending: stats.pending || 0,
               in_progress: stats.in_progress || 0,
+              unread_messages: stats.unread_messages || 0,
               total_active: stats.total_active || 0,
             });
           }
@@ -79,7 +81,7 @@ export const Header = React.memo(({
       loadStats();
     };
     window.addEventListener("shotlang:feedback-updated", handleUpdated);
-    const interval = setInterval(loadStats, 30000);
+    const interval = setInterval(loadStats, 10000);
 
     return () => {
       isMounted = false;
@@ -88,10 +90,37 @@ export const Header = React.memo(({
     };
   }, [isAdmin, token]);
 
+  const handleUrlChange = (value) => {
+    // If user enters or pastes a YouTube URL with list/playlist/tracking parameters
+    if (value && (value.includes("list=") || value.includes("&list") || value.includes("youtube.com") || value.includes("youtu.be"))) {
+      const cleaned = cleanYouTubeUrl(value);
+      if (cleaned && (cleaned.startsWith("http") || cleaned.length === 11)) {
+        setUrlInput(cleaned);
+        return;
+      }
+    }
+    setUrlInput(value);
+  };
+
+  const handlePasteUrl = (e) => {
+    const pasted = e.clipboardData?.getData("text") || "";
+    if (pasted && (pasted.includes("youtube.com") || pasted.includes("youtu.be") || pasted.includes("list="))) {
+      const cleaned = cleanYouTubeUrl(pasted);
+      if (cleaned && (cleaned.startsWith("http") || cleaned.length === 11)) {
+        e.preventDefault();
+        setUrlInput(cleaned);
+      }
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (urlInput && !isLoading) {
-      onLoadLesson(urlInput);
+      const cleaned = cleanYouTubeUrl(urlInput);
+      if (cleaned && cleaned !== urlInput) {
+        setUrlInput(cleaned);
+      }
+      onLoadLesson(cleaned || urlInput);
     }
   };
 
@@ -127,7 +156,8 @@ export const Header = React.memo(({
               className="url-input"
               placeholder="Dán link YouTube (ví dụ: https://www.youtube.com/watch?v=qe9QSCF-d88)..."
               value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
+              onChange={(e) => handleUrlChange(e.target.value)}
+              onPaste={handlePasteUrl}
               disabled={isLoading}
             />
           </div>
@@ -294,10 +324,10 @@ export const Header = React.memo(({
         {/* Feedback Button */}
         <button
           className={`btn btn-secondary btn-icon-text btn-feedback ${isAdmin ? "has-admin-badge" : ""}`}
-          onClick={onOpenFeedback}
+          onClick={isAdmin ? () => (onOpenAdminTab ? onOpenAdminTab() : onOpenFeedback()) : onOpenFeedback}
           title={
             isAdmin
-              ? `Góp ý: ${adminFeedbackStats.total_active} cần xử lý (${adminFeedbackStats.pending} mới, ${adminFeedbackStats.in_progress} đang xử lý)`
+              ? `Góp ý: ${adminFeedbackStats.total_active} cần xử lý (${adminFeedbackStats.pending} mới, ${adminFeedbackStats.unread_messages || 0} tin nhắn mới từ học viên, ${adminFeedbackStats.in_progress} đang xử lý)`
               : userUnreadCount > 0
               ? `Bạn có ${userUnreadCount} phản hồi mới từ Quản trị viên!`
               : "Gửi góp ý & báo lỗi"
@@ -308,10 +338,12 @@ export const Header = React.memo(({
           <span>Góp ý</span>
           {isAdmin ? (
             <span
-              className={`admin-feedback-badge ${adminFeedbackStats.total_active > 0 ? "active-badge" : "zero-badge"}`}
-              title={`${adminFeedbackStats.pending} góp ý mới, ${adminFeedbackStats.in_progress} đang xử lý`}
+              className={`admin-feedback-badge ${(adminFeedbackStats.unread_messages > 0 || adminFeedbackStats.total_active > 0) ? "active-badge" : "zero-badge"}`}
+              title={`${adminFeedbackStats.pending} góp ý mới, ${adminFeedbackStats.unread_messages || 0} tin nhắn mới từ học viên, ${adminFeedbackStats.in_progress} đang xử lý`}
             >
-              {adminFeedbackStats.total_active}
+              {adminFeedbackStats.unread_messages > 0
+                ? `${adminFeedbackStats.total_active} (💬${adminFeedbackStats.unread_messages})`
+                : adminFeedbackStats.total_active}
             </span>
           ) : userUnreadCount > 0 ? (
             <span

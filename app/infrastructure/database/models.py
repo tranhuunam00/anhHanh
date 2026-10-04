@@ -213,7 +213,8 @@ class Feedback(Base):
         user_email = self.sender_email or ''
         user_avatar = None
         messages_list = []
-        unread_replies = 0
+        unread_admin_messages = 0
+        unread_user_messages = 0
         try:
             ins = inspect(self)
             if "user" in ins.dict and self.user is not None:
@@ -222,7 +223,8 @@ class Feedback(Base):
                 user_avatar = self.user.avatar_url
             if "messages" in ins.dict and self.messages is not None:
                 messages_list = [m.to_dict() for m in self.messages]
-                unread_replies = sum(1 for m in self.messages if not m.is_read)
+                unread_admin_messages = sum(1 for m in self.messages if not m.is_read and m.sender_role == 'ADMIN')
+                unread_user_messages = sum(1 for m in self.messages if not m.is_read and m.sender_role == 'USER')
         except Exception:
             pass
 
@@ -245,7 +247,9 @@ class Feedback(Base):
             'image_url': self.image_url,
             'status': self.status,
             'messages_count': len(messages_list),
-            'unread_replies': unread_replies,
+            'unread_replies': unread_admin_messages,
+            'unread_user_messages': unread_user_messages,
+            'has_unread_messages': unread_user_messages > 0,
             'messages': messages_list,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }

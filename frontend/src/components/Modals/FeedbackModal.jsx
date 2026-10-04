@@ -28,6 +28,7 @@ import {
   uploadFeedbackImage,
   fetchFeedbackMessages,
   sendFeedbackReply,
+  fetchUnreadFeedbackCount,
 } from '../../services/feedbackService';
 
 export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpenAdminTab, showToast }) => {
@@ -62,6 +63,19 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
   const replyFileInputRef = useRef(null);
   const threadEndRef = useRef(null);
 
+  // When modal opens, if user has unread replies from Admin, automatically switch to History tab
+  useEffect(() => {
+    if (isOpen && token) {
+      fetchUnreadFeedbackCount(token)
+        .then((count) => {
+          if (count > 0) {
+            setActiveSubTab('history');
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isOpen, token]);
+
   useEffect(() => {
     if (isOpen && token && activeSubTab === 'history') {
       loadHistory();
@@ -71,12 +85,37 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
   useEffect(() => {
     const handleFeedbackUpdated = () => {
       if (token && activeSubTab === 'history') {
-        loadHistory();
+        loadHistory(true);
       }
     };
     window.addEventListener('shotlang:feedback-updated', handleFeedbackUpdated);
     return () => window.removeEventListener('shotlang:feedback-updated', handleFeedbackUpdated);
   }, [token, activeSubTab]);
+
+  // Polling history list in background every 8s so user sees new Admin replies in real time
+  useEffect(() => {
+    if (!isOpen || !token || activeSubTab !== 'history' || selectedThreadFeedback) return;
+    const interval = setInterval(() => {
+      loadHistory(true);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [isOpen, token, activeSubTab, selectedThreadFeedback]);
+
+  // Polling active thread in background every 4s so user gets live chat updates from Admin
+  useEffect(() => {
+    if (!isOpen || !token || !selectedThreadFeedback) return;
+    const interval = setInterval(async () => {
+      try {
+        const data = await fetchFeedbackMessages(selectedThreadFeedback.id, token);
+        if (data && data.messages) {
+          setThreadMessages(data.messages);
+        }
+      } catch (err) {
+        // silent error during background poll
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [isOpen, token, selectedThreadFeedback]);
 
   useEffect(() => {
     return () => {
@@ -91,15 +130,21 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
     }
   }, [threadMessages, selectedThreadFeedback]);
 
-  const loadHistory = async () => {
+  const loadHistory = async (silent = false) => {
     try {
-      setIsLoadingHistory(true);
+      if (!silent) setIsLoadingHistory(true);
       const list = await fetchMyFeedbacks(token);
+      // Sort: feedbacks with unread replies from Admin appear first
+      list.sort((a, b) => {
+        if ((a.unread_replies || 0) > 0 && (b.unread_replies || 0) === 0) return -1;
+        if ((a.unread_replies || 0) === 0 && (b.unread_replies || 0) > 0) return 1;
+        return 0;
+      });
       setMyFeedbacks(list);
     } catch (err) {
       console.error('Error fetching feedbacks:', err);
     } finally {
-      setIsLoadingHistory(false);
+      if (!silent) setIsLoadingHistory(false);
     }
   };
 
@@ -380,6 +425,18 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
               >
                 <History size={15} />
                 <span>Lịch sử đóng góp</span>
+                {myFeedbacks.some((f) => (f.unread_replies || 0) > 0) && (
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      background: '#ef4444',
+                      display: 'inline-block'
+                    }}
+                    title="Có phản hồi mới từ Quản trị viên"
+                  />
+                )}
               </button>
             )}
           </div>
