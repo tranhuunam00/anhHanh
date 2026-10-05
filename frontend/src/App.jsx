@@ -472,10 +472,12 @@ export default function App() {
       const challengeText = currentLesson.challenges[index].text;
       userInputRef.current = challengeText;
       setUserInput(challengeText);
+      if (speechRef.current) speechRef.current.setBaseText(challengeText);
       setIsCompleted(true);
     } else {
       userInputRef.current = "";
       setUserInput("");
+      if (speechRef.current) speechRef.current.setBaseText("");
       setIsCompleted(false);
       if (index > maxReachedIndex) {
         setMaxReachedIndex(index);
@@ -507,6 +509,7 @@ export default function App() {
     setCurrentIndex(0);
     userInputRef.current = "";
     setUserInput("");
+    if (speechRef.current) speechRef.current.setBaseText("");
     setIsCompleted(false);
 
     const sL = currentLesson.source_lang || sourceLang;
@@ -604,6 +607,7 @@ export default function App() {
     if (!currentChallenge || !currentLesson) return;
     userInputRef.current = currentChallenge.text;
     setUserInput(currentChallenge.text);
+    if (speechRef.current) speechRef.current.setBaseText(currentChallenge.text);
     setIsCompleted(true);
 
     const isAllDone = currentIndex === (currentLesson?.challenges?.length || 0) - 1;
@@ -636,6 +640,7 @@ export default function App() {
     const nextVal = getNextLetterHint(currentChallenge.text, currentVal, settings.strictPunctuation);
     userInputRef.current = nextVal;
     setUserInput(nextVal);
+    if (speechRef.current) speechRef.current.setBaseText(nextVal);
   };
 
   const handleHintWord = () => {
@@ -644,6 +649,7 @@ export default function App() {
     const nextVal = getNextWordHint(currentChallenge.text, currentVal);
     userInputRef.current = nextVal;
     setUserInput(nextVal);
+    if (speechRef.current) speechRef.current.setBaseText(nextVal);
   };
 
   const handleSpeakSentence = () => {
@@ -654,7 +660,12 @@ export default function App() {
 
   const handleToggleMic = (currentInput) => {
     if (speechRef.current) {
-      const base = currentInput !== undefined ? currentInput : (userInputRef.current || userInput);
+      const base =
+        typeof currentInput === "string"
+          ? currentInput
+          : (typeof userInputRef.current === "string"
+              ? userInputRef.current
+              : (typeof userInput === "string" ? userInput : ""));
       speechRef.current.toggle(base);
     }
   };
@@ -890,6 +901,9 @@ export default function App() {
                 setUserInput={setUserInput}
                 onInputChange={(val) => {
                   userInputRef.current = val;
+                  if (speechRef.current) {
+                    speechRef.current.setBaseText(val);
+                  }
                 }}
                 isListening={isListening}
                 isPlaying={isPlaying}
@@ -918,6 +932,9 @@ export default function App() {
                 onRetryChallenge={() => {
                   userInputRef.current = "";
                   setUserInput("");
+                  if (speechRef.current) {
+                    speechRef.current.setBaseText("");
+                  }
                   setIsCompleted(false);
                   playerController.replayCurrentSegment();
                 }}

@@ -113,11 +113,17 @@ export function AudioStudioPage({ isActive = true }) {
     );
   }, []);
 
-  const handleToggleMic = useCallback(() => {
+  const handleToggleMic = useCallback((currentInput) => {
     if (speechRef.current) {
-      speechRef.current.toggle();
+      const base =
+        typeof currentInput === "string"
+          ? currentInput
+          : (typeof userInputRef.current === "string"
+              ? userInputRef.current
+              : (typeof userInput === "string" ? userInput : ""));
+      speechRef.current.toggle(base);
     }
-  }, []);
+  }, [userInput]);
 
   // Current active sentence object
   const currentSentence = audioResult?.segments?.[currentSentenceIndex] || null;
@@ -194,10 +200,12 @@ export function AudioStudioPage({ isActive = true }) {
     if (completedMap[currentSentenceIndex]) {
       setUserInput(currentSentence.text);
       userInputRef.current = currentSentence.text;
+      if (speechRef.current) speechRef.current.setBaseText(currentSentence.text);
       setIsCompleted(true);
     } else {
       setUserInput("");
       userInputRef.current = "";
+      if (speechRef.current) speechRef.current.setBaseText("");
       setIsCompleted(false);
     }
 
@@ -205,7 +213,7 @@ export function AudioStudioPage({ isActive = true }) {
     notifyYouTubePause();
     audio.play().catch(() => {});
     setIsPlaying(true);
-  }, [isActive, currentSentenceIndex, audioResult]);
+  }, [isActive, currentSentenceIndex, audioResult, completedMap]);
 
   // Audio TimeUpdate Event (Loop segment logic)
   const handleTimeUpdate = () => {
@@ -229,6 +237,7 @@ export function AudioStudioPage({ isActive = true }) {
     const nextVal = getNextLetterHint(currentSentence.text, currentVal, settings.strictPunctuation);
     userInputRef.current = nextVal;
     setUserInput(nextVal);
+    if (speechRef.current) speechRef.current.setBaseText(nextVal);
   }, [currentSentence, userInput, settings.strictPunctuation]);
 
   // Hint Word Mechanism (Identical to DictationStudio)
@@ -238,6 +247,7 @@ export function AudioStudioPage({ isActive = true }) {
     const nextVal = getNextWordHint(currentSentence.text, currentVal);
     userInputRef.current = nextVal;
     setUserInput(nextVal);
+    if (speechRef.current) speechRef.current.setBaseText(nextVal);
   }, [currentSentence, userInput]);
 
   // Skip Sentence Mechanism
@@ -245,6 +255,7 @@ export function AudioStudioPage({ isActive = true }) {
     if (!currentSentence) return;
     userInputRef.current = currentSentence.text;
     setUserInput(currentSentence.text);
+    if (speechRef.current) speechRef.current.setBaseText(currentSentence.text);
     setIsCompleted(true);
     setCompletedMap((prev) => ({ ...prev, [currentSentenceIndex]: true }));
   }, [currentSentence, currentSentenceIndex]);
@@ -254,6 +265,7 @@ export function AudioStudioPage({ isActive = true }) {
     if (!currentSentence) return;
     userInputRef.current = "";
     setUserInput("");
+    if (speechRef.current) speechRef.current.setBaseText("");
     setIsCompleted(false);
     setCompletedMap((prev) => ({ ...prev, [currentSentenceIndex]: false }));
     replayCurrentSegment();
@@ -733,10 +745,16 @@ export function AudioStudioPage({ isActive = true }) {
                     setUserInput={(val) => {
                       setUserInput(val);
                       userInputRef.current = val;
+                      if (speechRef.current) {
+                        speechRef.current.setBaseText(val);
+                      }
                     }}
                     onInputChange={(val) => {
                       setUserInput(val);
                       userInputRef.current = val;
+                      if (speechRef.current) {
+                        speechRef.current.setBaseText(val);
+                      }
                     }}
                     isListening={isListening}
                     isPlaying={isPlaying}

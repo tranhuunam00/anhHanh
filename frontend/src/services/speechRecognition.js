@@ -14,6 +14,8 @@ export class SpeechRecognitionService {
     this.onPermissionRequired = onPermissionRequired;
     this.currentLang = "en-US";
     this.baseText = "";
+    this.resultStartIndex = 0;
+    this.lastResultLength = 0;
     this._micGranted = false; // true once getUserMedia succeeds
 
     this.initRecognizer();
@@ -34,6 +36,8 @@ export class SpeechRecognitionService {
       this.recognizer.continuous = true;
       this.recognizer.interimResults = true;
       this.recognizer.maxAlternatives = 1;
+      this.resultStartIndex = 0;
+      this.lastResultLength = 0;
 
       this.recognizer.onstart = () => {
         this.isListening = true;
@@ -43,8 +47,11 @@ export class SpeechRecognitionService {
       this.recognizer.onresult = (event) => {
         let interim = "";
         let final = "";
+        this.lastResultLength = event.results.length;
 
-        for (let i = 0; i < event.results.length; ++i) {
+        // Skip utterances spoken prior to user's manual text edits or deletions
+        const startIdx = Math.min(this.resultStartIndex, event.results.length);
+        for (let i = startIdx; i < event.results.length; ++i) {
           const res = event.results[i];
           if (res.isFinal) {
             final += res[0].transcript + " ";
@@ -117,6 +124,13 @@ export class SpeechRecognitionService {
     }
   }
 
+  setBaseText(text) {
+    this.baseText = typeof text === "string" ? text : "";
+    // Advance resultStartIndex to current length so that utterances spoken before
+    // this manual edit/deletion are completely skipped
+    this.resultStartIndex = this.lastResultLength;
+  }
+
   async requestMicrophonePermission() {
     if (typeof navigator !== "undefined" && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
@@ -134,6 +148,8 @@ export class SpeechRecognitionService {
   async toggle(currentBaseText = "") {
     // Save base text so spoken words append to current input
     this.baseText = typeof currentBaseText === "string" ? currentBaseText : "";
+    this.resultStartIndex = 0;
+    this.lastResultLength = 0;
 
     if (this.isListening) {
       try {
