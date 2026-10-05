@@ -75,6 +75,15 @@ function sanitizePastedHtml(rawHtml) {
         }
       });
 
+      if (el.hasAttribute("style")) {
+        el.style.removeProperty("font-size");
+        el.style.removeProperty("font-family");
+        el.style.removeProperty("line-height");
+        if (!el.getAttribute("style") || !el.getAttribute("style").trim()) {
+          el.removeAttribute("style");
+        }
+      }
+
       if (el.tagName.toLowerCase() === "a") {
         el.setAttribute("target", "_blank");
         el.setAttribute("rel", "noopener noreferrer");
@@ -244,10 +253,30 @@ export function SmartReaderPage({ isActive = true }) {
   const [speechRate, setSpeechRate] = useState(1.0);
   const [currentSentenceIdx, setCurrentSentenceIdx] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [autoScroll, setAutoScroll] = useState(() => localStorage.getItem("shotlang_reader_autoscroll") !== "false");
 
   const editorBoxRef = useRef(null);
   const articleContainerRef = useRef(null);
+  const articleScrollParentRef = useRef(null);
   const sentenceStartRef = useRef(null);
+
+  // Lock body/window scroll completely while in reading mode
+  useEffect(() => {
+    if (mode === "reading" && isActive) {
+      const prevBodyOverflow = document.body.style.overflow;
+      const prevHtmlOverflow = document.documentElement.style.overflow;
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prevBodyOverflow;
+        document.documentElement.style.overflow = prevHtmlOverflow;
+      };
+    }
+  }, [mode, isActive]);
+
+  useEffect(() => {
+    localStorage.setItem("shotlang_reader_autoscroll", autoScroll);
+  }, [autoScroll]);
 
   // Sync editorContent to editorBoxRef when editorContent changes from outside
   useEffect(() => {
@@ -394,6 +423,15 @@ export function SmartReaderPage({ isActive = true }) {
       const doc = parser.parseFromString(articleHtml, "text/html");
       const matchedSet = new Map();
       let totalWordCount = 0;
+
+      // Clean inline font overrides so user fontSize and fontFamily settings always work
+      doc.body.querySelectorAll("*").forEach((el) => {
+        if (el.style) {
+          el.style.removeProperty("font-size");
+          el.style.removeProperty("font-family");
+          el.style.removeProperty("line-height");
+        }
+      });
 
       // 1. Highlight saved vocabulary tokens on all text nodes first
       const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, null, false);
@@ -597,7 +635,7 @@ export function SmartReaderPage({ isActive = true }) {
     activeEls.forEach((el) => el.classList.remove("active-speaking"));
   }, []);
 
-  // Highlight specific sentence in DOM and scroll into view smoothly
+  // Highlight specific sentence in DOM and smoothly scroll container ONLY if autoScroll is enabled
   const highlightSentenceInDOM = useCallback((index) => {
     if (!articleContainerRef.current) return;
     const prevActive = articleContainerRef.current.querySelectorAll(".reader-sentence.active-speaking");
@@ -606,9 +644,19 @@ export function SmartReaderPage({ isActive = true }) {
     const target = articleContainerRef.current.querySelector(`.reader-sentence[data-s-idx="${index}"]`);
     if (target) {
       target.classList.add("active-speaking");
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (autoScroll && articleScrollParentRef.current) {
+        const container = articleScrollParentRef.current;
+        const containerRect = container.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const relativeTop = targetRect.top - containerRect.top + container.scrollTop;
+        const targetScrollTop = relativeTop - (container.clientHeight / 2) + (targetRect.height / 2);
+        container.scrollTo({
+          top: Math.max(0, targetScrollTop),
+          behavior: "smooth",
+        });
+      }
     }
-  }, []);
+  }, [autoScroll]);
 
   // Text-To-Speech: Speak sentence at index
   const speakSentence = useCallback(
@@ -806,13 +854,23 @@ export function SmartReaderPage({ isActive = true }) {
     }
   };
 
-  // Scroll to word from chip
+  // Scroll to word from chip within article reading container
   const handleScrollToWord = (word) => {
     if (!articleContainerRef.current) return;
     const marks = articleContainerRef.current.querySelectorAll(".smart-vocab-mark");
     for (const m of marks) {
       if ((m.getAttribute("data-word") || "").toLowerCase() === word.toLowerCase()) {
-        m.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (articleScrollParentRef.current) {
+          const container = articleScrollParentRef.current;
+          const containerRect = container.getBoundingClientRect();
+          const mRect = m.getBoundingClientRect();
+          const relativeTop = mRect.top - containerRect.top + container.scrollTop;
+          const targetScrollTop = relativeTop - (container.clientHeight / 2) + (mRect.height / 2);
+          container.scrollTo({
+            top: Math.max(0, targetScrollTop),
+            behavior: "smooth",
+          });
+        }
         m.classList.add("reader-tts-active");
         setTimeout(() => m.classList.remove("reader-tts-active"), 2000);
         break;
@@ -1009,13 +1067,23 @@ export function SmartReaderPage({ isActive = true }) {
                   </button>
                 </div>
 
-                <span className="reader-sentence-badge">
-                  <Volume2 size={13} style={{ color: isSpeaking ? "#10b981" : "var(--text-muted)" }} />
-                  <span>
-                    Câu <strong>{sentencesList && sentencesList.length > 0 ? currentSentenceIdx + 1 : 0}</strong> /{" "}
-                    {sentencesList?.length || 0}
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <button
+                    className={`reader-autoscroll-pill ${autoScroll ? "active" : ""}`}
+                    onClick={() => setAutoScroll(!autoScroll)}
+                    title={autoScroll ? "Đang bật tự cuộn theo giọng đọc (Bấm để giữ im)" : "Đang giữ im màn hình (Bấm để tự cuộn)"}
+                  >
+                    {autoScroll ? "🔽 Tự cuộn" : "⏸️ Để im"}
+                  </button>
+
+                  <span className="reader-sentence-badge">
+                    <Volume2 size={13} style={{ color: isSpeaking ? "#10b981" : "var(--text-muted)" }} />
+                    <span>
+                      Câu <strong>{sentencesList && sentencesList.length > 0 ? currentSentenceIdx + 1 : 0}</strong> /{" "}
+                      {sentencesList?.length || 0}
+                    </span>
                   </span>
-                </span>
+                </div>
               </div>
 
               {/* Row 2: Tốc độ đọc */}
@@ -1114,17 +1182,17 @@ export function SmartReaderPage({ isActive = true }) {
                   <div className="reader-control-btn-group">
                     <button
                       className="reader-control-btn"
-                      onClick={() => setFontSize((s) => Math.max(15, s - 1))}
+                      onClick={() => setFontSize((s) => Math.max(14, s - 1))}
                       title="Giảm kích thước chữ"
                     >
                       A-
                     </button>
-                    <span style={{ fontSize: "0.8rem", padding: "0 6px", color: "var(--text-muted)", minWidth: "32px", textAlign: "center" }}>
+                    <span style={{ fontSize: "0.8rem", padding: "0 6px", color: "var(--text-muted)", minWidth: "32px", textAlign: "center", fontWeight: 700 }}>
                       {fontSize}px
                     </span>
                     <button
                       className="reader-control-btn"
-                      onClick={() => setFontSize((s) => Math.min(26, s + 1))}
+                      onClick={() => setFontSize((s) => Math.min(30, s + 1))}
                       title="Tăng kích thước chữ"
                     >
                       A+
@@ -1149,6 +1217,27 @@ export function SmartReaderPage({ isActive = true }) {
                       title="Font chữ báo chí (Serif)"
                     >
                       Serif
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tự động cuộn trang khi đọc */}
+                <div className="reader-display-row-item">
+                  <span className="reader-display-row-label">Khi phát âm:</span>
+                  <div className="reader-control-btn-group">
+                    <button
+                      className={`reader-control-btn ${autoScroll ? "active" : ""}`}
+                      onClick={() => setAutoScroll(true)}
+                      title="Tự động cuộn khung đọc theo câu đang phát âm"
+                    >
+                      🔽 Tự cuộn
+                    </button>
+                    <button
+                      className={`reader-control-btn ${!autoScroll ? "active" : ""}`}
+                      onClick={() => setAutoScroll(false)}
+                      title="Giữ nguyên vị trí khung đọc, không tự động cuộn trang"
+                    >
+                      ⏸️ Để im
                     </button>
                   </div>
                 </div>
@@ -1187,8 +1276,12 @@ export function SmartReaderPage({ isActive = true }) {
           {/* CỘT PHẢI: BÀI TEXT ĐỌC */}
           <main className="reader-content-panel">
             <div
+              ref={articleScrollParentRef}
               className={`reader-article-card theme-${readerTheme} font-${fontFamily}`}
-              style={{ fontSize: `${fontSize}px` }}
+              style={{
+                fontSize: `${fontSize}px`,
+                "--reader-font-size": `${fontSize}px`,
+              }}
             >
               <div
                 ref={articleContainerRef}

@@ -72,6 +72,10 @@ export default function App() {
 
   // Navigation & Modal State
   const [activeTab, setActiveTabState] = useState(getTabFromPath);
+  const activeTabRef = useRef(activeTab);
+  useEffect(() => {
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
 
   const setActiveTab = useCallback((tabOrFn) => {
     setActiveTabState((prev) => {
@@ -395,13 +399,19 @@ export default function App() {
         speechRef.current.setLang(langCode);
       }
 
-      // 7. CRITICAL: Load video FIRST in the player controller so it points to the new video ID
+      // 7. CRITICAL: Load video in the player controller so it points to the new video ID
       const targetChallenge = lessonData.challenges && lessonData.challenges[targetIndex];
       const targetStartTime = targetChallenge ? targetChallenge.time_start : 0;
-      playerController.loadVideo(lessonData.video_id, targetStartTime, true);
+      const isDictationActive = activeTabRef.current === "tab-dictation";
+      playerController.loadVideo(lessonData.video_id, targetStartTime, isDictationActive);
 
-      // 8. THEN play the segment boundaries for this target index (autoplay from resume position)
-      playChallengeAtIndex(lessonData, targetIndex);
+      // 8. Only play segment if currently on dictation tab; otherwise cue and pause
+      if (isDictationActive) {
+        playChallengeAtIndex(lessonData, targetIndex);
+      } else {
+        cueChallengeAtIndex(lessonData, targetIndex);
+        playerController.pause();
+      }
     } catch (e) {
       alert("Lỗi tải video: " + e.message);
     } finally {
@@ -428,6 +438,7 @@ export default function App() {
   // Play segment for challenge at specific index
   const playChallengeAtIndex = (lessonObj, index) => {
     if (!lessonObj || !lessonObj.challenges || !lessonObj.challenges[index]) return;
+    if (activeTabRef.current !== "tab-dictation") return; // Safety guard: never play if not on dictation tab
     const c = lessonObj.challenges[index];
     const prevC = index > 0 ? lessonObj.challenges[index - 1] : null;
     const nextC = index < lessonObj.challenges.length - 1 ? lessonObj.challenges[index + 1] : null;

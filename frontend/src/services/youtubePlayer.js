@@ -287,6 +287,8 @@ export class YouTubePlayerController {
   }
 
   pause() {
+    this.pendingPlay = false;
+    this.pendingCue = true;
     this.isWaitingReplay = false;
     if (this.replayTimeout) clearTimeout(this.replayTimeout);
     if (!this.isReady || !this.player) return;
