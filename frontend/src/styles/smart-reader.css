@@ -1,0 +1,502 @@
+/* Smart Reader (Đọc Báo & Ôn Từ Vựng) Stylesheet */
+
+.smart-reader-container {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 12px 16px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Header & Controls */
+.reader-header-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.reader-header-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981, #06b6d4, #6366f1);
+}
+
+.reader-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.reader-header-titles h1 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.reader-badge-sparkle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.reader-header-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.reader-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Stats Ribbon */
+.reader-stats-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.reader-stats-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.reader-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.reader-stat-item strong {
+  color: var(--text-primary);
+}
+
+.reader-matched-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(6, 182, 212, 0.18));
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .reader-matched-badge {
+  color: #34d399;
+}
+
+/* Reader Toolbar Controls (Font, Audio, Actions) */
+.reader-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.reader-toolbar-left,
+.reader-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.reader-control-btn-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.reader-control-btn {
+  background: transparent;
+  border: none;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reader-control-btn:hover {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .reader-control-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reader-control-btn.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Dropzone / Paste Area */
+.reader-paste-dropzone {
+  background: var(--bg-card);
+  border: 2px dashed rgba(16, 185, 129, 0.4);
+  border-radius: var(--radius);
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  position: relative;
+}
+
+.reader-paste-dropzone:hover,
+.reader-paste-dropzone.drag-active {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.04);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.15);
+}
+
+.reader-dropzone-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #10b981;
+}
+
+.reader-dropzone-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.reader-dropzone-desc {
+  max-width: 540px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.reader-dropzone-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reader-hidden-input {
+  position: absolute;
+  opacity: 0;
+  width: 0.1px;
+  height: 0.1px;
+  pointer-events: none;
+}
+
+/* Article Reading View */
+.reader-article-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 36px 48px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+@media (max-width: 768px) {
+  .reader-article-card {
+    padding: 24px 18px;
+  }
+}
+
+/* Theme variations for article reading */
+.reader-article-card.theme-sepia {
+  background: #fbf0d9 !important;
+  color: #2b2518 !important;
+  border-color: #ebdcb9 !important;
+}
+
+.reader-article-card.theme-sepia .reader-article-body {
+  color: #2c2519 !important;
+}
+
+.reader-article-card.theme-sepia .reader-article-body h1,
+.reader-article-card.theme-sepia .reader-article-body h2,
+.reader-article-card.theme-sepia .reader-article-body h3 {
+  color: #1a160d !important;
+}
+
+.reader-article-card.theme-dark {
+  background: #090d16 !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(51, 65, 85, 0.7) !important;
+}
+
+.reader-article-card.font-serif {
+  font-family: "Merriweather", "Georgia", "Cambria", serif;
+}
+
+.reader-article-card.font-sans {
+  font-family: var(--font-family);
+}
+
+.reader-article-body {
+  line-height: 1.85;
+  color: var(--text-primary);
+  font-size: 1.125rem;
+}
+
+.reader-article-body p {
+  margin-bottom: 1.25em;
+  line-height: 1.8;
+}
+
+.reader-article-body h1,
+.reader-article-body h2,
+.reader-article-body h3,
+.reader-article-body h4 {
+  color: var(--text-primary);
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.reader-article-body h1 { font-size: 1.9rem; }
+.reader-article-body h2 { font-size: 1.55rem; }
+.reader-article-body h3 { font-size: 1.3rem; }
+
+.reader-article-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+  object-fit: cover;
+}
+
+.reader-article-body figure {
+  margin: 24px 0;
+  text-align: center;
+}
+
+.reader-article-body figcaption,
+.reader-article-body img + em,
+.reader-article-body img + p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+  margin-top: -12px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.reader-article-body blockquote {
+  margin: 20px 0;
+  padding: 12px 20px;
+  border-left: 4px solid var(--primary);
+  background: rgba(37, 99, 235, 0.05);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.reader-article-body ul,
+.reader-article-body ol {
+  margin: 16px 0;
+  padding-left: 28px;
+}
+
+.reader-article-body li {
+  margin-bottom: 8px;
+}
+
+/* VOCABULARY HIGHLIGHT TOKEN */
+.smart-vocab-mark {
+  display: inline-block;
+  cursor: pointer;
+  padding: 1px 4px;
+  margin: 0 1px;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  position: relative;
+  text-decoration: underline;
+  text-decoration-style: solid;
+  text-underline-offset: 3px;
+}
+
+/* Status: NEW (Mới lưu - Blue) */
+.smart-vocab-mark.status-new {
+  background: rgba(59, 130, 246, 0.14);
+  color: #1d4ed8;
+  text-decoration-color: #3b82f6;
+  border-bottom: 2px solid #3b82f6;
+}
+
+[data-theme="dark"] .smart-vocab-mark.status-new {
+  background: rgba(59, 130, 246, 0.24);
+  color: #93c5fd;
+  text-decoration-color: #60a5fa;
+  border-bottom-color: #60a5fa;
+}
+
+/* Status: LEARNING (Đang học - Amber/Orange) */
+.smart-vocab-mark.status-learning {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+  text-decoration-color: #f59e0b;
+  border-bottom: 2px solid #f59e0b;
+}
+
+[data-theme="dark"] .smart-vocab-mark.status-learning {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fcd34d;
+  text-decoration-color: #fbbf24;
+  border-bottom-color: #fbbf24;
+}
+
+/* Status: MASTERED (Đã thuộc - Emerald/Green) */
+.smart-vocab-mark.status-mastered {
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+  text-decoration-color: #10b981;
+  border-bottom: 2px solid #10b981;
+}
+
+[data-theme="dark"] .smart-vocab-mark.status-mastered {
+  background: rgba(16, 185, 129, 0.24);
+  color: #6ee7b7;
+  text-decoration-color: #34d399;
+  border-bottom-color: #34d399;
+}
+
+.smart-vocab-mark:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.smart-vocab-star {
+  font-size: 0.68em;
+  margin-left: 2px;
+  vertical-align: super;
+  opacity: 0.8;
+}
+
+/* Matched Vocab Drawer / Quick Chips */
+.reader-chips-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: thin;
+}
+
+.reader-word-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.reader-word-chip:hover {
+  border-color: #10b981;
+  color: #10b981;
+  transform: translateY(-1px);
+}
+
+.reader-word-chip .chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.chip-dot.status-new { background: #3b82f6; }
+.chip-dot.status-learning { background: #f59e0b; }
+.chip-dot.status-mastered { background: #10b981; }
+
+/* Active TTS Sentence Highlight */
+.reader-tts-active {
+  background: rgba(254, 240, 138, 0.45) !important;
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px rgba(254, 240, 138, 0.45);
+  transition: background 0.2s ease;
+}
+
+[data-theme="dark"] .reader-tts-active {
+  background: rgba(234, 179, 8, 0.22) !important;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.22);
+}
