@@ -8,6 +8,8 @@ import {
   Play,
   Pause,
   RotateCcw,
+  SkipBack,
+  SkipForward,
   Trash2,
   Type,
   Maximize2,
@@ -107,6 +109,117 @@ function getWordVariants(word) {
   return variants;
 }
 
+// Split text into readable sentence segments protecting abbreviations and decimals
+function splitTextIntoSentences(text) {
+  if (!text || typeof text !== "string") return [];
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  // Protect common abbreviations and titles from premature splitting
+  const protectedText = trimmed
+    .replace(
+      /\b(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|Inc|Ltd|Co|Corp|U\.S|U\.K|e\.g|i\.e|vs|etc|No|St|Dept|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\./gi,
+      (m) => m.replace(/\./g, "\uE000")
+    )
+    .replace(/(\d+)\.(\d+)/g, "$1\uE000$2");
+
+  // Split on sentence boundaries: punctuation (. ! ?) followed by whitespace and a start char
+  const rawParts = protectedText.split(/(?<=[.?!])\s+(?=[A-Z0-9"“'‘(])/);
+
+  const sentences = [];
+  for (const part of rawParts) {
+    const restored = part.replace(/\uE000/g, ".").trim();
+    if (restored.length > 0) {
+      sentences.push(restored);
+    }
+  }
+
+  return sentences.length > 0 ? sentences : [trimmed];
+}
+
+// Format duration seconds to mm:ss
+function formatTime(seconds) {
+  if (isNaN(seconds) || seconds < 0) return "00:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+// Group leaf block children into identifiable sentence spans
+function groupBlockIntoSentences(block, getNextIndex, addSentence, doc) {
+  const fullText = block.textContent.trim();
+  if (!fullText) return;
+
+  const sentenceStrings = splitTextIntoSentences(fullText);
+  if (sentenceStrings.length === 0) return;
+
+  // Single sentence block: wrap all children directly
+  if (sentenceStrings.length === 1) {
+    const sIdx = getNextIndex();
+    const span = doc.createElement("span");
+    span.className = "reader-sentence";
+    span.setAttribute("data-s-idx", String(sIdx));
+    while (block.firstChild) {
+      span.appendChild(block.firstChild);
+    }
+    block.appendChild(span);
+    addSentence(sIdx, sentenceStrings[0]);
+    return;
+  }
+
+  // Multiple sentences: split child nodes into sentence spans
+  const originalChildren = Array.from(block.childNodes);
+  block.innerHTML = "";
+
+  let sIdx = getNextIndex();
+  let currentSpan = doc.createElement("span");
+  currentSpan.className = "reader-sentence";
+  currentSpan.setAttribute("data-s-idx", String(sIdx));
+
+  let currentSentenceIdx = 0;
+
+  originalChildren.forEach((child) => {
+    if (child.nodeType !== Node.TEXT_NODE) {
+      currentSpan.appendChild(child);
+      return;
+    }
+
+    let remainingText = child.nodeValue;
+    while (remainingText.length > 0 && currentSentenceIdx < sentenceStrings.length - 1) {
+      const match = remainingText.match(/([.?!]+(?:\s+|$))/);
+      if (match && match.index !== undefined) {
+        const cutIdx = match.index + match[0].length;
+        const partBefore = remainingText.slice(0, cutIdx);
+        remainingText = remainingText.slice(cutIdx);
+
+        if (partBefore) {
+          currentSpan.appendChild(doc.createTextNode(partBefore));
+        }
+
+        block.appendChild(currentSpan);
+        addSentence(sIdx, sentenceStrings[currentSentenceIdx]);
+
+        currentSentenceIdx++;
+        sIdx = getNextIndex();
+        currentSpan = doc.createElement("span");
+        currentSpan.className = "reader-sentence";
+        currentSpan.setAttribute("data-s-idx", String(sIdx));
+      } else {
+        break;
+      }
+    }
+
+    if (remainingText.length > 0) {
+      currentSpan.appendChild(doc.createTextNode(remainingText));
+    }
+  });
+
+  if (currentSpan.childNodes.length > 0) {
+    block.appendChild(currentSpan);
+    addSentence(sIdx, sentenceStrings[currentSentenceIdx] || currentSpan.textContent.trim());
+  }
+}
+
 export function SmartReaderPage({ isActive = true }) {
   const { savedVocabMap, showToast } = useAuth();
 
@@ -125,13 +238,16 @@ export function SmartReaderPage({ isActive = true }) {
   const [fontFamily, setFontFamily] = useState(() => localStorage.getItem("shotlang_reader_fontfamily") || "sans");
   const [readerTheme, setReaderTheme] = useState(() => localStorage.getItem("shotlang_reader_theme") || "default");
 
-  // Interaction State
+  // Interaction & Audio Player State
   const [activeWordPopover, setActiveWordPopover] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechRate, setSpeechRate] = useState(1.0);
+  const [currentSentenceIdx, setCurrentSentenceIdx] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const editorBoxRef = useRef(null);
   const articleContainerRef = useRef(null);
+  const sentenceStartRef = useRef(null);
 
   // Sync editorContent to editorBoxRef when editorContent changes from outside
   useEffect(() => {
@@ -264,47 +380,13 @@ export function SmartReaderPage({ isActive = true }) {
       window.speechSynthesis?.cancel();
       setIsSpeaking(false);
     }
+    clearSentenceHighlights();
   };
 
-  // Text-To-Speech Controller
-  const handleToggleSpeech = () => {
-    if (!window.speechSynthesis) {
-      alert("Trình duyệt không hỗ trợ Web Speech Synthesis.");
-      return;
-    }
-
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-      return;
-    }
-
-    const textToRead = articleContainerRef.current?.innerText || "";
-    if (!textToRead.trim()) return;
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(textToRead.slice(0, 3000));
-    utterance.lang = "en-US";
-    utterance.rate = speechRate;
-
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
-    setIsSpeaking(true);
-  };
-
-  useEffect(() => {
-    if (!isActive && isSpeaking) {
-      window.speechSynthesis?.cancel();
-      setIsSpeaking(false);
-    }
-  }, [isActive, isSpeaking]);
-
-  // Compute matched words & stats for Reading Mode
-  const { processedHtml, matchedWords, totalWordsCount } = useMemo(() => {
+  // Compute matched words, parsed sentences, and stats for Reading Mode
+  const { processedHtml, matchedWords, totalWordsCount, sentencesList } = useMemo(() => {
     if (!articleHtml || mode !== "reading") {
-      return { processedHtml: "", matchedWords: [], totalWordsCount: 0 };
+      return { processedHtml: "", matchedWords: [], totalWordsCount: 0, sentencesList: [] };
     }
 
     try {
@@ -313,13 +395,8 @@ export function SmartReaderPage({ isActive = true }) {
       const matchedSet = new Map();
       let totalWordCount = 0;
 
-      const walker = doc.createTreeWalker(
-        doc.body,
-        NodeFilter.SHOW_TEXT,
-        null,
-        false
-      );
-
+      // 1. Highlight saved vocabulary tokens on all text nodes first
+      const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, null, false);
       const textNodes = [];
       let currentNode;
       while ((currentNode = walker.nextNode())) {
@@ -387,7 +464,7 @@ export function SmartReaderPage({ isActive = true }) {
             span.setAttribute("data-word", matchedPhrase.word);
             span.setAttribute("data-status", matchedPhrase.status || "NEW");
             span.textContent = tokens.slice(i, i + phraseSkip).join("");
-            
+
             const star = doc.createElement("span");
             star.className = "smart-vocab-star";
             star.textContent = "⭐";
@@ -435,33 +512,298 @@ export function SmartReaderPage({ isActive = true }) {
         }
       });
 
+      // 2. Wrap direct text nodes in <p> if needed
+      Array.from(doc.body.childNodes).forEach((node) => {
+        if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim().length > 0) {
+          const p = doc.createElement("p");
+          p.textContent = node.nodeValue;
+          doc.body.replaceChild(p, node);
+        }
+      });
+
+      // 3. Find leaf blocks and segment them into sentence spans (.reader-sentence)
+      const blockSelector = "p, h1, h2, h3, h4, h5, h6, li, blockquote, figcaption, dt, dd, div";
+      let leafBlocks = Array.from(doc.body.querySelectorAll(blockSelector)).filter((el) => {
+        const hasChildBlock = el.querySelector(blockSelector);
+        return !hasChildBlock && el.textContent.trim().length > 0;
+      });
+
+      if (leafBlocks.length === 0 && doc.body.textContent.trim().length > 0) {
+        const p = doc.createElement("p");
+        while (doc.body.firstChild) {
+          p.appendChild(doc.body.firstChild);
+        }
+        doc.body.appendChild(p);
+        leafBlocks = [p];
+      }
+
+      const rawSentences = [];
+      let nextSentenceIndex = 0;
+      const getNextIndex = () => nextSentenceIndex++;
+      const addSentence = (index, text) => {
+        const clean = text.replace(/⭐/g, "").trim();
+        if (clean.length > 0) {
+          rawSentences.push({ index, text: clean });
+        }
+      };
+
+      leafBlocks.forEach((block) => {
+        groupBlockIntoSentences(block, getNextIndex, addSentence, doc);
+      });
+
+      // 4. Enrich sentences with duration, cumulative timestamps
+      let cumulative = 0;
+      const parsedSentencesList = rawSentences.map((s, idx) => {
+        const words = s.text.match(/\b[a-zA-Z0-9'’-]+\b/g) || [];
+        const wordCount = words.length;
+        const duration = Math.max(1.2, Number(((wordCount / 2.33) + 0.35).toFixed(1)));
+        const startTime = cumulative;
+        const endTime = Number((cumulative + duration).toFixed(1));
+        cumulative = endTime;
+
+        return {
+          index: idx,
+          text: s.text,
+          wordCount,
+          duration,
+          startTime,
+          endTime,
+        };
+      });
+
       return {
         processedHtml: doc.body.innerHTML,
         matchedWords: Array.from(matchedSet.values()),
         totalWordsCount: totalWordCount,
+        sentencesList: parsedSentencesList,
       };
     } catch (e) {
       console.error("Error processing reader HTML:", e);
-      return { processedHtml: articleHtml, matchedWords: [], totalWordsCount: 0 };
+      return { processedHtml: articleHtml, matchedWords: [], totalWordsCount: 0, sentencesList: [] };
     }
   }, [articleHtml, savedVocabMap, mode]);
 
-  // Click on highlighted mark inside article
+  // Total audio duration at current speechRate
+  const totalDuration = useMemo(() => {
+    if (!sentencesList || sentencesList.length === 0) return 0;
+    const last = sentencesList[sentencesList.length - 1];
+    return Number((last.endTime / speechRate).toFixed(1));
+  }, [sentencesList, speechRate]);
+
+  // Remove speaking highlight from all sentences
+  const clearSentenceHighlights = useCallback(() => {
+    if (!articleContainerRef.current) return;
+    const activeEls = articleContainerRef.current.querySelectorAll(".reader-sentence.active-speaking");
+    activeEls.forEach((el) => el.classList.remove("active-speaking"));
+  }, []);
+
+  // Highlight specific sentence in DOM and scroll into view smoothly
+  const highlightSentenceInDOM = useCallback((index) => {
+    if (!articleContainerRef.current) return;
+    const prevActive = articleContainerRef.current.querySelectorAll(".reader-sentence.active-speaking");
+    prevActive.forEach((el) => el.classList.remove("active-speaking"));
+
+    const target = articleContainerRef.current.querySelector(`.reader-sentence[data-s-idx="${index}"]`);
+    if (target) {
+      target.classList.add("active-speaking");
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, []);
+
+  // Text-To-Speech: Speak sentence at index
+  const speakSentence = useCallback(
+    (index, autoPlay = true) => {
+      if (!window.speechSynthesis) {
+        alert("Trình duyệt không hỗ trợ Web Speech Synthesis.");
+        return;
+      }
+
+      if (!sentencesList || sentencesList.length === 0) return;
+
+      if (index < 0 || index >= sentencesList.length) {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+        setCurrentSentenceIdx(0);
+        setElapsedSeconds(0);
+        clearSentenceHighlights();
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      setCurrentSentenceIdx(index);
+
+      const sentence = sentencesList[index];
+      const sentenceStartSec = Number((sentence.startTime / speechRate).toFixed(1));
+      setElapsedSeconds(sentenceStartSec);
+
+      highlightSentenceInDOM(index);
+
+      if (!autoPlay) {
+        setIsSpeaking(false);
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(sentence.text);
+      utterance.lang = "en-US";
+      utterance.rate = speechRate;
+
+      sentenceStartRef.current = {
+        index,
+        startTime: Date.now(),
+        baseElapsed: sentenceStartSec,
+        duration: sentence.duration / speechRate,
+      };
+
+      utterance.onend = () => {
+        if (index + 1 < sentencesList.length) {
+          speakSentence(index + 1, true);
+        } else {
+          setIsSpeaking(false);
+          setCurrentSentenceIdx(0);
+          setElapsedSeconds(0);
+          clearSentenceHighlights();
+          if (showToast) {
+            showToast("Đã nghe xong bài viết!", "success");
+          }
+        }
+      };
+
+      utterance.onerror = (e) => {
+        if (e.error !== "interrupted" && e.error !== "canceled") {
+          console.warn("Speech synthesis error:", e);
+          setIsSpeaking(false);
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+    },
+    [sentencesList, speechRate, clearSentenceHighlights, highlightSentenceInDOM, showToast]
+  );
+
+  // Play / Pause Toggle
+  const handleToggleSpeech = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    } else {
+      const startIdx = currentSentenceIdx >= (sentencesList?.length || 0) ? 0 : currentSentenceIdx;
+      speakSentence(startIdx, true);
+    }
+  };
+
+  // Jump to previous sentence
+  const handlePrevSentence = () => {
+    const prevIdx = Math.max(0, currentSentenceIdx - 1);
+    speakSentence(prevIdx, isSpeaking);
+  };
+
+  // Jump to next sentence
+  const handleNextSentence = () => {
+    const nextIdx = Math.min((sentencesList?.length || 1) - 1, currentSentenceIdx + 1);
+    speakSentence(nextIdx, isSpeaking);
+  };
+
+  // Restart from beginning
+  const handleRestartSpeech = () => {
+    speakSentence(0, true);
+  };
+
+  // Change speech playback rate
+  const handleRateChange = (rate) => {
+    setSpeechRate(rate);
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setTimeout(() => {
+        speakSentence(currentSentenceIdx, true);
+      }, 50);
+    }
+  };
+
+  // Interactive timeline scrubber
+  const handleSeekChange = (e) => {
+    const newTime = Number(e.target.value);
+    setElapsedSeconds(newTime);
+
+    if (!sentencesList || sentencesList.length === 0) return;
+
+    const baseTime = newTime * speechRate;
+    const targetIdx = sentencesList.findIndex((s) => baseTime >= s.startTime && baseTime < s.endTime);
+    const finalIdx = targetIdx >= 0 ? targetIdx : (newTime >= totalDuration ? sentencesList.length - 1 : 0);
+
+    if (finalIdx !== currentSentenceIdx) {
+      setCurrentSentenceIdx(finalIdx);
+      highlightSentenceInDOM(finalIdx);
+    }
+
+    if (isSpeaking) {
+      speakSentence(finalIdx, true);
+    }
+  };
+
+  // Smooth seeker progress ticker while speaking
+  useEffect(() => {
+    if (!isSpeaking) return;
+
+    const timer = setInterval(() => {
+      if (sentenceStartRef.current) {
+        const { baseElapsed, startTime, duration } = sentenceStartRef.current;
+        const elapsedInSentence = (Date.now() - startTime) / 1000;
+        const current = Math.min(totalDuration, baseElapsed + Math.min(duration, elapsedInSentence));
+        setElapsedSeconds(Number(current.toFixed(1)));
+      }
+    }, 150);
+
+    return () => clearInterval(timer);
+  }, [isSpeaking, totalDuration]);
+
+  // Cleanup on tab switch or unmount
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isActive && isSpeaking) {
+      window.speechSynthesis?.cancel();
+      setIsSpeaking(false);
+      clearSentenceHighlights();
+    }
+  }, [isActive, isSpeaking, clearSentenceHighlights]);
+
+  // Click on highlighted mark inside article OR click on sentence to speak
   const handleArticleClick = (e) => {
+    // 1. Click on saved vocab word -> open popover
     const markEl = e.target.closest(".smart-vocab-mark");
-    if (!markEl) return;
+    if (markEl) {
+      e.preventDefault();
+      e.stopPropagation();
 
-    e.preventDefault();
-    e.stopPropagation();
+      const word = markEl.getAttribute("data-word") || markEl.textContent.replace("⭐", "").trim();
+      const parentSentence = markEl.closest(".reader-sentence, p, li, h1, h2, h3, h4, blockquote")?.innerText || "";
 
-    const word = markEl.getAttribute("data-word") || markEl.textContent.replace("⭐", "").trim();
-    const parentSentence = markEl.closest("p, li, h1, h2, h3, h4, blockquote")?.innerText || "";
+      setActiveWordPopover({
+        word,
+        element: markEl,
+        contextSentence: parentSentence,
+      });
+      return;
+    }
 
-    setActiveWordPopover({
-      word,
-      element: markEl,
-      contextSentence: parentSentence,
-    });
+    // 2. Click on sentence -> jump audio playback to this sentence
+    const sentenceEl = e.target.closest(".reader-sentence");
+    if (sentenceEl) {
+      const sIdxAttr = sentenceEl.getAttribute("data-s-idx");
+      if (sIdxAttr !== null) {
+        const sIdx = Number(sIdxAttr);
+        if (!isNaN(sIdx) && sentencesList && sIdx >= 0 && sIdx < sentencesList.length) {
+          speakSentence(sIdx, true);
+        }
+      }
+    }
   };
 
   // Scroll to word from chip
@@ -661,40 +1003,113 @@ export function SmartReaderPage({ isActive = true }) {
               )}
             </div>
 
-            {/* Toolbar (Font, Theme, TTS) */}
-            <div className="reader-toolbar">
-              <div className="reader-toolbar-left">
-                {/* Text to Speech Control */}
-                <button
-                  className={`btn btn-secondary btn-with-icon ${isSpeaking ? "btn-primary" : ""}`}
-                  onClick={handleToggleSpeech}
-                  title={isSpeaking ? "Dừng đọc" : "Đọc toàn bộ bài viết bằng giọng AI"}
-                >
-                  {isSpeaking ? <Pause size={15} /> : <Play size={15} />}
-                  <span>{isSpeaking ? "Tạm dừng đọc" : "Nghe đọc bài"}</span>
-                </button>
+            {/* Dedicated Audio Player Section with Timeline Scrubber Bar */}
+            <div className="reader-player-section">
+              {/* Row 1: Player controls & sentence counter */}
+              <div className="reader-player-main-row">
+                <div className="reader-player-controls-left">
+                  {/* Prev Sentence */}
+                  <button
+                    className="btn btn-secondary btn-icon"
+                    onClick={handlePrevSentence}
+                    disabled={currentSentenceIdx <= 0}
+                    title="Lùi về câu trước (Câu trước)"
+                  >
+                    <SkipBack size={15} />
+                  </button>
 
-                {/* Speech Rate Toggle */}
-                {isSpeaking && (
+                  {/* Main Play / Pause Button */}
+                  <button
+                    className={`btn ${isSpeaking ? "btn-primary" : "btn-secondary"} btn-with-icon reader-play-btn`}
+                    onClick={handleToggleSpeech}
+                    title={isSpeaking ? "Tạm dừng đọc" : "Bắt đầu nghe đọc bài viết bằng AI"}
+                  >
+                    {isSpeaking ? <Pause size={15} /> : <Play size={15} />}
+                    <span>{isSpeaking ? "Tạm dừng" : "Nghe đọc bài"}</span>
+                  </button>
+
+                  {/* Next Sentence */}
+                  <button
+                    className="btn btn-secondary btn-icon"
+                    onClick={handleNextSentence}
+                    disabled={currentSentenceIdx >= (sentencesList?.length || 1) - 1}
+                    title="Chuyển sang câu tiếp theo"
+                  >
+                    <SkipForward size={15} />
+                  </button>
+
+                  {/* Replay from Start */}
+                  <button
+                    className="btn btn-secondary btn-icon"
+                    onClick={handleRestartSpeech}
+                    title="Đọc lại từ đầu bài viết"
+                  >
+                    <RotateCcw size={14} />
+                  </button>
+
+                  {/* Speech Rate Group */}
                   <div className="reader-control-btn-group">
-                    {[0.8, 1.0, 1.25].map((rate) => (
+                    {[0.8, 1.0, 1.25, 1.5].map((rate) => (
                       <button
                         key={rate}
                         className={`reader-control-btn ${speechRate === rate ? "active" : ""}`}
-                        onClick={() => {
-                          setSpeechRate(rate);
-                          if (isSpeaking) {
-                            window.speechSynthesis?.cancel();
-                            setIsSpeaking(false);
-                            setTimeout(handleToggleSpeech, 100);
-                          }
-                        }}
+                        onClick={() => handleRateChange(rate)}
+                        title={`Tốc độ đọc ${rate}x`}
                       >
                         {rate}x
                       </button>
                     ))}
                   </div>
-                )}
+                </div>
+
+                {/* Sentence Counter Badge */}
+                <div className="reader-player-controls-right">
+                  <span className="reader-sentence-badge">
+                    <Volume2 size={13} style={{ color: isSpeaking ? "#10b981" : "var(--text-muted)" }} />
+                    <span>
+                      Câu <strong>{sentencesList && sentencesList.length > 0 ? currentSentenceIdx + 1 : 0}</strong> /{" "}
+                      {sentencesList?.length || 0}
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Row 2: Timeline Scrubber Bar */}
+              <div className="reader-scrubber-row">
+                <span className="reader-time-badge current-time">{formatTime(elapsedSeconds)}</span>
+
+                <div className="reader-range-wrap">
+                  <input
+                    type="range"
+                    className="reader-seek-range"
+                    min="0"
+                    max={Math.max(1, totalDuration)}
+                    step="0.5"
+                    value={elapsedSeconds}
+                    onChange={handleSeekChange}
+                    style={{
+                      "--progress-percent": `${totalDuration > 0 ? Math.min(100, (elapsedSeconds / totalDuration) * 100) : 0}%`,
+                    }}
+                    title="Kéo hoặc nhấp vào thanh để tua thời gian bài đọc"
+                    aria-label="Thanh tua thời gian bài đọc"
+                  />
+                </div>
+
+                <span className="reader-time-badge total-time">{formatTime(totalDuration)}</span>
+              </div>
+
+              {/* Row 3: Scrubber helper hint */}
+              <div className="reader-scrubber-hint">
+                <span>💡 Kéo thanh trượt để tua thời gian hoặc <strong>nhấp trực tiếp vào bất kỳ câu nào</strong> trong bài báo để nghe câu đó</span>
+              </div>
+            </div>
+
+            {/* Toolbar (Font, Theme, Layout) */}
+            <div className="reader-toolbar">
+              <div className="reader-toolbar-left">
+                <span style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Type size={14} /> Tùy chỉnh hiển thị:
+                </span>
               </div>
 
               <div className="reader-toolbar-right">
