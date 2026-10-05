@@ -254,6 +254,13 @@ export function SmartReaderPage({ isActive = true }) {
   const [currentSentenceIdx, setCurrentSentenceIdx] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [autoScroll, setAutoScroll] = useState(() => localStorage.getItem("shotlang_reader_autoscroll") !== "false");
+  const [onlyCurrentSentence, setOnlyCurrentSentence] = useState(() => localStorage.getItem("shotlang_reader_single_sentence") === "true");
+  const onlyCurrentSentenceRef = useRef(onlyCurrentSentence);
+
+  useEffect(() => {
+    onlyCurrentSentenceRef.current = onlyCurrentSentence;
+    localStorage.setItem("shotlang_reader_single_sentence", onlyCurrentSentence);
+  }, [onlyCurrentSentence]);
 
   const editorBoxRef = useRef(null);
   const articleContainerRef = useRef(null);
@@ -503,11 +510,6 @@ export function SmartReaderPage({ isActive = true }) {
             span.setAttribute("data-status", matchedPhrase.status || "NEW");
             span.textContent = tokens.slice(i, i + phraseSkip).join("");
 
-            const star = doc.createElement("span");
-            star.className = "smart-vocab-star";
-            star.textContent = "⭐";
-            span.appendChild(star);
-
             fragment.appendChild(span);
             matchedSet.set(matchedPhrase.word.toLowerCase(), matchedPhrase);
             i += phraseSkip;
@@ -531,11 +533,6 @@ export function SmartReaderPage({ isActive = true }) {
             span.setAttribute("data-word", matchItem.word);
             span.setAttribute("data-status", matchItem.status || "NEW");
             span.textContent = t;
-
-            const star = doc.createElement("span");
-            star.className = "smart-vocab-star";
-            star.textContent = "⭐";
-            span.appendChild(star);
 
             fragment.appendChild(span);
             matchedSet.set(matchItem.word.toLowerCase(), matchItem);
@@ -703,15 +700,18 @@ export function SmartReaderPage({ isActive = true }) {
       };
 
       utterance.onend = () => {
-        if (index + 1 < sentencesList.length) {
+        if (!onlyCurrentSentenceRef.current && index + 1 < sentencesList.length) {
           speakSentence(index + 1, true);
         } else {
           setIsSpeaking(false);
-          setCurrentSentenceIdx(0);
-          setElapsedSeconds(0);
-          clearSentenceHighlights();
-          if (showToast) {
-            showToast("Đã nghe xong bài viết!", "success");
+          sentenceStartRef.current = null;
+          if (!onlyCurrentSentenceRef.current) {
+            setCurrentSentenceIdx(0);
+            setElapsedSeconds(0);
+            clearSentenceHighlights();
+            if (showToast) {
+              showToast("Đã nghe xong bài viết!", "success");
+            }
           }
         }
       };
@@ -737,6 +737,16 @@ export function SmartReaderPage({ isActive = true }) {
     } else {
       const startIdx = currentSentenceIdx >= (sentencesList?.length || 0) ? 0 : currentSentenceIdx;
       speakSentence(startIdx, true);
+    }
+  };
+
+  // Toggle between Continuous reading and Single designated sentence mode
+  const handleToggleSingleSentenceMode = () => {
+    const next = !onlyCurrentSentence;
+    setOnlyCurrentSentence(next);
+    if (next && !isSpeaking) {
+      const targetIdx = currentSentenceIdx >= (sentencesList?.length || 0) ? 0 : currentSentenceIdx;
+      speakSentence(targetIdx, true);
     }
   };
 
@@ -936,7 +946,7 @@ export function SmartReaderPage({ isActive = true }) {
                 title="Chuyển sang chế độ đọc và tự động highlight từ vựng đã lưu"
               >
                 <BookOpen size={18} strokeWidth={2.4} />
-                <span>Bắt đầu đọc bài ➔</span>
+                <span>Bắt đầu đọc bài</span>
               </button>
 
               <button
@@ -953,7 +963,6 @@ export function SmartReaderPage({ isActive = true }) {
                 onClick={() => handleInsertIntoEditor(SAMPLE_ARTICLE)}
                 title="Tải bài báo mẫu thời tiết (Việt Nam News) có ảnh để xem thử"
               >
-                <Sparkles size={15} strokeWidth={2} style={{ color: "#f59e0b" }} />
                 <span>Thử bài báo mẫu</span>
               </button>
             </div>
@@ -1001,7 +1010,6 @@ export function SmartReaderPage({ isActive = true }) {
 
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 <span className="reader-badge-sparkle">
-                  <Sparkles size={12} />
                   Đọc & Ôn từ
                 </span>
 
@@ -1043,10 +1051,16 @@ export function SmartReaderPage({ isActive = true }) {
                   <button
                     className={`btn ${isSpeaking ? "btn-primary" : "btn-secondary"} btn-with-icon reader-play-btn`}
                     onClick={handleToggleSpeech}
-                    title={isSpeaking ? "Tạm dừng đọc" : "Bắt đầu nghe đọc bài viết bằng AI"}
+                    title={
+                      isSpeaking
+                        ? "Tạm dừng đọc"
+                        : onlyCurrentSentence
+                        ? "Đọc câu chỉ định hiện tại"
+                        : "Bắt đầu nghe đọc bài viết bằng AI"
+                    }
                   >
                     {isSpeaking ? <Pause size={15} /> : <Play size={15} />}
-                    <span>{isSpeaking ? "Tạm dừng" : "Nghe đọc"}</span>
+                    <span>{isSpeaking ? "Tạm dừng" : onlyCurrentSentence ? "Đọc câu này" : "Nghe đọc"}</span>
                   </button>
 
                   <button
@@ -1067,17 +1081,20 @@ export function SmartReaderPage({ isActive = true }) {
                   </button>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <button
-                    className={`reader-autoscroll-pill ${autoScroll ? "active" : ""}`}
-                    onClick={() => setAutoScroll(!autoScroll)}
-                    title={autoScroll ? "Đang bật tự cuộn theo giọng đọc (Bấm để giữ im)" : "Đang giữ im màn hình (Bấm để tự cuộn)"}
+                    className={`reader-single-sentence-pill ${onlyCurrentSentence ? "active" : ""}`}
+                    onClick={handleToggleSingleSentenceMode}
+                    title={
+                      onlyCurrentSentence
+                        ? "Đang bật: Chỉ đọc câu chỉ định rồi dừng (Bấm để chuyển sang đọc cả bài)"
+                        : "Đang tắt: Đọc liên tục cả bài (Bấm để chỉ đọc 1 câu chỉ định)"
+                    }
                   >
-                    {autoScroll ? "🔽 Tự cuộn" : "⏸️ Để im"}
+                    <span>{onlyCurrentSentence ? "Chỉ đọc câu này" : "Chỉ đọc câu chỉ định"}</span>
                   </button>
 
                   <span className="reader-sentence-badge">
-                    <Volume2 size={13} style={{ color: isSpeaking ? "#10b981" : "var(--text-muted)" }} />
                     <span>
                       Câu <strong>{sentencesList && sentencesList.length > 0 ? currentSentenceIdx + 1 : 0}</strong> /{" "}
                       {sentencesList?.length || 0}
@@ -1129,7 +1146,7 @@ export function SmartReaderPage({ isActive = true }) {
 
               {/* Row 4: Scrubber helper hint */}
               <div className="reader-scrubber-hint">
-                <span>💡 Kéo thanh tua hoặc <strong>bấm vào câu bất kỳ</strong> bên phải để nghe</span>
+                <span>Kéo thanh tua hoặc <strong>bấm vào câu bất kỳ</strong> bên phải để nghe</span>
               </div>
             </div>
 
@@ -1137,12 +1154,11 @@ export function SmartReaderPage({ isActive = true }) {
             <div className="reader-sidebar-stats-card">
               <div className="reader-sidebar-stats-row">
                 <div className="reader-stat-item">
-                  <BookOpen size={15} style={{ color: "#0284c7" }} />
                   <span>Tổng số: <strong>{totalWordsCount}</strong> từ</span>
                 </div>
 
                 <span className="reader-matched-badge">
-                  ⭐ <strong>{matchedWords.length} từ đã lưu</strong>
+                  <strong>{matchedWords.length}</strong> từ đã lưu
                 </span>
               </div>
 
@@ -1172,7 +1188,7 @@ export function SmartReaderPage({ isActive = true }) {
             {/* Tùy chỉnh hiển thị (Cỡ chữ, Font, Giao diện) */}
             <div className="reader-sidebar-display-card">
               <span className="reader-sidebar-display-title">
-                <Type size={14} /> Tùy chỉnh hiển thị:
+                Tùy chỉnh hiển thị:
               </span>
 
               <div className="reader-display-rows">
@@ -1221,6 +1237,27 @@ export function SmartReaderPage({ isActive = true }) {
                   </div>
                 </div>
 
+                {/* Chế độ phát âm: Cả bài / Chỉ câu chỉ định */}
+                <div className="reader-display-row-item">
+                  <span className="reader-display-row-label">Chế độ đọc:</span>
+                  <div className="reader-control-btn-group">
+                    <button
+                      className={`reader-control-btn ${!onlyCurrentSentence ? "active" : ""}`}
+                      onClick={() => setOnlyCurrentSentence(false)}
+                      title="Đọc liên tục từ câu hiện tại đến hết bài"
+                    >
+                      Cả bài
+                    </button>
+                    <button
+                      className={`reader-control-btn ${onlyCurrentSentence ? "active" : ""}`}
+                      onClick={() => setOnlyCurrentSentence(true)}
+                      title="Chỉ đọc câu được chỉ định rồi dừng lại"
+                    >
+                      Chỉ 1 câu
+                    </button>
+                  </div>
+                </div>
+
                 {/* Tự động cuộn trang khi đọc */}
                 <div className="reader-display-row-item">
                   <span className="reader-display-row-label">Khi phát âm:</span>
@@ -1230,14 +1267,14 @@ export function SmartReaderPage({ isActive = true }) {
                       onClick={() => setAutoScroll(true)}
                       title="Tự động cuộn khung đọc theo câu đang phát âm"
                     >
-                      🔽 Tự cuộn
+                      Tự cuộn
                     </button>
                     <button
                       className={`reader-control-btn ${!autoScroll ? "active" : ""}`}
                       onClick={() => setAutoScroll(false)}
                       title="Giữ nguyên vị trí khung đọc, không tự động cuộn trang"
                     >
-                      ⏸️ Để im
+                      Để im
                     </button>
                   </div>
                 </div>
@@ -1258,14 +1295,14 @@ export function SmartReaderPage({ isActive = true }) {
                       onClick={() => setReaderTheme("sepia")}
                       title="Nền giấy vàng ấm (Sepia)"
                     >
-                      📜 Giấy
+                      Giấy
                     </button>
                     <button
                       className={`reader-control-btn ${readerTheme === "dark" ? "active" : ""}`}
                       onClick={() => setReaderTheme("dark")}
                       title="Nền tối OLED"
                     >
-                      🌙 Tối
+                      Tối
                     </button>
                   </div>
                 </div>

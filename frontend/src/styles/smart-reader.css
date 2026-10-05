@@ -996,38 +996,46 @@
   background: rgba(100, 116, 139, 0.75);
 }
 
-/* Auto-scroll toggle pill button in player row */
-.reader-autoscroll-pill {
+/* Single sentence mode toggle pill button in player row */
+.reader-single-sentence-pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  font-size: 0.74rem;
+  gap: 5px;
+  padding: 3px 10px;
+  font-size: 0.76rem;
   font-weight: 700;
-  border-radius: 6px;
+  border-radius: 999px;
   border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
+  white-space: nowrap;
 }
 
-.reader-autoscroll-pill:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+.reader-single-sentence-pill:hover {
+  border-color: #0284c7;
+  color: #0284c7;
 }
 
-.reader-autoscroll-pill.active {
-  background: rgba(16, 185, 129, 0.12);
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #059669;
+.reader-single-sentence-pill.active {
+  background: rgba(2, 132, 199, 0.12);
+  border-color: rgba(2, 132, 199, 0.5);
+  color: #0284c7;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.15);
 }
 
-[data-theme="dark"] .reader-autoscroll-pill.active {
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.22);
-  border-color: rgba(52, 211, 153, 0.45);
+[data-theme="dark"] .reader-single-sentence-pill:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .reader-single-sentence-pill.active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #38bdf8;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive breakpoint: Tablets & Mobile (< 1024px) */
