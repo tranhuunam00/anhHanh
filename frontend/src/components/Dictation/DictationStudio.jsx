@@ -80,6 +80,7 @@ export const DictationStudio = React.memo(({
   onNextChallenge,
   onRetryChallenge,
   onCompleteLesson,
+  inputVersion = 0,
 }) => {
   const isLastChallenge = totalChallenges > 0 && currentIndex >= totalChallenges - 1;
   const targetText = currentChallenge ? currentChallenge.text : "";
@@ -120,7 +121,7 @@ export const DictationStudio = React.memo(({
   // Đồng bộ khi cha truyền input mới (chuyển câu, gợi ý, bỏ qua, làm lại, mic nói)
   React.useEffect(() => {
     setLocalInput(userInput || "");
-  }, [userInput]);
+  }, [userInput, inputVersion]);
 
   // Hoãn nhẹ phần diff sang frame sau bằng useDeferredValue để ưu tiên gõ phím mượt 60fps
   const deferredInput = React.useDeferredValue(localInput);
@@ -175,6 +176,14 @@ export const DictationStudio = React.memo(({
       e.preventDefault();
       e.stopPropagation();
       if (onCheck) onCheck(localInput);
+      return;
+    }
+
+    // Esc -> Bỏ qua / Điền đáp án / Sang câu tiếp
+    if (e.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
+      if (onSkip) onSkip();
       return;
     }
 
@@ -337,7 +346,7 @@ export const DictationStudio = React.memo(({
           <span>Kiểm tra</span>
         </button>
 
-        <button className="btn btn-secondary btn-with-icon" title="Bỏ qua (Esc + Enter)" onClick={onSkip}>
+        <button className="btn btn-secondary btn-with-icon" title="Bỏ qua câu hiện tại (tự điền đáp án - Esc)" onClick={onSkip}>
           <SkipForward size={15} strokeWidth={2.2} />
           <span>Bỏ qua</span>
         </button>

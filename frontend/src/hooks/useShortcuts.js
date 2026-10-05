@@ -120,8 +120,9 @@ export const useShortcuts = ({
         }
       }
 
-      // Esc -> Skip
+      // Esc -> Skip / Điền đáp án / Sang câu tiếp
       if (e.key === "Escape") {
+        e.preventDefault();
         callbacksRef.current.onSkip?.();
         return;
       }

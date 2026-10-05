@@ -47,6 +47,7 @@ export function AudioStudioPage({ isActive = true }) {
   const [userInput, setUserInput] = useState("");
   const userInputRef = useRef("");
   userInputRef.current = userInput;
+  const [inputVersion, setInputVersion] = useState(0);
 
   const [isCompleted, setIsCompleted] = useState(false);
   const [completedMap, setCompletedMap] = useState({});
@@ -250,11 +251,12 @@ export function AudioStudioPage({ isActive = true }) {
     if (speechRef.current) speechRef.current.setBaseText(nextVal);
   }, [currentSentence, userInput]);
 
-  // Skip Sentence Mechanism
+  // Skip Sentence Mechanism (Điền đáp án, không tự ý chuyển câu)
   const handleSkip = useCallback(() => {
     if (!currentSentence) return;
     userInputRef.current = currentSentence.text;
     setUserInput(currentSentence.text);
+    setInputVersion((v) => v + 1);
     if (speechRef.current) speechRef.current.setBaseText(currentSentence.text);
     setIsCompleted(true);
     setCompletedMap((prev) => ({ ...prev, [currentSentenceIndex]: true }));
@@ -265,6 +267,7 @@ export function AudioStudioPage({ isActive = true }) {
     if (!currentSentence) return;
     userInputRef.current = "";
     setUserInput("");
+    setInputVersion((v) => v + 1);
     if (speechRef.current) speechRef.current.setBaseText("");
     setIsCompleted(false);
     setCompletedMap((prev) => ({ ...prev, [currentSentenceIndex]: false }));
@@ -742,6 +745,7 @@ export function AudioStudioPage({ isActive = true }) {
                     targetLang="none"
                     sourceLang="en"
                     userInput={userInput}
+                    inputVersion={inputVersion}
                     setUserInput={(val) => {
                       setUserInput(val);
                       userInputRef.current = val;

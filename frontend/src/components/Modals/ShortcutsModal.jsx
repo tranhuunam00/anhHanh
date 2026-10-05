@@ -205,7 +205,7 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
                     <kbd>Enter (lần 2)</kbd>
                   </div>
                   <div className="shortcut-row-item">
-                    <span className="shortcut-row-action">Bỏ qua câu hiện tại (hoặc đóng modal)</span>
+                    <span className="shortcut-row-action">Bỏ qua câu hiện tại (tự điền đáp án chuẩn)</span>
                     <kbd>Esc</kbd>
                   </div>
                 </div>
