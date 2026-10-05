@@ -16,6 +16,7 @@ import {
   ExternalLink,
   BookOpen,
   ArrowRight,
+  ArrowLeft,
   Info,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -24,27 +25,18 @@ import "../styles/smart-reader.css";
 
 // Sample article for instant 1-click testing
 const SAMPLE_ARTICLE = `
-<h1>The AI Revolution in Everyday Language Learning</h1>
-<p>In recent years, <strong>artificial intelligence</strong> and modern <strong>technology</strong> have completely transformed how students learn foreign languages across the globe. Rather than memorizing endless grammar rules in isolation, learners now have the <strong>potential</strong> to immerse themselves in authentic, real-world context.</p>
+<h1>Cold snap triggers heavy rain, temperatures to plunge below 18°C</h1>
+<p><strong>The cold air mass reached the northeastern region</strong>, the northern province of Thanh Hóa and parts of the northwest on Monday morning, pushing temperatures at 7am to 21-24 degrees Celsius.</p>
 
-<img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&auto=format&fit=crop&q=80" alt="Students studying together with modern technology" />
+<img src="https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=900&auto=format&fit=crop&q=80" alt="Hanoians wear long-sleeved shirts and raincoats to keep warm during a cold day" />
+<p style="font-size:0.88rem; color:#64748b; text-align:center; margin-top:-8px; font-style:italic;">Hanoians wear long-sleeved shirts and raincoats to keep warm during a cold day. — Photo VNA</p>
 
-<h2>Why Contextual Learning Matters</h2>
-<p>Cognitive psychologists have repeatedly demonstrated that our memory retention increases dramatically when we encounter new vocabulary within meaningful stories. When you read a <em>fascinating</em> article about science, space exploration, or global culture, your brain naturally connects words with visual imagery and emotions.</p>
+<h2>Heavy Rain and Temperature Drops</h2>
+<p>HÀ NỘI — A strengthening cold air mass is bringing heavy to torrential rain and thunderstorms across the northern and central regions, with temperatures forecast to fall to as low as 14-17 degrees Celsius in high mountainous areas and rainfall of more than 200mm possible in parts of the central region.</p>
 
-<blockquote>"Language is not a genetic gift, it is a social gift. Learning a new language is becoming a member of the club - the community of speakers of that language." — Frank Smith</blockquote>
+<p>The cold air mass reached the northeastern region, the northern province of Thanh Hóa and parts of the northwest on Monday morning, pushing temperatures at 7am to 21-24 degrees Celsius.</p>
 
-<p>Moreover, modern digital platforms allow you to <strong>specify</strong> custom practice intervals, track your daily streak, and conquer pronunciation obstacles. The ultimate <strong>opportunity</strong> lies in making language acquisition a joyful, curiosity-driven habit rather than a tedious chore.</p>
-
-<img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=900&auto=format&fit=crop&q=80" alt="Digital learning on laptop" />
-
-<h2>Actionable Steps for Mastery</h2>
-<ul>
-  <li>Read at least 10 minutes of authentic news or blog posts every day.</li>
-  <li>Save unfamiliar expressions directly to your personal notebook for spaced repetition.</li>
-  <li>Listen to native pronunciation and practice shadowing sentences aloud.</li>
-</ul>
-<p>By combining curiosity with consistent practice, you unlock a <strong>revolutionary</strong> gateway to fluency and endless global opportunities.</p>
+<p>The meteorological agency advised local residents to stay alert against potential flash floods, landslides, and high winds during the extreme weather interval.</p>
 `;
 
 // Clean & sanitize pasted HTML safely using DOMParser
@@ -74,15 +66,13 @@ function sanitizePastedHtml(rawHtml) {
     // Clean inline attributes except safe ones
     const allEls = doc.body.querySelectorAll("*");
     allEls.forEach((el) => {
-      // Remove all on* event handlers
       Array.from(el.attributes).forEach((attr) => {
         const name = attr.name.toLowerCase();
-        if (name.startsWith("on") || name.startsWith("data-") && !name.startsWith("data-lang")) {
+        if (name.startsWith("on")) {
           el.removeAttribute(attr.name);
         }
       });
 
-      // Secure links
       if (el.tagName.toLowerCase() === "a") {
         el.setAttribute("target", "_blank");
         el.setAttribute("rel", "noopener noreferrer");
@@ -120,7 +110,14 @@ function getWordVariants(word) {
 export function SmartReaderPage({ isActive = true }) {
   const { savedVocabMap, showToast } = useAuth();
 
-  // Article State (persisted in localStorage)
+  // Mode: "paste" (Khung dán bài mới) vs "reading" (Giao diện đọc bài)
+  const [mode, setMode] = useState(() => {
+    const saved = localStorage.getItem("shotlang_reader_article");
+    return saved && saved.trim().length > 10 ? "reading" : "paste";
+  });
+
+  // Content state
+  const [editorContent, setEditorContent] = useState("");
   const [articleHtml, setArticleHtml] = useState(() => {
     return localStorage.getItem("shotlang_reader_article") || "";
   });
@@ -132,11 +129,20 @@ export function SmartReaderPage({ isActive = true }) {
 
   // Interaction State
   const [activeWordPopover, setActiveWordPopover] = useState(null);
-  const [statusFilter, setStatusFilter] = useState("ALL");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechRate, setSpeechRate] = useState(1.0);
 
+  const editorBoxRef = useRef(null);
   const articleContainerRef = useRef(null);
+
+  // Sync editorContent to editorBoxRef when editorContent changes from outside
+  useEffect(() => {
+    if (editorBoxRef.current && mode === "paste") {
+      if (editorBoxRef.current.innerHTML !== editorContent) {
+        editorBoxRef.current.innerHTML = editorContent;
+      }
+    }
+  }, [editorContent, mode]);
 
   // Save changes to localStorage
   useEffect(() => {
@@ -159,13 +165,12 @@ export function SmartReaderPage({ isActive = true }) {
     localStorage.setItem("shotlang_reader_theme", readerTheme);
   }, [readerTheme]);
 
-  // Clean and import new text/HTML
-  const handleImportContent = useCallback((rawHtmlOrText) => {
+  // Clean and import new text/HTML into editor
+  const handleInsertIntoEditor = useCallback((rawHtmlOrText) => {
     if (!rawHtmlOrText || !rawHtmlOrText.trim()) return;
 
     let clean = rawHtmlOrText.trim();
     if (!clean.includes("<p>") && !clean.includes("<div>") && !clean.includes("<h")) {
-      // Plain text -> wrap paragraphs
       clean = clean
         .split(/\n\s*\n/)
         .map((p) => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`)
@@ -174,20 +179,18 @@ export function SmartReaderPage({ isActive = true }) {
       clean = sanitizePastedHtml(clean);
     }
 
-    setArticleHtml(clean);
+    setEditorContent(clean);
+    if (editorBoxRef.current) {
+      editorBoxRef.current.innerHTML = clean;
+    }
     if (showToast) {
-      showToast("Đã tải bài viết thành công! Bắt đầu quét từ vựng...", "success");
+      showToast("Đã dán bài viết! Hãy bấm 'Bắt đầu đọc bài' để đọc.", "success");
     }
   }, [showToast]);
 
-  // Paste Event Handler (Clipboard)
-  const handlePasteEvent = useCallback((e) => {
-    if (!isActive) return;
-    const activeEl = document.activeElement;
-    if (activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.isContentEditable)) {
-      return;
-    }
-
+  // Paste Event Handler on the editor box
+  const handleEditorPaste = (e) => {
+    e.preventDefault();
     const clipboardData = e.clipboardData;
     if (!clipboardData) return;
 
@@ -195,17 +198,18 @@ export function SmartReaderPage({ isActive = true }) {
     const text = clipboardData.getData("text/plain");
 
     if (html || text) {
-      e.preventDefault();
-      handleImportContent(html || text);
+      handleInsertIntoEditor(html || text);
     }
-  }, [isActive, handleImportContent]);
+  };
 
-  useEffect(() => {
-    window.addEventListener("paste", handlePasteEvent);
-    return () => window.removeEventListener("paste", handlePasteEvent);
-  }, [handlePasteEvent]);
+  // Input Event inside editor box
+  const handleEditorInput = () => {
+    if (editorBoxRef.current) {
+      setEditorContent(editorBoxRef.current.innerHTML);
+    }
+  };
 
-  // Clipboard button handler
+  // Button handler: Paste from Clipboard API
   const handlePasteFromClipboardBtn = async () => {
     try {
       if (navigator.clipboard && navigator.clipboard.read) {
@@ -214,7 +218,7 @@ export function SmartReaderPage({ isActive = true }) {
           if (item.types.includes("text/html")) {
             const blob = await item.getType("text/html");
             const html = await blob.text();
-            handleImportContent(html);
+            handleInsertIntoEditor(html);
             return;
           }
         }
@@ -222,13 +226,38 @@ export function SmartReaderPage({ isActive = true }) {
       if (navigator.clipboard && navigator.clipboard.readText) {
         const text = await navigator.clipboard.readText();
         if (text) {
-          handleImportContent(text);
+          handleInsertIntoEditor(text);
           return;
         }
       }
-      alert("Hãy bấm phím Ctrl + V (hoặc Cmd + V trên Mac) để dán nội dung bài báo vào đây!");
+      alert("Hãy bấm chuột vào khung bên dưới và nhấn phím Ctrl + V (hoặc Cmd + V trên Mac) để dán bài báo!");
     } catch {
-      alert("Hãy bấm phím Ctrl + V (hoặc Cmd + V trên Mac) để dán nội dung bài báo vào đây!");
+      alert("Hãy bấm chuột vào khung bên dưới và nhấn phím Ctrl + V (hoặc Cmd + V trên Mac) để dán bài báo!");
+    }
+  };
+
+  // Start Reading: Switch from paste mode to reading mode
+  const handleStartReading = () => {
+    const content = (editorBoxRef.current?.innerHTML || editorContent || "").trim();
+    if (!content || content === "<br>" || content === "<p></p>") {
+      alert("Vui lòng dán nội dung bài báo vào ô trước khi bấm đọc bài!");
+      return;
+    }
+
+    setArticleHtml(content);
+    setMode("reading");
+    if (showToast) {
+      showToast("Đang mở chế độ đọc và quét từ vựng...", "info");
+    }
+  };
+
+  // Switch to paste mode to paste a new article
+  const handleSwitchToPaste = () => {
+    setEditorContent(articleHtml || "");
+    setMode("paste");
+    if (isSpeaking) {
+      window.speechSynthesis?.cancel();
+      setIsSpeaking(false);
     }
   };
 
@@ -260,7 +289,6 @@ export function SmartReaderPage({ isActive = true }) {
     setIsSpeaking(true);
   };
 
-  // Stop speech if tab inactive
   useEffect(() => {
     if (!isActive && isSpeaking) {
       window.speechSynthesis?.cancel();
@@ -268,9 +296,9 @@ export function SmartReaderPage({ isActive = true }) {
     }
   }, [isActive, isSpeaking]);
 
-  // Compute matched words & stats
+  // Compute matched words & stats for Reading Mode
   const { processedHtml, matchedWords, totalWordsCount } = useMemo(() => {
-    if (!articleHtml) {
+    if (!articleHtml || mode !== "reading") {
       return { processedHtml: "", matchedWords: [], totalWordsCount: 0 };
     }
 
@@ -280,7 +308,6 @@ export function SmartReaderPage({ isActive = true }) {
       const matchedSet = new Map();
       let totalWordCount = 0;
 
-      // Extract all text nodes in reading elements
       const walker = doc.createTreeWalker(
         doc.body,
         NodeFilter.SHOW_TEXT,
@@ -296,7 +323,6 @@ export function SmartReaderPage({ isActive = true }) {
         }
       }
 
-      // Process each text node and highlight matched words
       textNodes.forEach((node) => {
         const text = node.nodeValue;
         const wordsInNode = text.match(/\b[a-zA-Z0-9'’-]+\b/g) || [];
@@ -306,7 +332,6 @@ export function SmartReaderPage({ isActive = true }) {
           return;
         }
 
-        // Tokenize by word boundaries
         const tokens = text.split(/([a-zA-Z0-9'’-]+)/g);
         let hasReplacement = false;
         const fragment = doc.createDocumentFragment();
@@ -414,7 +439,7 @@ export function SmartReaderPage({ isActive = true }) {
       console.error("Error processing reader HTML:", e);
       return { processedHtml: articleHtml, matchedWords: [], totalWordsCount: 0 };
     }
-  }, [articleHtml, savedVocabMap]);
+  }, [articleHtml, savedVocabMap, mode]);
 
   // Click on highlighted mark inside article
   const handleArticleClick = (e) => {
@@ -448,249 +473,306 @@ export function SmartReaderPage({ isActive = true }) {
     }
   };
 
+  const isEditorEmpty = !editorContent || !editorContent.trim() || editorContent === "<br>";
+
   return (
     <div className="smart-reader-container">
-      {/* Top Header Card */}
-      <div className="reader-header-card">
-        <div className="reader-header-top">
-          <div className="reader-header-titles">
-            <h1>
-              <Newspaper size={26} strokeWidth={2.4} style={{ color: "#10b981" }} />
-              <span>Đọc Báo & Ôn Từ Vựng (Smart Reader)</span>
-              <span className="reader-badge-sparkle">
-                <Sparkles size={13} />
-                Tự động Highlight
-              </span>
-            </h1>
-            <p className="reader-header-desc">
-              Dán bất kỳ bài báo hoặc tài liệu tiếng Anh nào (hỗ trợ cả chữ và hình ảnh), hệ thống sẽ tự động quét và highlight các từ vựng bạn đã lưu để ôn tập trong ngữ cảnh thực tế.
-            </p>
+      {/* ======================================================== */}
+      {/* BƯỚC 1: MÀN HÌNH DÁN BÀI VIẾT (PASTE & PREVIEW MODE)     */}
+      {/* ======================================================== */}
+      {mode === "paste" && (
+        <div className="reader-editor-card">
+          <div className="reader-editor-header">
+            <div>
+              <div className="reader-editor-title">
+                <Newspaper size={24} style={{ color: "#10b981" }} />
+                <span>Dán bài báo / Tài liệu tiếng Anh mới</span>
+              </div>
+              <p className="reader-editor-desc">
+                Nhấp chuột vào ô bên dưới rồi nhấn <strong>Ctrl + V</strong> (hoặc Cmd + V). Hệ thống hỗ trợ dán đầy đủ cả văn bản lẫn hình ảnh từ bất kỳ trang báo nào!
+              </p>
+            </div>
+
+            <div className="reader-editor-actions-right">
+              {articleHtml && (
+                <button
+                  className="btn btn-secondary btn-with-icon"
+                  onClick={() => setMode("reading")}
+                  title="Quay lại bài báo đang đọc trước đó"
+                >
+                  <ArrowRight size={16} />
+                  <span>Quay lại bài đang đọc</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="reader-header-actions">
-            <button
-              className="btn btn-primary btn-with-icon"
-              onClick={handlePasteFromClipboardBtn}
-              title="Dán nội dung từ Clipboard (Ctrl + V)"
-            >
-              <ClipboardPaste size={16} strokeWidth={2.2} />
-              <span>Dán bài viết (Ctrl + V)</span>
-            </button>
+          {/* Ô nhập / dán trực tiếp (ContentEditable) */}
+          <div
+            ref={editorBoxRef}
+            className="reader-editor-box"
+            contentEditable={true}
+            onPaste={handleEditorPaste}
+            onInput={handleEditorInput}
+            data-empty={isEditorEmpty}
+            data-placeholder="👉 Nhấp chuột vào đây và nhấn Ctrl + V để dán bài báo (hỗ trợ cả chữ, tiêu đề và hình ảnh)..."
+            suppressContentEditableWarning={true}
+          />
 
-            <button
-              className="btn btn-secondary btn-with-icon"
-              onClick={() => handleImportContent(SAMPLE_ARTICLE)}
-              title="Tải bài báo mẫu tiếng Anh để xem thử tính năng"
-            >
-              <Sparkles size={15} strokeWidth={2} style={{ color: "#f59e0b" }} />
-              <span>Bài báo mẫu</span>
-            </button>
-
-            {articleHtml && (
+          {/* Toolbar bên dưới ô nhập */}
+          <div className="reader-editor-actions">
+            <div className="reader-editor-actions-left">
+              {/* NÚT CHÍNH: BẮT ĐẦU ĐỌC BÀI */}
               <button
-                className="btn btn-secondary btn-icon"
-                onClick={() => {
-                  if (window.confirm("Bạn có chắc chắn muốn xóa bài viết hiện tại để dán bài mới?")) {
-                    setArticleHtml("");
-                    if (isSpeaking) {
-                      window.speechSynthesis?.cancel();
-                      setIsSpeaking(false);
-                    }
-                  }
-                }}
-                title="Xóa bài viết hiện tại để dán bài mới"
-                style={{ color: "#ef4444" }}
+                className="btn btn-primary btn-with-icon"
+                style={{ padding: "9px 22px", fontSize: "0.95rem", fontWeight: 700 }}
+                onClick={handleStartReading}
+                disabled={isEditorEmpty}
+                title="Chuyển sang chế độ đọc và tự động highlight từ vựng đã lưu"
               >
-                <Trash2 size={16} />
+                <BookOpen size={18} strokeWidth={2.4} />
+                <span>Bắt đầu đọc bài ➔</span>
               </button>
-            )}
+
+              <button
+                className="btn btn-secondary btn-with-icon"
+                onClick={handlePasteFromClipboardBtn}
+                title="Dán nhanh nội dung từ Clipboard"
+              >
+                <ClipboardPaste size={16} strokeWidth={2} />
+                <span>Dán từ Clipboard</span>
+              </button>
+
+              <button
+                className="btn btn-secondary btn-with-icon"
+                onClick={() => handleInsertIntoEditor(SAMPLE_ARTICLE)}
+                title="Tải bài báo mẫu thời tiết (Việt Nam News) có ảnh để xem thử"
+              >
+                <Sparkles size={15} strokeWidth={2} style={{ color: "#f59e0b" }} />
+                <span>Thử bài báo mẫu</span>
+              </button>
+            </div>
+
+            <div className="reader-editor-actions-right">
+              {!isEditorEmpty && (
+                <button
+                  className="btn btn-secondary btn-with-icon"
+                  onClick={() => {
+                    setEditorContent("");
+                    if (editorBoxRef.current) editorBoxRef.current.innerHTML = "";
+                  }}
+                  style={{ color: "#ef4444" }}
+                  title="Xóa toàn bộ nội dung trong ô dán"
+                >
+                  <Trash2 size={15} />
+                  <span>Xóa trắng</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Stats Ribbon (if article loaded) */}
-        {articleHtml && (
-          <div className="reader-stats-ribbon">
-            <div className="reader-stats-group">
-              <div className="reader-stat-item">
-                <BookOpen size={16} style={{ color: "#0284c7" }} />
-                <span>Tổng số từ: <strong>{totalWordsCount}</strong> từ</span>
-              </div>
+      {/* ======================================================== */}
+      {/* BƯỚC 2: MÀN HÌNH ĐỌC BÀI VIẾT (READER MODE & HIGHLIGHTS)  */}
+      {/* ======================================================== */}
+      {mode === "reading" && (
+        <>
+          {/* Header Card in Reader Mode */}
+          <div className="reader-header-card">
+            {/* Top row with Back button */}
+            <div className="reader-nav-back-row">
+              <button
+                className="btn btn-secondary btn-with-icon"
+                onClick={handleSwitchToPaste}
+                title="Dán bài báo khác hoặc bài mới"
+              >
+                <ArrowLeft size={16} strokeWidth={2.2} />
+                <span>Dán bài khác / Bài mới</span>
+              </button>
 
-              <div className="reader-stat-item">
-                <span className="reader-matched-badge">
-                  ⭐ <strong>{matchedWords.length} từ đã lưu</strong> xuất hiện trong bài
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="reader-badge-sparkle">
+                  <Sparkles size={13} />
+                  Chế độ Đọc & Ôn từ
                 </span>
+
+                <button
+                  className="btn btn-secondary btn-icon"
+                  onClick={() => {
+                    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+                      setArticleHtml("");
+                      setEditorContent("");
+                      setMode("paste");
+                      if (isSpeaking) {
+                        window.speechSynthesis?.cancel();
+                        setIsSpeaking(false);
+                      }
+                    }
+                  }}
+                  title="Xóa bài viết này"
+                  style={{ color: "#ef4444" }}
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             </div>
 
-            {/* Quick Word Chips */}
-            {matchedWords.length > 0 && (
-              <div className="reader-chips-bar">
-                {matchedWords.slice(0, 10).map((item, idx) => (
-                  <button
-                    key={idx}
-                    className="reader-word-chip"
-                    onClick={() => handleScrollToWord(item.word)}
-                    title={`Chạm để cuộn đến từ "${item.word}" trong bài báo`}
-                  >
-                    <span className={`chip-dot status-${(item.status || "NEW").toLowerCase()}`}></span>
-                    <span>{item.word}</span>
-                  </button>
-                ))}
-                {matchedWords.length > 10 && (
-                  <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", alignSelf: "center" }}>
-                    +{matchedWords.length - 10} từ khác
+            {/* Stats Ribbon */}
+            <div className="reader-stats-ribbon">
+              <div className="reader-stats-group">
+                <div className="reader-stat-item">
+                  <BookOpen size={16} style={{ color: "#0284c7" }} />
+                  <span>Tổng số từ: <strong>{totalWordsCount}</strong> từ</span>
+                </div>
+
+                <div className="reader-stat-item">
+                  <span className="reader-matched-badge">
+                    ⭐ <strong>{matchedWords.length} từ đã lưu</strong> xuất hiện trong bài
                   </span>
-                )}
+                </div>
               </div>
-            )}
-          </div>
-        )}
 
-        {/* Toolbar (Font, Theme, TTS) */}
-        {articleHtml && (
-          <div className="reader-toolbar">
-            <div className="reader-toolbar-left">
-              {/* Text to Speech Control */}
-              <button
-                className={`btn btn-secondary btn-with-icon ${isSpeaking ? "btn-primary" : ""}`}
-                onClick={handleToggleSpeech}
-                title={isSpeaking ? "Dừng đọc" : "Đọc toàn bộ bài viết bằng giọng AI"}
-              >
-                {isSpeaking ? <Pause size={15} /> : <Play size={15} />}
-                <span>{isSpeaking ? "Tạm dừng đọc" : "Nghe đọc bài"}</span>
-              </button>
-
-              {/* Speech Rate Toggle */}
-              {isSpeaking && (
-                <div className="reader-control-btn-group">
-                  {[0.8, 1.0, 1.25].map((rate) => (
+              {/* Quick Word Chips */}
+              {matchedWords.length > 0 && (
+                <div className="reader-chips-bar">
+                  {matchedWords.slice(0, 12).map((item, idx) => (
                     <button
-                      key={rate}
-                      className={`reader-control-btn ${speechRate === rate ? "active" : ""}`}
-                      onClick={() => {
-                        setSpeechRate(rate);
-                        if (isSpeaking) {
-                          window.speechSynthesis?.cancel();
-                          setIsSpeaking(false);
-                          setTimeout(handleToggleSpeech, 100);
-                        }
-                      }}
+                      key={idx}
+                      className="reader-word-chip"
+                      onClick={() => handleScrollToWord(item.word)}
+                      title={`Chạm để cuộn đến từ "${item.word}" trong bài báo`}
                     >
-                      {rate}x
+                      <span className={`chip-dot status-${(item.status || "NEW").toLowerCase()}`}></span>
+                      <span>{item.word}</span>
                     </button>
                   ))}
+                  {matchedWords.length > 12 && (
+                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", alignSelf: "center" }}>
+                      +{matchedWords.length - 12} từ khác
+                    </span>
+                  )}
                 </div>
               )}
             </div>
 
-            <div className="reader-toolbar-right">
-              {/* Font Size A- / A+ */}
-              <div className="reader-control-btn-group">
+            {/* Toolbar (Font, Theme, TTS) */}
+            <div className="reader-toolbar">
+              <div className="reader-toolbar-left">
+                {/* Text to Speech Control */}
                 <button
-                  className="reader-control-btn"
-                  onClick={() => setFontSize((s) => Math.max(15, s - 1))}
-                  title="Giảm kích thước chữ"
+                  className={`btn btn-secondary btn-with-icon ${isSpeaking ? "btn-primary" : ""}`}
+                  onClick={handleToggleSpeech}
+                  title={isSpeaking ? "Dừng đọc" : "Đọc toàn bộ bài viết bằng giọng AI"}
                 >
-                  A-
+                  {isSpeaking ? <Pause size={15} /> : <Play size={15} />}
+                  <span>{isSpeaking ? "Tạm dừng đọc" : "Nghe đọc bài"}</span>
                 </button>
-                <span style={{ fontSize: "0.8rem", padding: "0 4px", color: "var(--text-muted)" }}>
-                  {fontSize}px
-                </span>
-                <button
-                  className="reader-control-btn"
-                  onClick={() => setFontSize((s) => Math.min(26, s + 1))}
-                  title="Tăng kích thước chữ"
-                >
-                  A+
-                </button>
+
+                {/* Speech Rate Toggle */}
+                {isSpeaking && (
+                  <div className="reader-control-btn-group">
+                    {[0.8, 1.0, 1.25].map((rate) => (
+                      <button
+                        key={rate}
+                        className={`reader-control-btn ${speechRate === rate ? "active" : ""}`}
+                        onClick={() => {
+                          setSpeechRate(rate);
+                          if (isSpeaking) {
+                            window.speechSynthesis?.cancel();
+                            setIsSpeaking(false);
+                            setTimeout(handleToggleSpeech, 100);
+                          }
+                        }}
+                      >
+                        {rate}x
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Font Family (Sans vs Serif) */}
-              <div className="reader-control-btn-group">
-                <button
-                  className={`reader-control-btn ${fontFamily === "sans" ? "active" : ""}`}
-                  onClick={() => setFontFamily("sans")}
-                  title="Font chữ hiện đại (Sans-serif)"
-                >
-                  Sans
-                </button>
-                <button
-                  className={`reader-control-btn ${fontFamily === "serif" ? "active" : ""}`}
-                  onClick={() => setFontFamily("serif")}
-                  title="Font chữ báo chí (Serif)"
-                >
-                  Serif
-                </button>
-              </div>
+              <div className="reader-toolbar-right">
+                {/* Font Size A- / A+ */}
+                <div className="reader-control-btn-group">
+                  <button
+                    className="reader-control-btn"
+                    onClick={() => setFontSize((s) => Math.max(15, s - 1))}
+                    title="Giảm kích thước chữ"
+                  >
+                    A-
+                  </button>
+                  <span style={{ fontSize: "0.8rem", padding: "0 4px", color: "var(--text-muted)" }}>
+                    {fontSize}px
+                  </span>
+                  <button
+                    className="reader-control-btn"
+                    onClick={() => setFontSize((s) => Math.min(26, s + 1))}
+                    title="Tăng kích thước chữ"
+                  >
+                    A+
+                  </button>
+                </div>
 
-              {/* Reader Theme (Default, Sepia, Dark) */}
-              <div className="reader-control-btn-group">
-                <button
-                  className={`reader-control-btn ${readerTheme === "default" ? "active" : ""}`}
-                  onClick={() => setReaderTheme("default")}
-                  title="Giao diện mặc định"
-                >
-                  Chuẩn
-                </button>
-                <button
-                  className={`reader-control-btn ${readerTheme === "sepia" ? "active" : ""}`}
-                  onClick={() => setReaderTheme("sepia")}
-                  title="Nền giấy vàng ấm (Sepia - Đọc ban đêm không mỏi mắt)"
-                >
-                  📜 Giấy
-                </button>
-                <button
-                  className={`reader-control-btn ${readerTheme === "dark" ? "active" : ""}`}
-                  onClick={() => setReaderTheme("dark")}
-                  title="Nền tối OLED"
-                >
-                  🌙 Tối
-                </button>
+                {/* Font Family (Sans vs Serif) */}
+                <div className="reader-control-btn-group">
+                  <button
+                    className={`reader-control-btn ${fontFamily === "sans" ? "active" : ""}`}
+                    onClick={() => setFontFamily("sans")}
+                    title="Font chữ hiện đại (Sans-serif)"
+                  >
+                    Sans
+                  </button>
+                  <button
+                    className={`reader-control-btn ${fontFamily === "serif" ? "active" : ""}`}
+                    onClick={() => setFontFamily("serif")}
+                    title="Font chữ báo chí (Serif)"
+                  >
+                    Serif
+                  </button>
+                </div>
+
+                {/* Reader Theme (Default, Sepia, Dark) */}
+                <div className="reader-control-btn-group">
+                  <button
+                    className={`reader-control-btn ${readerTheme === "default" ? "active" : ""}`}
+                    onClick={() => setReaderTheme("default")}
+                    title="Giao diện mặc định"
+                  >
+                    Chuẩn
+                  </button>
+                  <button
+                    className={`reader-control-btn ${readerTheme === "sepia" ? "active" : ""}`}
+                    onClick={() => setReaderTheme("sepia")}
+                    title="Nền giấy vàng ấm (Sepia - Đọc ban đêm không mỏi mắt)"
+                  >
+                    📜 Giấy
+                  </button>
+                  <button
+                    className={`reader-control-btn ${readerTheme === "dark" ? "active" : ""}`}
+                    onClick={() => setReaderTheme("dark")}
+                    title="Nền tối OLED"
+                  >
+                    🌙 Tối
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Main Content Area */}
-      {!articleHtml ? (
-        /* Empty State Dropzone */
-        <div className="reader-paste-dropzone" onClick={handlePasteFromClipboardBtn}>
-          <div className="reader-dropzone-icon">
-            <ClipboardPaste size={32} strokeWidth={2.2} />
-          </div>
-          <div className="reader-dropzone-title">Dán bài báo của bạn vào đây (Ctrl + V)</div>
-          <p className="reader-dropzone-desc">
-            Bạn có thể lên BBC, CNN, Medium, The Verge, Reddit... copy một đoạn bài viết bất kỳ (chọn cả chữ lẫn hình ảnh) rồi dán vào đây. Hệ thống sẽ tự động quét và highlight các từ vựng bạn đã lưu!
-          </p>
-          <div className="reader-dropzone-buttons" onClick={(e) => e.stopPropagation()}>
-            <button className="btn btn-primary btn-with-icon" onClick={handlePasteFromClipboardBtn}>
-              <ClipboardPaste size={16} strokeWidth={2} />
-              <span>Dán từ Clipboard (Ctrl + V)</span>
-            </button>
-            <button
-              className="btn btn-secondary btn-with-icon"
-              onClick={() => handleImportContent(SAMPLE_ARTICLE)}
-            >
-              <Sparkles size={15} strokeWidth={2} style={{ color: "#f59e0b" }} />
-              <span>Thử bài báo mẫu</span>
-            </button>
-          </div>
-        </div>
-      ) : (
-        /* Article Reading View */
-        <div
-          className={`reader-article-card theme-${readerTheme} font-${fontFamily}`}
-          style={{ fontSize: `${fontSize}px` }}
-        >
+          {/* Article Reading View */}
           <div
-            ref={articleContainerRef}
-            className="reader-article-body"
-            dangerouslySetInnerHTML={{ __html: processedHtml }}
-            onClick={handleArticleClick}
-          />
-        </div>
+            className={`reader-article-card theme-${readerTheme} font-${fontFamily}`}
+            style={{ fontSize: `${fontSize}px` }}
+          >
+            <div
+              ref={articleContainerRef}
+              className="reader-article-body"
+              dangerouslySetInnerHTML={{ __html: processedHtml }}
+              onClick={handleArticleClick}
+            />
+          </div>
+        </>
       )}
 
       {/* Interactive Word Lookup Popover */}
