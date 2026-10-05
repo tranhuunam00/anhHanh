@@ -753,3 +753,232 @@
 [data-theme="dark"] .reader-seek-range::-webkit-slider-thumb {
   border-color: #0f172a;
 }
+
+/* ======================================================== */
+/* 2-COLUMN SPLIT LAYOUT (SIDEBAR LEFT, ARTICLE RIGHT)     */
+/* ======================================================== */
+
+.smart-reader-container.reader-split-mode {
+  max-width: 1420px;
+  height: calc(100vh - 72px);
+  max-height: calc(100vh - 72px);
+  padding: 4px 16px 8px;
+  margin: 0 auto;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.reader-split-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 20px;
+  align-items: stretch;
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Left Sidebar Panel - Fixed Height & Internal Scroll */
+.reader-sidebar-panel {
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  scrollbar-width: thin;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.reader-sidebar-panel::-webkit-scrollbar {
+  width: 5px;
+}
+
+.reader-sidebar-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reader-sidebar-panel::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 999px;
+}
+
+.reader-sidebar-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.65);
+}
+
+.reader-sidebar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Sidebar Stats & Chips Card */
+.reader-sidebar-stats-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reader-sidebar-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reader-sidebar-chips-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 8px;
+}
+
+.reader-sidebar-chips-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.reader-chips-bar.sidebar-chips {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 2px 0;
+  gap: 6px;
+  scrollbar-width: thin;
+}
+
+/* Sidebar Display Settings Card */
+.reader-sidebar-display-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reader-sidebar-display-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.reader-display-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reader-display-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.reader-display-row-label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Right Column Content Panel */
+.reader-content-panel {
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Article Reading View - ONLY THIS AREA SCROLLS */
+.reader-content-panel .reader-article-card {
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding: 32px 46px 60px;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+.reader-content-panel .reader-article-card::-webkit-scrollbar {
+  width: 7px;
+}
+
+.reader-content-panel .reader-article-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reader-content-panel .reader-article-card::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 999px;
+}
+
+.reader-content-panel .reader-article-card::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.75);
+}
+
+/* Responsive breakpoint: Tablets & Mobile (< 1024px) */
+@media (max-width: 1024px) {
+  .smart-reader-container.reader-split-mode {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .reader-split-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .reader-sidebar-panel {
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .reader-content-panel {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .reader-content-panel .reader-article-card {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 24px 18px 40px;
+  }
+}

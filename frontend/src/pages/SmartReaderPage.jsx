@@ -823,7 +823,7 @@ export function SmartReaderPage({ isActive = true }) {
   const isEditorEmpty = !editorContent || (!editorContent.trim() && !editorContent.includes("<img"));
 
   return (
-    <div className="smart-reader-container">
+    <div className={`smart-reader-container ${mode === "reading" ? "reader-split-mode" : ""}`}>
       {/* ======================================================== */}
       {/* BƯỚC 1: MÀN HÌNH DÁN BÀI VIẾT (PASTE & PREVIEW MODE)     */}
       {/* ======================================================== */}
@@ -923,25 +923,28 @@ export function SmartReaderPage({ isActive = true }) {
       {/* ======================================================== */}
       {/* BƯỚC 2: MÀN HÌNH ĐỌC BÀI VIẾT (READER MODE & HIGHLIGHTS)  */}
       {/* ======================================================== */}
+      {/* ======================================================== */}
+      {/* BƯỚC 2: MÀN HÌNH ĐỌC BÀI VIẾT (CHIA 2 CỘT: TRÁI & PHẢI)  */}
+      {/* ======================================================== */}
       {mode === "reading" && (
-        <>
-          {/* Header Card in Reader Mode */}
-          <div className="reader-header-card">
-            {/* Top row with Back button */}
-            <div className="reader-nav-back-row">
+        <div className="reader-split-layout">
+          {/* CỘT TRÁI (STICKY SIDEBAR): BẢNG ĐIỀU KHIỂN & AUDIO PLAYER */}
+          <aside className="reader-sidebar-panel">
+            {/* Top row: Nút Quay lại & Xóa bài */}
+            <div className="reader-sidebar-nav">
               <button
                 className="btn btn-secondary btn-with-icon"
                 onClick={handleSwitchToPaste}
                 title="Dán bài báo khác hoặc bài mới"
               >
                 <ArrowLeft size={16} strokeWidth={2.2} />
-                <span>Dán bài khác / Bài mới</span>
+                <span>Dán bài khác</span>
               </button>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 <span className="reader-badge-sparkle">
-                  <Sparkles size={13} />
-                  Chế độ Đọc & Ôn từ
+                  <Sparkles size={12} />
+                  Đọc & Ôn từ
                 </span>
 
                 <button
@@ -960,75 +963,34 @@ export function SmartReaderPage({ isActive = true }) {
                   title="Xóa bài viết này"
                   style={{ color: "#ef4444" }}
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={15} />
                 </button>
               </div>
             </div>
 
-            {/* Stats Ribbon */}
-            <div className="reader-stats-ribbon">
-              <div className="reader-stats-group">
-                <div className="reader-stat-item">
-                  <BookOpen size={16} style={{ color: "#0284c7" }} />
-                  <span>Tổng số từ: <strong>{totalWordsCount}</strong> từ</span>
-                </div>
-
-                <div className="reader-stat-item">
-                  <span className="reader-matched-badge">
-                    ⭐ <strong>{matchedWords.length} từ đã lưu</strong> xuất hiện trong bài
-                  </span>
-                </div>
-              </div>
-
-              {/* Quick Word Chips */}
-              {matchedWords.length > 0 && (
-                <div className="reader-chips-bar">
-                  {matchedWords.slice(0, 12).map((item, idx) => (
-                    <button
-                      key={idx}
-                      className="reader-word-chip"
-                      onClick={() => handleScrollToWord(item.word)}
-                      title={`Chạm để cuộn đến từ "${item.word}" trong bài báo`}
-                    >
-                      <span className={`chip-dot status-${(item.status || "NEW").toLowerCase()}`}></span>
-                      <span>{item.word}</span>
-                    </button>
-                  ))}
-                  {matchedWords.length > 12 && (
-                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", alignSelf: "center" }}>
-                      +{matchedWords.length - 12} từ khác
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Dedicated Audio Player Section with Timeline Scrubber Bar */}
+            {/* Trình phát âm thanh & Thanh tua thời gian */}
             <div className="reader-player-section">
               {/* Row 1: Player controls & sentence counter */}
               <div className="reader-player-main-row">
                 <div className="reader-player-controls-left">
-                  {/* Prev Sentence */}
                   <button
                     className="btn btn-secondary btn-icon"
                     onClick={handlePrevSentence}
                     disabled={currentSentenceIdx <= 0}
-                    title="Lùi về câu trước (Câu trước)"
+                    title="Lùi về câu trước"
                   >
                     <SkipBack size={15} />
                   </button>
 
-                  {/* Main Play / Pause Button */}
                   <button
                     className={`btn ${isSpeaking ? "btn-primary" : "btn-secondary"} btn-with-icon reader-play-btn`}
                     onClick={handleToggleSpeech}
                     title={isSpeaking ? "Tạm dừng đọc" : "Bắt đầu nghe đọc bài viết bằng AI"}
                   >
                     {isSpeaking ? <Pause size={15} /> : <Play size={15} />}
-                    <span>{isSpeaking ? "Tạm dừng" : "Nghe đọc bài"}</span>
+                    <span>{isSpeaking ? "Tạm dừng" : "Nghe đọc"}</span>
                   </button>
 
-                  {/* Next Sentence */}
                   <button
                     className="btn btn-secondary btn-icon"
                     onClick={handleNextSentence}
@@ -1038,7 +1000,6 @@ export function SmartReaderPage({ isActive = true }) {
                     <SkipForward size={15} />
                   </button>
 
-                  {/* Replay from Start */}
                   <button
                     className="btn btn-secondary btn-icon"
                     onClick={handleRestartSpeech}
@@ -1046,35 +1007,35 @@ export function SmartReaderPage({ isActive = true }) {
                   >
                     <RotateCcw size={14} />
                   </button>
-
-                  {/* Speech Rate Group */}
-                  <div className="reader-control-btn-group">
-                    {[0.8, 1.0, 1.25, 1.5].map((rate) => (
-                      <button
-                        key={rate}
-                        className={`reader-control-btn ${speechRate === rate ? "active" : ""}`}
-                        onClick={() => handleRateChange(rate)}
-                        title={`Tốc độ đọc ${rate}x`}
-                      >
-                        {rate}x
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
-                {/* Sentence Counter Badge */}
-                <div className="reader-player-controls-right">
-                  <span className="reader-sentence-badge">
-                    <Volume2 size={13} style={{ color: isSpeaking ? "#10b981" : "var(--text-muted)" }} />
-                    <span>
-                      Câu <strong>{sentencesList && sentencesList.length > 0 ? currentSentenceIdx + 1 : 0}</strong> /{" "}
-                      {sentencesList?.length || 0}
-                    </span>
+                <span className="reader-sentence-badge">
+                  <Volume2 size={13} style={{ color: isSpeaking ? "#10b981" : "var(--text-muted)" }} />
+                  <span>
+                    Câu <strong>{sentencesList && sentencesList.length > 0 ? currentSentenceIdx + 1 : 0}</strong> /{" "}
+                    {sentencesList?.length || 0}
                   </span>
+                </span>
+              </div>
+
+              {/* Row 2: Tốc độ đọc */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600 }}>Tốc độ đọc:</span>
+                <div className="reader-control-btn-group">
+                  {[0.8, 1.0, 1.25, 1.5].map((rate) => (
+                    <button
+                      key={rate}
+                      className={`reader-control-btn ${speechRate === rate ? "active" : ""}`}
+                      onClick={() => handleRateChange(rate)}
+                      title={`Tốc độ đọc ${rate}x`}
+                    >
+                      {rate}x
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Row 2: Timeline Scrubber Bar */}
+              {/* Row 3: Timeline Scrubber Bar */}
               <div className="reader-scrubber-row">
                 <span className="reader-time-badge current-time">{formatTime(elapsedSeconds)}</span>
 
@@ -1098,101 +1059,146 @@ export function SmartReaderPage({ isActive = true }) {
                 <span className="reader-time-badge total-time">{formatTime(totalDuration)}</span>
               </div>
 
-              {/* Row 3: Scrubber helper hint */}
+              {/* Row 4: Scrubber helper hint */}
               <div className="reader-scrubber-hint">
-                <span>💡 Kéo thanh trượt để tua thời gian hoặc <strong>nhấp trực tiếp vào bất kỳ câu nào</strong> trong bài báo để nghe câu đó</span>
+                <span>💡 Kéo thanh tua hoặc <strong>bấm vào câu bất kỳ</strong> bên phải để nghe</span>
               </div>
             </div>
 
-            {/* Toolbar (Font, Theme, Layout) */}
-            <div className="reader-toolbar">
-              <div className="reader-toolbar-left">
-                <span style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "6px" }}>
-                  <Type size={14} /> Tùy chỉnh hiển thị:
+            {/* Thống kê bài viết & Danh sách từ vựng cần ôn */}
+            <div className="reader-sidebar-stats-card">
+              <div className="reader-sidebar-stats-row">
+                <div className="reader-stat-item">
+                  <BookOpen size={15} style={{ color: "#0284c7" }} />
+                  <span>Tổng số: <strong>{totalWordsCount}</strong> từ</span>
+                </div>
+
+                <span className="reader-matched-badge">
+                  ⭐ <strong>{matchedWords.length} từ đã lưu</strong>
                 </span>
               </div>
 
-              <div className="reader-toolbar-right">
-                {/* Font Size A- / A+ */}
-                <div className="reader-control-btn-group">
-                  <button
-                    className="reader-control-btn"
-                    onClick={() => setFontSize((s) => Math.max(15, s - 1))}
-                    title="Giảm kích thước chữ"
-                  >
-                    A-
-                  </button>
-                  <span style={{ fontSize: "0.8rem", padding: "0 4px", color: "var(--text-muted)" }}>
-                    {fontSize}px
+              {/* Danh sách chip từ vựng */}
+              {matchedWords.length > 0 && (
+                <div className="reader-sidebar-chips-wrap">
+                  <span className="reader-sidebar-chips-label">
+                    Từ vựng đã lưu trong bài:
                   </span>
-                  <button
-                    className="reader-control-btn"
-                    onClick={() => setFontSize((s) => Math.min(26, s + 1))}
-                    title="Tăng kích thước chữ"
-                  >
-                    A+
-                  </button>
+                  <div className="reader-chips-bar sidebar-chips">
+                    {matchedWords.map((item, idx) => (
+                      <button
+                        key={idx}
+                        className="reader-word-chip"
+                        onClick={() => handleScrollToWord(item.word)}
+                        title={`Chạm để cuộn đến từ "${item.word}" trong bài báo`}
+                      >
+                        <span className={`chip-dot status-${(item.status || "NEW").toLowerCase()}`}></span>
+                        <span>{item.word}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Tùy chỉnh hiển thị (Cỡ chữ, Font, Giao diện) */}
+            <div className="reader-sidebar-display-card">
+              <span className="reader-sidebar-display-title">
+                <Type size={14} /> Tùy chỉnh hiển thị:
+              </span>
+
+              <div className="reader-display-rows">
+                {/* Kích cỡ chữ */}
+                <div className="reader-display-row-item">
+                  <span className="reader-display-row-label">Cỡ chữ:</span>
+                  <div className="reader-control-btn-group">
+                    <button
+                      className="reader-control-btn"
+                      onClick={() => setFontSize((s) => Math.max(15, s - 1))}
+                      title="Giảm kích thước chữ"
+                    >
+                      A-
+                    </button>
+                    <span style={{ fontSize: "0.8rem", padding: "0 6px", color: "var(--text-muted)", minWidth: "32px", textAlign: "center" }}>
+                      {fontSize}px
+                    </span>
+                    <button
+                      className="reader-control-btn"
+                      onClick={() => setFontSize((s) => Math.min(26, s + 1))}
+                      title="Tăng kích thước chữ"
+                    >
+                      A+
+                    </button>
+                  </div>
                 </div>
 
-                {/* Font Family (Sans vs Serif) */}
-                <div className="reader-control-btn-group">
-                  <button
-                    className={`reader-control-btn ${fontFamily === "sans" ? "active" : ""}`}
-                    onClick={() => setFontFamily("sans")}
-                    title="Font chữ hiện đại (Sans-serif)"
-                  >
-                    Sans
-                  </button>
-                  <button
-                    className={`reader-control-btn ${fontFamily === "serif" ? "active" : ""}`}
-                    onClick={() => setFontFamily("serif")}
-                    title="Font chữ báo chí (Serif)"
-                  >
-                    Serif
-                  </button>
+                {/* Kiểu chữ */}
+                <div className="reader-display-row-item">
+                  <span className="reader-display-row-label">Kiểu chữ:</span>
+                  <div className="reader-control-btn-group">
+                    <button
+                      className={`reader-control-btn ${fontFamily === "sans" ? "active" : ""}`}
+                      onClick={() => setFontFamily("sans")}
+                      title="Font chữ hiện đại (Sans-serif)"
+                    >
+                      Sans
+                    </button>
+                    <button
+                      className={`reader-control-btn ${fontFamily === "serif" ? "active" : ""}`}
+                      onClick={() => setFontFamily("serif")}
+                      title="Font chữ báo chí (Serif)"
+                    >
+                      Serif
+                    </button>
+                  </div>
                 </div>
 
-                {/* Reader Theme (Default, Sepia, Dark) */}
-                <div className="reader-control-btn-group">
-                  <button
-                    className={`reader-control-btn ${readerTheme === "default" ? "active" : ""}`}
-                    onClick={() => setReaderTheme("default")}
-                    title="Giao diện mặc định"
-                  >
-                    Chuẩn
-                  </button>
-                  <button
-                    className={`reader-control-btn ${readerTheme === "sepia" ? "active" : ""}`}
-                    onClick={() => setReaderTheme("sepia")}
-                    title="Nền giấy vàng ấm (Sepia - Đọc ban đêm không mỏi mắt)"
-                  >
-                    📜 Giấy
-                  </button>
-                  <button
-                    className={`reader-control-btn ${readerTheme === "dark" ? "active" : ""}`}
-                    onClick={() => setReaderTheme("dark")}
-                    title="Nền tối OLED"
-                  >
-                    🌙 Tối
-                  </button>
+                {/* Màu nền giao diện */}
+                <div className="reader-display-row-item">
+                  <span className="reader-display-row-label">Màu nền:</span>
+                  <div className="reader-control-btn-group">
+                    <button
+                      className={`reader-control-btn ${readerTheme === "default" ? "active" : ""}`}
+                      onClick={() => setReaderTheme("default")}
+                      title="Giao diện mặc định"
+                    >
+                      Chuẩn
+                    </button>
+                    <button
+                      className={`reader-control-btn ${readerTheme === "sepia" ? "active" : ""}`}
+                      onClick={() => setReaderTheme("sepia")}
+                      title="Nền giấy vàng ấm (Sepia)"
+                    >
+                      📜 Giấy
+                    </button>
+                    <button
+                      className={`reader-control-btn ${readerTheme === "dark" ? "active" : ""}`}
+                      onClick={() => setReaderTheme("dark")}
+                      title="Nền tối OLED"
+                    >
+                      🌙 Tối
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
 
-          {/* Article Reading View */}
-          <div
-            className={`reader-article-card theme-${readerTheme} font-${fontFamily}`}
-            style={{ fontSize: `${fontSize}px` }}
-          >
+          {/* CỘT PHẢI: BÀI TEXT ĐỌC */}
+          <main className="reader-content-panel">
             <div
-              ref={articleContainerRef}
-              className="reader-article-body"
-              dangerouslySetInnerHTML={{ __html: processedHtml }}
-              onClick={handleArticleClick}
-            />
-          </div>
-        </>
+              className={`reader-article-card theme-${readerTheme} font-${fontFamily}`}
+              style={{ fontSize: `${fontSize}px` }}
+            >
+              <div
+                ref={articleContainerRef}
+                className="reader-article-body"
+                dangerouslySetInnerHTML={{ __html: processedHtml }}
+                onClick={handleArticleClick}
+              />
+            </div>
+          </main>
+        </div>
       )}
 
       {/* Interactive Word Lookup Popover */}
