@@ -110,11 +110,9 @@ function getWordVariants(word) {
 export function SmartReaderPage({ isActive = true }) {
   const { savedVocabMap, showToast } = useAuth();
 
-  // Mode: "paste" (Khung dán bài mới) vs "reading" (Giao diện đọc bài)
-  const [mode, setMode] = useState(() => {
-    const saved = localStorage.getItem("shotlang_reader_article");
-    return saved && saved.trim().length > 10 ? "reading" : "paste";
-  });
+  // Mode: "paste" (Màn hình dán bài mới) vs "reading" (Giao diện đọc bài)
+  // Mặc định luôn mở màn hình Dán bài mới để người dùng paste vào trước
+  const [mode, setMode] = useState("paste");
 
   // Content state
   const [editorContent, setEditorContent] = useState("");
@@ -205,7 +203,14 @@ export function SmartReaderPage({ isActive = true }) {
   // Input Event inside editor box
   const handleEditorInput = () => {
     if (editorBoxRef.current) {
-      setEditorContent(editorBoxRef.current.innerHTML);
+      const html = editorBoxRef.current.innerHTML || "";
+      const text = editorBoxRef.current.innerText || "";
+      const hasImg = Boolean(editorBoxRef.current.querySelector("img"));
+      if (!text.trim() && !hasImg) {
+        setEditorContent("");
+      } else {
+        setEditorContent(html);
+      }
     }
   };
 
@@ -473,7 +478,7 @@ export function SmartReaderPage({ isActive = true }) {
     }
   };
 
-  const isEditorEmpty = !editorContent || !editorContent.trim() || editorContent === "<br>";
+  const isEditorEmpty = !editorContent || (!editorContent.trim() && !editorContent.includes("<img"));
 
   return (
     <div className="smart-reader-container">
