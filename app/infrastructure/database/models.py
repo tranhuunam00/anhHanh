@@ -40,6 +40,21 @@ class User(Base):
     feedbacks = relationship('Feedback', back_populates='user', cascade='all, delete-orphan')
     feedback_messages = relationship('FeedbackMessage', back_populates='user', cascade='all, delete-orphan')
 
+    @property
+    def can_use_ai_import(self) -> bool:
+        if not self.email:
+            return False
+        em = self.email.strip().lower()
+        handle = em.split('@')[0]
+        nm = (self.name or '').strip().lower()
+        if handle in {'tranhuunam23022000', 'vuthiquynhtrang', 'vuthiquynhtrangbl6d'}:
+            return True
+        if 'tranhuunam23022000' in em or 'vuthiquynhtrang' in em or 'vuthiquynhtrangbl6d' in em:
+            return True
+        if 'tranhuunam23022000' in nm or 'vuthiquynhtrang' in nm or 'vuthiquynhtrangbl6d' in nm:
+            return True
+        return False
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -47,6 +62,7 @@ class User(Base):
             'name': self.name,
             'role': self.role,
             'avatar_url': self.avatar_url,
+            'can_use_ai_import': self.can_use_ai_import,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
 

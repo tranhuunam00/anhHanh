@@ -499,3 +499,48 @@ export const playPronunciationAudio = (word, accent = "us") => {
     }
   });
 };
+
+export const aiExtractVocabFromText = async (text, sourceLang = "en", targetLang = "vi", mode = "auto", token = null) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch("/api/vocab/ai-extract", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      text,
+      source_lang: sourceLang,
+      target_lang: targetLang,
+      mode,
+    }),
+  });
+  return await safeParseResponse(res, "Không thể trích xuất từ vựng qua AI");
+};
+
+export const aiExtractVocabFromFile = async (file, token = null) => {
+  const headers = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch("/api/vocab/ai-extract-file", {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+  return await safeParseResponse(res, "Không thể trích xuất từ tệp qua AI");
+};
+
+export const batchImportVocab = async (items, token = null) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch("/api/vocab/batch-import", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ items }),
+  });
+  return await safeParseResponse(res, "Không thể lưu danh sách từ vựng");
+};
+

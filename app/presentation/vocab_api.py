@@ -6,15 +6,16 @@ import re
 import logging
 from typing import Optional, List
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.infrastructure.database.connection import get_db
 from app.infrastructure.database.models import User, UserVocabulary, DictionaryWord
-from app.application.auth_service import get_current_user, get_current_user_optional
+from app.application.auth_service import get_current_user, get_current_user_optional, require_ai_import_permission
 from app.infrastructure.image_search_service import ImageSearchService
 from app.infrastructure.translation_service import TranslationService
+from app.infrastructure.ai_vocab_service import AIVocabService
 
 logger = logging.getLogger(__name__)
 
@@ -695,4 +696,197 @@ async def submit_vocab_review_result(
     await db.commit()
     await db.refresh(vocab)
     return {'message': 'Đã cập nhật tiến độ học', 'vocab': vocab.to_dict()}
+
+
+class AIExtractTextRequest(BaseModel):
+    text: str = Field(..., min_length=2)
+    source_lang: Optional[str] = "en"
+    target_lang: Optional[str] = "vi"
+    mode: Optional[str] = "auto"
+
+
+class BatchImportVocabItem(BaseModel):
+    word: str = Field(..., min_length=1, max_length=150)
+    meaning: str
+    phonetic: Optional[str] = None
+    context_sentence: Optional[str] = ""
+    image_url: Optional[str] = None
+
+
+class BatchImportVocabRequest(BaseModel):
+    items: List[BatchImportVocabItem]
+
+
+@router.post('/ai-extract')
+async def ai_extract_vocabulary_from_text(
+    payload: AIExtractTextRequest,
+    current_user: User = Depends(require_ai_import_permission)
+):
+    """AI Vocabulary Extraction from raw text or document snippet.
+    Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrang.
+    """
+    try:
+        items = await AIVocabService.extract_vocabulary(
+            text=payload.text,
+            source_lang=payload.source_lang or "en",
+            target_lang=payload.target_lang or "vi",
+            mode=payload.mode or "auto"
+        )
+        return {
+            'success': True,
+            'items': items,
+            'total': len(items),
+            'operator': current_user.email
+        }
+    except Exception as e:
+        logger.error(f"AI Vocabulary extraction error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi AI trích xuất từ vựng: {str(e)}"
+        )
+
+
+@router.post('/ai-extract-file')
+async def ai_extract_vocabulary_from_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(require_ai_import_permission)
+):
+    """AI Vocabulary Extraction directly from uploaded PDF, Word DOCX, or text file.
+    Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrang.
+    """
+    filename = file.filename or "uploaded_document"
+    allowed_exts = (".pdf", ".docx", ".txt", ".md", ".csv")
+    if not any(filename.lower().endswith(ext) for ext in allowed_exts):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Định dạng tệp không được hỗ trợ. Vui lòng tải lên tệp: {', '.join(allowed_exts)}"
+        )
+
+    try:
+        content_bytes = await file.read()
+        if len(content_bytes) > 25 * 1024 * 1024:  # 25MB max
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Kích thước tệp vượt quá giới hạn cho phép (tối đa 25MB)."
+            )
+
+        extracted_text = AIVocabService.extract_text_from_file(content_bytes, filename)
+        if not extracted_text or not extracted_text.strip():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Không thể đọc nội dung văn bản từ tệp này hoặc tệp rỗng."
+            )
+
+        items = await AIVocabService.extract_vocabulary(
+            text=extracted_text,
+            source_lang="en",
+            target_lang="vi",
+            mode="auto"
+        )
+        return {
+            'success': True,
+            'filename': filename,
+            'raw_text_length': len(extracted_text),
+            'items': items,
+            'total': len(items),
+            'operator': current_user.email
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"AI file extraction error on '{filename}': {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi khi xử lý tệp '{filename}': {str(e)}"
+        )
+
+
+@router.post('/batch-import')
+async def batch_import_vocabulary_words(
+    payload: BatchImportVocabRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Batch import multiple vocabulary words into user notebook."""
+    if not payload.items:
+        raise HTTPException(status_code=400, detail="Danh sách từ vựng rỗng")
+
+    added_count = 0
+    updated_count = 0
+    now = datetime.now(timezone.utc)
+
+    # Pre-fetch existing words for this user to minimize individual queries
+    existing_res = await db.execute(
+        select(UserVocabulary).where(UserVocabulary.user_id == current_user.id)
+    )
+    existing_map = {v.word.lower().strip(): v for v in existing_res.scalars().all()}
+
+    for item in payload.items:
+        clean_word = item.word.strip()
+        if not clean_word:
+            continue
+
+        clean_meaning = (item.meaning or "").strip() or clean_word
+        phonetic = (item.phonetic or "").strip() or None
+        context = (item.context_sentence or "").strip()
+        image_url = (item.image_url or "").strip() or None
+
+        # Auto enrich IPA if not provided
+        if not phonetic:
+            phonetic = ImageSearchService.get_word_phonetic(clean_word)
+
+        key = clean_word.lower()
+        if key in existing_map:
+            # Update existing
+            existing_vocab = existing_map[key]
+            existing_vocab.meaning = clean_meaning
+            if phonetic:
+                existing_vocab.phonetic = phonetic
+            if context:
+                existing_vocab.context_sentence = context
+            if image_url:
+                existing_vocab.image_url = image_url
+            updated_count += 1
+        else:
+            # Create new
+            new_v = UserVocabulary(
+                user_id=current_user.id,
+                word=clean_word,
+                phonetic=phonetic,
+                meaning=clean_meaning,
+                context_sentence=context,
+                image_url=image_url,
+                status='NEW',
+                next_review_at=now,
+                review_interval_days=1,
+                mastery_score=0
+            )
+            db.add(new_v)
+            existing_map[key] = new_v
+            added_count += 1
+
+        # Also register in global DictionaryWord
+        try:
+            dict_check = await db.execute(select(DictionaryWord).where(DictionaryWord.word == key))
+            if not dict_check.scalars().first():
+                db.add(DictionaryWord(
+                    word=key,
+                    ipa=phonetic,
+                    ipa_uk=phonetic,
+                    ipa_us=phonetic,
+                    meaning=clean_meaning,
+                ))
+        except Exception:
+            pass
+
+    await db.commit()
+
+    return {
+        'success': True,
+        'message': f"Đã lưu thành công: thêm mới {added_count} từ, cập nhật {updated_count} từ.",
+        'added_count': added_count,
+        'updated_count': updated_count,
+        'total_processed': len(payload.items)
+    }
+
 

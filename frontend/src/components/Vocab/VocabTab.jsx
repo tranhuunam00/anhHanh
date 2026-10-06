@@ -30,8 +30,10 @@ import {
   fetchDueVocabSession,
 } from "../../services/authVocabService";
 import VocabReviewModal from "./VocabReviewModal";
+import VocabExerciseHubModal from "./VocabExerciseHubModal";
 import { AddVocabModal } from "../Modals/AddVocabModal";
 import { EditVocabModal } from "../Modals/EditVocabModal";
+import { AIVocabImportModal } from "../Modals/AIVocabImportModal";
 import { exportVocabToCSV, exportVocabToAnki } from "../../utils/vocabExporter";
 import { splitContextSentence } from "../../utils/textNormalizer";
 
@@ -45,7 +47,9 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [refreshingMeaningId, setRefreshingMeaningId] = useState(null);
   const [dueItems, setDueItems] = useState([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isExerciseHubOpen, setIsExerciseHubOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAIImportModalOpen, setIsAIImportModalOpen] = useState(false);
   const [editingVocab, setEditingVocab] = useState(null);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [listeningWordId, setListeningWordId] = useState(null);
@@ -351,6 +355,44 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
               <span>Thêm từ mới</span>
             </button>
 
+            {/* AI Extract & Import Vocabulary Button */}
+            <button
+              className="btn btn-primary btn-with-icon"
+              onClick={() => setIsAIImportModalOpen(true)}
+              style={{
+                padding: "6px 14px",
+                fontSize: "0.82rem",
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)",
+                fontWeight: 700,
+                border: "none",
+                boxShadow: "0 2px 10px rgba(139, 92, 246, 0.35)",
+              }}
+              title="AI Tự động trích xuất & chèn từ vựng từ tệp PDF/Word hoặc văn bản dán (tranhuunam23022000 & vuthiquynhtrang)"
+            >
+              <Sparkles size={14} />
+              <span>AI Tách & Import</span>
+            </button>
+
+            {/* 20 Exercise Modes & Interactive Games Button */}
+            <button
+              className="btn btn-primary btn-with-icon"
+              onClick={() => setIsExerciseHubOpen(true)}
+              style={{
+                padding: "6px 14px",
+                fontSize: "0.82rem",
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, #0284c7 0%, #059669 100%)",
+                fontWeight: 700,
+                border: "none",
+                boxShadow: "0 2px 10px rgba(2, 132, 199, 0.35)",
+              }}
+              title="Luyện tập từ vựng qua 20 dạng bài tập tương tác, trắc nghiệm, phản xạ & trò chơi"
+            >
+              <Zap size={14} fill="currentColor" />
+              <span>Luyện tập (20 dạng)</span>
+            </button>
+
             {/* Export Dropdown Menu */}
             <div className="vocab-export-container" ref={exportMenuRef}>
               <button
@@ -440,7 +482,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 Hôm nay bạn có <span style={{ color: "#38bdf8" }}>{dueItems.length} từ</span> đến hạn ôn tập!
               </div>
               <div style={{ fontSize: "0.85rem", color: "var(--text-secondary, #94a3b8)", marginTop: "2px" }}>
-                Thực hành qua 4 dạng bài tập tương tác (Trắc nghiệm, Nghe đoán từ, Điền câu, Flashcard)
+                Thực hành qua 20 dạng bài tập tương tác & trò chơi (Trắc nghiệm, Lật thẻ, Ghép cặp siêu tốc, Spelling Bee, Hangman, Phản xạ Đúng/Sai, Flashcard 3D...)
               </div>
             </div>
           </div>
@@ -460,12 +502,29 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
               alignItems: "center",
               gap: "8px",
             }}
-            onClick={() => setIsReviewModalOpen(true)}
+            onClick={() => setIsExerciseHubOpen(true)}
           >
             <Zap size={18} fill="currentColor" />
-            Bắt đầu Ôn tập ({dueItems.length} từ)
+            Bắt đầu Ôn tập 20 Dạng ({dueItems.length} từ)
           </button>
         </div>
+      )}
+
+      {/* 20 Exercise Modes & Games Modal */}
+      {isExerciseHubOpen && (
+        <VocabExerciseHubModal
+          vocabPool={dueItems.length > 0 ? dueItems : items}
+          token={token}
+          onClose={() => {
+            setIsExerciseHubOpen(false);
+            loadWords();
+            if (refreshStreak) refreshStreak();
+          }}
+          onFinished={() => {
+            loadWords();
+            if (refreshStreak) refreshStreak();
+          }}
+        />
       )}
 
       {isReviewModalOpen && (
@@ -738,6 +797,17 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
         isOpen={!!editingVocab}
         vocab={editingVocab}
         onClose={() => setEditingVocab(null)}
+        onSuccess={() => {
+          loadWords();
+          if (refreshStreak) refreshStreak();
+          if (refreshSavedVocab) refreshSavedVocab();
+        }}
+      />
+
+      {/* AI Smart Vocabulary Import Modal (tranhuunam23022000 & vuthiquynhtrang) */}
+      <AIVocabImportModal
+        isOpen={isAIImportModalOpen}
+        onClose={() => setIsAIImportModalOpen(false)}
         onSuccess={() => {
           loadWords();
           if (refreshStreak) refreshStreak();
