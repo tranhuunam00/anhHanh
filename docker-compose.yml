@@ -68,6 +68,8 @@ services:
         condition: service_healthy
     ports:
       - "${WEB_PORT:-5100}:5100"
+    env_file:
+      - .env
     environment:
       - PORT=${PORT:-5100}
       - HOST=${HOST:-0.0.0.0}
@@ -83,6 +85,7 @@ services:
       - YOUTUBE_PROXY=${YOUTUBE_PROXY:-}
       - YOUTUBE_COOKIE_FILE=${YOUTUBE_COOKIE_FILE:-/app/data/cookies.txt}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - MINIO_ENDPOINT=${MINIO_ENDPOINT:-minio:9100}
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-${MINIO_ROOT_USER:-minioadmin}}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-${MINIO_ROOT_PASSWORD:-minioadmin123}}
