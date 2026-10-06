@@ -226,3 +226,19 @@ async def require_ai_import_permission(current_user: User = Depends(get_current_
     return current_user
 
 
+def is_ai_writing_allowed(user: User) -> bool:
+    """Helper to check if user has permission for AI Writing evaluation & coaching."""
+    return bool(user and user.can_use_ai_writing)
+
+
+async def require_ai_writing_permission(current_user: User = Depends(get_current_user)) -> User:
+    """Enforce strict access control for AI Writing: Only tranhuunam23022000 & vuthiquynhtrangbl6d."""
+    if not is_ai_writing_allowed(current_user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Quyền truy cập bị từ chối: Tính năng AI Chấm điểm & Sửa bài Writing chỉ dành riêng cho tài khoản được cấp phép (tranhuunam23022000 & vuthiquynhtrangbl6d) nhằm bảo vệ chi phí API.'
+        )
+    return current_user
+
+
+

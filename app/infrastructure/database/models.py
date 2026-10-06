@@ -1,4 +1,5 @@
 import uuid
+import json
 from datetime import datetime, timezone
 from sqlalchemy import (
     Column,
@@ -55,6 +56,10 @@ class User(Base):
             return True
         return False
 
+    @property
+    def can_use_ai_writing(self) -> bool:
+        return self.can_use_ai_import
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -63,6 +68,7 @@ class User(Base):
             'role': self.role,
             'avatar_url': self.avatar_url,
             'can_use_ai_import': self.can_use_ai_import,
+            'can_use_ai_writing': self.can_use_ai_writing,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
 
@@ -339,5 +345,53 @@ class DictionaryWord(Base):
             'meaning': self.meaning,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
+
+
+class WritingSubmission(Base):
+    """User writing practice submissions with AI evaluation, scores, and feedback."""
+    __tablename__ = 'writing_submissions'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    topic = Column(Text, nullable=False)
+    genre = Column(String(50), nullable=False, default='ielts_task2')  # 'ielts_task2', 'ielts_task1', 'email', 'paragraph', 'free'
+    content = Column(Text, nullable=False)
+    word_count = Column(Integer, nullable=False, default=0)
+    target_band = Column(Float, nullable=True, default=7.0)
+    overall_score = Column(Float, nullable=True)
+    task_response_score = Column(Float, nullable=True)
+    coherence_score = Column(Float, nullable=True)
+    lexical_score = Column(Float, nullable=True)
+    grammar_score = Column(Float, nullable=True)
+    feedback_json = Column(Text, nullable=True)  # JSON-serialized AI feedback
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+
+    user = relationship('User', backref='writing_submissions')
+
+    def to_dict(self):
+        feedback_data = None
+        if self.feedback_json:
+            try:
+                feedback_data = json.loads(self.feedback_json)
+            except Exception:
+                feedback_data = None
+
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'topic': self.topic,
+            'genre': self.genre,
+            'content': self.content,
+            'word_count': self.word_count,
+            'target_band': self.target_band,
+            'overall_score': self.overall_score,
+            'task_response_score': self.task_response_score,
+            'coherence_score': self.coherence_score,
+            'lexical_score': self.lexical_score,
+            'grammar_score': self.grammar_score,
+            'feedback': feedback_data,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
 
 

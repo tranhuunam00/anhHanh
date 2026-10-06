@@ -20,6 +20,7 @@ import { Footer } from "./components/Footer/Footer";
 import { TranscriptPage } from "./pages/TranscriptPage";
 import { AudioStudioPage } from "./pages/AudioStudioPage";
 import { SmartReaderPage } from "./pages/SmartReaderPage";
+import { WritingPage } from "./pages/WritingPage";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -55,6 +56,7 @@ export default function App() {
     if (path === "/vocab" || path.startsWith("/vocab/")) return "tab-vocab";
     if (path === "/transcript" || path.startsWith("/transcript/")) return "tab-transcript";
     if (path === "/reader" || path.startsWith("/reader/")) return "tab-reader";
+    if (path === "/writing" || path.startsWith("/writing/")) return "tab-writing";
     if (path === "/history" || path.startsWith("/history/")) return "tab-history";
     if (path === "/audio-studio" || path.startsWith("/audio-studio/")) return "tab-audio-studio";
     return "tab-dictation";
@@ -65,6 +67,7 @@ export default function App() {
       case "tab-admin": return "/admin";
       case "tab-vocab": return "/vocab";
       case "tab-reader": return "/reader";
+      case "tab-writing": return "/writing";
       case "tab-transcript": return "/transcript";
       case "tab-history": return "/history";
       case "tab-audio-studio": return "/audio-studio";
@@ -833,6 +836,20 @@ export default function App() {
             </button>
 
             <button
+              className={`tab-btn ${activeTab === "tab-writing" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-writing")}
+              style={activeTab === "tab-writing" ? { borderColor: "#8b5cf6" } : {}}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                <path d="M2 2l7.586 7.586" />
+                <circle cx="11" cy="11" r="2" />
+              </svg>
+              <span>Luyện viết AI</span>
+            </button>
+
+            <button
               className={`tab-btn ${activeTab === "tab-history" ? "active" : ""}`}
               onClick={() => setActiveTab("tab-history")}
             >
@@ -1051,6 +1068,11 @@ export default function App() {
         {/* TAB 6: Audio & Phonology Studio (Isolated Screen) */}
         <div style={{ display: activeTab === "tab-audio-studio" ? "block" : "none" }}>
           <AudioStudioPage isActive={activeTab === "tab-audio-studio"} />
+        </div>
+
+        {/* TAB 7: AI Writing Studio */}
+        <div style={{ display: activeTab === "tab-writing" ? "block" : "none" }}>
+          <WritingPage isActive={activeTab === "tab-writing"} />
         </div>
       </main>
 
