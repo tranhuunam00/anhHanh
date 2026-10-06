@@ -36,6 +36,7 @@ import { EditVocabModal } from "../Modals/EditVocabModal";
 import { AIVocabImportModal } from "../Modals/AIVocabImportModal";
 import { exportVocabToCSV, exportVocabToAnki } from "../../utils/vocabExporter";
 import { splitContextSentence } from "../../utils/textNormalizer";
+import { markVocabStudiedToday } from "../../utils/dailyReminderManager";
 
 export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const { token, isAuthenticated, refreshStreak, showToast, refreshSavedVocab } = useAuth();
@@ -94,6 +95,22 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Tự động mở 20 Dạng Bài tập khi click thông báo Background hoặc Banner nhắc nhở
+  useEffect(() => {
+    const handleOpenHub = () => {
+      setIsExerciseHubOpen(true);
+    };
+    window.addEventListener("open-exercise-hub-modal", handleOpenHub);
+
+    if (typeof window !== "undefined" && window.location.search.includes("openExercise=true")) {
+      setIsExerciseHubOpen(true);
+    }
+
+    return () => {
+      window.removeEventListener("open-exercise-hub-modal", handleOpenHub);
+    };
   }, []);
 
   useEffect(() => {
@@ -521,6 +538,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
             if (refreshStreak) refreshStreak();
           }}
           onFinished={() => {
+            markVocabStudiedToday();
             loadWords();
             if (refreshStreak) refreshStreak();
           }}
@@ -537,6 +555,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
             if (refreshStreak) refreshStreak();
           }}
           onFinished={() => {
+            markVocabStudiedToday();
             loadWords();
             if (refreshStreak) refreshStreak();
           }}

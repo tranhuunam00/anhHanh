@@ -15,10 +15,12 @@ import { AdminPortal } from "./components/Admin/AdminPortal";
 import { VocabTab } from "./components/Vocab/VocabTab";
 import { HistoryTab } from "./components/History/HistoryTab";
 import { FloatingVocabSaver } from "./components/Vocab/FloatingVocabSaver";
+import { DailyReminderBanner } from "./components/Vocab/DailyReminderBanner";
 import { Footer } from "./components/Footer/Footer";
 import { TranscriptPage } from "./pages/TranscriptPage";
 import { AudioStudioPage } from "./pages/AudioStudioPage";
 import { SmartReaderPage } from "./pages/SmartReaderPage";
+import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
 import { useTheme } from "./hooks/useTheme";
@@ -96,6 +98,26 @@ export default function App() {
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
+
+  // Khởi động Daily Vocab Reminder Background Scheduler & Service Worker
+  useEffect(() => {
+    const cleanupScheduler = initDailyReminderScheduler();
+
+    const handleOpenExerciseHub = () => {
+      setActiveTab("tab-vocab");
+      // Gửi event để VocabTab tự mở VocabExerciseHubModal
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("open-exercise-hub-modal"));
+      }, 150);
+    };
+
+    window.addEventListener("open-exercise-hub", handleOpenExerciseHub);
+
+    return () => {
+      if (cleanupScheduler) cleanupScheduler();
+      window.removeEventListener("open-exercise-hub", handleOpenExerciseHub);
+    };
+  }, [setActiveTab]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -1126,6 +1148,17 @@ export default function App() {
           setIsMicPermissionModalOpen(false);
           handleToggleMic();
         }}
+      />
+
+      {/* In-App Floating Daily Reminder Banner */}
+      <DailyReminderBanner
+        onOpenExercise={() => {
+          setActiveTab("tab-vocab");
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent("open-exercise-hub-modal"));
+          }, 150);
+        }}
+        onOpenVocabTab={() => setActiveTab("tab-vocab")}
       />
     </div>
   );
