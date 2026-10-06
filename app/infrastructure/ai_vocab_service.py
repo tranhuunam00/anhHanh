@@ -165,7 +165,7 @@ VĂN BẢN ĐẦU VÀO:
         models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
         last_error = None
 
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=300.0) as client:
             for model_name in models_to_try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
                 payload = {
