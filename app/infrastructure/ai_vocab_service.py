@@ -9,11 +9,18 @@ from typing import List, Dict, Any, Optional
 import httpx
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+def get_gemini_api_key() -> str:
+    """Dynamically get GEMINI_API_KEY from environment or .env, reloading on demand."""
+    load_dotenv(override=True)
+    return (os.getenv("GEMINI_API_KEY", "") or "").strip()
+
+def get_groq_api_key() -> str:
+    load_dotenv(override=True)
+    return (os.getenv("GROQ_API_KEY", "") or "").strip()
+
 
 class AIVocabService:
     @staticmethod
@@ -151,7 +158,7 @@ VĂN BẢN ĐẦU VÀO:
 {cleaned_input}
 \"\"\"
 """
-        api_key = GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")
+        api_key = get_gemini_api_key()
         if not api_key:
             raise RuntimeError("GEMINI_API_KEY chưa được cấu hình trên máy chủ.")
 
