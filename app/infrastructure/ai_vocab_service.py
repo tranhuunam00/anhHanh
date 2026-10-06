@@ -18,27 +18,77 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 class AIVocabService:
     @staticmethod
     def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
-        """Extract plain text from PDF, DOCX, TXT, or Markdown file bytes."""
+        """Extract plain text from PDF, DOCX, TXT, or Markdown file bytes with multiple engine fallbacks."""
         fname_lower = filename.lower()
         if fname_lower.endswith(".pdf"):
-            import fitz  # PyMuPDF
-            doc = fitz.open(stream=file_bytes, filetype="pdf")
             extracted_pages = []
-            for i in range(len(doc)):
-                extracted_pages.append(doc[i].get_text())
-            return "\n".join(extracted_pages).strip()
-        
+
+            # Engine 1: Try PyMuPDF (fitz)
+            try:
+                import fitz
+                doc = fitz.open(stream=file_bytes, filetype="pdf")
+                for i in range(len(doc)):
+                    p_text = doc[i].get_text()
+                    if p_text and p_text.strip():
+                        extracted_pages.append(p_text)
+                if extracted_pages:
+                    return "\n".join(extracted_pages).strip()
+            except ImportError:
+                logger.debug("PyMuPDF (fitz) is not installed, trying pypdf...")
+            except Exception as e:
+                logger.warning(f"PyMuPDF extraction failed: {e}")
+
+            # Engine 2: Try pypdf (pure Python fallback)
+            try:
+                import pypdf
+                import io
+                reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+                for page in reader.pages:
+                    p_text = page.extract_text()
+                    if p_text and p_text.strip():
+                        extracted_pages.append(p_text)
+                if extracted_pages:
+                    return "\n".join(extracted_pages).strip()
+            except ImportError:
+                logger.debug("pypdf is not installed, trying pdfminer...")
+            except Exception as e:
+                logger.warning(f"pypdf extraction failed: {e}")
+
+            # Engine 3: Try pdfminer.six
+            try:
+                import pdfminer.high_level
+                import io
+                text = pdfminer.high_level.extract_text(io.BytesIO(file_bytes))
+                if text and text.strip():
+                    return text.strip()
+            except ImportError:
+                pass
+            except Exception as e:
+                logger.warning(f"pdfminer extraction failed: {e}")
+
+            if not extracted_pages:
+                raise RuntimeError(
+                    "Máy chủ chưa cài thư viện đọc PDF (PyMuPDF hoặc pypdf). "
+                    "Vui lòng cài 'pip install pypdf PyMuPDF' trên máy chủ hoặc dán trực tiếp nội dung văn bản vào ô Dán Văn Bản."
+                )
+
         elif fname_lower.endswith(".docx"):
-            import docx
-            import io
-            doc = docx.Document(io.BytesIO(file_bytes))
-            lines = [p.text for p in doc.paragraphs if p.text.strip()]
-            for table in doc.tables:
-                for row in table.rows:
-                    row_text = " | ".join([cell.text.strip() for cell in row.cells if cell.text.strip()])
-                    if row_text:
-                        lines.append(row_text)
-            return "\n".join(lines).strip()
+            try:
+                import docx
+                import io
+                doc = docx.Document(io.BytesIO(file_bytes))
+                lines = [p.text for p in doc.paragraphs if p.text.strip()]
+                for table in doc.tables:
+                    for row in table.rows:
+                        row_text = " | ".join([cell.text.strip() for cell in row.cells if cell.text.strip()])
+                        if row_text:
+                            lines.append(row_text)
+                return "\n".join(lines).strip()
+            except ImportError:
+                raise RuntimeError(
+                    "Máy chủ chưa cài thư viện đọc Word (python-docx). "
+                    "Vui lòng cài 'pip install python-docx' trên máy chủ hoặc dán trực tiếp nội dung văn bản vào ô Dán Văn Bản."
+                )
         
         else:
             # Assume text/markdown/csv
