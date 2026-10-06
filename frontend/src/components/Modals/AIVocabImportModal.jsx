@@ -15,6 +15,8 @@ import {
   AlertCircle,
   FileSpreadsheet,
   ArrowRight,
+  SlidersHorizontal,
+  Layers,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -22,6 +24,7 @@ import {
   aiExtractVocabFromFile,
   batchImportVocab,
 } from "../../services/authVocabService";
+import { getPdfPageCount, extractPdfTextClient } from "../../utils/pdfExtractor";
 import "./AIVocabImportModal.css";
 
 // Diverse samples for quick testing across all domains
@@ -52,12 +55,18 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
   const [selectedIndices, setSelectedIndices] = useState(new Set());
   const [dragOver, setDragOver] = useState(false);
 
+  // Selective Page Range State (for PDF & documents)
+  const [totalPages, setTotalPages] = useState(null);
+  const [startPage, setStartPage] = useState(1);
+  const [endPage, setEndPage] = useState(1);
+  const [usePageRange, setUsePageRange] = useState(true);
+  const [isReadingPdf, setIsReadingPdf] = useState(false);
+
   const fileInputRef = useRef(null);
 
   // Real-time word count calculation
   const wordCount = inputText.trim() ? inputText.trim().split(/\s+/).length : 0;
   const isOverWordLimit = wordCount > 5000;
-
 
   if (!isOpen) return null;
 
@@ -83,10 +92,35 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
     window.speechSynthesis.speak(utter);
   };
 
+  const processSelectedFile = async (file) => {
+    if (!file) return;
+    setSelectedFile(file);
+    setTotalPages(null);
+    setStartPage(1);
+    setEndPage(1);
+
+    const isPdf = file.name.toLowerCase().endsWith(".pdf");
+    if (isPdf) {
+      setIsReadingPdf(true);
+      try {
+        const count = await getPdfPageCount(file);
+        if (count && count > 0) {
+          setTotalPages(count);
+          setStartPage(1);
+          setEndPage(Math.min(count, 5));
+        }
+      } catch (err) {
+        console.warn("Could not read pdf pages:", err);
+      } finally {
+        setIsReadingPdf(false);
+      }
+    }
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
+      processSelectedFile(file);
     }
   };
 
@@ -95,7 +129,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
     setDragOver(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      setSelectedFile(file);
+      processSelectedFile(file);
     }
   };
 
@@ -116,8 +150,37 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       let result;
       if (activeTab === "file") {
-        showToast(`AI đang phân tích tệp "${selectedFile.name}"...`, "info");
-        result = await aiExtractVocabFromFile(selectedFile, token);
+        const isPdf = selectedFile.name.toLowerCase().endsWith(".pdf");
+
+        // Nếu là PDF và bật chọn khoảng trang: FE tự cắt trang trước rồi mới gửi lên AI
+        if (isPdf && usePageRange) {
+          const s = Math.max(1, parseInt(startPage) || 1);
+          const e = Math.max(s, parseInt(endPage) || s);
+
+          showToast(`⚡ Trình duyệt đang cắt trang ${s} → ${e} để tiết kiệm token...`, "info");
+          try {
+            const clientResult = await extractPdfTextClient(selectedFile, s, e);
+            if (clientResult.text && clientResult.text.trim()) {
+              const textToProcess = clientResult.text.trim();
+              showToast(`AI đang bóc tách từ vựng từ ${clientResult.wordCount} chữ (Trang ${s} - ${e})...`, "info");
+              result = await aiExtractVocabFromText(textToProcess, "en", "vi", "auto", token);
+            } else {
+              // Fallback qua backend nếu PDF không có text layer (ví dụ ảnh scan)
+              result = await aiExtractVocabFromFile(selectedFile, token, s, e);
+            }
+          } catch (clientErr) {
+            console.warn("Client PDF extraction fallback to backend:", clientErr);
+            result = await aiExtractVocabFromFile(selectedFile, token, s, e);
+          }
+        } else {
+          showToast(`AI đang phân tích tệp "${selectedFile.name}"...`, "info");
+          result = await aiExtractVocabFromFile(
+            selectedFile,
+            token,
+            usePageRange ? Number(startPage) : null,
+            usePageRange ? Number(endPage) : null
+          );
+        }
       } else {
         showToast("AI đang trích xuất thuật ngữ & từ vựng từ văn bản...", "info");
         result = await aiExtractVocabFromText(inputText.trim(), "en", "vi", "auto", token);
@@ -381,7 +444,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                           {selectedFile.name}
                         </div>
                         <div style={{ fontSize: "0.8rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
-                          Kích thước: {(selectedFile.size / 1024).toFixed(1)} KB (Tự động đọc nội dung & giới hạn 5.000 từ đầu)
+                          Kích thước: {(selectedFile.size / 1024).toFixed(1)} KB {totalPages ? `• Đã nhận diện: ${totalPages} trang` : ""}
                         </div>
                       </div>
                     ) : (
@@ -395,6 +458,82 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                       </div>
                     )}
                   </div>
+
+                  {/* Selective Page Range Box (Frontend cuts pages before sending to AI to save tokens) */}
+                  {selectedFile && (
+                    <div className="ai-page-range-card">
+                      <div className="ai-page-range-header">
+                        <div className="ai-page-range-title">
+                          <SlidersHorizontal size={16} className="text-primary" />
+                          <span>Chọn số trang cần bóc tách (Từ → Đến):</span>
+                        </div>
+                        <div className="ai-page-range-badge">
+                          {isReadingPdf ? (
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                              <Loader2 size={12} className="spin" /> Đang đọc số trang...
+                            </span>
+                          ) : totalPages ? (
+                            <span>Tệp có <strong>{totalPages}</strong> trang</span>
+                          ) : (
+                            <span>Trang tùy chỉnh</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="ai-page-range-inputs">
+                        <div className="ai-page-field">
+                          <label className="ai-page-label">Từ trang:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max={endPage || totalPages || 9999}
+                            value={startPage}
+                            onChange={(e) => {
+                              const val = Math.max(1, parseInt(e.target.value) || 1);
+                              setStartPage(val);
+                              if (val > endPage) setEndPage(val);
+                            }}
+                            className="ai-page-number-input"
+                          />
+                        </div>
+
+                        <span className="ai-page-arrow">➔</span>
+
+                        <div className="ai-page-field">
+                          <label className="ai-page-label">Đến trang:</label>
+                          <input
+                            type="number"
+                            min={startPage || 1}
+                            max={totalPages || 9999}
+                            value={endPage}
+                            onChange={(e) => {
+                              const val = Math.max(startPage, parseInt(e.target.value) || startPage);
+                              setEndPage(val);
+                            }}
+                            className="ai-page-number-input"
+                          />
+                        </div>
+
+                        {totalPages && (
+                          <button
+                            type="button"
+                            className="ai-btn-all-pages"
+                            onClick={() => {
+                              setStartPage(1);
+                              setEndPage(totalPages);
+                            }}
+                            title="Chọn toàn bộ tài liệu"
+                          >
+                            Toàn bộ ({totalPages} trang)
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="ai-page-range-notice">
+                        ⚡ <strong>Tiết kiệm Token tối đa:</strong> Trình duyệt sẽ tự động cắt <em>đúng từ trang {startPage} đến trang {endPage}</em> và chỉ gửi phần chữ này lên AI. Không gửi các trang thừa, vừa nhanh vừa không tốn chi phí API!
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

@@ -6,7 +6,7 @@ import re
 import logging
 from typing import Optional, List
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
@@ -749,9 +749,12 @@ async def ai_extract_vocabulary_from_text(
 @router.post('/ai-extract-file')
 async def ai_extract_vocabulary_from_file(
     file: UploadFile = File(...),
+    start_page: Optional[int] = Form(None),
+    end_page: Optional[int] = Form(None),
     current_user: User = Depends(require_ai_import_permission)
 ):
     """AI Vocabulary Extraction directly from uploaded PDF, Word DOCX, or text file.
+    Supports optional page range selection (start_page to end_page) for PDF files.
     Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrang.
     """
     filename = file.filename or "uploaded_document"
@@ -770,11 +773,16 @@ async def ai_extract_vocabulary_from_file(
                 detail="Kích thước tệp vượt quá giới hạn cho phép (tối đa 25MB)."
             )
 
-        extracted_text = AIVocabService.extract_text_from_file(content_bytes, filename)
+        extracted_text = AIVocabService.extract_text_from_file(
+            content_bytes,
+            filename,
+            start_page=start_page,
+            end_page=end_page
+        )
         if not extracted_text or not extracted_text.strip():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Không thể đọc nội dung văn bản từ tệp này hoặc tệp rỗng."
+                detail="Không thể đọc nội dung văn bản từ tệp này hoặc khoảng trang đã chọn không có chữ."
             )
 
         items = await AIVocabService.extract_vocabulary(

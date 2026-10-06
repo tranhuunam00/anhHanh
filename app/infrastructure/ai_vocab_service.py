@@ -24,21 +24,36 @@ def get_groq_api_key() -> str:
 
 class AIVocabService:
     @staticmethod
-    def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
-        """Extract plain text from PDF, DOCX, TXT, or Markdown file bytes with multiple engine fallbacks."""
+    def extract_text_from_file(
+        file_bytes: bytes,
+        filename: str,
+        start_page: Optional[int] = None,
+        end_page: Optional[int] = None
+    ) -> str:
+        """Extract plain text from PDF, DOCX, TXT, or Markdown file bytes with multiple engine fallbacks.
+        Supports selective page range (start_page to end_page, 1-indexed) for PDF documents.
+        """
         fname_lower = filename.lower()
         if fname_lower.endswith(".pdf"):
             extracted_pages = []
+
+            # Determine 0-based page bounds if requested
+            s_idx = max(0, (start_page - 1) if (start_page and start_page > 0) else 0)
 
             # Engine 1: Try PyMuPDF (fitz)
             try:
                 import fitz
                 doc = fitz.open(stream=file_bytes, filetype="pdf")
-                for i in range(len(doc)):
+                total_p = len(doc)
+                e_idx = min(total_p, end_page if (end_page and end_page > 0) else total_p)
+                if s_idx >= total_p:
+                    s_idx = 0
+                for i in range(s_idx, e_idx):
                     p_text = doc[i].get_text()
                     if p_text and p_text.strip():
                         extracted_pages.append(p_text)
                 if extracted_pages:
+                    logger.info(f"Extracted {len(extracted_pages)} pages (range {s_idx+1}-{e_idx} of {total_p}) using PyMuPDF.")
                     return "\n".join(extracted_pages).strip()
             except ImportError:
                 logger.debug("PyMuPDF (fitz) is not installed, trying pypdf...")
@@ -50,11 +65,16 @@ class AIVocabService:
                 import pypdf
                 import io
                 reader = pypdf.PdfReader(io.BytesIO(file_bytes))
-                for page in reader.pages:
-                    p_text = page.extract_text()
+                total_p = len(reader.pages)
+                e_idx = min(total_p, end_page if (end_page and end_page > 0) else total_p)
+                if s_idx >= total_p:
+                    s_idx = 0
+                for i in range(s_idx, e_idx):
+                    p_text = reader.pages[i].extract_text()
                     if p_text and p_text.strip():
                         extracted_pages.append(p_text)
                 if extracted_pages:
+                    logger.info(f"Extracted {len(extracted_pages)} pages (range {s_idx+1}-{e_idx} of {total_p}) using pypdf.")
                     return "\n".join(extracted_pages).strip()
             except ImportError:
                 logger.debug("pypdf is not installed, trying pdfminer...")
@@ -65,7 +85,10 @@ class AIVocabService:
             try:
                 import pdfminer.high_level
                 import io
-                text = pdfminer.high_level.extract_text(io.BytesIO(file_bytes))
+                page_numbers = None
+                if start_page or end_page:
+                    page_numbers = list(range(s_idx, end_page if end_page else s_idx + 20))
+                text = pdfminer.high_level.extract_text(io.BytesIO(file_bytes), page_numbers=page_numbers)
                 if text and text.strip():
                     return text.strip()
             except ImportError:

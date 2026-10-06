@@ -403,3 +403,113 @@
   align-items: center;
   justify-content: center;
 }
+
+/* Selective Page Range Card */
+.ai-page-range-card {
+  margin-top: 14px;
+  background: var(--input-bg, #f8fafc);
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: aiModalFadeIn 0.2s ease-out;
+}
+
+.ai-page-range-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-page-range-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text, #0f172a);
+}
+
+.ai-page-range-badge {
+  font-size: 0.78rem;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.ai-page-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ai-page-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-page-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+}
+
+.ai-page-number-input {
+  width: 80px;
+  padding: 7px 10px;
+  border: 1.5px solid var(--border, #cbd5e1);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text, #0f172a);
+  background: var(--card-bg, #ffffff);
+  text-align: center;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.ai-page-number-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.ai-page-arrow {
+  color: var(--text-muted, #94a3b8);
+  font-weight: 800;
+}
+
+.ai-btn-all-pages {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #6366f1;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ai-btn-all-pages:hover {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.ai-page-range-notice {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-muted, #64748b);
+  background: rgba(16, 185, 129, 0.08);
+  border-left: 3px solid #10b981;
+  padding: 8px 12px;
+  border-radius: 0 8px 8px 0;
+}
+
