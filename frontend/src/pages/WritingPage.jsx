@@ -131,12 +131,12 @@ export const WritingPage = ({ isActive = false }) => {
     }
   }, [selectedGenre, promptsLibrary]);
 
-  // Load history when tab is opened
+  // Load history immediately on mount / when token becomes available
   useEffect(() => {
-    if (isActive && token && activeRightTab === "history") {
+    if (token) {
       loadHistory();
     }
-  }, [isActive, token, activeRightTab]);
+  }, [token, isActive]);
 
   const loadHistory = async () => {
     if (!token) return;
@@ -589,49 +589,78 @@ export const WritingPage = ({ isActive = false }) => {
           {/* Editor Workspace */}
           <div className="writing-workspace">
             <div className="workspace-toolbar">
-              <div className="workspace-stats">
-                <div className="stat-pill words">
-                  <span className="stat-val">{wordCount}</span>
-                  <span className="stat-unit">/{currentGenreObj.minWords} từ</span>
-                </div>
-                <div className="stat-pill timer">
-                  <Clock size={14} />
-                  <span className="stat-val">{formatTimer(secondsElapsed)}</span>
-                  {isTimerRunning ? (
-                    <span className="timer-dot active" title="Đang tính giờ"></span>
-                  ) : (
-                    <span className="timer-dot" title="Tạm dừng"></span>
-                  )}
+              {/* Row 1: Word Count, Timer, Save Status & Target Band Controls */}
+              <div className="workspace-stats-row">
+                <div className="workspace-stats">
+                  <div className="stat-pill words">
+                    <span className="stat-val">{wordCount}</span>
+                    <span className="stat-unit">/{currentGenreObj.minWords} từ</span>
+                  </div>
+                  <div className="stat-pill timer">
+                    <Clock size={14} />
+                    <span className="stat-val">{formatTimer(secondsElapsed)}</span>
+                    {isTimerRunning ? (
+                      <span className="timer-dot active" title="Đang tính giờ"></span>
+                    ) : (
+                      <span className="timer-dot" title="Tạm dừng"></span>
+                    )}
+                  </div>
+
+                  {/* Save status badge */}
+                  <div className="save-status-indicator" title="Trạng thái lưu trữ bài viết">
+                    <span className={`save-status-dot ${hasUnsavedChanges ? "unsaved" : "saved"}`}></span>
+                    <span>
+                      {isSavingDraft
+                        ? "Đang lưu..."
+                        : lastSavedAt
+                        ? `Đã lưu ${lastSavedAt}`
+                        : hasUnsavedChanges
+                        ? "Chưa lưu"
+                        : "Sẵn sàng"}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Save status badge */}
-                <div className="save-status-indicator" title="Trạng thái lưu trữ bài viết">
-                  <span className={`save-status-dot ${hasUnsavedChanges ? "unsaved" : "saved"}`}></span>
-                  <span>
-                    {isSavingDraft
-                      ? "Đang lưu..."
-                      : lastSavedAt
-                      ? `Đã lưu ${lastSavedAt}`
-                      : hasUnsavedChanges
-                      ? "Chưa lưu"
-                      : "Sẵn sàng"}
-                  </span>
+                <div className="workspace-options">
+                  <div className="target-band-select-wrapper" title="Chọn mục tiêu điểm để AI chấm sát chuẩn">
+                    <span className="band-select-label">Mục tiêu:</span>
+                    <select
+                      className="band-select"
+                      value={targetBand}
+                      onChange={(e) => {
+                        setTargetBand(parseFloat(e.target.value));
+                        setHasUnsavedChanges(true);
+                      }}
+                    >
+                      {TARGET_BANDS.map((b) => (
+                        <option key={b.value} value={b.value}>{b.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-workspace-clear"
+                    onClick={handleReset}
+                    title="Xóa làm lại bài viết"
+                  >
+                    <RotateCcw size={14} />
+                    <span>Xóa</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="workspace-options">
-                {/* Button: Kho Cụm từ & Cấu trúc theo Band */}
+              {/* Row 2: Prominent Action Buttons */}
+              <div className="workspace-actions-row">
                 <button
                   type="button"
                   className="btn-workspace-structures"
                   onClick={() => setIsStructuresOpen(true)}
                   title="Mở kho cụm từ học thuật, collocations & cấu trúc câu theo Band IELTS"
                 >
-                  <BookOpen size={14} />
-                  <span>Cụm từ & Cấu trúc</span>
+                  <BookOpen size={16} />
+                  <span>Kho Cụm từ & Cấu trúc theo Band</span>
                 </button>
 
-                {/* Button: Lưu bài viết (Save Draft) */}
                 <button
                   type="button"
                   className="btn-workspace-save"
@@ -645,33 +674,21 @@ export const WritingPage = ({ isActive = false }) => {
                       : "Lưu lại bài viết hiện tại vào lịch sử"
                   }
                 >
-                  <BookmarkCheck size={14} />
-                  <span>{isSavingDraft ? "Đang lưu..." : "Lưu bài"}</span>
+                  <BookmarkCheck size={16} />
+                  <span>{isSavingDraft ? "Đang lưu..." : "Lưu bài viết"}</span>
                 </button>
 
-                <div className="target-band-select-wrapper" title="Chọn mục tiêu điểm để AI chấm sát chuẩn">
-                  <span className="band-select-label">Mục tiêu:</span>
-                  <select
-                    className="band-select"
-                    value={targetBand}
-                    onChange={(e) => {
-                      setTargetBand(parseFloat(e.target.value));
-                      setHasUnsavedChanges(true);
-                    }}
-                  >
-                    {TARGET_BANDS.map((b) => (
-                      <option key={b.value} value={b.value}>{b.label}</option>
-                    ))}
-                  </select>
-                </div>
                 <button
                   type="button"
-                  className="btn-workspace-clear"
-                  onClick={handleReset}
-                  title="Xóa làm lại bài viết"
+                  className="btn-workspace-history-quick"
+                  onClick={() => {
+                    setActiveRightTab("history");
+                    loadHistory();
+                  }}
+                  title="Xem lại toàn bộ danh sách các bài đã viết và bản nháp"
                 >
-                  <RotateCcw size={14} />
-                  <span>Xóa</span>
+                  <History size={16} />
+                  <span>Danh sách bài đã viết ({historyItems.length})</span>
                 </button>
               </div>
             </div>
@@ -771,8 +788,9 @@ export const WritingPage = ({ isActive = false }) => {
                     {historyItems.map((item) => (
                       <div
                         key={item.id}
-                        className="history-card"
+                        className={`history-card ${item.id === currentSubmissionId ? "active" : ""}`}
                         onClick={() => handleSelectHistoryItem(item)}
+                        title="Bấm để mở lại bài viết này trong trình soạn thảo"
                       >
                         <div className="history-card-header">
                           <span className="history-genre-pill">{item.genre}</span>
@@ -781,11 +799,16 @@ export const WritingPage = ({ isActive = false }) => {
                           ) : (
                             <span className="history-draft-pill">Bản nháp</span>
                           )}
+                          {item.id === currentSubmissionId && (
+                            <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7c3aed", background: "rgba(124, 58, 237, 0.12)", padding: "2px 6px", borderRadius: "4px" }}>
+                              Đang soạn
+                            </span>
+                          )}
                           <button
                             type="button"
                             className="btn-del-history"
                             onClick={(e) => handleDeleteHistoryItem(item.id, e)}
-                            title="Xóa bài viết"
+                            title="Xóa bài viết khỏi lịch sử"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -793,6 +816,11 @@ export const WritingPage = ({ isActive = false }) => {
                         <div className="history-topic-title" title={item.topic}>
                           {item.topic}
                         </div>
+                        {item.content && (
+                          <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "4px 0", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.45 }}>
+                            {item.content}
+                          </div>
+                        )}
                         <div className="history-card-footer">
                           <span>{item.word_count} từ</span>
                           <span>{item.created_at ? new Date(item.created_at).toLocaleDateString("vi-VN") : ""}</span>
