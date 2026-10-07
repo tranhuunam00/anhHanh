@@ -346,9 +346,15 @@ export const WritingPage = ({ isActive = false }) => {
         token: token,
       });
 
-      if (res && res.structures) {
-        setAiTopicStructures(res.structures);
-        showToast(`AI đã gợi ý ${res.structures.length} cấu trúc & cụm từ chuẩn cho đề bài!`, "success");
+      const list = Array.isArray(res)
+        ? res
+        : (res?.structures || res?.suggestions || []);
+
+      if (list && list.length > 0) {
+        setAiTopicStructures(list);
+        showToast(`AI đã gợi ý ${list.length} cấu trúc & cụm từ chuẩn cho đề bài!`, "success");
+      } else {
+        showToast("Không tìm thấy gợi ý cấu trúc phù hợp cho đề bài này.", "warning");
       }
     } catch (err) {
       showToast(err.message || "Lỗi khi AI phân tích cấu trúc", "error");

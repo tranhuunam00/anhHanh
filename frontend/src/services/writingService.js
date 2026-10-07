@@ -59,7 +59,18 @@ export const suggestWritingStructures = async ({ topic, language = "en", targetB
   });
 
   const data = await safeParseResponse(res, "Không thể tạo gợi ý cấu trúc theo đề");
-  return data.suggestions || [];
+  const list = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.suggestions)
+    ? data.suggestions
+    : Array.isArray(data?.structures)
+    ? data.structures
+    : [];
+  return {
+    success: true,
+    suggestions: list,
+    structures: list,
+  };
 };
 
 export const saveWritingSubmission = async ({ submissionId, topic, content, genre, targetBand, language = "en", token }) => {
