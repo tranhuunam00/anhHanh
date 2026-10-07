@@ -32,6 +32,7 @@ class EvaluateWritingRequest(BaseModel):
     content: str = Field(..., min_length=15, description="Bài viết của học viên")
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm (e.g. 6.5, 7.0, 7.5, 8.0)")
+    language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết (en, ja, zh, ko, fr, de)")
 
 
 class SaveWritingRequest(BaseModel):
@@ -40,11 +41,20 @@ class SaveWritingRequest(BaseModel):
     content: str = Field(..., min_length=1, description="Nội dung bài viết")
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm")
+    language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết")
 
 
 class GeneratePromptRequest(BaseModel):
     genre: Optional[str] = Field(default="ielts_task2")
     topic_area: Optional[str] = Field(default=None)
+    language: Optional[str] = Field(default="en", description="Ngôn ngữ đề bài")
+
+
+class SuggestStructuresRequest(BaseModel):
+    topic: str = Field(..., min_length=2, description="Đề bài cần gợi ý cụm từ")
+    language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết")
+    target_band: Optional[float] = Field(default=7.0, description="Mục tiêu điểm")
+    genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
 
 
 @router.get("/prompts")
@@ -76,6 +86,7 @@ async def save_writing_submission(
         if submission:
             submission.topic = body.topic
             submission.genre = body.genre or "ielts_task2"
+            submission.language = body.language or "en"
             submission.content = body.content
             submission.word_count = word_count
             submission.target_band = body.target_band or 7.0
@@ -84,7 +95,7 @@ async def save_writing_submission(
             return {
                 "success": True,
                 "submission_id": submission.id,
-                "message": "Đã cập nhật bài viết thành công",
+                "message": "Đã lưu bản nháp bài viết thành công",
                 "item": submission.to_dict()
             }
 
@@ -92,6 +103,7 @@ async def save_writing_submission(
         user_id=current_user.id,
         topic=body.topic,
         genre=body.genre or "ielts_task2",
+        language=body.language or "en",
         content=body.content,
         word_count=word_count,
         target_band=body.target_band or 7.0,
@@ -105,7 +117,7 @@ async def save_writing_submission(
     return {
         "success": True,
         "submission_id": submission.id,
-        "message": "Đã lưu bài viết thành công",
+        "message": "Đã lưu bản nháp bài viết thành công",
         "item": submission.to_dict()
     }
 
@@ -121,7 +133,8 @@ async def generate_custom_prompt(
     try:
         prompt_data = await AIWritingService.generate_prompt(
             genre=body.genre or "ielts_task2",
-            topic_area=body.topic_area
+            topic_area=body.topic_area,
+            language=body.language or "en"
         )
         return {
             "success": True,
@@ -132,6 +145,33 @@ async def generate_custom_prompt(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Lỗi khi tạo đề bài AI: {str(e)}"
+        )
+
+
+@router.post("/suggest-structures")
+async def suggest_writing_structures(
+    body: SuggestStructuresRequest,
+    current_user: User = Depends(require_ai_writing_permission)
+):
+    """AI automatically generates tailored collocations, phrases, and sentence structures specifically for this topic."""
+    try:
+        result = await AIWritingService.suggest_structures(
+            topic=body.topic,
+            language=body.language or "en",
+            target_band=body.target_band or 7.0,
+            genre=body.genre or "ielts_task2"
+        )
+        return {
+            "success": True,
+            "topic": result.get("topic", body.topic),
+            "language": result.get("language", body.language),
+            "suggestions": result.get("suggestions", [])
+        }
+    except Exception as e:
+        logger.error(f"Error suggesting structures: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi khi AI gợi ý cấu trúc theo đề: {str(e)}"
         )
 
 
@@ -157,7 +197,8 @@ async def evaluate_writing_submission(
             topic=body.topic,
             content=body.content,
             genre=body.genre or "ielts_task2",
-            target_band=body.target_band or 7.0
+            target_band=body.target_band or 7.0,
+            language=body.language or "en"
         )
 
         overall_score = evaluation.get("overall_score")
@@ -179,6 +220,7 @@ async def evaluate_writing_submission(
         if submission:
             submission.topic = body.topic
             submission.genre = body.genre or "ielts_task2"
+            submission.language = body.language or "en"
             submission.content = body.content
             submission.word_count = word_count
             submission.target_band = body.target_band or 7.0
@@ -194,6 +236,7 @@ async def evaluate_writing_submission(
                 user_id=current_user.id,
                 topic=body.topic,
                 genre=body.genre or "ielts_task2",
+                language=body.language or "en",
                 content=body.content,
                 word_count=word_count,
                 target_band=body.target_band or 7.0,

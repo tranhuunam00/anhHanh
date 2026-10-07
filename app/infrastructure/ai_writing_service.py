@@ -141,6 +141,16 @@ CURATED_PROMPTS = {
 }
 
 
+LANGUAGES_CONFIG = {
+    "en": {"name": "Tiếng Anh", "native": "English", "system": "IELTS Band 0-9 / CEFR", "examiner": "Giám khảo Khảo thí IELTS Quốc tế kỳ cựu và Chuyên gia Ngôn ngữ học Tiếng Anh cấp cao (Senior IELTS Examiner & Academic Writing Coach)"},
+    "ja": {"name": "Tiếng Nhật", "native": "日本語", "system": "JLPT N1-N5 & Tiểu luận Nhật ngữ (小論文 / 作文)", "examiner": "Giám khảo Năng lực Nhật ngữ JLPT cấp cao và Chuyên gia Viết luận Văn phong Nhật Bản (Japanese Academic Writing Coach)"},
+    "zh": {"name": "Tiếng Trung", "native": "中文", "system": "HSK 1-6 & Viết luận Hán ngữ (写作)", "examiner": "Giám khảo Khảo thí Hán ngữ Quốc tế HSK cấp cao và Chuyên gia Văn phong Tiếng Trung (Chinese Academic Writing Coach)"},
+    "ko": {"name": "Tiếng Hàn", "native": "한국어", "system": "TOPIK I-II & Viết luận Tiếng Hàn (쓰기)", "examiner": "Giám khảo Năng lực Tiếng Hàn TOPIK cấp cao và Chuyên gia Luyện viết Luận Hàn ngữ (Korean Writing Coach)"},
+    "fr": {"name": "Tiếng Pháp", "native": "Français", "system": "DELF/DALF / CEFR A1-C2", "examiner": "Giám khảo Khảo thí Tiếng Pháp DELF/DALF và Chuyên gia Ngôn ngữ Pháp (French Writing Coach)"},
+    "de": {"name": "Tiếng Đức", "native": "Deutsch", "system": "Goethe-Zertifikat / TestDaF", "examiner": "Giám khảo Khảo thí Tiếng Đức Goethe/TestDaF và Chuyên gia Văn phong Học thuật Đức (German Writing Coach)"},
+}
+
+
 class AIWritingService:
     @classmethod
     def get_prompts_library(cls) -> Dict[str, List[Dict[str, Any]]]:
@@ -148,8 +158,13 @@ class AIWritingService:
         return CURATED_PROMPTS
 
     @classmethod
-    async def generate_prompt(cls, genre: str, topic_area: Optional[str] = None) -> Dict[str, Any]:
-        """Generate a brand new realistic writing prompt using Gemini."""
+    async def generate_prompt(
+        cls,
+        genre: str,
+        topic_area: Optional[str] = None,
+        language: str = "en"
+    ) -> Dict[str, Any]:
+        """Generate a brand new realistic writing prompt in chosen language using Gemini."""
         api_key = get_gemini_api_key()
         if not api_key:
             # Fallback to random prompt from library
@@ -157,19 +172,23 @@ class AIWritingService:
             import random
             return random.choice(prompts)
 
+        cfg = LANGUAGES_CONFIG.get(language, LANGUAGES_CONFIG["en"])
+        lang_name = cfg["name"]
+
         area_hint = f"về chủ đề liên quan đến: {topic_area}" if topic_area else "về một chủ đề thời sự, học thuật hiện đại hoặc đời sống phổ biến"
 
-        prompt_instruction = f"""Bạn là một chuyên gia khảo thí Cambridge và giám khảo IELTS Writing hàng đầu.
-Hãy tạo MỘT đề bài luyện viết tiếng Anh mới lạ, chuẩn mực và thực tế {area_hint}.
+        prompt_instruction = f"""Bạn là một chuyên gia khảo thí và giảng viên luyện viết ngôn ngữ học thuật hàng đầu.
+Hãy tạo MỘT đề bài luyện viết bằng {lang_name} mới lạ, chuẩn mực và thực tế {area_hint}.
 Thể loại bài viết yêu cầu: {genre} (ielts_task2, ielts_task1, email, paragraph, free).
+Ngôn ngữ của đề bài: {lang_name} ({cfg['native']}).
 
 Trả về kết quả BẮT BUỘC dưới dạng JSON duy nhất với cấu trúc sau:
 {{
-  "id": "gen_{genre}",
-  "title": "Tiêu đề ngắn gọn tiếng Anh",
-  "prompt": "Nội dung đề bài chi tiết bằng tiếng Anh chuẩn học thuật",
-  "type": "Thể loại bài (ví dụ: Opinion Essay / Discussion / Process / Formal Email)",
-  "keywords": ["từ khóa gợi ý 1", "từ khóa gợi ý 2", "từ khóa gợi ý 3", "từ khóa gợi ý 4", "từ khóa gợi ý 5"],
+  "id": "gen_{genre}_{language}",
+  "title": "Tiêu đề ngắn gọn bằng {lang_name}",
+  "prompt": "Nội dung đề bài chi tiết bằng {lang_name} chuẩn học thuật",
+  "type": "Thể loại bài viết",
+  "keywords": ["từ khóa 1", "từ khóa 2", "từ khóa 3", "từ khóa 4", "từ khóa 5"],
   "min_words": 250,
   "recommended_time": 40
 }}
@@ -203,12 +222,101 @@ Trả về kết quả BẮT BUỘC dưới dạng JSON duy nhất với cấu t
         return random.choice(prompts)
 
     @classmethod
+    async def suggest_structures(
+        cls,
+        topic: str,
+        language: str = "en",
+        target_band: float = 7.0,
+        genre: str = "ielts_task2"
+    ) -> Dict[str, Any]:
+        """Generate tailored collocations, argument patterns and structures specifically for this topic."""
+        api_key = get_gemini_api_key()
+        if not api_key:
+            raise RuntimeError("GEMINI_API_KEY chưa được cấu hình trên máy chủ.")
+
+        cfg = LANGUAGES_CONFIG.get(language, LANGUAGES_CONFIG["en"])
+        lang_name = cfg["name"]
+        examiner = cfg["examiner"]
+
+        prompt_instruction = f"""Bạn là {examiner}.
+Nhiệm vụ của bạn là phân tích sâu sắc đề bài luyện viết dưới đây và tạo ra một bộ GỢI Ý CỤM TỪ (COLLOCATIONS), MẪU CÂU DẪN DẮT Ý VÀ CẤU TRÚC HỌC THUẬT ĐẮT GIÁ NHẤT ĐƯỢC THIẾT KẾ ĐO NI ĐÓNG GIÀY RIÊNG CHO ĐỀ BÀI NÀY bằng {lang_name}.
+
+ĐỀ BÀI (TOPIC):
+\"\"\"{topic}\"\"\"
+
+NGÔN NGỮ BÀI VIẾT: {lang_name} ({language})
+THỂ LOẠI: {genre}
+MỤC TIÊU ĐIỂM / TRÌNH ĐỘ: {target_band}
+
+Hãy suy nghĩ và đề xuất 10 đến 15 mẫu cụm từ / cấu trúc sát sườn với chủ đề này, phân loại vào 5 nhóm chính:
+1. "intro": Mở bài, đặt vấn đề, câu thesis statement
+2. "body": Nêu luận điểm chính, nguyên nhân cốt lõi, cơ chế tác động
+3. "examples": Dẫn chứng thực tế, ví dụ minh họa, dữ liệu
+4. "counter": Luận điểm phản biện, nhượng bộ, góc nhìn đối lập
+5. "conclusion": Kết bài, khẳng định lại lập trường, tầm nhìn tương lai
+
+Mỗi gợi ý gồm:
+- "category": Một trong các giá trị: "intro", "body", "examples", "counter", "conclusion"
+- "band": Mức độ học thuật: "band6", "band7", hoặc "band8"
+- "phrase": Cụm từ hoặc mẫu câu bằng {lang_name} (chứa từ vựng đắt giá sát với chủ đề đề bài)
+- "meaning": Dịch nghĩa và giải thích ngắn gọn bằng Tiếng Việt
+- "template": Mẫu câu có thể chèn trực tiếp vào bài viết (sử dụng dấu ngoặc vuông ví dụ [ý của bạn] nếu cần điền thêm thông tin)
+- "usage": Lời khuyên ngắn gọn bằng Tiếng Việt về cách áp dụng vào bài
+
+TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
+{{
+  "topic": "{topic[:150]}",
+  "language": "{language}",
+  "suggestions": [
+    {{
+      "category": "intro",
+      "band": "band8",
+      "phrase": "...",
+      "meaning": "...",
+      "template": "...",
+      "usage": "..."
+    }}
+  ]
+}}
+"""
+        models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
+        last_error = None
+
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            for model_name in models_to_try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+                payload = {
+                    "contents": [{"parts": [{"text": prompt_instruction}]}],
+                    "generationConfig": {
+                        "responseMimeType": "application/json",
+                        "temperature": 0.4
+                    }
+                }
+                try:
+                    resp = await client.post(url, json=payload)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                        raw_text = re.sub(r"^```json\s*", "", raw_text)
+                        raw_text = re.sub(r"\s*```$", "", raw_text)
+                        parsed = json.loads(raw_text)
+                        return parsed
+                    else:
+                        last_error = f"HTTP {resp.status_code}: {resp.text[:200]}"
+                except Exception as e:
+                    last_error = str(e)
+                    continue
+
+        raise RuntimeError(f"Không thể tạo gợi ý cấu trúc AI: {last_error}")
+
+    @classmethod
     async def evaluate_writing(
         cls,
         topic: str,
         content: str,
         genre: str = "ielts_task2",
-        target_band: float = 7.0
+        target_band: float = 7.0,
+        language: str = "en"
     ) -> Dict[str, Any]:
         """Grade and thoroughly evaluate a student's writing submission using Gemini AI."""
         if not content or len(content.strip().split()) < 15:
@@ -219,16 +327,21 @@ Trả về kết quả BẮT BUỘC dưới dạng JSON duy nhất với cấu t
             raise RuntimeError("GEMINI_API_KEY chưa được cấu hình trên máy chủ.")
 
         word_count = len(content.strip().split())
+        cfg = LANGUAGES_CONFIG.get(language, LANGUAGES_CONFIG["en"])
+        lang_name = cfg["name"]
+        examiner = cfg["examiner"]
+        system_scale = cfg["system"]
 
-        eval_prompt = f"""Bạn là một Giám khảo Khảo thí IELTS Quốc tế kỳ cựu và Chuyên gia Ngôn ngữ học Tiếng Anh cấp cao (Senior IELTS Examiner & Academic Writing Coach).
-Nhiệm vụ của bạn là đánh giá, chấm điểm cực kỳ khách quan, tỉ mỉ và đưa ra nhận xét sửa lỗi chi tiết cho bài viết tiếng Anh của học viên dưới đây.
+        eval_prompt = f"""Bạn là {examiner}.
+Nhiệm vụ của bạn là đánh giá, chấm điểm cực kỳ khách quan, tỉ mỉ và đưa ra nhận xét sửa lỗi chi tiết cho bài viết bằng {lang_name} của học viên dưới đây theo thang điểm {system_scale}.
 
 ĐỀ BÀI (PROMPT):
 \"\"\"{topic}\"\"\"
 
-THỂ LOẠI (GENRE): {genre} (IELTS Task 2, IELTS Task 1, Business Email, Paragraph, hoặc Free Writing)
-MỤC TIÊU BAND ĐIỂM: {target_band}
-SỐ TỪ THỰC TẾ: {word_count} từ
+NGÔN NGỮ BÀI VIẾT: {lang_name} ({language})
+THỂ LOẠI (GENRE): {genre} (ielts_task2, ielts_task1, email, paragraph, hoặc free)
+MỤC TIÊU BAND / ĐIỂM: {target_band}
+ĐỘ DÀI THỰC TẾ: {word_count} từ/ký tự
 
 BÀI VIẾT CỦA HỌC VIÊN:
 \"\"\"

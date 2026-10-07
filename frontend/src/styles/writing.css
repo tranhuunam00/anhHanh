@@ -1122,28 +1122,89 @@
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
 }
 
-.btn-workspace-history-quick {
+.btn-workspace-ai-suggest {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.16), rgba(139, 92, 246, 0.16));
+  border: 1.5px solid rgba(236, 72, 153, 0.45);
+  color: #db2777;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.btn-workspace-ai-suggest:hover {
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  color: #fff;
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.25);
+}
+
+.btn-workspace-ai-suggest:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.language-selector-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: var(--bg-card);
-  border: 1.5px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 6px 14px;
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
   border-radius: 8px;
   font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.18s ease;
-  margin-left: auto;
+  color: var(--text-primary);
 }
 
-.btn-workspace-history-quick:hover {
-  border-color: var(--primary);
+.language-select-dropdown {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: var(--primary);
-  background: rgba(99, 102, 241, 0.08);
-  transform: translateY(-1px);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.structures-tab-switcher {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.structures-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.structures-tab-btn.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .save-status-indicator {

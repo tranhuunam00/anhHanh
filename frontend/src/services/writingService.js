@@ -25,7 +25,7 @@ export const fetchWritingPrompts = async () => {
   }
 };
 
-export const generateWritingPrompt = async ({ genre, topicArea, token }) => {
+export const generateWritingPrompt = async ({ genre, topicArea, language = "en", token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -34,14 +34,35 @@ export const generateWritingPrompt = async ({ genre, topicArea, token }) => {
   const res = await fetch("/api/writing/generate-prompt", {
     method: "POST",
     headers,
-    body: JSON.stringify({ genre, topic_area: topicArea }),
+    body: JSON.stringify({ genre, topic_area: topicArea, language }),
   });
 
   const data = await safeParseResponse(res, "Không thể tạo đề bài AI mới");
   return data.prompt;
 };
 
-export const saveWritingSubmission = async ({ submissionId, topic, content, genre, targetBand, token }) => {
+export const suggestWritingStructures = async ({ topic, language = "en", targetBand = 7.0, genre = "ielts_task2", token }) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch("/api/writing/suggest-structures", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      topic,
+      language,
+      target_band: targetBand,
+      genre,
+    }),
+  });
+
+  const data = await safeParseResponse(res, "Không thể tạo gợi ý cấu trúc theo đề");
+  return data.suggestions || [];
+};
+
+export const saveWritingSubmission = async ({ submissionId, topic, content, genre, targetBand, language = "en", token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -56,13 +77,14 @@ export const saveWritingSubmission = async ({ submissionId, topic, content, genr
       content,
       genre,
       target_band: targetBand,
+      language,
     }),
   });
 
-  return await safeParseResponse(res, "Không thể lưu bài viết");
+  return await safeParseResponse(res, "Không thể lưu bản nháp bài viết");
 };
 
-export const evaluateWriting = async ({ submissionId, topic, content, genre, targetBand, token }) => {
+export const evaluateWriting = async ({ submissionId, topic, content, genre, targetBand, language = "en", token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -77,6 +99,7 @@ export const evaluateWriting = async ({ submissionId, topic, content, genre, tar
       content,
       genre,
       target_band: targetBand,
+      language,
     }),
   });
 

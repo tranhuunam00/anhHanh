@@ -364,6 +364,7 @@ class WritingSubmission(Base):
     lexical_score = Column(Float, nullable=True)
     grammar_score = Column(Float, nullable=True)
     feedback_json = Column(Text, nullable=True)  # JSON-serialized AI feedback
+    language = Column(String(10), nullable=False, default='en')  # 'en', 'ja', 'zh', 'ko', 'fr', 'de'
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     user = relationship('User', backref='writing_submissions')
@@ -381,6 +382,7 @@ class WritingSubmission(Base):
             'user_id': self.user_id,
             'topic': self.topic,
             'genre': self.genre,
+            'language': self.language or 'en',
             'content': self.content,
             'word_count': self.word_count,
             'target_band': self.target_band,
