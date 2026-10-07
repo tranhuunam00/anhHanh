@@ -81,6 +81,8 @@ async def init_db() -> None:
                     "ALTER TABLE feedbacks ADD COLUMN IF NOT EXISTS sender_name VARCHAR(100) DEFAULT 'Ẩn danh';",
                     "ALTER TABLE feedbacks ADD COLUMN IF NOT EXISTS sender_email VARCHAR(255) NULL;",
                     "ALTER TABLE feedbacks ALTER COLUMN user_id DROP NOT NULL;",
+                    "ALTER TABLE writing_submissions ADD COLUMN IF NOT EXISTS language VARCHAR(10) NOT NULL DEFAULT 'en';",
+                    "ALTER TABLE writing_submissions ADD COLUMN IF NOT EXISTS sub_type VARCHAR(50) DEFAULT 'general' NULL;",
                 ]
                 for sql in pg_sqls:
                     try:
@@ -98,6 +100,8 @@ async def init_db() -> None:
                     "ALTER TABLE feedbacks ADD COLUMN image_url TEXT NULL;",
                     "ALTER TABLE feedbacks ADD COLUMN sender_name VARCHAR(100) DEFAULT 'Ẩn danh';",
                     "ALTER TABLE feedbacks ADD COLUMN sender_email VARCHAR(255) NULL;",
+                    "ALTER TABLE writing_submissions ADD COLUMN language VARCHAR(10) NOT NULL DEFAULT 'en';",
+                    "ALTER TABLE writing_submissions ADD COLUMN sub_type VARCHAR(50) DEFAULT 'general' NULL;",
                 ]:
                     try:
                         await conn.execute(text(sql))

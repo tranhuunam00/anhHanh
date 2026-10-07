@@ -33,6 +33,7 @@ class EvaluateWritingRequest(BaseModel):
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm (e.g. 6.5, 7.0, 7.5, 8.0)")
     language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết (en, ja, zh, ko, fr, de)")
+    sub_type: Optional[str] = Field(default=None, description="Dạng bài chi tiết (line_graph, bar_chart, map, opinion, discussion...)")
     images: Optional[List[str]] = Field(default=[], description="Danh sách ảnh đề bài đính kèm (base64 data URL hoặc URL)")
 
 
@@ -43,6 +44,7 @@ class SaveWritingRequest(BaseModel):
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm")
     language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết")
+    sub_type: Optional[str] = Field(default=None, description="Dạng bài chi tiết (line_graph, bar_chart, map, opinion, discussion...)")
 
 
 class GeneratePromptRequest(BaseModel):
@@ -78,50 +80,60 @@ async def save_writing_submission(
     words = body.content.strip().split()
     word_count = len(words)
 
-    if body.submission_id:
-        stmt = select(WritingSubmission).where(
-            WritingSubmission.id == body.submission_id,
-            WritingSubmission.user_id == current_user.id
+    try:
+        if body.submission_id:
+            stmt = select(WritingSubmission).where(
+                WritingSubmission.id == body.submission_id,
+                WritingSubmission.user_id == current_user.id
+            )
+            res = await db.execute(stmt)
+            submission = res.scalar_one_or_none()
+            if submission:
+                submission.topic = body.topic
+                submission.genre = body.genre or "ielts_task2"
+                submission.language = body.language or "en"
+                submission.sub_type = body.sub_type or submission.sub_type
+                submission.content = body.content
+                submission.word_count = word_count
+                submission.target_band = body.target_band or 7.0
+                await db.commit()
+                await db.refresh(submission)
+                return {
+                    "success": True,
+                    "submission_id": submission.id,
+                    "message": "Đã lưu bản nháp bài viết thành công",
+                    "item": submission.to_dict()
+                }
+
+        submission = WritingSubmission(
+            user_id=current_user.id,
+            topic=body.topic,
+            genre=body.genre or "ielts_task2",
+            language=body.language or "en",
+            sub_type=body.sub_type,
+            content=body.content,
+            word_count=word_count,
+            target_band=body.target_band or 7.0,
+            overall_score=None,
+            feedback_json=None
         )
-        res = await db.execute(stmt)
-        submission = res.scalar_one_or_none()
-        if submission:
-            submission.topic = body.topic
-            submission.genre = body.genre or "ielts_task2"
-            submission.language = body.language or "en"
-            submission.content = body.content
-            submission.word_count = word_count
-            submission.target_band = body.target_band or 7.0
-            await db.commit()
-            await db.refresh(submission)
-            return {
-                "success": True,
-                "submission_id": submission.id,
-                "message": "Đã lưu bản nháp bài viết thành công",
-                "item": submission.to_dict()
-            }
+        db.add(submission)
+        await db.commit()
+        await db.refresh(submission)
 
-    submission = WritingSubmission(
-        user_id=current_user.id,
-        topic=body.topic,
-        genre=body.genre or "ielts_task2",
-        language=body.language or "en",
-        content=body.content,
-        word_count=word_count,
-        target_band=body.target_band or 7.0,
-        overall_score=None,
-        feedback_json=None
-    )
-    db.add(submission)
-    await db.commit()
-    await db.refresh(submission)
-
-    return {
-        "success": True,
-        "submission_id": submission.id,
-        "message": "Đã lưu bản nháp bài viết thành công",
-        "item": submission.to_dict()
-    }
+        return {
+            "success": True,
+            "submission_id": submission.id,
+            "message": "Đã lưu bản nháp bài viết thành công",
+            "item": submission.to_dict()
+        }
+    except Exception as e:
+        logger.error(f"Error saving writing submission draft: {e}", exc_info=True)
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi cơ sở dữ liệu khi lưu bản nháp: {str(e)}"
+        )
 
 
 @router.post("/generate-prompt")
@@ -225,6 +237,7 @@ async def evaluate_writing_submission(
             submission.topic = body.topic
             submission.genre = body.genre or "ielts_task2"
             submission.language = body.language or "en"
+            submission.sub_type = body.sub_type or submission.sub_type
             submission.content = body.content
             submission.word_count = word_count
             submission.target_band = body.target_band or 7.0
@@ -241,6 +254,7 @@ async def evaluate_writing_submission(
                 topic=body.topic,
                 genre=body.genre or "ielts_task2",
                 language=body.language or "en",
+                sub_type=body.sub_type,
                 content=body.content,
                 word_count=word_count,
                 target_band=body.target_band or 7.0,
@@ -282,19 +296,26 @@ async def get_writing_history(
     db: AsyncSession = Depends(get_db)
 ):
     """Retrieve past writing submissions and scores of the current authenticated user."""
-    stmt = (
-        select(WritingSubmission)
-        .where(WritingSubmission.user_id == current_user.id)
-        .order_by(desc(WritingSubmission.created_at))
-        .limit(50)
-    )
-    result = await db.execute(stmt)
-    submissions = result.scalars().all()
+    try:
+        stmt = (
+            select(WritingSubmission)
+            .where(WritingSubmission.user_id == current_user.id)
+            .order_by(desc(WritingSubmission.created_at))
+            .limit(50)
+        )
+        result = await db.execute(stmt)
+        submissions = result.scalars().all()
 
-    return {
-        "success": True,
-        "items": [s.to_dict() for s in submissions]
-    }
+        return {
+            "success": True,
+            "items": [s.to_dict() for s in submissions]
+        }
+    except Exception as e:
+        logger.error(f"Error fetching writing history: {e}", exc_info=True)
+        return {
+            "success": True,
+            "items": []
+        }
 
 
 @router.get("/submission/{submission_id}")

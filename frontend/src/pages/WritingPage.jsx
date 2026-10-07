@@ -655,6 +655,7 @@ export const WritingPage = ({ isActive = false }) => {
         genre: selectedGenre,
         targetBand: targetBand,
         language: selectedLanguage,
+        subType: selectedSubType !== "all" ? selectedSubType : (currentPrompt?.sub_type || null),
         token: token,
       });
 
@@ -707,6 +708,7 @@ export const WritingPage = ({ isActive = false }) => {
         genre: selectedGenre,
         targetBand: targetBand,
         language: selectedLanguage,
+        subType: selectedSubType !== "all" ? selectedSubType : (currentPrompt?.sub_type || null),
         images: isCustomPrompt ? customPromptImages : [],
         token: token,
       });
@@ -776,6 +778,11 @@ export const WritingPage = ({ isActive = false }) => {
     setCurrentSubmissionId(item.id);
     setContent(item.content || "");
     if (item.genre) setSelectedGenre(item.genre);
+    if (item.sub_type && item.sub_type !== "general") {
+      setSelectedSubType(item.sub_type);
+    } else {
+      setSelectedSubType("all");
+    }
     if (item.target_band) setTargetBand(item.target_band);
     if (item.language) setSelectedLanguage(item.language);
     if (item.topic) {

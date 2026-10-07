@@ -24,17 +24,7 @@ async def upgrade(conn) -> None:
                 await conn.execute(text("ALTER TABLE writing_submissions ADD COLUMN language VARCHAR(10) DEFAULT 'en' NOT NULL;"))
                 logger.info(f"Migration {MIGRATION_ID}: Added language column to writing_submissions (SQLite).")
         else:
-            await conn.execute(text("""
-                DO $$
-                BEGIN
-                    IF NOT EXISTS (
-                        SELECT 1 FROM information_schema.columns 
-                        WHERE table_name = 'writing_submissions' AND column_name = 'language'
-                    ) THEN
-                        ALTER TABLE writing_submissions ADD COLUMN language VARCHAR(10) DEFAULT 'en' NOT NULL;
-                    END IF;
-                END $$;
-            """))
+            await conn.execute(text("ALTER TABLE writing_submissions ADD COLUMN IF NOT EXISTS language VARCHAR(10) DEFAULT 'en' NOT NULL;"))
             logger.info(f"Migration {MIGRATION_ID}: Added language column to writing_submissions (PostgreSQL).")
     except Exception as e:
         logger.warning(f"Notice during {MIGRATION_ID}: {e}")

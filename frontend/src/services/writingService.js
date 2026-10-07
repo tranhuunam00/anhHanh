@@ -74,7 +74,7 @@ export const suggestWritingStructures = async ({ topic, language = "en", targetB
   };
 };
 
-export const saveWritingSubmission = async ({ submissionId, topic, content, genre, targetBand, language = "en", token }) => {
+export const saveWritingSubmission = async ({ submissionId, topic, content, genre, targetBand, language = "en", subType, token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -90,13 +90,14 @@ export const saveWritingSubmission = async ({ submissionId, topic, content, genr
       genre,
       target_band: targetBand,
       language,
+      sub_type: subType || null,
     }),
   });
 
   return await safeParseResponse(res, "Không thể lưu bản nháp bài viết");
 };
 
-export const evaluateWriting = async ({ submissionId, topic, content, genre, targetBand, language = "en", images = [], token }) => {
+export const evaluateWriting = async ({ submissionId, topic, content, genre, targetBand, language = "en", subType, images = [], token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -112,6 +113,7 @@ export const evaluateWriting = async ({ submissionId, topic, content, genre, tar
       genre,
       target_band: targetBand,
       language,
+      sub_type: subType || null,
       images,
     }),
   });
