@@ -462,9 +462,18 @@ export const WritingPage = ({ isActive = false }) => {
     setSecondsElapsed(0);
   };
 
+  const cleanPromptText = (rawPrompt) => {
+    if (!rawPrompt) return "";
+    let cleaned = rawPrompt.split(/\[Data Summary\]|\[Data\]|Data Summary:/i)[0].trim();
+    // Strip standard closing prompt line if already present to avoid duplication
+    cleaned = cleaned.replace(/Summarise the information by selecting and reporting the main features, and make comparisons where relevant\.?/gi, "").trim();
+    cleaned = cleaned.replace(/^["'“”]+|["'“”]+$/g, "").trim();
+    return cleaned;
+  };
+
   const effectivePromptText = useMemo(() => {
     if (isCustomPrompt) return customPromptInput.trim();
-    return currentPrompt?.prompt || "";
+    return cleanPromptText(currentPrompt?.prompt);
   }, [isCustomPrompt, customPromptInput, currentPrompt]);
 
   // Filter structures list by Search, Band, and Category
@@ -887,16 +896,50 @@ export const WritingPage = ({ isActive = false }) => {
                   </div>
                 ) : (
                   <>
-                    <div className={`prompt-text ${isPromptCollapsed ? "collapsed" : ""}`}>
-                      "{currentPrompt?.prompt || "Vui lòng chọn hoặc tạo đề bài..."}"
-                    </div>
-                    {!isPromptCollapsed && selectedGenre === "ielts_task1" && (
-                      <Task1Visualizer
-                        visualData={currentPrompt?.visual_data}
-                        promptData={currentPrompt}
-                        subType={selectedSubType}
-                      />
+                    {selectedGenre === "ielts_task1" ? (
+                      <div className={`ielts-exam-prompt-box ${isPromptCollapsed ? "collapsed" : ""}`}>
+                        <div className="exam-meta-hint">You should spend 20 minutes on this task.</div>
+                        <div className="exam-question-text">
+                          {cleanPromptText(currentPrompt?.prompt) || "The chart below shows information..."}
+                        </div>
+                        {!isPromptCollapsed && (
+                          <Task1Visualizer
+                            visualData={currentPrompt?.visual_data}
+                            promptData={currentPrompt}
+                            subType={selectedSubType}
+                          />
+                        )}
+                        {!isPromptCollapsed && (
+                          <>
+                            <div className="exam-closing-req">
+                              Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+                            </div>
+                            <div className="exam-min-words">Write at least 150 words.</div>
+                          </>
+                        )}
+                      </div>
+                    ) : selectedGenre === "ielts_task2" ? (
+                      <div className={`ielts-exam-prompt-box ${isPromptCollapsed ? "collapsed" : ""}`}>
+                        <div className="exam-meta-hint">You should spend about 40 minutes on this task.</div>
+                        <div className="exam-intro-label">Write about the following topic:</div>
+                        <div className="exam-question-text bold">
+                          {cleanPromptText(currentPrompt?.prompt) || "Vui lòng chọn hoặc tạo đề bài..."}
+                        </div>
+                        {!isPromptCollapsed && (
+                          <>
+                            <div className="exam-closing-req">
+                              Give reasons for your answer and include any relevant examples from your own knowledge or experience.
+                            </div>
+                            <div className="exam-min-words">Write at least 250 words.</div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div className={`prompt-text ${isPromptCollapsed ? "collapsed" : ""}`}>
+                        "{cleanPromptText(currentPrompt?.prompt) || "Vui lòng chọn hoặc tạo đề bài..."}"
+                      </div>
                     )}
+
                     {!isPromptCollapsed && currentPrompt?.keywords && currentPrompt.keywords.length > 0 && (
                       <div className="prompt-keywords-bar">
                         <span className="keywords-label">Gợi ý từ khóa:</span>

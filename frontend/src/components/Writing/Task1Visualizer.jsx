@@ -253,10 +253,39 @@ const LineGraphViewer = ({ data }) => {
   );
 };
 
-// 2. Bar Chart Viewer
+// 2. Bar Chart Viewer (SVG standard IELTS format)
 const BarChartViewer = ({ data }) => {
   const categories = data.categories || [];
   const series = data.series || [];
+
+  const maxVal = useMemo(() => {
+    let max = 0;
+    series.forEach((s) => {
+      (s.data || []).forEach((v) => {
+        if (typeof v === "number" && v > max) max = v;
+      });
+    });
+    return Math.max(max, 10);
+  }, [series]);
+
+  // SVG dimensions
+  const chartWidth = 520;
+  const chartHeight = 220;
+  const paddingLeft = 45;
+  const paddingRight = 20;
+  const paddingTop = 25;
+  const paddingBottom = 35;
+
+  const usableWidth = chartWidth - paddingLeft - paddingRight;
+  const usableHeight = chartHeight - paddingTop - paddingBottom;
+  const yMax = Math.ceil(maxVal * 1.15 / 10) * 10;
+
+  const getY = (val) => {
+    return chartHeight - paddingBottom - (val / yMax) * usableHeight;
+  };
+
+  const groupWidth = categories.length > 0 ? usableWidth / categories.length : usableWidth;
+  const barWidth = Math.max(6, Math.min(22, (groupWidth * 0.7) / Math.max(1, series.length)));
 
   return (
     <div className="visual-block bar-chart-block">
@@ -270,28 +299,125 @@ const BarChartViewer = ({ data }) => {
         ))}
       </div>
 
-      {/* Grouped Bar Bars */}
-      <div className="bars-group-container">
-        {categories.map((cat, cIdx) => (
-          <div key={cIdx} className="bar-group-card">
-            <div className="bar-group-cat-title">{cat}</div>
-            <div className="bar-group-bars-row">
-              {series.map((s, sIdx) => {
-                const val = s.data?.[cIdx] || 0;
-                return (
-                  <div key={sIdx} className="single-bar-column">
-                    <div className="bar-pill-outer">
-                      <div className="bar-pill-inner" style={{ height: `${Math.min(100, Math.max(12, val))}%`, backgroundColor: s.color }}>
-                        <span className="bar-value-text">{val}%</span>
-                      </div>
-                    </div>
-                    <span className="bar-series-name">{s.name.split(" ")[0]}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+      {/* SVG Chart */}
+      <div className="svg-chart-wrapper">
+        <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="task1-svg-chart">
+          {/* Y Axis Grid lines & Labels */}
+          {[0, 0.25, 0.5, 0.75, 1].map((pct, i) => {
+            const val = Math.round(yMax * pct);
+            const y = getY(val);
+            return (
+              <g key={i}>
+                <line
+                  x1={paddingLeft}
+                  y1={y}
+                  x2={chartWidth - paddingRight}
+                  y2={y}
+                  stroke="rgba(148, 163, 184, 0.25)"
+                  strokeDasharray="3 3"
+                />
+                <text x={paddingLeft - 8} y={y + 3.5} textAnchor="end" fontSize="9" fill="#94a3b8" fontWeight="600">
+                  {val}{data.unit === "%" || !data.unit ? "%" : ""}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Grouped Bars */}
+          {categories.map((cat, cIdx) => {
+            const groupCenterX = paddingLeft + (cIdx + 0.5) * groupWidth;
+            const totalBarsWidth = series.length * barWidth;
+            const startX = groupCenterX - totalBarsWidth / 2;
+
+            return (
+              <g key={cIdx}>
+                {/* Category label on X axis */}
+                <text
+                  x={groupCenterX}
+                  y={chartHeight - 12}
+                  textAnchor="middle"
+                  fontSize="10"
+                  fontWeight="600"
+                  fill="#475569"
+                >
+                  {cat}
+                </text>
+
+                {/* Bars in group */}
+                {series.map((s, sIdx) => {
+                  const val = s.data?.[cIdx] || 0;
+                  const barX = startX + sIdx * barWidth;
+                  const barY = getY(val);
+                  const barH = chartHeight - paddingBottom - barY;
+
+                  return (
+                    <g key={sIdx} className="bar-hover-group">
+                      <rect
+                        x={barX}
+                        y={barY}
+                        width={barWidth - 2}
+                        height={Math.max(2, barH)}
+                        fill={s.color}
+                        rx="3"
+                        ry="3"
+                      >
+                        <title>{`${s.name} (${cat}): ${val}${data.unit || "%"}`}</title>
+                      </rect>
+                      {/* Value label on top of bar */}
+                      <text
+                        x={barX + (barWidth - 2) / 2}
+                        y={barY - 4}
+                        textAnchor="middle"
+                        fontSize="8"
+                        fontWeight="700"
+                        fill="#334155"
+                      >
+                        {val}
+                      </text>
+                    </g>
+                  );
+                })}
+              </g>
+            );
+          })}
+
+          {/* Base X Axis Line */}
+          <line
+            x1={paddingLeft}
+            y1={chartHeight - paddingBottom}
+            x2={chartWidth - paddingRight}
+            y2={chartHeight - paddingBottom}
+            stroke="#cbd5e1"
+            strokeWidth="1.5"
+          />
+        </svg>
+      </div>
+
+      {/* Clean Compact Data Table below */}
+      <div className="visual-data-table-wrapper">
+        <table className="task1-data-table">
+          <thead>
+            <tr>
+              <th>Danh mục ({data.unit || "%"})</th>
+              {categories.map((cat, i) => (
+                <th key={i}>{cat}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {series.map((s, idx) => (
+              <tr key={idx}>
+                <td>
+                  <span className="table-row-dot" style={{ backgroundColor: s.color }}></span>
+                  <strong>{s.name}</strong>
+                </td>
+                {(s.data || []).map((val, vIdx) => (
+                  <td key={vIdx}>{val}%</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

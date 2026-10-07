@@ -826,41 +826,25 @@ class AIWritingService:
         if genre == "ielts_task1":
             min_words = 150
             rec_time = 20
-            if sub_type == "process":
-                sub_type_rule = """
-YÊU CẦU ĐẶC BIỆT DẠNG QUY TRÌNH (PROCESS / FLOWCHART):
-- Đề bài BẮT BUỘC mô tả một quy trình sản xuất công nghiệp, tái chế hoặc chu trình sinh học.
-- Trong nội dung 'prompt', BẮT BUỘC liệt kê rõ ràng 5 đến 7 bước/giai đoạn kế tiếp nhau (được đánh số 1. -> 2. -> 3. -> ...) từ nguyên liệu đầu vào cho đến thành phẩm cuối cùng để người học có dữ liệu thực tế viết bài báo cáo 150 từ!
-"""
-            elif sub_type == "map":
-                sub_type_rule = """
-YÊU CẦU ĐẶC BIỆT DẠNG BẢN ĐỒ / QUY HOẠCH (MAP COMPARISON):
-- Đề bài BẮT BUỘC mô tả sự thay đổi và tái quy hoạch của một khu vực (thị trấn, khuôn viên trường học, bệnh viện, khu công nghiệp) giữa 2 mốc thời gian (ví dụ: năm 2010 và hiện tại).
-- Trong 'prompt', BẮT BUỘC mô tả cụ thể 4-6 thay đổi về cơ sở hạ tầng (công trình nào bị phá dỡ, công trình nào mới xây dựng, mở rộng đường sá, khu đi bộ) để người học có dữ liệu so sánh!
-"""
-            elif sub_type in ["line_graph", "bar_chart", "pie_chart", "table", "mixed"]:
-                sub_type_rule = f"""
-YÊU CẦU ĐẶC BIỆT DẠNG BIỂU ĐỒ SỐ LIỆU ({sub_type}):
-- Trong phần nội dung 'prompt', BẮT BUỘC có mục '[Data Summary]' liệt kê cụ thể các số liệu nổi bật (mốc năm, số lượng hoặc tỷ lệ % cụ thể của 3-4 quốc gia/đối tượng so sánh) để người học có thể phân tích xu hướng tăng/giảm và so sánh dữ liệu thực tế!
-"""
-            else:
-                sub_type_rule = """
-YÊU CẦU DẠNG BÁO CÁO DỮ LIỆU / QUY TRÌNH TASK 1:
-- Cung cấp bối cảnh rõ ràng và kèm theo tóm tắt dữ liệu/các bước cụ thể trong 'prompt' để người viết có đủ căn cứ số liệu phân tích.
+            sub_type_rule = """
+YÊU CẦU ĐẶC BIỆT IELTS TASK 1:
+- Đề bài trường 'prompt' CHỈ ĐƯỢC CHỨA 1-2 CÂU ĐẦU BÀI CHUẨN ĐỀ THI CAMBRIDGE (Ví dụ: 'The bar chart below shows... Summarise the information by selecting and reporting the main features, and make comparisons where relevant.').
+- TUYỆT ĐỐI KHÔNG VIẾT TÓM TẮT SỐ LIỆU ([Data Summary]), KHÔNG VIẾT ĐÁP ÁN HOẶC PHÂN TÍCH VÀO TRƯỜNG 'prompt'!
+- Toàn bộ số liệu, danh mục, tỷ lệ, các bước quy trình hoặc địa điểm bản đồ BẮT BUỘC ĐƯA VÀO TRƯỜNG 'visual_data'.
 """
         elif genre == "ielts_task2":
             min_words = 250
             rec_time = 40
             if sub_type == "opinion":
-                sub_type_rule = "YÊU CẦU ĐẶC BIỆT: Đề bài dạng 'Agree or Disagree' (Quan điểm cá nhân). Câu hỏi kết thúc bằng câu hỏi mức độ đồng ý/phản đối."
+                sub_type_rule = "YÊU CẦU: Dạng 'Agree or Disagree' (To what extent do you agree or disagree?)."
             elif sub_type == "discussion":
-                sub_type_rule = "YÊU CẦU ĐẶC BIỆT: Đề bài dạng 'Discuss both views and give your opinion' (Bàn luận 2 quan điểm trái chiều và đưa ra ý kiến bản thân)."
+                sub_type_rule = "YÊU CẦU: Dạng 'Discuss both views and give your own opinion'."
             elif sub_type == "causes_solutions":
-                sub_type_rule = "YÊU CẦU ĐẶC BIỆT: Đề bài dạng 'Causes and Solutions' (Nguyên nhân của một thực trạng nhức nhối và đề xuất giải pháp khả thi)."
+                sub_type_rule = "YÊU CẦU: Dạng 'Causes and Solutions' (What are the causes, and what measures can be taken?)."
             elif sub_type == "advantages_disadvantages":
-                sub_type_rule = "YÊU CẦU ĐẶC BIỆT: Đề bài dạng 'Advantages vs Disadvantages' (Liệu lợi ích có vượt trội hơn những tác hại hay không?)."
+                sub_type_rule = "YÊU CẦU: Dạng 'Do the advantages outweigh the disadvantages?'."
             elif sub_type == "two_part":
-                sub_type_rule = "YÊU CẦU ĐẶC BIỆT: Đề bài dạng 'Two-part Question' (Đặt ra 2 câu hỏi trực tiếp liên quan đến một hiện tượng xã hội)."
+                sub_type_rule = "YÊU CẦU: Dạng 'Two-part Question' (2 câu hỏi trực tiếp)."
 
         ielts_real_exam_rule = ""
         if language == "en" and genre in ["ielts_task1", "ielts_task2"]:
@@ -868,31 +852,27 @@ YÊU CẦU DẠNG BÁO CÁO DỮ LIỆU / QUY TRÌNH TASK 1:
 ĐẶC BIỆT BẮT BUỘC ĐỐI VỚI IELTS TIẾNG ANH:
 - Đề bài PHẢI BÁM SÁT 100% ĐỀ THI THẬT IELTS CHÍNH THỨC (Cambridge IELTS Past Examination Papers hoặc IDP/British Council official tests).
 - KHÔNG TỰ BỊA RA những câu hỏi không thực tế hoặc xa rời chuẩn đề thi IELTS.
-- Đối với Task 1: BẮT BUỘC sinh ra trường "visual_data" chứa số liệu cụ thể (loại chart/table/process/map, tiêu đề, các chuỗi số liệu hoặc các bước quy trình, hoặc bản đồ 2 giai đoạn) để giao diện hiển thị biểu đồ trực quan!
+- TUYỆT ĐỐI KHÔNG VIẾT ĐÁP ÁN HOẶC GỢI Ý NỘI DUNG VÀO ĐỀ BÀI. Người dùng cần tự nhìn biểu đồ (Task 1) hoặc tự suy nghĩ luận điểm (Task 2) để viết!
 """
 
         prompt_instruction = f"""Bạn là một chuyên gia khảo thí ngôn ngữ và giảng viên luyện viết học thuật hàng đầu ({cfg['examiner']}).
-Hãy tạo MỘT đề bài luyện viết hoàn chỉnh {area_hint}.
-Thể loại yêu cầu: {genre}
-Dạng đề chi tiết yêu cầu: {sub_type or 'tự chọn phù hợp'}
+Hãy tạo MỘT đề bài luyện viết {area_hint}.
+Thể loại: {genre}
+Dạng đề: {sub_type or 'tự chọn phù hợp'}
 Ngôn ngữ của đề bài: BẮT BUỘC VIẾT TOÀN BỘ BẰNG {lang_name} ({cfg['native']})!
 
 {sub_type_rule}
 {ielts_real_exam_rule}
 
-QUY TẮC BẮT BUỘC:
-- Toàn bộ 'title', 'prompt', 'keywords' PHẢI được viết bằng ngôn ngữ {lang_name} ({cfg['native']}).
-- Đề bài phải mang tính thực tế, văn phong khảo thí chuẩn mực theo định dạng chứng chỉ của ngôn ngữ này ({cfg['system']}).
-
-QUY TẮC ĐỘ DÀI ĐỀ BÀI:
-- Nếu là IELTS Task 2, email, paragraph, free: Đề bài trường "prompt" phải NGẮN GỌN, tối đa 2-3 câu súc tích, đúng format đề thi thật (không dài dòng, không giải thích thêm).
-- Nếu là IELTS Task 1: Đề bài trường "prompt" có thể dài hơn vì cần mô tả số liệu. BẮT BUỘC kèm trường "visual_data" chứa dữ liệu biểu đồ.
+QUY TẮC BẮT BUỘC VỀ ĐỘ DÀI VÀ NỘI DUNG:
+- Trường 'prompt' CHỈ CHỨA DUY NHẤT CÂU HỎI ĐẦU BÀI (1-2 câu). TUYỆT ĐỐI KHÔNG KÈM SỐ LIỆU CHI TIẾT, KHÔNG CÓ [Data Summary], KHÔNG CÓ BÀI MẪU HAY ĐÁP ÁN.
+- Với Task 1: Bắt buộc cung cấp trường 'visual_data' chứa dữ liệu để hệ thống vẽ biểu đồ cho thí sinh xem.
 
 Trả về kết quả DUY NHẤT định dạng JSON:
 {{
   "id": "gen_{genre}_{language}_{sub_type or 'custom'}",
   "title": "Tiêu đề ngắn gọn bằng {lang_name}",
-  "prompt": "Nội dung đề bài bằng {lang_name} (NGẮN GỌN 2-3 câu nếu Task 2/email/paragraph/free; có kèm mô tả số liệu nếu Task 1)",
+  "prompt": "Chỉ duy nhất nội dung câu hỏi đầu bài bằng {lang_name} (KHÔNG CÓ số liệu tóm tắt, KHÔNG CÓ đáp án)",
   "type": "Tên dạng đề bằng Tiếng Việt hoặc {lang_name}",
   "sub_type": "{sub_type or 'general'}",
   "keywords": ["từ khóa 1", "từ khóa 2", "từ khóa 3", "từ khóa 4", "từ khóa 5"],
@@ -928,6 +908,10 @@ Trả về kết quả DUY NHẤT định dạng JSON:
                         raw_text = re.sub(r"^```json\s*", "", raw_text)
                         raw_text = re.sub(r"\s*```$", "", raw_text)
                         parsed = json.loads(raw_text)
+                        if isinstance(parsed, dict) and "prompt" in parsed and isinstance(parsed["prompt"], str):
+                            # Remove any leaked [Data Summary] or answer sections
+                            cleaned = re.split(r"\[Data Summary\]|\[Data\]|Data Summary:", parsed["prompt"], flags=re.IGNORECASE)[0].strip()
+                            parsed["prompt"] = cleaned
                         return parsed
                 except Exception as e:
                     logger.warning(f"Generate prompt failed with {model_name}: {e}")
