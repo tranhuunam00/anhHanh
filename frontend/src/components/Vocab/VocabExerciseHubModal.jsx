@@ -99,6 +99,63 @@ export default function VocabExerciseHubModal({
     }
   }, []);
 
+  // Helper: Web Audio API synthesis for clean, pleasant correct/wrong SFX
+  const playSoundFeedback = useCallback((isCorrect) => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+
+      if (isCorrect) {
+        // Bright cheerful ascending chime (D5 -> A5)
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = "sine";
+        osc2.type = "sine";
+
+        osc1.frequency.setValueAtTime(587.33, now); // D5
+        osc1.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+
+        osc2.frequency.setValueAtTime(440, now); // A4
+        osc2.frequency.exponentialRampToValueAtTime(659.25, now + 0.12); // E5
+
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.35);
+        osc2.stop(now + 0.35);
+      } else {
+        // Gentle downward buzz for incorrect
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + 0.22);
+
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.28);
+      }
+    } catch (err) {
+      console.debug("Audio feedback notice:", err);
+    }
+  }, []);
+
   // Generate 4 randomized multiple choice options (1 correct + 3 distinct distractors)
   const mcqOptions = useMemo(() => {
     if (!currentItem || !currentItem.meaning) return [];
@@ -256,12 +313,15 @@ export default function VocabExerciseHubModal({
 
       const correct = opt.trim().toLowerCase() === currentItem.meaning.trim().toLowerCase();
 
+      // Phát âm thanh đúng / sai tức thì
+      playSoundFeedback(correct);
+
       // Auto-advance after 950ms so user can clearly see correct/wrong feedback
       setTimeout(() => {
         proceedNext(correct);
       }, 950);
     },
-    [currentItem, isAnswered, proceedNext]
+    [currentItem, isAnswered, playSoundFeedback, proceedNext]
   );
 
   // Keyboard navigation shortcuts: keys 1, 2, 3, 4 to select, Space to replay audio, H to toggle hint
@@ -271,17 +331,17 @@ export default function VocabExerciseHubModal({
     const handleKeyDown = (e) => {
       if (isAnswered) return;
 
-      // Spacebar: replay audio
-      if (e.key === " " || e.key === "Spacebar") {
+      // Escape key (Esc): toggle context sentence hint
+      if (e.key === "Escape" || e.key === "Esc") {
         e.preventDefault();
-        if (currentItem?.word) playAudio(currentItem.word);
+        setShowContext((prev) => !prev);
         return;
       }
 
-      // H key: toggle context sentence hint
-      if (e.key === "h" || e.key === "H") {
+      // Ctrl key (hoặc Control): replay audio
+      if (e.key === "Control" || (e.ctrlKey && !e.altKey && !e.shiftKey) || e.key === " " || e.key === "Spacebar") {
         e.preventDefault();
-        setShowContext((prev) => !prev);
+        if (currentItem?.word) playAudio(currentItem.word);
         return;
       }
 
@@ -376,7 +436,7 @@ export default function VocabExerciseHubModal({
                     </div>
                     <div className="ex-preview-eye-demo">
                       <Eye size={13} />
-                      <span>Gợi ý câu ngữ cảnh (Mặc định ẩn, bấm để mở)</span>
+                      <span>Gợi ý câu ngữ cảnh (Mặc định ẩn • Phím Esc)</span>
                     </div>
                     <div className="ex-preview-options-grid">
                       <div className="ex-preview-opt">A. tràn ngập</div>
@@ -617,7 +677,7 @@ export default function VocabExerciseHubModal({
                 type="button"
                 className={`ex-audio-circle-btn ${isPlayingAudio ? "playing" : ""}`}
                 onClick={() => playAudio(currentItem.word)}
-                title="Nghe phát âm (Phím Space)"
+                title="Nghe phát âm (Phím Ctrl)"
               >
                 <Volume2 size={22} />
               </button>
@@ -635,17 +695,17 @@ export default function VocabExerciseHubModal({
                   type="button"
                   className={`ex-eye-hint-btn ${showContext ? "active" : ""}`}
                   onClick={() => setShowContext((prev) => !prev)}
-                  title="Nhấn phím H hoặc bấm để bật/tắt gợi ý câu ví dụ"
+                  title="Nhấn phím Esc hoặc bấm để bật/tắt gợi ý câu ví dụ"
                 >
                   {showContext ? (
                     <>
                       <EyeOff size={15} />
-                      <span>Ẩn gợi ý ngữ cảnh (Phím H)</span>
+                      <span>Ẩn gợi ý ngữ cảnh (Phím Esc)</span>
                     </>
                   ) : (
                     <>
                       <Eye size={15} />
-                      <span>Gợi ý trong câu (Mặc định ẩn • Phím H)</span>
+                      <span>Gợi ý trong câu (Mặc định ẩn • Phím Esc)</span>
                     </>
                   )}
                 </button>
@@ -702,7 +762,7 @@ export default function VocabExerciseHubModal({
 
             {/* Keyboard shortcut tip */}
             <div className="ex-keyboard-hint">
-              <span>💡 Mẹo: Bấm <strong>1, 2, 3, 4</strong> để chọn • <strong>Space</strong> nghe lại • <strong>H</strong> bật/tắt mắt gợi ý</span>
+              <span>💡 Mẹo: Bấm <strong>1, 2, 3, 4</strong> để chọn • <strong>Ctrl</strong> nghe lại • <strong>Esc</strong> bật/tắt gợi ý</span>
             </div>
           </div>
         </div>
