@@ -142,6 +142,71 @@ export const WritingPage = ({ isActive = false }) => {
   const timerRef = useRef(null);
   const textareaRef = useRef(null);
 
+  // Prompt collapse state for compact view
+  const [isPromptCollapsed, setIsPromptCollapsed] = useState(false);
+
+  // Draggable Split Ratio between Editor and Feedback Panels (clamped 25% - 75%)
+  const [splitRatio, setSplitRatio] = useState(() => {
+    try {
+      const saved = localStorage.getItem("writing_split_ratio");
+      const num = Number(saved);
+      return !isNaN(num) && num >= 25 && num <= 75 ? num : 50;
+    } catch {
+      return 50;
+    }
+  });
+  const [isDraggingSplit, setIsDraggingSplit] = useState(false);
+  const splitContainerRef = useRef(null);
+  const isDraggingSplitRef = useRef(false);
+  const splitRatioRef = useRef(splitRatio);
+  splitRatioRef.current = splitRatio;
+
+  const handleSplitMouseDown = (e) => {
+    e.preventDefault();
+    setIsDraggingSplit(true);
+    isDraggingSplitRef.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
+
+  const handleResetSplitRatio = () => {
+    setSplitRatio(50);
+    try {
+      localStorage.setItem("writing_split_ratio", 50);
+    } catch {}
+    if (showToast) showToast("Đã đặt lại tỷ lệ 2 bên 50% / 50%", "info");
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDraggingSplitRef.current || !splitContainerRef.current) return;
+      const rect = splitContainerRef.current.getBoundingClientRect();
+      if (!rect.width) return;
+      const newRatio = ((e.clientX - rect.left) / rect.width) * 100;
+      const clamped = Math.max(25, Math.min(75, Math.round(newRatio * 10) / 10));
+      setSplitRatio(clamped);
+    };
+
+    const handleMouseUp = () => {
+      if (isDraggingSplitRef.current) {
+        isDraggingSplitRef.current = false;
+        setIsDraggingSplit(false);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        try {
+          localStorage.setItem("writing_split_ratio", splitRatioRef.current);
+        } catch {}
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
   // Get prompt library slice for current language
   const currentLangPrompts = useMemo(() => {
     if (!promptsLibrary) return {};
@@ -651,9 +716,9 @@ export const WritingPage = ({ isActive = false }) => {
       </div>
 
       {/* Main Studio Grid: Left (Editor) & Right (AI Feedback / History) */}
-      <div className="writing-studio-layout">
+      <div className="writing-studio-layout" ref={splitContainerRef}>
         {/* Left Column: Topic, Controls, Textarea */}
-        <div className="writing-editor-panel">
+        <div className="writing-editor-panel" style={{ width: `${splitRatio}%`, flexShrink: 0 }}>
           {/* Genre selector tabs */}
           <div className="genre-nav-bar">
             {GENRES.map((g) => (
@@ -734,6 +799,14 @@ export const WritingPage = ({ isActive = false }) => {
                   <IconFile size={13} />
                   <span>Tự nhập đề</span>
                 </button>
+                <button
+                  type="button"
+                  className={`btn-prompt-action ${isPromptCollapsed ? "active" : ""}`}
+                  onClick={() => setIsPromptCollapsed(!isPromptCollapsed)}
+                  title={isPromptCollapsed ? "Mở rộng nội dung đề bài" : "Thu gọn đề bài để tiết kiệm diện tích"}
+                >
+                  <span>{isPromptCollapsed ? "Mở rộng đề" : "Thu gọn"}</span>
+                </button>
               </div>
             </div>
 
@@ -744,15 +817,15 @@ export const WritingPage = ({ isActive = false }) => {
                   placeholder={`Nhập đề bài ${currentLangObj.label.toLowerCase()} của bạn tại đây...`}
                   value={customPromptInput}
                   onChange={(e) => setCustomPromptInput(e.target.value)}
-                  rows={3}
+                  rows={2}
                 />
               </div>
             ) : (
               <div className="prompt-body">
-                <div className="prompt-text">
+                <div className={`prompt-text ${isPromptCollapsed ? "collapsed" : ""}`}>
                   "{currentPrompt?.prompt || "Vui lòng chọn hoặc tạo đề bài..."}"
                 </div>
-                {currentPrompt?.keywords && currentPrompt.keywords.length > 0 && (
+                {!isPromptCollapsed && currentPrompt?.keywords && currentPrompt.keywords.length > 0 && (
                   <div className="prompt-keywords-bar">
                     <span className="keywords-label">Gợi ý từ khóa:</span>
                     <div className="keywords-list">
@@ -926,8 +999,24 @@ export const WritingPage = ({ isActive = false }) => {
           </div>
         </div>
 
+        {/* Draggable Divider Bar */}
+        <div
+          className={`split-divider writing-split-divider ${isDraggingSplit ? "active" : ""}`}
+          onMouseDown={handleSplitMouseDown}
+          onDoubleClick={handleResetSplitRatio}
+          title="Kéo thả để điều chỉnh tỷ lệ 2 bên (Nhấp đúp để đặt lại 50/50)"
+        >
+          <div className="split-divider-line">
+            <div className="split-divider-handle">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+
         {/* Right Column: AI Feedback / History */}
-        <div className="writing-feedback-panel">
+        <div className="writing-feedback-panel" style={{ flex: "1 1 0", minWidth: 280 }}>
           {/* Tab selector */}
           <div className="feedback-nav-tabs">
             <button

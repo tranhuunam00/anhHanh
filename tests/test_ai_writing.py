@@ -106,3 +106,12 @@ async def test_evaluate_writing_success_mock():
         assert len(result["corrections"]) == 1
         assert len(result["vocab_upgrades"]) == 1
         assert result["vocab_upgrades"][0]["word"] == "paramount"
+
+
+def test_server_app_import_and_routes():
+    """Ensure server entrypoint imports cleanly and mounts all writing routes without any NameError or syntax issues."""
+    import server
+    assert server.app is not None
+    # Verify that the writing router was included without error
+    from app.presentation.writing_api import router as writing_router
+    assert len(writing_router.routes) > 0
