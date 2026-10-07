@@ -189,6 +189,87 @@
   line-height: 1;
 }
 
+/* Level Selector Bar */
+.ai-level-selector-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: 12px;
+}
+
+.ai-level-label-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4f46e5;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ai-level-title {
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+.ai-level-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ai-level-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border, #cbd5e1);
+  background: var(--card-bg, #ffffff);
+  color: var(--text, #334155);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ai-level-pill-btn:hover {
+  border-color: #6366f1;
+  color: #4f46e5;
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.ai-level-pill-btn.active {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.ai-level-name {
+  font-weight: 600;
+}
+
+.ai-level-badge {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  font-weight: 700;
+}
+
+.ai-level-pill-btn.active .ai-level-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
 .ai-large-file-badge {
   display: inline-block;
   margin-top: 6px;

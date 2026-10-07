@@ -19,6 +19,7 @@ import {
   SlidersHorizontal,
   Layers,
   Globe,
+  GraduationCap,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -37,6 +38,34 @@ export const EXTRACT_LANGUAGES = [
   { id: "ko", label: "Tiếng Hàn", native: "한국어", flag: "🇰🇷" },
   { id: "fr", label: "Tiếng Pháp", native: "Français", flag: "🇫🇷" },
   { id: "de", label: "Tiếng Đức", native: "Deutsch", flag: "🇩🇪" },
+];
+
+// Vocabulary Filtering Levels
+export const VOCAB_LEVELS = [
+  {
+    id: "intermediate",
+    label: "Trung cấp (B1 – C2)",
+    badge: "Khuyên dùng",
+    desc: "Tự động lọc bỏ các từ vựng quá dễ (say, note, tell, good, bad...)",
+  },
+  {
+    id: "advanced",
+    label: "Nâng cao & Học thuật (B2 – C2)",
+    badge: "IELTS 6.5+",
+    desc: "Chỉ chọn lọc từ vựng học thuật, collocations hay, idioms",
+  },
+  {
+    id: "expert",
+    label: "Chuyên sâu (C1 – C2)",
+    badge: "IELTS 8.0+",
+    desc: "Thuật ngữ chuyên ngành tinh tế, lối diễn đạt cao cấp",
+  },
+  {
+    id: "all",
+    label: "Tất cả (A1 – C2)",
+    badge: "Mọi cấp độ",
+    desc: "Lấy đầy đủ từ vựng từ cơ bản đến nâng cao",
+  },
 ];
 
 // Diverse samples by language for quick testing
@@ -150,6 +179,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
   const { user, token, showToast, refreshStreak, refreshSavedVocab } = useAuth();
   const [activeTab, setActiveTab] = useState("paste"); // "paste" | "file"
   const [selectedLang, setSelectedLang] = useState("en"); // "en" | "ja" | "zh" | "ko" | "fr" | "de"
+  const [vocabLevel, setVocabLevel] = useState("intermediate"); // "intermediate" | "advanced" | "expert" | "all"
   const [inputText, setInputText] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -372,7 +402,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
           // Chiến lược 1: Trình duyệt đã đọc được chữ -> Gửi trực tiếp text lên AI (Tối ưu nhất, 0 lỗi máy chủ)
           if (clientResult && clientResult.text && clientResult.text.trim().length >= 10) {
             showToast(
-              `⚡ Đã đọc ${clientResult.selectedPagesCount} trang (${clientResult.wordCount} chữ). AI đang bóc tách từ vựng...`,
+              `⚡ Đã đọc ${clientResult.selectedPagesCount} trang (${clientResult.wordCount} chữ). AI đang bóc tách theo cấp độ đã chọn...`,
               "info"
             );
             result = await aiExtractVocabFromText(
@@ -380,12 +410,13 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
               selectedLang,
               "vi",
               "auto",
-              token
+              token,
+              vocabLevel
             );
           } else {
-            // Chiến lược 2: Nếu client không thấy chữ (tệp scan ảnh, chứng chỉ, hoặc mã hoá) -> Cắt tệp & gửi lên BE
+            // Chiến lược 2: Nếu client không thấy chữ (tệp scan ảnh, chứng chỉ, hoặc mã hoá) -> Cắt tệp & gửi lên BE để dùng Gemini Vision OCR
             showToast(
-              `⚡ Đang cắt trang ${s} → ${e} để tải tệp lên máy chủ bóc tách...`,
+              `⚡ Phát hiện trang PDF scan/ảnh. Đang gửi lên máy chủ để nhận diện qua Gemini Vision OCR...`,
               "info"
             );
             let fileToSend = selectedFile;
@@ -403,7 +434,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
             }
 
             showToast(
-              `Đang gửi tệp cắt "${fileToSend.name}" (${(fileToSend.size / 1024).toFixed(1)} KB) lên AI...`,
+              `Đang gửi tệp cắt "${fileToSend.name}" (${(fileToSend.size / 1024).toFixed(1)} KB) lên Gemini Vision OCR...`,
               "info"
             );
             result = await aiExtractVocabFromFile(
@@ -412,13 +443,21 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
               null,
               null,
               selectedLang,
-              "vi"
+              "vi",
+              vocabLevel
             );
           }
         } else {
-          // Xử lý tệp không phải PDF (.docx, .txt, .md, .csv)
+          // Xử lý tệp không phải PDF (.docx, .txt, .md, .csv, hoặc ảnh .png/.jpg/.webp)
+          const isImage = /\.(png|jpg|jpeg|webp)$/i.test(selectedFile.name);
           let fileToSend = selectedFile;
-          if (selectedFile.size > MAX_BE_FILE_SIZE) {
+
+          if (isImage) {
+            showToast(
+              `⚡ Đang gửi ảnh "${selectedFile.name}" lên Gemini Vision OCR để đọc chữ & bóc tách từ vựng...`,
+              "info"
+            );
+          } else if (selectedFile.size > MAX_BE_FILE_SIZE) {
             // Nếu là tệp text/md/csv lớn: FE tự cắt văn bản dưới 5MB
             const isTextType = /\.(txt|md|csv)$/i.test(selectedFile.name);
             if (isTextType) {
@@ -437,17 +476,21 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
             }
           }
 
-          showToast(
-            `AI đang phân tích tệp "${fileToSend.name}" (${(fileToSend.size / 1024).toFixed(1)} KB - ${currentLangObj.label})...`,
-            "info"
-          );
+          if (!isImage) {
+            showToast(
+              `AI đang phân tích tệp "${fileToSend.name}" (${(fileToSend.size / 1024).toFixed(1)} KB - ${currentLangObj.label})...`,
+              "info"
+            );
+          }
+
           result = await aiExtractVocabFromFile(
             fileToSend,
             token,
             null,
             null,
             selectedLang,
-            "vi"
+            "vi",
+            vocabLevel
           );
         }
       } else {
@@ -455,7 +498,14 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
           `AI đang trích xuất thuật ngữ & từ vựng (${currentLangObj.label} → Tiếng Việt)...`,
           "info"
         );
-        result = await aiExtractVocabFromText(inputText.trim(), selectedLang, "vi", "auto", token);
+        result = await aiExtractVocabFromText(
+          inputText.trim(),
+          selectedLang,
+          "vi",
+          "auto",
+          token,
+          vocabLevel
+        );
       }
 
       const items = result.items || [];
@@ -662,6 +712,28 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                 </div>
               </div>
 
+              {/* Level Selector Bar */}
+              <div className="ai-level-selector-bar">
+                <div className="ai-level-label-group">
+                  <GraduationCap size={15} className="text-primary" />
+                  <span className="ai-level-title">Cấp độ từ vựng cần lọc:</span>
+                </div>
+                <div className="ai-level-pills">
+                  {VOCAB_LEVELS.map((lvl) => (
+                    <button
+                      key={lvl.id}
+                      type="button"
+                      className={`ai-level-pill-btn ${vocabLevel === lvl.id ? "active" : ""}`}
+                      onClick={() => setVocabLevel(lvl.id)}
+                      title={lvl.desc}
+                    >
+                      <span className="ai-level-name">{lvl.label}</span>
+                      {lvl.badge && <span className="ai-level-badge">{lvl.badge}</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Tab 1: Paste Text */}
               {activeTab === "paste" && (
                 <div className="ai-paste-wrapper">
@@ -715,7 +787,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
-                    accept=".pdf,.docx,.txt,.md,.csv"
+                    accept=".pdf,.docx,.txt,.md,.csv,.png,.jpg,.jpeg,.webp"
                     style={{ display: "none" }}
                   />
                   <div
@@ -739,6 +811,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                         <div style={{ fontSize: "0.8rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
                           Kích thước: {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB ({(selectedFile.size / 1024).toFixed(0)} KB)
                           {totalPages ? ` • Đã nhận diện: ${totalPages} trang` : ""}
+                          {/\.(png|jpg|jpeg|webp)$/i.test(selectedFile.name) ? " • Định dạng hình ảnh (Gemini Vision OCR)" : ""}
                         </div>
                         {selectedFile.size > MAX_BE_FILE_SIZE ? (
                           <div className="ai-large-file-badge">
@@ -753,10 +826,10 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                     ) : (
                       <div>
                         <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>
-                          Kéo thả tệp PDF, Word (.docx) hoặc Text vào đây (Hỗ trợ tệp lớn đến 500MB)
+                          Kéo thả tệp PDF, Word (.docx), Text hoặc Ảnh chụp/scan vào đây (Hỗ trợ tệp đến 500MB)
                         </div>
                         <div style={{ fontSize: "0.8rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
-                          Hỗ trợ định dạng: .pdf, .docx, .txt, .md, .csv (Sách, giáo trình, đề thi, báo cáo mọi dung lượng)
+                          Hỗ trợ định dạng: .pdf (kể cả scan), .docx, .txt, .md, .csv & hình ảnh/scan (.png, .jpg, .webp). Mọi tệp đều được AI tự động nhận diện!
                         </div>
                       </div>
                     )}
@@ -938,8 +1011,10 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
 
               {/* Action Trigger */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-                <div style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                  Ngôn ngữ đang chọn: <strong>{EXTRACT_LANGUAGES.find((l) => l.id === selectedLang)?.flag} {EXTRACT_LANGUAGES.find((l) => l.id === selectedLang)?.label}</strong> (Dịch sang Tiếng Việt)
+                <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                  <span>Ngôn ngữ: <strong>{EXTRACT_LANGUAGES.find((l) => l.id === selectedLang)?.flag} {EXTRACT_LANGUAGES.find((l) => l.id === selectedLang)?.label}</strong></span>
+                  <span>•</span>
+                  <span>Cấp độ: <strong style={{ color: "#4f46e5" }}>{VOCAB_LEVELS.find((v) => v.id === vocabLevel)?.label}</strong></span>
                 </div>
                 <button
                   className="ai-btn-analyze"

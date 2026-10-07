@@ -703,6 +703,7 @@ class AIExtractTextRequest(BaseModel):
     source_lang: Optional[str] = "en"
     target_lang: Optional[str] = "vi"
     mode: Optional[str] = "auto"
+    vocab_level: Optional[str] = "intermediate"  # all | intermediate | advanced | expert
 
 
 class BatchImportVocabItem(BaseModel):
@@ -722,7 +723,7 @@ async def ai_extract_vocabulary_from_text(
     payload: AIExtractTextRequest,
     current_user: User = Depends(require_ai_import_permission)
 ):
-    """AI Vocabulary Extraction from raw text or document snippet.
+    """AI Vocabulary Extraction from raw text or document snippet with customizable level filter.
     Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrang.
     """
     try:
@@ -730,7 +731,8 @@ async def ai_extract_vocabulary_from_text(
             text=payload.text,
             source_lang=payload.source_lang or "en",
             target_lang=payload.target_lang or "vi",
-            mode=payload.mode or "auto"
+            mode=payload.mode or "auto",
+            vocab_level=payload.vocab_level or "intermediate"
         )
         return {
             'success': True,
@@ -753,15 +755,15 @@ async def ai_extract_vocabulary_from_file(
     end_page: Optional[int] = Form(None),
     source_lang: Optional[str] = Form("en"),
     target_lang: Optional[str] = Form("vi"),
+    vocab_level: Optional[str] = Form("intermediate"),
     current_user: User = Depends(require_ai_import_permission)
 ):
-    """AI Vocabulary Extraction directly from uploaded PDF, Word DOCX, or text file.
-    Supports optional page range selection (start_page to end_page) for PDF files.
-    Backend file size is strictly capped at 5MB to preserve server memory and bandwidth.
+    """AI Vocabulary Extraction from ANY file: PDF, DOCX, TXT, or scanned images/photos.
+    Supports smart fallback to Gemini Multimodal Vision OCR if PDF has no text layer (scanned).
     Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrang.
     """
     filename = file.filename or "uploaded_document"
-    allowed_exts = (".pdf", ".docx", ".txt", ".md", ".csv")
+    allowed_exts = (".pdf", ".docx", ".txt", ".md", ".csv", ".png", ".jpg", ".jpeg", ".webp")
     if not any(filename.lower().endswith(ext) for ext in allowed_exts):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -777,29 +779,71 @@ async def ai_extract_vocabulary_from_file(
                 detail="Kích thước tệp gửi lên máy chủ vượt quá giới hạn 5MB. Với tệp PDF lớn (hỗ trợ đến 500MB), vui lòng sử dụng tính năng trích xuất trang trực tiếp trên trình duyệt."
             )
 
-        extracted_text = AIVocabService.extract_text_from_file(
-            content_bytes,
-            filename,
-            start_page=start_page,
-            end_page=end_page
-        )
-        if not extracted_text or not extracted_text.strip():
+        extracted_text = None
+        images = []
+        is_image_file = any(filename.lower().endswith(ext) for ext in (".png", ".jpg", ".jpeg", ".webp"))
+        is_pdf_file = filename.lower().endswith(".pdf")
+
+        if is_image_file:
+            # Direct photo/screenshot upload: pass image bytes directly to Gemini Vision OCR
+            images = [content_bytes]
+        elif is_pdf_file:
+            try:
+                extracted_text = AIVocabService.extract_text_from_file(
+                    content_bytes,
+                    filename,
+                    start_page=start_page,
+                    end_page=end_page
+                )
+            except Exception as ex:
+                logger.info(f"Standard PDF text extraction had notice ({ex}). Will fallback to Gemini Vision OCR.")
+                extracted_text = None
+
+            # Fallback for scanned PDF / image-only pages: render page(s) to images with PyMuPDF
+            if not extracted_text or not extracted_text.strip():
+                try:
+                    import fitz
+                    doc = fitz.open(stream=content_bytes, filetype="pdf")
+                    total_p = len(doc)
+                    s_idx = max(0, (start_page - 1) if (start_page and start_page > 0) else 0)
+                    e_idx = min(total_p, end_page if (end_page and end_page > 0) else total_p)
+                    if s_idx >= total_p:
+                        s_idx = 0
+                    for i in range(s_idx, min(s_idx + 5, e_idx)):
+                        pix = doc[i].get_pixmap(dpi=150)
+                        images.append(pix.tobytes("jpeg"))
+                    logger.info(f"Rendered {len(images)} PDF page(s) to images for Gemini Vision OCR.")
+                except Exception as render_err:
+                    logger.warning(f"Failed to render scanned PDF page(s) for Vision OCR: {render_err}")
+        else:
+            extracted_text = AIVocabService.extract_text_from_file(
+                content_bytes,
+                filename,
+                start_page=start_page,
+                end_page=end_page
+            )
+
+        if not extracted_text and not images:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Không thể đọc nội dung văn bản từ tệp này hoặc khoảng trang đã chọn không có chữ."
+                detail="Không thể đọc nội dung văn bản từ tệp này. Tệp có thể bị hỏng hoặc khoảng trang không hợp lệ."
             )
 
         items = await AIVocabService.extract_vocabulary(
-            text=extracted_text,
+            text=extracted_text or "",
             source_lang=source_lang or "en",
             target_lang=target_lang or "vi",
-            mode="auto"
+            mode="auto",
+            vocab_level=vocab_level or "intermediate",
+            images=images
         )
         return {
             'success': True,
             'filename': filename,
             'source_lang': source_lang or "en",
-            'raw_text_length': len(extracted_text),
+            'vocab_level': vocab_level or "intermediate",
+            'raw_text_length': len(extracted_text) if extracted_text else 0,
+            'vision_ocr_used': bool(images),
             'items': items,
             'total': len(items),
             'operator': current_user.email

@@ -4,6 +4,7 @@ Specialized for bilingual vocabulary lists, diplomatic/technical documents, tabl
 import os
 import re
 import json
+import base64
 import logging
 from typing import List, Dict, Any, Optional
 import httpx
@@ -142,22 +143,58 @@ class AIVocabService:
     @classmethod
     async def extract_vocabulary(
         cls,
-        text: str,
+        text: str = "",
         source_lang: str = "en",
         target_lang: str = "vi",
-        mode: str = "auto"
+        mode: str = "auto",
+        vocab_level: str = "intermediate",
+        images: Optional[List[bytes]] = None
     ) -> List[Dict[str, Any]]:
-        """Call Gemini to extract, normalize, and enrich vocabulary pairs from ANY document text (up to 5,000 words)."""
-        if not text or not text.strip():
+        """Call Gemini to extract, normalize, and enrich vocabulary pairs from ANY document text or images/scanned PDFs."""
+        if (not text or not text.strip()) and not images:
             return []
 
-        # Enforce maximum 5,000 words limit
-        words = text.strip().split()
-        if len(words) > 5000:
-            cleaned_input = " ".join(words[:5000])
-            logger.info(f"Input text exceeded 5,000 words ({len(words)} words). Truncated to first 5,000 words.")
-        else:
-            cleaned_input = text.strip()
+        # Enforce maximum 5,000 words limit for text
+        cleaned_input = ""
+        if text and text.strip():
+            words = text.strip().split()
+            if len(words) > 5000:
+                cleaned_input = " ".join(words[:5000])
+                logger.info(f"Input text exceeded 5,000 words ({len(words)} words). Truncated to first 5,000 words.")
+            else:
+                cleaned_input = text.strip()
+
+        # Vocabulary Level Filter Specs
+        LEVEL_SPECS = {
+            "all": {
+                "name": "Mọi cấp độ (A1 – C2)",
+                "instruction": "Trích xuất các từ vựng và cụm từ hữu ích từ bài đọc, từ cơ bản đến nâng cao.",
+                "exclude": "Chỉ bỏ qua các mạo từ đơn lẻ (a, an, the) hoặc đại từ nhân xưng vô nghĩa (I, you, he, she)."
+            },
+            "intermediate": {
+                "name": "Trung cấp trở lên (B1 – C2 / IELTS 5.0 - 6.5)",
+                "instruction": "Chỉ chọn lọc từ vựng từ cấp độ B1 trở lên, collocations, cụm động từ (phrasal verbs), thành ngữ (idioms) và từ vựng mang tính học tập.",
+                "exclude": (
+                    "TUYỆT ĐỐI KHÔNG LẤY các từ vựng sơ cấp A1 - A2 quá dễ và hiển nhiên. "
+                    "Ví dụ BẮT BUỘC BỎ: say, note, tell, ask, speak, talk, see, look, go, come, make, do, have, get, "
+                    "give, take, good, bad, happy, sad, big, small, new, old, very, really, because, but, and, so, or..."
+                )
+            },
+            "advanced": {
+                "name": "Nâng cao & Học thuật (B2 – C2 / IELTS 6.5 - 7.5+)",
+                "instruction": "Chỉ chọn lọc các từ vựng học thuật (academic), thuật ngữ báo chí/khoa học, collocations đắt giá, thành ngữ và từ vựng band cao (ví dụ: underscore, highlight, stress, corroborate, exacerbate, unprecedented...).",
+                "exclude": (
+                    "TUYỆT ĐỐI LOẠI BỎ toàn bộ từ vựng dưới cấp độ B2 (B1, A2, A1). "
+                    "Tuyệt đối không lấy các từ thông dụng như: say, note, tell, important, problem, result, effect, different, difficult, easy..."
+                )
+            },
+            "expert": {
+                "name": "Chuyên sâu / C1 – C2 (IELTS 8.0+)",
+                "instruction": "Chỉ chọn các từ vựng C1 – C2 cao cấp, thuật ngữ chuyên ngành tinh tế, từ vựng văn phong học thuật xuất sắc và cấu trúc hiếm gặp.",
+                "exclude": "TUYỆT ĐỐI LOẠI BỎ toàn bộ từ vựng phổ thông các cấp độ A1, A2, B1 và B2."
+            }
+        }
+        lvl = LEVEL_SPECS.get(vocab_level, LEVEL_SPECS["intermediate"])
 
         # Language-specific descriptors for 6 supported languages
         LANG_SPECS = {
@@ -226,13 +263,17 @@ class AIVocabService:
         lang_name = spec["name"]
 
         prompt = f"""Bạn là một chuyên gia ngôn ngữ học và giảng dạy {lang_name} hàng đầu.
-Nhiệm vụ của bạn là đọc và phân tích KỸ LƯỠNG BẤT KỲ văn bản {lang_name} nào dưới đây (bài báo tin tức, giáo trình, đoạn văn học thuật, hội thoại, thư từ, ghi chú, danh sách từ vựng song ngữ, hoặc tài liệu chuyên ngành bất kỳ - tối đa 5.000 từ).
+Nhiệm vụ của bạn là đọc và phân tích KỸ LƯỠNG tài liệu/văn bản {lang_name} dưới đây (kể cả tệp scan, báo cáo, đề thi, danh sách từ vựng song ngữ, hoặc bài đọc chuyên ngành).
 
 Hãy tự động nhận diện và trích xuất TOÀN BỘ các từ vựng quan trọng, cụm từ đắt giá, cấu trúc câu hay, và thuật ngữ hữu ích cho người học.
 
+QUY CHUẨN CẤP ĐỘ BẮT BUỘC: {lvl['name']}
+- Mục tiêu tuyển chọn: {lvl['instruction']}
+- {lvl['exclude']}
+
 Yêu cầu bóc tách chi tiết:
 1. Áp dụng linh hoạt cho MỌI thể loại văn bản:
-   - Nếu là đoạn văn bản tự do: Chọn lọc các từ vựng cốt lõi, từ vựng nâng cao, thành ngữ và cụm từ xuất hiện trong bài.
+   - Nếu là đoạn văn bản tự do: Chọn lọc các từ vựng cốt lõi, từ vựng nâng cao, thành ngữ và cụm từ xuất hiện trong bài đạt chuẩn {lvl['name']}.
    - Nếu là danh sách từ vựng/bảng song ngữ: Tách chính xác từng cặp từ {lang_name} và nghĩa tiếng Việt tương ứng.
 2. Tách rõ ràng từng mục:
    - "word": {spec['word_rule']}.
@@ -240,8 +281,7 @@ Yêu cầu bóc tách chi tiết:
    - "phonetic": {spec['phonetic_rule']}.
    - "part_of_speech": {spec['pos_rule']}.
    - "context_sentence": Câu ví dụ trích trực tiếp từ văn bản đầu vào (hoặc câu ví dụ tự nhiên minh họa cách dùng từ này).
-3. Loại bỏ các từ quá vụn vặt cơ bản không mang giá trị học tập.
-4. Định dạng trả về BẮT BUỘC là JSON Array thuần túy chứa danh sách các object, ví dụ:
+3. Định dạng trả về BẮT BUỘC là JSON Array thuần túy chứa danh sách các object, ví dụ:
 [
   {{
     "word": "{spec['sample_word']}",
@@ -251,7 +291,9 @@ Yêu cầu bóc tách chi tiết:
     "context_sentence": "Ví dụ minh họa ngữ cảnh câu chứa từ này."
   }}
 ]
-
+"""
+        if cleaned_input:
+            prompt += f"""
 VĂN BẢN ĐẦU VÀO ({lang_name}):
 \"\"\"
 {cleaned_input}
@@ -264,16 +306,33 @@ VĂN BẢN ĐẦU VÀO ({lang_name}):
         models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
         last_error = None
 
+        # Build multimodal contents parts
+        contents_parts = []
+        if images:
+            for img in images:
+                contents_parts.append({
+                    "inline_data": {
+                        "mime_type": "image/jpeg",
+                        "data": base64.b64encode(img).decode("utf-8")
+                    }
+                })
+            contents_parts.append({
+                "text": f"TÀI LIỆU HÌNH ẢNH / TRANG SCAN ĐÍNH KÈM:\nHãy đọc kỹ và nhận diện toàn bộ văn bản xuất hiện trong các bức ảnh này (OCR).\nSau đó thực hiện yêu cầu bóc tách từ vựng dưới đây:\n\n{prompt}"
+            })
+        else:
+            contents_parts.append({"text": prompt})
+
+        payload = {
+            "contents": [{"parts": contents_parts}],
+            "generationConfig": {
+                "responseMimeType": "application/json",
+                "temperature": 0.2
+            }
+        }
+
         async with httpx.AsyncClient(timeout=300.0) as client:
             for model_name in models_to_try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
-                payload = {
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {
-                        "responseMimeType": "application/json",
-                        "temperature": 0.2
-                    }
-                }
                 try:
                     response = await client.post(url, json=payload)
                     if response.status_code == 200:

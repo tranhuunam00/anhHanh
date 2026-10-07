@@ -27,6 +27,7 @@ limiter = Limiter(
 )
 
 MAX_PAYLOAD_BYTES = 512 * 1024  # 512 KB
+MAX_DOC_PAYLOAD_BYTES = 505 * 1024 * 1024  # 5 MB for document/vocab uploads
 MAX_AUDIO_PAYLOAD_BYTES = 25 * 1024 * 1024  # 25 MB for custom audio uploads
 
 # ── Per-route-group hard limits (enforced at middleware, no decorator needed) ──
@@ -85,7 +86,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         content_length = request.headers.get('content-length')
         if content_length:
             try:
-                allowed_max = MAX_AUDIO_PAYLOAD_BYTES if path.startswith('/api/audio-studio/') else MAX_PAYLOAD_BYTES
+                if path.startswith('/api/audio-studio/'):
+                    allowed_max = MAX_AUDIO_PAYLOAD_BYTES
+                elif path.startswith('/api/vocab/'):
+                    allowed_max = MAX_DOC_PAYLOAD_BYTES
+                else:
+                    allowed_max = MAX_PAYLOAD_BYTES
+
                 if int(content_length) > allowed_max:
                     max_mb = allowed_max // (1024 * 1024) or (allowed_max // 1024)
                     unit = "MB" if allowed_max >= 1024 * 1024 else "KB"

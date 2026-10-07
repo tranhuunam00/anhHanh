@@ -500,7 +500,14 @@ export const playPronunciationAudio = (word, accent = "us") => {
   });
 };
 
-export const aiExtractVocabFromText = async (text, sourceLang = "en", targetLang = "vi", mode = "auto", token = null) => {
+export const aiExtractVocabFromText = async (
+  text,
+  sourceLang = "en",
+  targetLang = "vi",
+  mode = "auto",
+  token = null,
+  vocabLevel = "intermediate"
+) => {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -512,6 +519,7 @@ export const aiExtractVocabFromText = async (text, sourceLang = "en", targetLang
       source_lang: sourceLang,
       target_lang: targetLang,
       mode,
+      vocab_level: vocabLevel,
     }),
   });
   return await safeParseResponse(res, "Không thể trích xuất từ vựng qua AI");
@@ -523,7 +531,8 @@ export const aiExtractVocabFromFile = async (
   startPage = null,
   endPage = null,
   sourceLang = "en",
-  targetLang = "vi"
+  targetLang = "vi",
+  vocabLevel = "intermediate"
 ) => {
   const headers = {};
   if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -534,6 +543,7 @@ export const aiExtractVocabFromFile = async (
   if (endPage) formData.append("end_page", String(endPage));
   formData.append("source_lang", sourceLang || "en");
   formData.append("target_lang", targetLang || "vi");
+  formData.append("vocab_level", vocabLevel || "intermediate");
 
   const res = await fetch("/api/vocab/ai-extract-file", {
     method: "POST",
