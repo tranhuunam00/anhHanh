@@ -32,6 +32,7 @@ import {
 import { WRITING_CATEGORIES, WRITING_STRUCTURES } from "../constants/writingStructures";
 import { createVocabWord } from "../services/authVocabService";
 import { Task1Visualizer } from "../components/Writing/Task1Visualizer";
+import { IeltsPromptLibraryModal } from "../components/Writing/IeltsPromptLibraryModal";
 import "../styles/writing.css";
 
 export const LANGUAGES = [
@@ -99,6 +100,7 @@ export const WritingPage = ({ isActive = false }) => {
 
   // Prompt library and selection state
   const [promptsLibrary, setPromptsLibrary] = useState({});
+  const [isPromptLibraryOpen, setIsPromptLibraryOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState("ielts_task2");
   const [selectedSubType, setSelectedSubType] = useState("all");
   const [targetBand, setTargetBand] = useState(7.0);
@@ -255,6 +257,23 @@ export const WritingPage = ({ isActive = false }) => {
     };
     loadPrompts();
   }, []);
+
+  const handleSelectFromLibrary = (promptItem, targetGenre) => {
+    if (!promptItem) return;
+    if (targetGenre) {
+      setSelectedGenre(targetGenre);
+    }
+    if (promptItem.sub_type) {
+      setSelectedSubType(promptItem.sub_type);
+    }
+    setCurrentPrompt(promptItem);
+    setIsCustomPrompt(false);
+    setEvaluationResult(null);
+    showToast(
+      `Đã chọn đề: "${promptItem.title}" (${promptItem.exam_date || promptItem.year || "Thi thật"})!`,
+      "success"
+    );
+  };
 
   // When changing genre, pick the matching prompt of that genre & sub-type
   useEffect(() => {
@@ -905,12 +924,24 @@ export const WritingPage = ({ isActive = false }) => {
               <div className="prompt-action-group">
                 <button
                   type="button"
+                  className="btn-prompt-action ielts-bank-action"
+                  onClick={() => setIsPromptLibraryOpen(true)}
+                  title="Kho đề thi IELTS Writing chính cống từ 2020 đến nay (Cambridge 15-19 & Đề thi thật IDP/BC)"
+                >
+                  <IconBook size={13} />
+                  <span>Kho đề thi thật</span>
+                  <span className="ielts-bank-badge">
+                    {(promptsLibrary?.en?.ielts_task2?.length || 45) + (promptsLibrary?.en?.ielts_task1?.length || 17)}+
+                  </span>
+                </button>
+                <button
+                  type="button"
                   className="btn-prompt-action"
                   onClick={handleShufflePrompt}
                   title="Đổi sang đề bài khác trong thư viện"
                 >
                   <IconRotate size={13} />
-                  <span>Đổi đề bài</span>
+                  <span>Đổi ngẫu nhiên</span>
                 </button>
                 {/* Input nhập prompt chủ đề gợi ý (không bắt buộc) */}
                 <div className="ai-topic-prompt-wrapper" title="Nhập chủ đề gợi ý (vd: xe điện, biến đổi khí hậu, AI...) rồi bấm 'AI Tạo đề mới' (không bắt buộc nhập)">
@@ -2043,6 +2074,15 @@ export const WritingPage = ({ isActive = false }) => {
           </div>
         </div>
       )}
+
+      {/* Modal: Kho Đề Thi IELTS Chính Cống (2020 - Hiện tại) */}
+      <IeltsPromptLibraryModal
+        isOpen={isPromptLibraryOpen}
+        onClose={() => setIsPromptLibraryOpen(false)}
+        promptsLibrary={promptsLibrary}
+        currentPrompt={currentPrompt}
+        onSelectPrompt={handleSelectFromLibrary}
+      />
     </div>
   );
 };

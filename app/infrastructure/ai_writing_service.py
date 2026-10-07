@@ -9,6 +9,10 @@ import logging
 from typing import List, Dict, Any, Optional
 import httpx
 from dotenv import load_dotenv
+from app.infrastructure.ielts_prompts_bank import (
+    IELTS_TASK2_AUTHENTIC_PROMPTS,
+    IELTS_TASK1_AUTHENTIC_PROMPTS,
+)
 
 load_dotenv(override=True)
 logger = logging.getLogger(__name__)
@@ -21,59 +25,8 @@ def get_gemini_api_key() -> str:
 
 CURATED_PROMPTS_BY_LANG: Dict[str, Dict[str, List[Dict[str, Any]]]] = {
     "en": {
-        "ielts_task2": [
-            {
-                "id": "t2_cam16_t1",
-                "title": "Compulsory Community Service for High School Students (Cambridge 16 Test 1)",
-                "prompt": "Some people believe that unpaid community service should be a compulsory part of high school programmes (for example working for a charity, improving the neighborhood or teaching sports to younger children). To what extent do you agree or disagree?",
-                "type": "Agree / Disagree (Cambridge 16)",
-                "sub_type": "opinion",
-                "keywords": ["compulsory community service", "civic responsibility", "altruistic mindset", "practical life skills", "academic overload"],
-                "min_words": 250,
-                "recommended_time": 40
-            },
-            {
-                "id": "t2_cam14_t2",
-                "title": "Global vs National Environmental Solutions (Cambridge 14 Test 2)",
-                "prompt": "Some people think that environmental problems should be solved on a global scale, while others believe that it is better to deal with them individually at a national level. Discuss both views and give your own opinion.",
-                "type": "Discuss Both Views (Cambridge 14)",
-                "sub_type": "discussion",
-                "keywords": ["transnational cooperation", "cross-border carbon emissions", "multilateral treaties", "domestic legislation", "localized initiatives"],
-                "min_words": 250,
-                "recommended_time": 40
-            },
-            {
-                "id": "t2_cam14_t1",
-                "title": "Urban Overcrowding, Traffic Congestion & Housing (Cambridge 14 Test 1)",
-                "prompt": "The rapid expansion of cities has led to severe traffic congestion and housing shortages in many countries. What are the causes of these problems, and what measures can governments take to resolve them?",
-                "type": "Causes & Solutions (Cambridge 14)",
-                "sub_type": "causes_solutions",
-                "keywords": ["unbridled urbanization", "chronic traffic congestion", "affordable housing deficits", "decentralization policies", "public transit infrastructure"],
-                "min_words": 250,
-                "recommended_time": 40
-            },
-            {
-                "id": "t2_cam16_t2",
-                "title": "Tourism in Remote Natural Environments (Cambridge 16 Test 2)",
-                "prompt": "In many parts of the world, tourists are increasingly visiting remote and pristine natural environments such as the Arctic, deserts, or tropical rainforests. Do the advantages of this development outweigh the disadvantages?",
-                "type": "Advantages & Disadvantages (Cambridge 16)",
-                "sub_type": "advantages_disadvantages",
-                "keywords": ["ecotourism expansion", "pristine wilderness", "ecological disturbance", "economic stimulus", "environmental degradation"],
-                "min_words": 250,
-                "recommended_time": 40
-            },
-            {
-                "id": "t2_cam17_t2",
-                "title": "Solo Living in Contemporary Society (Cambridge 17 Test 2)",
-                "prompt": "In many countries around the world, an increasing number of individuals are choosing to live alone rather than with family or roommates. What are the primary reasons for this trend? Is this a positive or negative development?",
-                "type": "Two-part Question (Cambridge 17)",
-                "sub_type": "two_part",
-                "keywords": ["one-person households", "financial autonomy", "hyper-individualism", "social alienation", "housing market strain"],
-                "min_words": 250,
-                "recommended_time": 40
-            }
-        ],
-        "ielts_task1": [
+        "ielts_task2": IELTS_TASK2_AUTHENTIC_PROMPTS,
+        "ielts_task1": IELTS_TASK1_AUTHENTIC_PROMPTS + [
             {
                 "id": "t1_cam13_line",
                 "title": "Tourist Visits to Four Attractions in Brighton (Cambridge 13 Test 2)",
