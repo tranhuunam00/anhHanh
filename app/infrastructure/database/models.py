@@ -167,6 +167,7 @@ class UserVocabulary(Base):
     next_review_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
     review_interval_days = Column(Integer, default=1, nullable=False)
     mastery_score = Column(Integer, default=0, nullable=False)
+    source_lang = Column(String(10), default='en', nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     user = relationship('User', back_populates='vocabulary')
@@ -183,6 +184,7 @@ class UserVocabulary(Base):
             'video_id': self.video_id,
             'video_timestamp': self.video_timestamp,
             'status': self.status,
+            'source_lang': self.source_lang or 'en',
             'next_review_at': self.next_review_at.isoformat() if self.next_review_at else None,
             'review_interval_days': self.review_interval_days,
             'mastery_score': self.mastery_score,

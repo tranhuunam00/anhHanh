@@ -18,6 +18,7 @@ import {
   Lightbulb,
 } from "../Icons";
 import { submitVocabReviewResult, fetchPracticeSession } from "../../services/authVocabService";
+import { getVoiceLang } from "../../utils/languageVoices";
 import "./VocabExerciseHubModal.css";
 
 // Rich fallback Vietnamese meanings for distractors if user has fewer than 4 saved words
@@ -84,12 +85,12 @@ export default function VocabExerciseHubModal({
   const currentItem = items[currentIndex];
 
   // Helper: native audio speech synthesis
-  const playAudio = useCallback((wordToSpeak) => {
+  const playAudio = useCallback((wordToSpeak, wordLang = null) => {
     if (!("speechSynthesis" in window) || !wordToSpeak) return;
     try {
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(wordToSpeak);
-      utter.lang = "en-US";
+      utter.lang = getVoiceLang(wordLang || currentItem?.source_lang, wordToSpeak);
       utter.rate = 0.9;
       utter.onstart = () => setIsPlayingAudio(true);
       utter.onend = () => setIsPlayingAudio(false);
@@ -99,7 +100,7 @@ export default function VocabExerciseHubModal({
       console.warn("Audio playback notice:", err);
       setIsPlayingAudio(false);
     }
-  }, []);
+  }, [currentItem]);
 
 // Cached AudioContext for zero-latency instantaneous sound playback
 let cachedAudioCtx = null;
@@ -238,7 +239,7 @@ const playSoundFeedback = (isCorrect) => {
 
     if (currentItem && currentItem.word) {
       const timer = setTimeout(() => {
-        playAudio(currentItem.word);
+        playAudio(currentItem.word, currentItem.source_lang);
       }, 250);
       return () => clearTimeout(timer);
     }
@@ -333,6 +334,7 @@ const playSoundFeedback = (isCorrect) => {
           word: currentItem.word,
           meaning: currentItem.meaning,
           phonetic: currentItem.phonetic,
+          source_lang: currentItem.source_lang,
           isCorrect: correct,
         },
       ]);
@@ -386,7 +388,7 @@ const playSoundFeedback = (isCorrect) => {
       // Ctrl key (hoặc Control): replay audio
       if (e.key === "Control" || (e.ctrlKey && !e.altKey && !e.shiftKey) || e.key === " " || e.key === "Spacebar") {
         e.preventDefault();
-        if (currentItem?.word) playAudio(currentItem.word);
+        if (currentItem?.word) playAudio(currentItem.word, currentItem.source_lang);
         return;
       }
 
@@ -468,10 +470,10 @@ const playSoundFeedback = (isCorrect) => {
                     <span className="ex-pill-tag">Trắc nghiệm Phản xạ</span>
                   </div>
 
-                  <h3 className="ex-format-title">Từ tiếng Anh ➔ Nghĩa tiếng Việt</h3>
+                  <h3 className="ex-format-title">Từ vựng ➔ Nghĩa tiếng Việt</h3>
                   <p className="ex-format-desc">
-                    Quan sát từ tiếng Anh &amp; phiên âm IPA, suy luận nghĩa tiếng Việt qua 4 phương án.
-                    Có nút <strong>con mắt gợi ý câu ngữ cảnh</strong> (mặc định ẩn).
+                    Quan sát từ vựng &amp; phiên âm IPA, suy luận nghĩa tiếng Việt qua 4 phương án.
+                    Có nút <strong>con mắt gợi ý câu ngữ cảnh</strong> (mặc định ẩn • Phím Esc).
                   </p>
 
                   {/* Visual Preview Box */}
@@ -611,7 +613,7 @@ const playSoundFeedback = (isCorrect) => {
                       <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>{item.meaning}</span>
                       <button
                         type="button"
-                        onClick={() => playAudio(item.word)}
+                        onClick={() => playAudio(item.word, item.source_lang)}
                         className="ex-audio-mini-btn"
                         title="Nghe phát âm"
                       >
@@ -724,7 +726,7 @@ const playSoundFeedback = (isCorrect) => {
               <button
                 type="button"
                 className={`ex-audio-circle-btn ${isPlayingAudio ? "playing" : ""}`}
-                onClick={() => playAudio(currentItem.word)}
+                onClick={() => playAudio(currentItem.word, currentItem.source_lang)}
                 title="Nghe phát âm (Phím Ctrl)"
               >
                 <Volume2 size={22} />

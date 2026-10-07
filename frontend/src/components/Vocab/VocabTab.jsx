@@ -38,6 +38,7 @@ import { AIVocabImportModal } from "../Modals/AIVocabImportModal";
 import { exportVocabToCSV, exportVocabToAnki } from "../../utils/vocabExporter";
 import { splitContextSentence } from "../../utils/textNormalizer";
 import { markVocabStudiedToday } from "../../utils/dailyReminderManager";
+import { getVoiceLang } from "../../utils/languageVoices";
 
 export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const { token, isAuthenticated, refreshStreak, showToast, refreshSavedVocab } = useAuth();
@@ -313,11 +314,12 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
     return `/${clean}/`;
   };
 
-  const speakWord = (word, lang = "en-GB") => {
-    if ("speechSynthesis" in window) {
+  const speakWord = (word, sourceLang = null) => {
+    if ("speechSynthesis" in window && word) {
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(word);
-      utter.lang = lang;
+      utter.lang = getVoiceLang(sourceLang, word);
+      utter.rate = 0.9;
       window.speechSynthesis.speak(utter);
     }
   };
@@ -449,7 +451,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 border: "none",
                 boxShadow: "0 2px 10px rgba(2, 132, 199, 0.35)",
               }}
-              title="Luyện tập từ vựng chuẩn Dạng 1: Từ tiếng Anh ➔ Nghĩa tiếng Việt"
+              title="Luyện tập từ vựng chuẩn Dạng 1: Từ vựng ➔ Nghĩa tiếng Việt"
             >
               <Zap size={14} fill="currentColor" />
               <span>Luyện tập từ vựng</span>
@@ -544,7 +546,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 Hôm nay bạn có <span style={{ color: "#38bdf8" }}>{dueItems.length} từ</span> đến hạn ôn tập!
               </div>
               <div style={{ fontSize: "0.85rem", color: "var(--text-secondary, #94a3b8)", marginTop: "2px" }}>
-                Luyện tập chuẩn hóa Dạng 1: Từ tiếng Anh ➔ Chọn nghĩa tiếng Việt, kèm phát âm &amp; ngữ cảnh câu mẫu.
+                Luyện tập chuẩn hóa Dạng 1: Từ vựng ➔ Chọn nghĩa tiếng Việt, kèm phát âm &amp; ngữ cảnh câu mẫu.
               </div>
             </div>
           </div>
@@ -575,7 +577,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
       {/* Vocabulary Practice Exercise Modal (Dạng 1) */}
       {isExerciseHubOpen && (
         <VocabExerciseHubModal
-          vocabPool={dueItems.length > 0 ? dueItems : items}
+          vocabPool={items}
           token={token}
           onClose={() => {
             setIsExerciseHubOpen(false);
@@ -687,11 +689,11 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
 
                 {v.phonetic && (
                   <div className="vocab-pronunciation-row">
-                    <span className="vocab-pron-tag">UK</span>
+                    <span className="vocab-pron-tag">{(v.source_lang || "en").toUpperCase()}</span>
                     <button
                       className="vocab-pron-speaker-btn"
-                      onClick={() => speakWord(v.word, "en-GB")}
-                      title="Nghe phát âm giọng UK"
+                      onClick={() => speakWord(v.word, v.source_lang)}
+                      title={`Nghe phát âm (${(v.source_lang || "en").toUpperCase()})`}
                     >
                       <Volume2 size={13} strokeWidth={2.2} />
                     </button>
@@ -789,7 +791,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                   <div style={{ display: "flex", gap: "4px" }}>
                     <button
                       className="vocab-audio-btn"
-                      onClick={() => speakWord(v.word)}
+                      onClick={() => speakWord(v.word, v.source_lang)}
                       title="Phát âm từ này (Audio)"
                     >
                       <Volume2 size={14} strokeWidth={2} />

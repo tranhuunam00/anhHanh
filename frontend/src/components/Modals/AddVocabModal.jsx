@@ -16,6 +16,7 @@ import {
   fetchWordTranslation,
   fetchImageCandidates,
 } from "../../services/authVocabService";
+import { getVoiceLang } from "../../utils/languageVoices";
 
 export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
   const { token, refreshStreak, refreshSavedVocab, showToast } = useAuth();
@@ -35,7 +36,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
     if (!textToSpeak || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = "en-US";
+    utterance.lang = getVoiceLang(null, textToSpeak);
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   };
@@ -43,7 +44,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
   const handleAutoEnrich = async () => {
     const clean = word.trim();
     if (!clean) {
-      showToast("Vui lòng nhập từ tiếng Anh trước", "warning");
+      showToast("Vui lòng nhập từ vựng trước", "warning");
       return;
     }
 
@@ -104,7 +105,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
     e.preventDefault();
     const cleanWord = word.trim();
     if (!cleanWord) {
-      showToast("Vui lòng nhập từ vựng tiếng Anh", "warning");
+      showToast("Vui lòng nhập từ vựng", "warning");
       return;
     }
 
@@ -212,7 +213,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                   color: "var(--text-primary, #1e293b)",
                 }}
               >
-                Từ vựng tiếng Anh <span style={{ color: "#ef4444" }}>*</span>
+                Từ vựng <span style={{ color: "#ef4444" }}>*</span>
               </label>
               <button
                 type="button"

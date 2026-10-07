@@ -68,14 +68,14 @@ async def save_vocabulary_word(
     """Save a new word to the user's Smart Vocabulary notebook with auto-enriched metadata."""
     clean_word = payload.word.strip()
 
-    # 1. Auto-fetch phonetic IPA if not provided
+    # 1. Auto-fetch phonetic IPA if not provided (only for English words)
+    src_lang = (payload.source_lang or 'auto').strip().lower()
+    tgt_lang = 'vi'  # Mặc định dịch sang tiếng Việt
     phonetic = payload.phonetic
-    if not phonetic:
+    if not phonetic and src_lang in ('en', 'auto'):
         phonetic = ImageSearchService.get_word_phonetic(clean_word)
 
     # 2. Auto-translate meaning to Vietnamese if not provided
-    src_lang = (payload.source_lang or 'auto').strip().lower()
-    tgt_lang = 'vi'  # Mặc định dịch sang tiếng Việt
     meaning = payload.meaning
     if not meaning:
         try:
@@ -144,6 +144,7 @@ async def save_vocabulary_word(
         image_url=image_url,
         video_id=payload.video_id,
         video_timestamp=payload.effective_timestamp,
+        source_lang=src_lang if src_lang != 'auto' else 'en',
         status='NEW',
         next_review_at=datetime.now(timezone.utc),
         review_interval_days=1,
@@ -817,10 +818,12 @@ class BatchImportVocabItem(BaseModel):
     phonetic: Optional[str] = None
     context_sentence: Optional[str] = ""
     image_url: Optional[str] = None
+    source_lang: Optional[str] = "en"
 
 
 class BatchImportVocabRequest(BaseModel):
     items: List[BatchImportVocabItem]
+    source_lang: Optional[str] = None
 
 
 @router.post('/ai-extract')
@@ -1064,9 +1067,10 @@ async def batch_import_vocabulary_words(
         phonetic = (item.phonetic or "").strip() or None
         context = (item.context_sentence or "").strip()
         image_url = (item.image_url or "").strip() or None
+        item_lang = (item.source_lang or payload.source_lang or "en").strip().lower()
 
-        # Auto enrich IPA if not provided
-        if not phonetic:
+        # Auto enrich IPA if not provided (strictly only for English words)
+        if not phonetic and item_lang in ("en", "auto"):
             phonetic = ImageSearchService.get_word_phonetic(clean_word)
 
         key = clean_word.lower()
@@ -1080,6 +1084,8 @@ async def batch_import_vocabulary_words(
                 existing_vocab.context_sentence = context
             if image_url:
                 existing_vocab.image_url = image_url
+            if hasattr(existing_vocab, 'source_lang') and item_lang:
+                existing_vocab.source_lang = item_lang
             updated_count += 1
         else:
             # Create new
@@ -1090,6 +1096,7 @@ async def batch_import_vocabulary_words(
                 meaning=clean_meaning,
                 context_sentence=context,
                 image_url=image_url,
+                source_lang=item_lang,
                 status='NEW',
                 next_review_at=now,
                 review_interval_days=1,

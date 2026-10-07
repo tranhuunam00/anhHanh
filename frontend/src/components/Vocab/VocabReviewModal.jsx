@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { submitVocabReviewResult } from "../../services/authVocabService";
 import { splitContextSentence } from "../../utils/textNormalizer";
+import { getVoiceLang } from "../../utils/languageVoices";
 import "./VocabReviewModal.css";
 
 // Styled Modern Vector Icons
@@ -113,7 +114,7 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
     if ("speechSynthesis" in window && wordText) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(wordText);
-      utterance.lang = "en-US";
+      utterance.lang = getVoiceLang(currentItem?.source_lang, wordText);
       utterance.rate = 0.9;
       window.speechSynthesis.speak(utterance);
     }
@@ -281,7 +282,7 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
           {/* MODE 1: Audio Dictation Quiz (Nghe đoán từ) */}
           {questionType === 1 && (
             <div className="quiz-container audio-mode">
-              <span className="quiz-badge"><SvgHeadphones size={14} /> Nghe & Gõ lại từ tiếng Anh</span>
+              <span className="quiz-badge"><SvgHeadphones size={14} /> Nghe & Gõ lại từ vựng</span>
               <div className="audio-big-card" onClick={() => speakWord(currentItem.word)}>
                 <div className="audio-big-icon"><SvgVolume size={36} /></div>
                 <span className="audio-hint-txt">Bấm để nghe âm thanh từ vựng</span>
@@ -294,7 +295,7 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
                 <input
                   type="text"
                   className={`quiz-text-input ${isAnswered ? (isCorrect ? "input-correct" : "input-incorrect") : ""}`}
-                  placeholder="Gõ từ tiếng Anh vào đây..."
+                  placeholder="Gõ từ vựng vào đây..."
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   autoFocus
@@ -337,7 +338,7 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
                 <input
                   type="text"
                   className={`quiz-text-input ${isAnswered ? (isCorrect ? "input-correct" : "input-incorrect") : ""}`}
-                  placeholder="Điền từ tiếng Anh còn thiếu..."
+                  placeholder="Điền từ vựng còn thiếu..."
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   autoFocus

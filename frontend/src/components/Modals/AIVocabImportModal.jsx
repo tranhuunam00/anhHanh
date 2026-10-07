@@ -34,6 +34,7 @@ import {
   batchImportVocab,
 } from "../../services/authVocabService";
 import { getPdfPageCount, extractPdfTextClient, slicePdfClient } from "../../utils/pdfExtractor";
+import { getVoiceLang } from "../../utils/languageVoices";
 import "./AIVocabImportModal.css";
 
 // 6 Supported Languages
@@ -305,19 +306,11 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
           user.name.toLowerCase().includes("vuthiquynhtrangbl6d")))
   );
 
-  const handleSpeech = (text) => {
+  const handleSpeech = (text, itemLang = null) => {
     if (!text || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
-    const langMap = {
-      en: "en-US",
-      ja: "ja-JP",
-      zh: "zh-CN",
-      ko: "ko-KR",
-      fr: "fr-FR",
-      de: "de-DE",
-    };
-    utter.lang = langMap[selectedLang] || "en-US";
+    utter.lang = getVoiceLang(itemLang || selectedLang, text);
     utter.rate = 0.9;
     window.speechSynthesis.speak(utter);
   };
@@ -552,7 +545,10 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
         );
       }
 
-      const items = result.items || [];
+      const items = (result.items || []).map((it) => ({
+        ...it,
+        source_lang: it.source_lang || selectedLang || "en",
+      }));
       if (items.length === 0) {
         showToast("AI không tìm thấy từ vựng hoặc thuật ngữ nào trong nội dung này.", "warning");
       } else {
@@ -614,6 +610,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
         phonetic: "",
         part_of_speech: "phrase",
         context_sentence: "",
+        source_lang: selectedLang || "en",
       },
     ]);
     setSelectedIndices((prev) => new Set([...prev, extractedItems.length]));
@@ -622,7 +619,11 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
   const handleSaveToNotebook = async () => {
     const selectedList = extractedItems
       .filter((_, idx) => selectedIndices.has(idx))
-      .filter((item) => item.word && item.word.trim());
+      .filter((item) => item.word && item.word.trim())
+      .map((item) => ({
+        ...item,
+        source_lang: item.source_lang || selectedLang || "en",
+      }));
 
     if (selectedList.length === 0) {
       showToast("Vui lòng chọn ít nhất một từ vựng hợp lệ để lưu vào Sổ từ", "warning");
@@ -1293,7 +1294,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                                   {item.word && (
                                     <button
                                       type="button"
-                                      onClick={() => handleSpeech(item.word)}
+                                      onClick={() => handleSpeech(item.word, item.source_lang || selectedLang)}
                                       className="ai-speech-btn"
                                       title="Phát âm"
                                     >

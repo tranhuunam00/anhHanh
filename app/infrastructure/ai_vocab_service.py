@@ -240,8 +240,8 @@ class AIVocabService:
             },
             "fr": {
                 "name": "Tiếng Pháp",
-                "word_rule": "Từ hoặc cụm từ TIẾNG PHÁP chuẩn (kèm mạo từ le/la nếu là danh từ)",
-                "phonetic_rule": "Phiên âm quốc tế IPA chuẩn của từ (ví dụ: '/ɛ̃.tɛ.li.ʒɑ̃s/')",
+                "word_rule": "Từ hoặc cụm từ TIẾNG PHÁP chuẩn (kèm mạo từ le/la/l' nếu là danh từ)",
+                "phonetic_rule": "Phiên âm quốc tế IPA CHUẨN TIẾNG PHÁP của từ (BẮT BUỘC dùng ký hiệu ngữ âm tiếng Pháp, ví dụ: '/bɔ̃.ʒuʁ/', '/mɛʁ.si/', '/ɛ̃.tɛ.li.ʒɑ̃s aʁ.ti.fi.sjɛl/'). TUYỆT ĐỐI KHÔNG dùng phiên âm tiếng Anh",
                 "pos_rule": "Loại từ (nom masculin, nom féminin, verbe, adjectif, adverbe, locution...)",
                 "sample_word": "intelligence artificielle",
                 "sample_meaning": "trí tuệ nhân tạo",
@@ -251,7 +251,7 @@ class AIVocabService:
             "de": {
                 "name": "Tiếng Đức",
                 "word_rule": "Từ hoặc cụm từ TIẾNG ĐỨC chuẩn (viết hoa danh từ kèm mạo từ der/die/das)",
-                "phonetic_rule": "Phiên âm quốc tế IPA chuẩn của từ (ví dụ: '/ˈhaʊs/')",
+                "phonetic_rule": "Phiên âm quốc tế IPA CHUẨN TIẾNG ĐỨC của từ (ví dụ: '/ˈhaʊs/', '/ˈkʏnstlɪçə/'). TUYỆT ĐỐI KHÔNG dùng phiên âm tiếng Anh",
                 "pos_rule": "Loại từ (Nomen maskulin/feminin/neutral, Verb, Adjektiv, Adverb, Redewendung...)",
                 "sample_word": "künstliche Intelligenz",
                 "sample_meaning": "trí tuệ nhân tạo",
@@ -278,9 +278,9 @@ Yêu cầu bóc tách chi tiết:
 2. Tách rõ ràng từng mục:
    - "word": {spec['word_rule']}.
    - "meaning": Nghĩa TIẾNG VIỆT chính xác, tự nhiên, sát ngữ cảnh của bài.
-   - "phonetic": {spec['phonetic_rule']}.
+   - "phonetic": {spec['phonetic_rule']}. BẮT BUỘC là phiên âm chuẩn của {lang_name}, TUYỆT ĐỐI KHÔNG xuất phiên âm kiểu tiếng Anh.
    - "part_of_speech": {spec['pos_rule']}.
-   - "context_sentence": Câu ví dụ trích trực tiếp từ văn bản đầu vào (hoặc câu ví dụ tự nhiên minh họa cách dùng từ này).
+   - "context_sentence": Câu ví dụ trích trực tiếp từ văn bản đầu vào (hoặc câu ví dụ tự nhiên bằng {lang_name} minh họa cách dùng từ này).
 3. Định dạng trả về BẮT BUỘC là JSON Array thuần túy chứa danh sách các object, ví dụ:
 [
   {{
@@ -365,7 +365,8 @@ VĂN BẢN ĐẦU VÀO ({lang_name}):
                                             "meaning": m or w,
                                             "phonetic": str(item.get("phonetic", "")).strip() or None,
                                             "part_of_speech": str(item.get("part_of_speech", "phrase")).strip(),
-                                            "context_sentence": str(item.get("context_sentence", "")).strip()
+                                            "context_sentence": str(item.get("context_sentence", "")).strip(),
+                                            "source_lang": source_lang
                                         })
                                     return results
                     else:
