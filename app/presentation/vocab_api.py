@@ -176,6 +176,8 @@ async def list_vocabulary(
     video_id: Optional[str] = None,
     status_filter: Optional[str] = Query(None, alias='status'),
     search: Optional[str] = Query(None),
+    page: Optional[int] = Query(None, ge=1),
+    page_size: Optional[int] = Query(None, ge=1, le=100),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -192,7 +194,7 @@ async def list_vocabulary(
 
     stmt = stmt.order_by(UserVocabulary.created_at.desc())
     res = await db.execute(stmt)
-    words = res.scalars().all()
+    all_words = res.scalars().all()
 
     # Calculate status counts
     stats_res = await db.execute(
@@ -207,11 +209,24 @@ async def list_vocabulary(
             status_counts[key] = count
         status_counts['total'] += count
 
+    total_filtered = len(all_words)
+    if page is not None and page_size is not None:
+        offset = (page - 1) * page_size
+        words = all_words[offset:offset + page_size]
+        total_pages = (total_filtered + page_size - 1) // page_size if page_size > 0 else 1
+    else:
+        words = all_words
+        total_pages = 1
+
     word_dicts = [w.to_dict() for w in words]
     return {
         'items': word_dicts,
         'vocabulary': word_dicts,
         'total': status_counts['total'],
+        'filtered_total': total_filtered,
+        'page': page or 1,
+        'page_size': page_size or total_filtered,
+        'total_pages': total_pages,
         'stats': status_counts
     }
 
@@ -647,6 +662,96 @@ async def get_due_vocab_session(
         'total_due': len(due_words),
         'items': session_items
     }
+
+
+@router.get('/practice-session')
+async def get_practice_session(
+    limit: Optional[int] = Query(None, ge=1, description="Number of words: 20, 40, 60... or None for all"),
+    status_filter: Optional[str] = Query(None, alias='status'),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieve words for Dạng 1 practice session with multiple-choice distractors.
+    If limit < total_available, BE automatically samples randomly.
+    """
+    stmt = select(UserVocabulary).where(UserVocabulary.user_id == current_user.id)
+    if status_filter and status_filter.upper() != 'ALL':
+        stmt = stmt.where(UserVocabulary.status == status_filter.upper())
+
+    res = await db.execute(stmt)
+    all_words = list(res.scalars().all())
+    total_available = len(all_words)
+
+    if not all_words:
+        return {'total_available': 0, 'count': 0, 'items': []}
+
+    # If limit specified and limit < total_available, randomly sample in BE
+    if limit and limit < total_available:
+        selected_words = random.sample(all_words, limit)
+    else:
+        selected_words = list(all_words)
+        random.shuffle(selected_words)
+
+    # Fetch user's other meanings for distractors
+    all_meanings_res = await db.execute(
+        select(UserVocabulary.meaning)
+        .where(
+            UserVocabulary.user_id == current_user.id,
+            UserVocabulary.meaning != None,
+            UserVocabulary.meaning != ""
+        )
+    )
+    user_meanings = [
+        m[0] for m in all_meanings_res.all() 
+        if m[0] and not re.match(r'^[a-zA-Z\s\-]+$', m[0].strip())
+    ]
+    combined_pool = list(set(user_meanings + FALLBACK_DISTRACTORS))
+
+    session_items = []
+    for w in selected_words:
+        correct_meaning = (w.meaning or "").strip()
+        if not correct_meaning or correct_meaning.lower() == w.word.lower().strip():
+            try:
+                translated = _translation_service.translate(w.word, source_lang='auto', target_lang='vi')
+                if translated and translated.lower().strip() != w.word.lower().strip():
+                    correct_meaning = translated
+                    w.meaning = translated
+                    await db.commit()
+                else:
+                    correct_meaning = "Chưa có nghĩa tiếng Việt"
+            except Exception:
+                correct_meaning = "Chưa có nghĩa tiếng Việt"
+
+        w_dict = w.to_dict()
+        w_dict['meaning'] = correct_meaning
+
+        other_candidates = [
+            m for m in combined_pool 
+            if m.lower().strip() != correct_meaning.lower().strip() 
+            and m.lower().strip() != w.word.lower().strip()
+            and not re.match(r'^[a-zA-Z\s\-]+$', m.strip())
+        ]
+        selected_distractors = random.sample(other_candidates, min(3, len(other_candidates)))
+
+        fallback_idx = 0
+        while len(selected_distractors) < 3:
+            dummy = FALLBACK_DISTRACTORS[fallback_idx % len(FALLBACK_DISTRACTORS)]
+            fallback_idx += 1
+            if dummy.lower().strip() != correct_meaning.lower().strip() and dummy not in selected_distractors:
+                selected_distractors.append(dummy)
+
+        options = selected_distractors + [correct_meaning]
+        random.shuffle(options)
+
+        w_dict['options'] = options
+        session_items.append(w_dict)
+
+    return {
+        'total_available': total_available,
+        'count': len(session_items),
+        'items': session_items
+    }
+
 
 
 @router.post('/review-result')

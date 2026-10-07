@@ -8,8 +8,14 @@ import {
   RotateCcw,
   CheckCircle2,
   Sparkles,
-} from "lucide-react";
-import { submitVocabReviewResult } from "../../services/authVocabService";
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  BookOpen,
+  ArrowRight,
+  Layers,
+} from "../Icons";
+import { submitVocabReviewResult, fetchPracticeSession } from "../../services/authVocabService";
 import "./VocabExerciseHubModal.css";
 
 // Rich fallback Vietnamese meanings for distractors if user has fewer than 4 saved words
@@ -40,30 +46,37 @@ const FALLBACK_DISTRACTORS = [
   "tập trung cao độ",
 ];
 
+const QUANTITY_OPTIONS = [20, 40, 60, 80, "ALL"];
+
 export default function VocabExerciseHubModal({
   vocabPool = [],
   token = null,
   onClose,
   onFinished,
 }) {
-  const [items, setItems] = useState(() => {
-    if (!vocabPool || vocabPool.length === 0) return [];
-    // Shuffle the items for variety
-    return [...vocabPool].sort(() => Math.random() - 0.5);
-  });
+  // Navigation View: "MENU" (Card selection) | "PRACTICE" (Interactive session) | "SUMMARY" (Results)
+  const [viewMode, setViewMode] = useState("MENU");
 
+  // Quantity option selected in Dạng 1 card: 20, 40, 60, 80 or "ALL"
+  const [selectedLimit, setSelectedLimit] = useState(20);
+  const [isLoadingSession, setIsLoadingSession] = useState(false);
+
+  // Active practice session words
+  const [items, setItems] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
 
   // Per-question interactive state
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-  // Review history tracking for end-of-exercise summary
+  // Eye toggle: Mặc định là ẨN (false)
+  const [showContext, setShowContext] = useState(false);
+
+  // Review history tracking for summary
   const [resultsHistory, setResultsHistory] = useState([]);
 
   const currentItem = items[currentIndex];
@@ -90,6 +103,11 @@ export default function VocabExerciseHubModal({
   const mcqOptions = useMemo(() => {
     if (!currentItem || !currentItem.meaning) return [];
 
+    // If backend already enriched options, use them directly
+    if (Array.isArray(currentItem.options) && currentItem.options.length >= 4) {
+      return currentItem.options;
+    }
+
     const correctMeaning = currentItem.meaning.trim();
 
     // 1. Collect candidate distractors from other words in the current pool
@@ -108,19 +126,79 @@ export default function VocabExerciseHubModal({
     return combined.sort(() => Math.random() - 0.5);
   }, [currentItem, items]);
 
-  // Reset and auto-play audio when moving to a new word
+  // Reset per-question state and auto-play audio when moving to a new word
   useEffect(() => {
+    if (viewMode !== "PRACTICE") return;
+
     setSelectedOption(null);
     setIsAnswered(false);
+    setShowContext(false); // Mặc định ẩn ngữ cảnh cho câu mới
 
     if (currentItem && currentItem.word) {
-      // Short delay for smooth modal mount / transition
       const timer = setTimeout(() => {
         playAudio(currentItem.word);
       }, 250);
       return () => clearTimeout(timer);
     }
-  }, [currentIndex, currentItem, playAudio]);
+  }, [currentIndex, currentItem, playAudio, viewMode]);
+
+  // Start practice session with selected quantity
+  const handleStartPractice = async () => {
+    setIsLoadingSession(true);
+    try {
+      let sessionWords = [];
+
+      // 1. If user is authenticated, request BE to randomly sample
+      if (token) {
+        const limitParam = selectedLimit === "ALL" ? null : selectedLimit;
+        const res = await fetchPracticeSession(limitParam, "ALL", token);
+        if (res && Array.isArray(res.items) && res.items.length > 0) {
+          sessionWords = res.items;
+        }
+      }
+
+      // 2. Fallback to client pool if not logged in or BE returned empty
+      if (sessionWords.length === 0 && vocabPool && vocabPool.length > 0) {
+        let poolCopy = [...vocabPool];
+        // Shuffle pool
+        poolCopy.sort(() => Math.random() - 0.5);
+
+        if (selectedLimit !== "ALL" && typeof selectedLimit === "number") {
+          sessionWords = poolCopy.slice(0, selectedLimit);
+        } else {
+          sessionWords = poolCopy;
+        }
+      }
+
+      if (sessionWords.length === 0) {
+        alert("Sổ tay của bạn chưa có từ vựng nào để luyện tập!");
+        setIsLoadingSession(false);
+        return;
+      }
+
+      setItems(sessionWords);
+      setCurrentIndex(0);
+      setScore(0);
+      setCombo(0);
+      setMaxCombo(0);
+      setSelectedOption(null);
+      setIsAnswered(false);
+      setShowContext(false);
+      setResultsHistory([]);
+      setViewMode("PRACTICE");
+    } catch (err) {
+      console.error("Error starting practice session:", err);
+      // Fallback: use whatever is in vocabPool
+      if (vocabPool.length > 0) {
+        const shuffled = [...vocabPool].sort(() => Math.random() - 0.5);
+        const limitCount = selectedLimit === "ALL" ? shuffled.length : Math.min(selectedLimit, shuffled.length);
+        setItems(shuffled.slice(0, limitCount));
+        setViewMode("PRACTICE");
+      }
+    } finally {
+      setIsLoadingSession(false);
+    }
+  };
 
   // Handle progression to the next question
   const proceedNext = useCallback(
@@ -161,7 +239,7 @@ export default function VocabExerciseHubModal({
       if (currentIndex + 1 < items.length) {
         setCurrentIndex((i) => i + 1);
       } else {
-        setIsFinished(true);
+        setViewMode("SUMMARY");
         if (onFinished) onFinished();
       }
     },
@@ -186,17 +264,28 @@ export default function VocabExerciseHubModal({
     [currentItem, isAnswered, proceedNext]
   );
 
-  // Keyboard navigation shortcuts: keys 1, 2, 3, 4 to select, Space to replay audio
+  // Keyboard navigation shortcuts: keys 1, 2, 3, 4 to select, Space to replay audio, H to toggle hint
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (isFinished || isAnswered) return;
+    if (viewMode !== "PRACTICE") return;
 
+    const handleKeyDown = (e) => {
+      if (isAnswered) return;
+
+      // Spacebar: replay audio
       if (e.key === " " || e.key === "Spacebar") {
         e.preventDefault();
         if (currentItem?.word) playAudio(currentItem.word);
         return;
       }
 
+      // H key: toggle context sentence hint
+      if (e.key === "h" || e.key === "H") {
+        e.preventDefault();
+        setShowContext((prev) => !prev);
+        return;
+      }
+
+      // 1-4 keys: select option
       const keyIndex = ["1", "2", "3", "4"].indexOf(e.key);
       if (keyIndex !== -1 && mcqOptions[keyIndex]) {
         e.preventDefault();
@@ -206,49 +295,165 @@ export default function VocabExerciseHubModal({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleSelectOption, isAnswered, isFinished, mcqOptions, currentItem, playAudio]);
+  }, [handleSelectOption, isAnswered, mcqOptions, currentItem, playAudio, viewMode]);
 
-  // Restart exercise from beginning
+  // Restart practice session
   const handleRestart = () => {
     setItems((prev) => [...prev].sort(() => Math.random() - 0.5));
     setCurrentIndex(0);
     setScore(0);
     setCombo(0);
     setMaxCombo(0);
-    setIsFinished(false);
     setSelectedOption(null);
     setIsAnswered(false);
+    setShowContext(false);
     setResultsHistory([]);
+    setViewMode("PRACTICE");
   };
 
-  // 1. Empty state
-  if (items.length === 0) {
+  // Back to Menu view
+  const handleBackToMenu = () => {
+    setViewMode("MENU");
+  };
+
+  const totalPoolWords = vocabPool.length;
+
+  // -------------------------------------------------------------
+  // VIEW 1: MENU CARD SELECTION (Chọn dạng bài tập & Số lượng)
+  // -------------------------------------------------------------
+  if (viewMode === "MENU") {
     return (
       <div className="exercise-modal-backdrop" onClick={onClose}>
         <div className="exercise-modal-window" onClick={(e) => e.stopPropagation()}>
-          <div className="ex-summary-wrap">
-            <CheckCircle2 size={54} color="#10b981" />
-            <h2 style={{ margin: "14px 0 6px 0", fontWeight: 800 }}>Sổ tay của bạn chưa có từ vựng nào!</h2>
-            <p style={{ color: "#94a3b8", fontSize: "0.95rem", maxWidth: "420px", margin: "0 auto 20px" }}>
-              Hãy thêm từ mới hoặc sử dụng tính năng <strong>AI Tách & Import</strong> để đưa từ vựng vào sổ tay rồi bắt đầu luyện tập.
-            </p>
-            <button className="btn-primary" onClick={onClose} style={{ padding: "10px 24px", borderRadius: "12px" }}>
-              Đóng
+          {/* Modal Header */}
+          <div className="exercise-header">
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div className="ex-header-icon-badge">
+                <Sparkles size={18} color="var(--primary)" />
+              </div>
+              <div>
+                <h3 className="ex-header-title">Luyện Tập Từ Vựng</h3>
+                <span className="ex-header-subtitle">
+                  Sổ tay có <strong>{totalPoolWords} từ vựng</strong> • Chọn dạng bài tập để bắt đầu
+                </span>
+              </div>
+            </div>
+            <button className="btn-ex-close" onClick={onClose} title="Đóng">
+              <X size={20} />
             </button>
+          </div>
+
+          {/* Menu Body */}
+          <div className="exercise-body">
+            <div className="ex-menu-container">
+              <div className="ex-menu-headline">
+                <h4>Chọn hình thức bài tập luyện tập</h4>
+                <p>Hệ thống hỗ trợ rèn luyện trí nhớ từ vựng qua phản xạ trắc nghiệm chuẩn phương pháp.</p>
+              </div>
+
+              {/* Format Cards Grid: Currently 1 active format */}
+              <div className="ex-cards-grid">
+                {/* DẠNG 1: CARD DUY NHẤT HIỆN TẠI */}
+                <div className="ex-format-card active">
+                  <div className="ex-format-badge">
+                    <span className="ex-pill-badge active">
+                      🎯 Dạng 1 • Chuẩn phương pháp
+                    </span>
+                    <span className="ex-pill-tag">Trắc nghiệm Phản xạ</span>
+                  </div>
+
+                  <h3 className="ex-format-title">Từ tiếng Anh ➔ Nghĩa tiếng Việt</h3>
+                  <p className="ex-format-desc">
+                    Quan sát từ tiếng Anh & phiên âm IPA, suy luận nghĩa tiếng Việt qua 4 phương án.
+                    Có nút <strong>con mắt 👁️ gợi ý câu ngữ cảnh</strong> (mặc định ẩn).
+                  </p>
+
+                  {/* Visual Preview Box */}
+                  <div className="ex-preview-box">
+                    <div className="ex-preview-word-row">
+                      <span className="ex-preview-word">desperate need</span>
+                      <span className="ex-preview-ipa">/dˈɛsprɪt nˈid/</span>
+                    </div>
+                    <div className="ex-preview-eye-demo">
+                      <Eye size={13} />
+                      <span>Gợi ý câu ngữ cảnh (Mặc định ẩn, bấm để mở)</span>
+                    </div>
+                    <div className="ex-preview-options-grid">
+                      <div className="ex-preview-opt">A. tràn ngập</div>
+                      <div className="ex-preview-opt correct">B. nhu cầu tuyệt vọng ✓</div>
+                      <div className="ex-preview-opt">C. thanh lịch, tao nhã</div>
+                      <div className="ex-preview-opt">D. được coi là đương nhiên</div>
+                    </div>
+                  </div>
+
+                  {/* Quantity Selector: 20, 40, 60, 80 hoặc Tất cả */}
+                  <div className="ex-quantity-section">
+                    <div className="ex-quantity-label">
+                      <span>Chọn số lượng câu hỏi luyện tập:</span>
+                      <span className="ex-quantity-subtext">
+                        {selectedLimit === "ALL"
+                          ? `Tất cả (${totalPoolWords} từ)`
+                          : `${Math.min(selectedLimit, totalPoolWords || selectedLimit)} từ`}
+                      </span>
+                    </div>
+
+                    <div className="ex-quantity-pills">
+                      {QUANTITY_OPTIONS.map((opt) => {
+                        const isSelected = selectedLimit === opt;
+                        const label = opt === "ALL" ? `Tất cả (${totalPoolWords})` : `${opt} từ`;
+                        return (
+                          <button
+                            key={opt}
+                            type="button"
+                            className={`ex-quantity-btn ${isSelected ? "selected" : ""}`}
+                            onClick={() => setSelectedLimit(opt)}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="ex-quantity-helper">
+                      💡 Nếu chọn số lượng nhỏ hơn tổng số từ ({totalPoolWords} từ), hệ thống sẽ tự động <strong>random ngẫu nhiên</strong> từ trong Sổ tay của bạn.
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <button
+                    type="button"
+                    className="ex-start-btn"
+                    onClick={handleStartPractice}
+                    disabled={isLoadingSession || totalPoolWords === 0}
+                  >
+                    {isLoadingSession ? (
+                      <span>Đang chuẩn bị câu hỏi ngẫu nhiên...</span>
+                    ) : (
+                      <>
+                        <span>Bắt đầu Luyện tập ngay</span>
+                        <ArrowRight size={18} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // 2. Summary Screen (when all words are completed)
-  if (isFinished) {
+  // -------------------------------------------------------------
+  // VIEW 2: SUMMARY SCREEN (Sau khi làm xong bài)
+  // -------------------------------------------------------------
+  if (viewMode === "SUMMARY") {
     const accuracy = Math.round((score / items.length) * 100);
     return (
       <div className="exercise-modal-backdrop" onClick={onClose}>
         <div className="exercise-modal-window" onClick={(e) => e.stopPropagation()}>
           <div className="exercise-header">
-            <h3 style={{ margin: 0, fontWeight: 800, fontSize: "1.1rem" }}>Kết Quả Luyện Tập Từ Vựng</h3>
+            <h3 className="ex-header-title">Kết Quả Luyện Tập Từ Vựng</h3>
             <button className="btn-ex-close" onClick={onClose} title="Đóng">
               <X size={20} />
             </button>
@@ -261,7 +466,7 @@ export default function VocabExerciseHubModal({
             <h2 style={{ margin: "10px 0 4px", fontSize: "1.6rem", fontWeight: 800 }}>
               {accuracy >= 80 ? "Xuất sắc! Bạn đã làm chủ bài tập!" : "Hoàn thành bài luyện tập!"}
             </h2>
-            <p style={{ color: "#94a3b8", margin: "0 0 16px", fontSize: "0.9rem" }}>
+            <p style={{ color: "var(--text-muted)", margin: "0 0 16px", fontSize: "0.9rem" }}>
               Đã ghi nhận kết quả vào bộ nhớ ngắt quãng SRS để củng cố trí nhớ dài hạn.
             </p>
 
@@ -292,11 +497,11 @@ export default function VocabExerciseHubModal({
                       <span className={`ex-status-pill ${item.isCorrect ? "correct" : "wrong"}`}>
                         {item.isCorrect ? "ĐÚNG" : "CHƯA ĐÚNG"}
                       </span>
-                      <strong style={{ color: "#f8fafc", fontSize: "0.95rem" }}>{item.word}</strong>
-                      {item.phonetic && <span style={{ color: "#818cf8", fontSize: "0.82rem" }}>{item.phonetic}</span>}
+                      <strong style={{ fontSize: "0.95rem" }}>{item.word}</strong>
+                      {item.phonetic && <span className="ex-history-ipa">{item.phonetic}</span>}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <span style={{ color: "#cbd5e1", fontSize: "0.9rem" }}>{item.meaning}</span>
+                      <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>{item.meaning}</span>
                       <button
                         type="button"
                         onClick={() => playAudio(item.word)}
@@ -315,10 +520,18 @@ export default function VocabExerciseHubModal({
               <button
                 type="button"
                 className="ex-btn-secondary"
+                onClick={handleBackToMenu}
+                style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+              >
+                <ArrowLeft size={16} /> Chọn dạng / số lượng khác
+              </button>
+              <button
+                type="button"
+                className="ex-btn-secondary"
                 onClick={handleRestart}
                 style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
               >
-                <RotateCcw size={16} /> Luyện tập lại từ đầu
+                <RotateCcw size={16} /> Luyện tập lại danh sách này
               </button>
               <button
                 type="button"
@@ -335,14 +548,26 @@ export default function VocabExerciseHubModal({
     );
   }
 
-  // 3. Question Card (Dạng 1: Từ tiếng Anh -> Nghĩa tiếng Việt)
-  const progressPercent = Math.round(((currentIndex + 1) / items.length) * 100);
+  // -------------------------------------------------------------
+  // VIEW 3: PRACTICE SESSION (DẠNG 1 CHUẨN HOÁ)
+  // -------------------------------------------------------------
+  const progressPercent = items.length > 0 ? Math.round(((currentIndex + 1) / items.length) * 100) : 0;
 
   return (
     <div className="exercise-modal-backdrop" onClick={onClose}>
       <div className="exercise-modal-window" onClick={(e) => e.stopPropagation()}>
-        {/* Top Header with Progress & Score */}
+        {/* Top Header with Back to Menu, Progress, Score & Close */}
         <div className="exercise-header">
+          <button
+            type="button"
+            className="ex-back-menu-btn"
+            onClick={handleBackToMenu}
+            title="Quay lại menu chọn dạng"
+          >
+            <ArrowLeft size={16} />
+            <span>Menu dạng</span>
+          </button>
+
           <div className="ex-progress-wrapper">
             <div className="ex-progress-track">
               <div className="ex-progress-fill" style={{ width: `${progressPercent}%` }} />
@@ -374,16 +599,15 @@ export default function VocabExerciseHubModal({
         <div className="ex-mode-banner">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <span className="ex-mode-tag">
-              🎯 Trắc nghiệm Từ -&gt; Nghĩa
+              🎯 Dạng 1: Trắc nghiệm Từ ➔ Nghĩa
             </span>
-            <span className="ex-group-tag">Nhóm: Trắc nghiệm</span>
           </div>
-          <div style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+          <div className="ex-counter-tag">
             Câu <strong>{currentIndex + 1}</strong> / {items.length}
           </div>
         </div>
 
-        {/* Main Exercise Arena: DẠNG 1 EXACT LAYOUT */}
+        {/* Main Exercise Arena */}
         <div className="exercise-body">
           <div className="ex-question-card">
             {/* Target English Word + Audio Speaker Button */}
@@ -404,10 +628,33 @@ export default function VocabExerciseHubModal({
               <div className="ex-target-ipa">{currentItem.phonetic}</div>
             )}
 
-            {/* Context Sentence Quote Box */}
+            {/* CON MẮT GỢI Ý CÂU NGỮ CẢNH: MẶC ĐỊNH ẨN */}
             {currentItem.context_sentence && (
-              <div className="ex-context-quote">
-                “{currentItem.context_sentence}”
+              <div className="ex-context-container">
+                <button
+                  type="button"
+                  className={`ex-eye-hint-btn ${showContext ? "active" : ""}`}
+                  onClick={() => setShowContext((prev) => !prev)}
+                  title="Nhấn phím H hoặc bấm để bật/tắt gợi ý câu ví dụ"
+                >
+                  {showContext ? (
+                    <>
+                      <EyeOff size={15} />
+                      <span>Ẩn gợi ý ngữ cảnh (Phím H)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Eye size={15} />
+                      <span>Gợi ý trong câu (Mặc định ẩn • Phím H)</span>
+                    </>
+                  )}
+                </button>
+
+                {showContext && (
+                  <div className="ex-context-quote">
+                    “{currentItem.context_sentence}”
+                  </div>
+                )}
               </div>
             )}
 
@@ -422,7 +669,6 @@ export default function VocabExerciseHubModal({
                   if (isSelected) {
                     stateClass = isCorrectOption ? "correct" : "wrong";
                   } else if (isCorrectOption) {
-                    // Reveal the correct answer in green even if user chose wrong
                     stateClass = "correct";
                   }
                 }
@@ -443,9 +689,9 @@ export default function VocabExerciseHubModal({
                     {isAnswered && (
                       <span className="ex-mcq-feedback-icon">
                         {isCorrectOption ? (
-                          <Check size={18} color="#10b981" />
+                          <Check size={18} color="var(--success, #10b981)" />
                         ) : isSelected ? (
-                          <X size={18} color="#ef4444" />
+                          <X size={18} color="var(--danger, #ef4444)" />
                         ) : null}
                       </span>
                     )}
@@ -456,7 +702,7 @@ export default function VocabExerciseHubModal({
 
             {/* Keyboard shortcut tip */}
             <div className="ex-keyboard-hint">
-              <span>💡 Mẹo: Bấm phím <strong>1, 2, 3, 4</strong> để chọn nhanh • Phím <strong>Space</strong> để nghe lại phát âm</span>
+              <span>💡 Mẹo: Bấm <strong>1, 2, 3, 4</strong> để chọn • <strong>Space</strong> nghe lại • <strong>H</strong> bật/tắt mắt gợi ý</span>
             </div>
           </div>
         </div>

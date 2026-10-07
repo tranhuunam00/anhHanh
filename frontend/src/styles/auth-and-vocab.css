@@ -1259,3 +1259,110 @@
   100% { transform: scale(1); }
 }
 
+/* Vocab List Pagination System */
+.vocab-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding: 14px 18px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+}
+
+.vocab-pagination-info {
+  font-size: 0.88rem;
+  color: var(--text-muted, #64748b);
+}
+
+.vocab-pagination-info strong {
+  color: var(--text-primary, #0f172a);
+}
+
+.vocab-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vocab-page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vocab-page-btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-secondary, #334155);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.vocab-page-btn:hover:not(:disabled) {
+  border-color: var(--primary, #2563eb);
+  color: var(--primary, #2563eb);
+  background: var(--primary-light, rgba(37, 99, 235, 0.08));
+}
+
+.vocab-page-btn.active {
+  background: var(--primary, #2563eb);
+  border-color: var(--primary, #2563eb);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.vocab-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: var(--border-color, #e2e8f0);
+}
+
+.vocab-page-btn.nav-btn {
+  gap: 4px;
+  padding: 0 10px;
+}
+
+.vocab-page-dots {
+  padding: 0 4px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.9rem;
+}
+
+.vocab-page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vocab-page-size-select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-primary, #0f172a);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.vocab-page-size-select:focus {
+  border-color: var(--primary, #2563eb);
+}
+
+

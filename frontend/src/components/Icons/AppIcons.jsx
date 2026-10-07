@@ -302,4 +302,319 @@ export const IconMessage = (props) => (
   </BaseIcon>
 );
 
+// 32. Eye (Show / Reveal)
+export const IconEye = (props) => (
+  <BaseIcon {...props}>
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </BaseIcon>
+);
+
+// 33. Eye Off (Hide / Conceal)
+export const IconEyeOff = (props) => (
+  <BaseIcon {...props}>
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </BaseIcon>
+);
+
+// 34. Trophy / Achievement Cup
+export const IconTrophy = (props) => (
+  <BaseIcon {...props}>
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+    <path d="M4 22h16" />
+    <path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h10c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-2c-.55 0-1-.45-1-1v-2.34" />
+    <path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2z" />
+  </BaseIcon>
+);
+
+// 35. Target / Goal Bullseye
+export const IconTarget = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="2" />
+  </BaseIcon>
+);
+
+// 36. Zap / Lightning Fast
+export const IconZap = (props) => (
+  <BaseIcon {...props}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </BaseIcon>
+);
+
+// 37. Microphone / Voice Input
+export const IconMic = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" y1="19" x2="12" y2="23" />
+    <line x1="8" y1="23" x2="16" y2="23" />
+  </BaseIcon>
+);
+
+// 38. Arrow Left
+export const IconArrowLeft = (props) => (
+  <BaseIcon {...props}>
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </BaseIcon>
+);
+
+// 39. Chevron Up
+export const IconChevronUp = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="18 15 12 9 6 15" />
+  </BaseIcon>
+);
+
+// 40. Chevron Left
+export const IconChevronLeft = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="15 18 9 12 15 6" />
+  </BaseIcon>
+);
+
+// 41. Chevron Right
+export const IconChevronRight = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="9 18 15 12 9 6" />
+  </BaseIcon>
+);
+
+// 42. Info Circle
+export const IconInfo = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="16" x2="12" y2="12" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+  </BaseIcon>
+);
+
+// 43. Help / Question Circle
+export const IconHelpCircle = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </BaseIcon>
+);
+
+// 44. Download
+export const IconDownload = (props) => (
+  <BaseIcon {...props}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </BaseIcon>
+);
+
+// 45. File Spreadsheet (CSV / Excel)
+export const IconFileSpreadsheet = (props) => (
+  <BaseIcon {...props}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <path d="M8 13h8" />
+    <path d="M8 17h8" />
+    <path d="M12 11v8" />
+  </BaseIcon>
+);
+
+// 46. Layers
+export const IconLayers = (props) => (
+  <BaseIcon {...props}>
+    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+    <polyline points="2 17 12 22 22 17" />
+    <polyline points="2 12 12 17 22 12" />
+  </BaseIcon>
+);
+
+// 47. Play
+export const IconPlay = (props) => (
+  <BaseIcon {...props}>
+    <polygon points="5 3 19 12 5 21 5 3" />
+  </BaseIcon>
+);
+
+// 48. Pause
+export const IconPause = (props) => (
+  <BaseIcon {...props}>
+    <rect x="6" y="4" width="4" height="16" />
+    <rect x="14" y="4" width="4" height="16" />
+  </BaseIcon>
+);
+
+// 49. Sliders / Controls
+export const IconSliders = (props) => (
+  <BaseIcon {...props}>
+    <line x1="4" y1="21" x2="4" y2="14" />
+    <line x1="4" y1="10" x2="4" y2="3" />
+    <line x1="12" y1="21" x2="12" y2="12" />
+    <line x1="12" y1="8" x2="12" y2="3" />
+    <line x1="20" y1="21" x2="20" y2="16" />
+    <line x1="20" y1="12" x2="20" y2="3" />
+    <line x1="1" y1="14" x2="7" y2="14" />
+    <line x1="9" y1="8" x2="15" y2="8" />
+    <line x1="17" y1="16" x2="23" y2="16" />
+  </BaseIcon>
+);
+
+// 50. Loader / Spinner
+export const IconLoader = (props) => (
+  <BaseIcon {...props}>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </BaseIcon>
+);
+
+// 51. Lock
+export const IconLock = (props) => (
+  <BaseIcon {...props}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </BaseIcon>
+);
+
+// 52. Upload
+export const IconUpload = (props) => (
+  <BaseIcon {...props}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </BaseIcon>
+);
+
+// 53. Image
+export const IconImage = (props) => (
+  <BaseIcon {...props}>
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <polyline points="21 15 16 10 5 21" />
+  </BaseIcon>
+);
+
+// 54. Scissors / Split
+export const IconScissors = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="6" cy="6" r="3" />
+    <circle cx="6" cy="18" r="3" />
+    <line x1="20" y1="4" x2="8.12" y2="15.88" />
+    <line x1="14.47" y1="14.48" x2="20" y2="20" />
+    <line x1="8.12" y1="8.12" x2="12" y2="12" />
+  </BaseIcon>
+);
+
+// 55. Graduation Cap / Academic
+export const IconGraduationCap = (props) => (
+  <BaseIcon {...props}>
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+  </BaseIcon>
+);
+
+// 56. Square (Unchecked)
+export const IconSquare = (props) => (
+  <BaseIcon {...props}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+  </BaseIcon>
+);
+
+// 57. Check Square (Checked)
+export const IconCheckSquare = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="9 11 12 14 22 4" />
+    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+  </BaseIcon>
+);
+
+// 58. Minus
+export const IconMinus = (props) => (
+  <BaseIcon {...props}>
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </BaseIcon>
+);
+
+// 59. File Check
+export const IconFileCheck = (props) => (
+  <BaseIcon {...props}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <polyline points="9 15 11 17 15 13" />
+  </BaseIcon>
+);
+
+// 60. File Text
+export const IconFileText = (props) => (
+  <BaseIcon {...props}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <polyline points="10 9 9 9 8 9" />
+  </BaseIcon>
+);
+
+/* ============================================================
+   DIRECT LUCIDE-COMPATIBLE ALIASES
+   Allows components to drop-in replace `from "lucide-react"`
+   without altering existing tag names!
+   ============================================================ */
+export const X = IconClose;
+export const Close = IconClose;
+export const Eye = IconEye;
+export const EyeOff = IconEyeOff;
+export const Trophy = IconTrophy;
+export const Target = IconTarget;
+export const Zap = IconZap;
+export const Mic = IconMic;
+export const Volume = IconVolume;
+export const Volume2 = IconVolume;
+export const Check = IconCheck;
+export const CheckCircle = IconCheckCircle;
+export const CheckCircle2 = IconCheckCircle;
+export const Sparkles = IconSparkles;
+export const Flame = IconFlame;
+export const RotateCw = IconRotate;
+export const RotateCcw = IconRotate;
+export const ArrowLeft = IconArrowLeft;
+export const ArrowRight = IconArrowRight;
+export const ChevronDown = IconChevronDown;
+export const ChevronUp = IconChevronUp;
+export const ChevronLeft = IconChevronLeft;
+export const ChevronRight = IconChevronRight;
+export const Book = IconBook;
+export const BookOpen = IconBook;
+export const Info = IconInfo;
+export const HelpCircle = IconHelpCircle;
+export const Plus = IconPlus;
+export const Trash = IconTrash;
+export const Trash2 = IconTrash;
+export const Pencil = IconPen;
+export const Download = IconDownload;
+export const FileSpreadsheet = IconFileSpreadsheet;
+export const Layers = IconLayers;
+export const Play = IconPlay;
+export const Pause = IconPause;
+export const Sliders = IconSliders;
+export const SlidersHorizontal = IconSliders;
+export const Search = IconSearch;
+export const Bookmark = IconBookmark;
+export const History = IconHistory;
+export const Loader2 = IconLoader;
+export const Lock = IconLock;
+export const Upload = IconUpload;
+export const Image = IconImage;
+export const Scissors = IconScissors;
+export const GraduationCap = IconGraduationCap;
+export const Square = IconSquare;
+export const CheckSquare = IconCheckSquare;
+export const Minus = IconMinus;
+export const FileCheck = IconFileCheck;
+export const FileText = IconFileText;
+export const AlertCircle = IconAlert;
+export const Globe = IconGlobe;
+
+
+
 

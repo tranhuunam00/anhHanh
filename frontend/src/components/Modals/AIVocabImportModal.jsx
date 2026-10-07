@@ -25,7 +25,7 @@ import {
   Eye,
   RotateCcw,
   FileCheck,
-} from "lucide-react";
+} from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
   aiExtractVocabFromText,

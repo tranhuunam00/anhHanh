@@ -8,7 +8,7 @@ import {
   Volume2,
   Image as ImageIcon,
   RotateCw,
-} from "lucide-react";
+} from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
   createVocabWord,

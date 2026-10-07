@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   BookOpen,
   Search,
@@ -11,6 +11,8 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   HelpCircle,
   Plus,
   Download,
@@ -18,8 +20,7 @@ import {
   Layers,
   Mic,
   CheckCircle2,
-  Pencil,
-} from "lucide-react";
+} from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
   fetchVocabList,
@@ -54,8 +55,53 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [listeningWordId, setListeningWordId] = useState(null);
   const [pronounceResults, setPronounceResults] = useState({});
 
+  // Pagination state for vocabulary list
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(18);
+
   const exportMenuRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  // Reset to page 1 on filter or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterStatus, searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(items.length / (pageSize === "ALL" ? items.length || 1 : pageSize)));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const displayedItems = useMemo(() => {
+    if (pageSize === "ALL") return items;
+    const start = (currentPage - 1) * pageSize;
+    return items.slice(start, start + pageSize);
+  }, [items, currentPage, pageSize]);
+
+  const handlePageChange = (p) => {
+    if (p < 1 || p > totalPages) return;
+    setCurrentPage(p);
+    const container = document.querySelector(".vocab-container");
+    if (container) {
+      container.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const getPageNumbers = () => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, "...", totalPages];
+    }
+    if (currentPage >= totalPages - 3) {
+      return [1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    }
+    return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
+  };
 
   const loadWords = useCallback(async () => {
     setIsLoading(true);
@@ -599,8 +645,9 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
           )}
         </div>
       ) : (
-        <div className="vocab-grid">
-          {items.map((v) => (
+        <>
+          <div className="vocab-grid">
+          {displayedItems.map((v) => (
             <div key={v.id} className="vocab-card">
               <div className="vocab-card-img-wrap">
                 <img
@@ -779,7 +826,82 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
             </div>
           ))}
         </div>
-      )}
+
+        {/* Vocab List Pagination Bar */}
+        {items.length > 0 && (
+          <div className="vocab-pagination-bar">
+            <div className="vocab-pagination-info">
+              Hiển thị <strong>{pageSize === "ALL" ? 1 : (currentPage - 1) * pageSize + 1}</strong> -{" "}
+              <strong>{pageSize === "ALL" ? items.length : Math.min(currentPage * pageSize, items.length)}</strong> trên tổng số{" "}
+              <strong>{items.length}</strong> từ
+            </div>
+
+            {pageSize !== "ALL" && totalPages > 1 && (
+              <div className="vocab-pagination-controls">
+                <button
+                  type="button"
+                  className="vocab-page-btn nav-btn"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  title="Trang trước"
+                >
+                  <ChevronLeft size={16} />
+                  <span>Trước</span>
+                </button>
+
+                <div className="vocab-page-numbers">
+                  {getPageNumbers().map((p, idx) =>
+                    p === "..." ? (
+                      <span key={`dots-${idx}`} className="vocab-page-dots">
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={p}
+                        type="button"
+                        className={`vocab-page-btn ${currentPage === p ? "active" : ""}`}
+                        onClick={() => handlePageChange(p)}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  className="vocab-page-btn nav-btn"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  title="Trang sau"
+                >
+                  <span>Sau</span>
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
+
+            <div className="vocab-page-size-selector">
+              <span style={{ fontSize: "0.82rem", color: "var(--text-muted, #64748b)" }}>Số từ:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  const val = e.target.value === "ALL" ? "ALL" : Number(e.target.value);
+                  setPageSize(val);
+                  setCurrentPage(1);
+                }}
+                className="vocab-page-size-select"
+              >
+                <option value={12}>12 từ/trang</option>
+                <option value={18}>18 từ/trang</option>
+                <option value={36}>36 từ/trang</option>
+                <option value="ALL">Tất cả từ</option>
+              </select>
+            </div>
+          </div>
+        )}
+      </>
+    )}
 
       {/* Manual Add Vocab Modal */}
       <AddVocabModal

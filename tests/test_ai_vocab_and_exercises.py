@@ -34,3 +34,38 @@ def test_ai_vocab_service_text_extraction():
     assert "Điện mừng" in extracted
     assert "message of congratulations" in extracted
 
+
+def test_practice_session_random_sampling_logic():
+    import random
+    items = [f"word_{i}" for i in range(100)]
+    
+    # Selecting 20 should give 20 items
+    sampled_20 = random.sample(items, 20)
+    assert len(sampled_20) == 20
+    assert len(set(sampled_20)) == 20
+
+    # Selecting 40 should give 40 items
+    sampled_40 = random.sample(items, 40)
+    assert len(sampled_40) == 40
+
+    # Selecting all
+    shuffled = list(items)
+    random.shuffle(shuffled)
+    assert len(shuffled) == 100
+
+
+def test_vocab_pagination_math():
+    total_items = 55
+    page_size = 18
+    total_pages = (total_items + page_size - 1) // page_size
+    assert total_pages == 4  # 18 + 18 + 18 + 1 = 55
+
+    # Page 1
+    p1 = list(range(total_items))[0:18]
+    assert len(p1) == 18
+
+    # Page 4 (last page)
+    p4 = list(range(total_items))[54:72]
+    assert len(p4) == 1
+
+

@@ -277,6 +277,23 @@ export const fetchDueVocabSession = async (limit = 20, token = null) => {
   return { total_due: 0, items: [] };
 };
 
+export const fetchPracticeSession = async (limit = null, status = "ALL", token = null) => {
+  try {
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const params = new URLSearchParams();
+    if (limit) params.append("limit", limit);
+    if (status && status !== "ALL") params.append("status", status);
+    const res = await fetch(`/api/vocab/practice-session?${params.toString()}`, { headers });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (e) {
+    console.error("Error fetching practice session:", e);
+  }
+  return { total_available: 0, count: 0, items: [] };
+};
+
 export const submitVocabReviewResult = async (vocabId, isCorrect, token = null) => {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;

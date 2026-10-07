@@ -10,7 +10,7 @@ import {
   Loader2,
   AlertCircle,
   BookOpen,
-} from "lucide-react";
+} from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
   updateVocabWord,
