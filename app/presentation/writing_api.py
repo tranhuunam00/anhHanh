@@ -33,6 +33,7 @@ class EvaluateWritingRequest(BaseModel):
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm (e.g. 6.5, 7.0, 7.5, 8.0)")
     language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết (en, ja, zh, ko, fr, de)")
+    images: Optional[List[str]] = Field(default=[], description="Danh sách ảnh đề bài đính kèm (base64 data URL hoặc URL)")
 
 
 class SaveWritingRequest(BaseModel):
@@ -200,7 +201,8 @@ async def evaluate_writing_submission(
             content=body.content,
             genre=body.genre or "ielts_task2",
             target_band=body.target_band or 7.0,
-            language=body.language or "en"
+            language=body.language or "en",
+            images=body.images
         )
 
         overall_score = evaluation.get("overall_score")

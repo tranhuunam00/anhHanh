@@ -816,7 +816,11 @@ class AIWritingService:
             import random
             return random.choice(prompts)
 
-        area_hint = f"về lĩnh vực: {topic_area}" if topic_area else "về một chủ đề mang tính thời sự hoặc khoa học xã hội phổ biến"
+        area_hint = (
+            f"BẮT BUỘC BÁM SÁT CHỦ ĐỀ / Ý TƯỞNG ĐƯỢC YÊU CẦU: '{topic_area.strip()}' (xây dựng đề thi khảo thí chuẩn chỉnh xoay quanh chủ đề này)"
+            if topic_area and topic_area.strip()
+            else "về một chủ đề mang tính thời sự hoặc khoa học xã hội phổ biến trong kỳ thi IELTS"
+        )
 
         # Specialized instructions depending on genre and sub-type
         sub_type_rule = ""
@@ -826,12 +830,40 @@ class AIWritingService:
         if genre == "ielts_task1":
             min_words = 150
             rec_time = 20
-            sub_type_rule = """
-YÊU CẦU ĐẶC BIỆT IELTS TASK 1:
-- Đề bài trường 'prompt' CHỈ ĐƯỢC CHỨA 1-2 CÂU ĐẦU BÀI CHUẨN ĐỀ THI CAMBRIDGE (Ví dụ: 'The bar chart below shows... Summarise the information by selecting and reporting the main features, and make comparisons where relevant.').
-- TUYỆT ĐỐI KHÔNG VIẾT TÓM TẮT SỐ LIỆU ([Data Summary]), KHÔNG VIẾT ĐÁP ÁN HOẶC PHÂN TÍCH VÀO TRƯỜNG 'prompt'!
-- Toàn bộ số liệu, danh mục, tỷ lệ, các bước quy trình hoặc địa điểm bản đồ BẮT BUỘC ĐƯA VÀO TRƯỜNG 'visual_data'.
+            base_task1_rule = """
+YÊU CẦU CHUNG IELTS TASK 1:
+- Trường 'prompt' CHỈ CHỨA 1-2 CÂU ĐẦU BÀI CHUẨN ĐỀ THI CAMBRIDGE.
+- TUYỆT ĐỐI KHÔNG VIẾT TÓM TẮT SỐ LIỆU, ĐÁP ÁN HOẶC PHÂN TÍCH VÀO 'prompt'!
+- Toàn bộ dữ liệu BẮT BUỘC ĐƯA VÀO TRƯỜNG 'visual_data'.
 """
+            if sub_type == "map":
+                sub_type_rule = base_task1_rule + """
+YÊU CẦU ĐẶC BIỆT DẠNG BẢN ĐỒ (MAP):
+- IELTS Task 1 dạng bản đồ THƯỜNG XUYÊN và BẮT BUỘC có 2 bản đồ so sánh 2 mốc thời gian (Trước & Sau: ví dụ 1990 vs 2020, hoặc Hiện tại vs Kế hoạch quy hoạch tương lai).
+- Trường 'prompt' BẮT BUỘC mở đầu bằng: "The two maps show/illustrate [địa điểm/thị trấn/trường học/đảo] in [Năm A] and [Năm B] (hoặc present day and future development plans)... Summarise the information by selecting and reporting the main features, and make comparisons where relevant."
+- visual_data BẮT BUỘC có:
+  + "type": "map"
+  + "title": "Bản đồ quy hoạch [Địa điểm] ([Năm A] so với [Năm B])"
+  + "period_a": {"year": "mốc năm A hoặc Hiện tại", "zones": [danh sách 5-7 khu vực/địa điểm chi tiết]}
+  + "period_b": {"year": "mốc năm B hoặc Sau quy hoạch", "zones": [danh sách 5-7 khu vực tương ứng]}
+  + Mỗi zone trong zones gồm: {"area": "vị trí (Đông/Tây/Nam/Bắc/Trung tâm)", "name": "mô tả chi tiết công trình/khu vực", "status": "new" (xây mới) / "demolished" (phá bỏ) / "expanded" (mở rộng) / "converted" (chuyển đổi công năng) / "unchanged" (giữ nguyên)}.
+- Đảm bảo có đầy đủ dữ liệu so sánh cụ thể để học viên có cơ sở viết bài 150+ từ.
+"""
+            elif sub_type == "process":
+                sub_type_rule = base_task1_rule + """
+YÊU CẦU ĐẶC BIỆT DẠNG QUY TRÌNH (PROCESS):
+- visual_data BẮT BUỘC có type "process" và trường "process_a" chứa "steps" (5-7 bước).
+- Mỗi step gồm: {"step": số thứ tự, "title": "tên bước", "desc": "mô tả chi tiết", "icon": "crush/mix/heat/grind/pack"}.
+- Đề bài mô tả quy trình sản xuất công nghiệp, tái chế hoặc chu trình sinh học.
+"""
+            elif sub_type in ["line_graph", "bar_chart", "pie_chart", "table", "mixed"]:
+                sub_type_rule = base_task1_rule + f"""
+YÊU CẦU ĐẶC BIỆT DẠNG BIỂU ĐỒ ({sub_type}):
+- visual_data BẮT BUỘC chứa dữ liệu số liệu cụ thể (3-5 danh mục, 2-4 series số liệu).
+- Số liệu phải thực tế, có xu hướng rõ ràng để thí sinh phân tích.
+"""
+            else:
+                sub_type_rule = base_task1_rule
         elif genre == "ielts_task2":
             min_words = 250
             rec_time = 40
@@ -1081,9 +1113,10 @@ TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
         content: str,
         genre: str = "ielts_task2",
         target_band: float = 7.0,
-        language: str = "en"
+        language: str = "en",
+        images: Optional[List[str]] = None
     ) -> Dict[str, Any]:
-        """Grade and thoroughly evaluate a student's writing submission using Gemini AI, with detailed sentence-by-sentence analysis."""
+        """Grade and thoroughly evaluate a student's writing submission using Gemini AI, with detailed sentence-by-sentence analysis and multimodal vision support."""
         if not content or len(content.strip().split()) < 15:
             raise ValueError("Bài viết quá ngắn (tối thiểu 15 từ) để AI có thể đánh giá và chấm điểm chính xác.")
 
@@ -1206,6 +1239,31 @@ BẮT BUỘC là JSON duy nhất (không bọc text giải thích bên ngoài), 
   ]
 }}
 """
+        if images and len(images) > 0:
+            eval_prompt += """
+LƯU Ý ĐẶC BIỆT VỀ HÌNH ẢNH ĐỀ BÀI ĐÍNH KÈM:
+- Học viên ĐÃ ĐÍNH KÈM HÌNH ẢNH ĐỀ BÀI (ảnh chụp đề thi, bản đồ 2 giai đoạn trước - sau, biểu đồ hoặc quy trình).
+- BẠN BẮT BUỘC PHẢI QUAN SÁT KỸ HÌNH ẢNH ĐƯỢC GỬI KÈM để chấm Task Response / Task Achievement chính xác 100%.
+- Kiểm tra xem học viên có trích xuất số liệu chuẩn xác, nhận định đúng xu hướng, hoặc mô tả chính xác sự thay đổi giữa 2 bản đồ hay không.
+"""
+
+        # Build multimodal contents parts
+        content_parts = [{"text": eval_prompt}]
+        if images and len(images) > 0:
+            for img_item in images:
+                if isinstance(img_item, str) and img_item.startswith("data:"):
+                    try:
+                        header, b64_str = img_item.split(",", 1)
+                        mime_type = header.split(";")[0].replace("data:", "").strip()
+                        content_parts.append({
+                            "inline_data": {
+                                "mime_type": mime_type,
+                                "data": b64_str.strip()
+                            }
+                        })
+                    except Exception as parse_ex:
+                        logger.warning(f"Failed to parse base64 image part: {parse_ex}")
+
         models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
         last_error = None
 
@@ -1213,7 +1271,7 @@ BẮT BUỘC là JSON duy nhất (không bọc text giải thích bên ngoài), 
             for model_name in models_to_try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
                 payload = {
-                    "contents": [{"parts": [{"text": eval_prompt}]}],
+                    "contents": [{"parts": content_parts}],
                     "generationConfig": {
                         "responseMimeType": "application/json",
                         "temperature": 0.2

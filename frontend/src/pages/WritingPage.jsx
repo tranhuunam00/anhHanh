@@ -106,6 +106,10 @@ export const WritingPage = ({ isActive = false }) => {
   const [currentPrompt, setCurrentPrompt] = useState(null);
   const [isCustomPrompt, setIsCustomPrompt] = useState(false);
   const [customPromptInput, setCustomPromptInput] = useState("");
+  const [customPromptImages, setCustomPromptImages] = useState([]);
+  const [aiTopicInput, setAiTopicInput] = useState("");
+  const customPromptRef = useRef(null);
+  const promptFileInputRef = useRef(null);
 
   // Editor state
   const [content, setContent] = useState("");
@@ -420,8 +424,10 @@ export const WritingPage = ({ isActive = false }) => {
     }
     setIsGeneratingPrompt(true);
     try {
+      const topicAreaVal = aiTopicInput.trim() || null;
       const p = await generateWritingPrompt({
         genre: selectedGenre,
+        topicArea: topicAreaVal,
         language: selectedLanguage,
         subType: selectedSubType !== "all" ? selectedSubType : null,
         token
@@ -429,7 +435,8 @@ export const WritingPage = ({ isActive = false }) => {
       if (p) {
         setCurrentPrompt(p);
         setIsCustomPrompt(false);
-        showToast(`Đã tạo đề bài mới (${p.type || currentGenreObj.label}) thành công!`, "success");
+        const topicMsg = topicAreaVal ? ` về "${topicAreaVal}"` : "";
+        showToast(`Đã tạo đề bài mới${topicMsg} (${p.type || currentGenreObj.label}) thành công!`, "success");
       }
     } catch (e) {
       showToast(e.message || "Lỗi khi tạo đề bài AI", "error");
@@ -471,10 +478,60 @@ export const WritingPage = ({ isActive = false }) => {
     return cleaned;
   };
 
+  const handlePromptPaste = (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type && items[i].type.indexOf("image") !== -1) {
+        e.preventDefault();
+        const file = items[i].getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (uploadEvent) => {
+            const dataUrl = uploadEvent.target?.result;
+            if (dataUrl) {
+              setCustomPromptImages((prev) => [...prev, dataUrl]);
+              showToast("Đã dán ảnh đề bài vào khung thành công!", "success");
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+  };
+
+  const handlePromptImageUpload = (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    Array.from(files).forEach((file) => {
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (uploadEvent) => {
+          const dataUrl = uploadEvent.target?.result;
+          if (dataUrl) {
+            setCustomPromptImages((prev) => [...prev, dataUrl]);
+            showToast("Đã tải ảnh đề bài lên!", "success");
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    if (promptFileInputRef.current) promptFileInputRef.current.value = "";
+  };
+
+  const removePromptImage = (idxToRemove) => {
+    setCustomPromptImages((prev) => prev.filter((_, idx) => idx !== idxToRemove));
+    showToast("Đã gỡ ảnh đề bài.", "info");
+  };
+
   const effectivePromptText = useMemo(() => {
-    if (isCustomPrompt) return customPromptInput.trim();
+    if (isCustomPrompt) {
+      if (customPromptInput.trim()) return customPromptInput.trim();
+      if (customPromptImages.length > 0) return "Phân tích và làm bài theo nội dung hình ảnh đề bài đính kèm.";
+      return "";
+    }
     return cleanPromptText(currentPrompt?.prompt);
-  }, [isCustomPrompt, customPromptInput, currentPrompt]);
+  }, [isCustomPrompt, customPromptInput, customPromptImages, currentPrompt]);
 
   // Filter structures list by Search, Band, and Category
   const filteredStructures = useMemo(() => {
@@ -650,6 +707,7 @@ export const WritingPage = ({ isActive = false }) => {
         genre: selectedGenre,
         targetBand: targetBand,
         language: selectedLanguage,
+        images: isCustomPrompt ? customPromptImages : [],
         token: token,
       });
 
@@ -847,12 +905,38 @@ export const WritingPage = ({ isActive = false }) => {
                   <IconRotate size={13} />
                   <span>Đổi đề bài</span>
                 </button>
+                {/* Input nhập prompt chủ đề gợi ý (không bắt buộc) */}
+                <div className="ai-topic-prompt-wrapper" title="Nhập chủ đề gợi ý (vd: xe điện, biến đổi khí hậu, AI...) rồi bấm 'AI Tạo đề mới' (không bắt buộc nhập)">
+                  <input
+                    type="text"
+                    className="ai-topic-prompt-input"
+                    placeholder="Chủ đề gợi ý (tùy chọn)..."
+                    value={aiTopicInput}
+                    onChange={(e) => setAiTopicInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !isGeneratingPrompt && isAuthorized) {
+                        handleGenerateAIPrompt();
+                      }
+                    }}
+                  />
+                  {aiTopicInput && (
+                    <button
+                      type="button"
+                      className="btn-clear-ai-topic"
+                      onClick={() => setAiTopicInput("")}
+                      title="Xóa chủ đề gợi ý"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+
                 <button
                   type="button"
                   className="btn-prompt-action ai-action"
                   onClick={handleGenerateAIPrompt}
                   disabled={isGeneratingPrompt || !isAuthorized}
-                  title={isAuthorized ? "AI sinh ngẫu nhiên đề bài mới" : "Chỉ tài khoản được cấp phép mới dùng AI sinh đề"}
+                  title={isAuthorized ? (aiTopicInput.trim() ? `AI tạo đề bài bám sát: "${aiTopicInput.trim()}"` : "AI sinh đề ngẫu nhiên (hoặc gõ chủ đề vào ô bên cạnh)") : "Chỉ tài khoản được cấp phép mới dùng AI sinh đề"}
                 >
                   <IconSparkles size={13} />
                   <span>{isGeneratingPrompt ? "Đang tạo..." : "AI Tạo đề mới"}</span>
@@ -878,14 +962,66 @@ export const WritingPage = ({ isActive = false }) => {
             </div>
 
             {isCustomPrompt ? (
-              <div className="custom-prompt-input-wrapper">
-                <textarea
-                  className="custom-prompt-textarea"
-                  placeholder={`Nhập đề bài ${currentLangObj.label.toLowerCase()} của bạn tại đây...`}
-                  value={customPromptInput}
-                  onChange={(e) => setCustomPromptInput(e.target.value)}
-                  rows={2}
-                />
+              <div className="custom-prompt-container">
+                <div className="custom-prompt-input-wrapper">
+                  <textarea
+                    ref={customPromptRef}
+                    className="custom-prompt-textarea"
+                    placeholder={`Nhập hoặc dán trực tiếp (Ctrl+V) đề bài văn bản & ảnh chụp đề thi/bản đồ/biểu đồ...`}
+                    value={customPromptInput}
+                    onChange={(e) => setCustomPromptInput(e.target.value)}
+                    onPaste={handlePromptPaste}
+                    rows={isPromptCollapsed ? 1 : 3}
+                  />
+                  <div className="custom-prompt-toolbar">
+                    <input
+                      type="file"
+                      ref={promptFileInputRef}
+                      onChange={handlePromptImageUpload}
+                      accept="image/*"
+                      multiple
+                      style={{ display: "none" }}
+                    />
+                    <button
+                      type="button"
+                      className="btn-upload-prompt-image"
+                      onClick={() => promptFileInputRef.current?.click()}
+                      title="Tải lên ảnh đề bài, bản đồ hoặc biểu đồ từ máy tính"
+                    >
+                      <IconFile size={13} />
+                      <span>{customPromptImages.length > 0 ? `+ Thêm ảnh (${customPromptImages.length})` : "Tải/Dán ảnh đề bài (Ctrl+V)"}</span>
+                    </button>
+                    <span className="custom-prompt-tip">
+                      📋 Có thể chụp màn hình (PrtScn / Snipping Tool) đề thi rồi bấm <strong>Ctrl+V</strong> dán trực tiếp vào ô trên!
+                    </span>
+                  </div>
+                </div>
+
+                {customPromptImages.length > 0 && !isPromptCollapsed && (
+                  <div className="custom-prompt-images-gallery">
+                    {customPromptImages.map((imgSrc, imgIdx) => (
+                      <div key={imgIdx} className="custom-prompt-image-card">
+                        <img src={imgSrc} alt={`Ảnh đề bài ${imgIdx + 1}`} className="custom-prompt-preview-img" />
+                        <div className="custom-prompt-image-meta">
+                          <span className="custom-image-badge">Ảnh đề bài #{imgIdx + 1}</span>
+                          <button
+                            type="button"
+                            className="btn-remove-prompt-image"
+                            onClick={() => removePromptImage(imgIdx)}
+                            title="Xóa ảnh này"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {customPromptImages.length > 0 && isPromptCollapsed && (
+                  <div className="custom-prompt-collapsed-badge">
+                    📎 Đã đính kèm {customPromptImages.length} hình ảnh đề bài (Mở rộng đề để xem)
+                  </div>
+                )}
               </div>
             ) : (
               <div className="prompt-body">

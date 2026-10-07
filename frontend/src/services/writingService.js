@@ -96,7 +96,7 @@ export const saveWritingSubmission = async ({ submissionId, topic, content, genr
   return await safeParseResponse(res, "Không thể lưu bản nháp bài viết");
 };
 
-export const evaluateWriting = async ({ submissionId, topic, content, genre, targetBand, language = "en", token }) => {
+export const evaluateWriting = async ({ submissionId, topic, content, genre, targetBand, language = "en", images = [], token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -112,6 +112,7 @@ export const evaluateWriting = async ({ submissionId, topic, content, genre, tar
       genre,
       target_band: targetBand,
       language,
+      images,
     }),
   });
 
