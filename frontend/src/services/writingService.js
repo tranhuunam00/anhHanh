@@ -41,7 +41,28 @@ export const generateWritingPrompt = async ({ genre, topicArea, token }) => {
   return data.prompt;
 };
 
-export const evaluateWriting = async ({ topic, content, genre, targetBand, token }) => {
+export const saveWritingSubmission = async ({ submissionId, topic, content, genre, targetBand, token }) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch("/api/writing/save", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      submission_id: submissionId,
+      topic,
+      content,
+      genre,
+      target_band: targetBand,
+    }),
+  });
+
+  return await safeParseResponse(res, "Không thể lưu bài viết");
+};
+
+export const evaluateWriting = async ({ submissionId, topic, content, genre, targetBand, token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -51,6 +72,7 @@ export const evaluateWriting = async ({ topic, content, genre, targetBand, token
     method: "POST",
     headers,
     body: JSON.stringify({
+      submission_id: submissionId,
       topic,
       content,
       genre,

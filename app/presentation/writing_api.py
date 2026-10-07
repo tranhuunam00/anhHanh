@@ -27,10 +27,19 @@ router = APIRouter(prefix="/api/writing", tags=["Writing"])
 
 
 class EvaluateWritingRequest(BaseModel):
-    topic: str = Field(..., min_length=5, description="Đề bài cần làm")
-    content: str = Field(..., min_length=20, description="Bài viết của học viên")
+    submission_id: Optional[str] = Field(default=None, description="ID bài viết nếu đã lưu trước đó")
+    topic: str = Field(..., min_length=2, description="Đề bài cần làm")
+    content: str = Field(..., min_length=15, description="Bài viết của học viên")
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm (e.g. 6.5, 7.0, 7.5, 8.0)")
+
+
+class SaveWritingRequest(BaseModel):
+    submission_id: Optional[str] = Field(default=None, description="ID bài viết nếu cập nhật")
+    topic: str = Field(..., min_length=2, description="Đề bài cần làm")
+    content: str = Field(..., min_length=1, description="Nội dung bài viết")
+    genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
+    target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm")
 
 
 class GeneratePromptRequest(BaseModel):
@@ -44,6 +53,60 @@ async def get_writing_prompts():
     return {
         "success": True,
         "prompts": AIWritingService.get_prompts_library()
+    }
+
+
+@router.post("/save")
+async def save_writing_submission(
+    body: SaveWritingRequest,
+    current_user: User = Depends(require_ai_writing_permission),
+    db: AsyncSession = Depends(get_db)
+):
+    """Save or update a writing draft/submission without triggering AI evaluation."""
+    words = body.content.strip().split()
+    word_count = len(words)
+
+    if body.submission_id:
+        stmt = select(WritingSubmission).where(
+            WritingSubmission.id == body.submission_id,
+            WritingSubmission.user_id == current_user.id
+        )
+        res = await db.execute(stmt)
+        submission = res.scalar_one_or_none()
+        if submission:
+            submission.topic = body.topic
+            submission.genre = body.genre or "ielts_task2"
+            submission.content = body.content
+            submission.word_count = word_count
+            submission.target_band = body.target_band or 7.0
+            await db.commit()
+            await db.refresh(submission)
+            return {
+                "success": True,
+                "submission_id": submission.id,
+                "message": "Đã cập nhật bài viết thành công",
+                "item": submission.to_dict()
+            }
+
+    submission = WritingSubmission(
+        user_id=current_user.id,
+        topic=body.topic,
+        genre=body.genre or "ielts_task2",
+        content=body.content,
+        word_count=word_count,
+        target_band=body.target_band or 7.0,
+        overall_score=None,
+        feedback_json=None
+    )
+    db.add(submission)
+    await db.commit()
+    await db.refresh(submission)
+
+    return {
+        "success": True,
+        "submission_id": submission.id,
+        "message": "Đã lưu bài viết thành công",
+        "item": submission.to_dict()
     }
 
 
@@ -104,22 +167,45 @@ async def evaluate_writing_submission(
         lr_score = criteria.get("lexical_resource", {}).get("score")
         gr_score = criteria.get("grammatical_range_accuracy", {}).get("score")
 
-        # Save submission to database for history tracking
-        submission = WritingSubmission(
-            user_id=current_user.id,
-            topic=body.topic,
-            genre=body.genre or "ielts_task2",
-            content=body.content,
-            word_count=word_count,
-            target_band=body.target_band or 7.0,
-            overall_score=overall_score,
-            task_response_score=tr_score,
-            coherence_score=cc_score,
-            lexical_score=lr_score,
-            grammar_score=gr_score,
-            feedback_json=json.dumps(evaluation, ensure_ascii=False)
-        )
-        db.add(submission)
+        submission = None
+        if body.submission_id:
+            stmt = select(WritingSubmission).where(
+                WritingSubmission.id == body.submission_id,
+                WritingSubmission.user_id == current_user.id
+            )
+            res = await db.execute(stmt)
+            submission = res.scalar_one_or_none()
+
+        if submission:
+            submission.topic = body.topic
+            submission.genre = body.genre or "ielts_task2"
+            submission.content = body.content
+            submission.word_count = word_count
+            submission.target_band = body.target_band or 7.0
+            submission.overall_score = overall_score
+            submission.task_response_score = tr_score
+            submission.coherence_score = cc_score
+            submission.lexical_score = lr_score
+            submission.grammar_score = gr_score
+            submission.feedback_json = json.dumps(evaluation, ensure_ascii=False)
+        else:
+            # Save new submission to database for history tracking
+            submission = WritingSubmission(
+                user_id=current_user.id,
+                topic=body.topic,
+                genre=body.genre or "ielts_task2",
+                content=body.content,
+                word_count=word_count,
+                target_band=body.target_band or 7.0,
+                overall_score=overall_score,
+                task_response_score=tr_score,
+                coherence_score=cc_score,
+                lexical_score=lr_score,
+                grammar_score=gr_score,
+                feedback_json=json.dumps(evaluation, ensure_ascii=False)
+            )
+            db.add(submission)
+
         await db.commit()
         await db.refresh(submission)
 

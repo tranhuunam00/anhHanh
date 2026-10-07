@@ -372,44 +372,85 @@ body {
   flex: 1;
 }
 
-/* Tabs Navigation */
+/* Tabs Navigation - Compact Single-Row Design */
 .tabs-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1.5px solid var(--border-color);
   margin-bottom: 10px;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch;
+}
+.tabs-header::-webkit-scrollbar {
+  display: none; /* Safari & Chrome */
 }
 .tabs-nav-group {
   display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
+  gap: 2px;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  flex: 1;
 }
 .tab-btn {
-  padding: 6px 12px;
+  padding: 6px 10px;
   background: none;
   border: none;
   border-bottom: 2.5px solid transparent;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-family: var(--font-family);
   margin-bottom: -1.5px;
-  transition: all 0.15s;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  border-radius: 6px 6px 0 0;
 }
 .tab-btn:hover {
   color: var(--primary);
+  background: rgba(99, 102, 241, 0.05);
 }
 .tab-btn.active {
   color: var(--primary);
   border-bottom-color: var(--primary);
   font-weight: 700;
+  background: rgba(99, 102, 241, 0.08);
+}
+.tabs-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding-bottom: 4px;
+}
+.tab-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.tab-action-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--primary);
+  background: var(--bg-hover);
+  transform: translateY(-1px);
 }
 
 /* Exercise Grid */

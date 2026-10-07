@@ -21,15 +21,18 @@ import {
   FileText,
   TrendingUp,
   BookmarkCheck,
+  Search,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import {
   fetchWritingPrompts,
   generateWritingPrompt,
   evaluateWriting,
+  saveWritingSubmission,
   fetchWritingHistory,
   deleteSubmission,
 } from "../services/writingService";
+import { WRITING_CATEGORIES, WRITING_STRUCTURES } from "../constants/writingStructures";
 import { createVocabWord } from "../services/authVocabService";
 import "../styles/writing.css";
 
@@ -81,6 +84,18 @@ export const WritingPage = ({ isActive = false }) => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
 
+  // Draft and Submission persistence state
+  const [currentSubmissionId, setCurrentSubmissionId] = useState(null);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Structures & Collocations Modal State
+  const [isStructuresOpen, setIsStructuresOpen] = useState(false);
+  const [structureSearch, setStructureSearch] = useState("");
+  const [structureBandFilter, setStructureBandFilter] = useState("all");
+  const [structureCategoryFilter, setStructureCategoryFilter] = useState("all");
+
   // Analysis / Result state
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
@@ -94,6 +109,7 @@ export const WritingPage = ({ isActive = false }) => {
   const [addedWords, setAddedWords] = useState({});
 
   const timerRef = useRef(null);
+  const textareaRef = useRef(null);
 
   // Load prompts on mount
   useEffect(() => {
@@ -149,10 +165,26 @@ export const WritingPage = ({ isActive = false }) => {
     };
   }, [isTimerRunning]);
 
+  // Local auto-save draft to prevent data loss on browser refresh
+  useEffect(() => {
+    if (content && content.trim().length > 0) {
+      try {
+        const draftKey = `writing_draft_${selectedGenre}`;
+        localStorage.setItem(draftKey, JSON.stringify({
+          content,
+          genre: selectedGenre,
+          submissionId: currentSubmissionId,
+          timestamp: Date.now()
+        }));
+      } catch {}
+    }
+  }, [content, selectedGenre, currentSubmissionId]);
+
   // Start timer on first keystroke
   const handleContentChange = (e) => {
     const val = e.target.value;
     setContent(val);
+    setHasUnsavedChanges(true);
     if (!isTimerRunning && val.trim().length > 0) {
       setIsTimerRunning(true);
     }
@@ -207,6 +239,9 @@ export const WritingPage = ({ isActive = false }) => {
       return;
     }
     setContent("");
+    setCurrentSubmissionId(null);
+    setLastSavedAt(null);
+    setHasUnsavedChanges(false);
     setIsTimerRunning(false);
     setSecondsElapsed(0);
   };
@@ -215,6 +250,105 @@ export const WritingPage = ({ isActive = false }) => {
     if (isCustomPrompt) return customPromptInput.trim();
     return currentPrompt?.prompt || "";
   }, [isCustomPrompt, customPromptInput, currentPrompt]);
+
+  // Filter structures list by Search, Band, and Category
+  const filteredStructures = useMemo(() => {
+    return WRITING_STRUCTURES.filter((item) => {
+      if (structureBandFilter !== "all" && item.band !== structureBandFilter) {
+        return false;
+      }
+      if (structureCategoryFilter !== "all" && item.category !== structureCategoryFilter) {
+        return false;
+      }
+      if (structureSearch.trim()) {
+        const q = structureSearch.toLowerCase();
+        const matchPhrase = (item.phrase || "").toLowerCase().includes(q);
+        const matchMeaning = (item.meaning || "").toLowerCase().includes(q);
+        const matchUsage = (item.usage || "").toLowerCase().includes(q);
+        return matchPhrase || matchMeaning || matchUsage;
+      }
+      return true;
+    });
+  }, [structureBandFilter, structureCategoryFilter, structureSearch]);
+
+  // Insert selected structure / phrase at the current cursor position in the editor
+  const handleInsertPhrase = (templateText) => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setContent((prev) => (prev ? `${prev} ${templateText}` : templateText));
+      setHasUnsavedChanges(true);
+      setIsTimerRunning(true);
+      showToast("Đã chèn cụm từ vào bài viết!", "success");
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = content.substring(0, start);
+    const after = content.substring(end);
+    const sepBefore = before.length > 0 && !before.endsWith(" ") && !before.endsWith("\n") ? " " : "";
+    const sepAfter = after.length > 0 && !after.startsWith(" ") && !after.startsWith("\n") ? " " : "";
+    const newContent = before + sepBefore + templateText + sepAfter + after;
+
+    setContent(newContent);
+    setHasUnsavedChanges(true);
+    setIsTimerRunning(true);
+    setIsStructuresOpen(false); // Close modal to continue writing
+
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = (before + sepBefore + templateText).length;
+      textarea.setSelectionRange(newPos, newPos);
+    }, 60);
+
+    showToast("Đã chèn cấu trúc vào bài viết!", "success");
+  };
+
+  // Save current writing as a draft in database
+  const handleSaveDraft = async () => {
+    if (!isAuthenticated) {
+      showToast("Vui lòng đăng nhập để lưu bài viết", "info");
+      return;
+    }
+    if (!isAuthorized) {
+      showToast("Tính năng AI Writing chỉ dành riêng cho 2 tài khoản được cấp phép (tranhuunam23022000 & vuthiquynhtrangbl6d)", "warning");
+      return;
+    }
+    if (!effectivePromptText) {
+      showToast("Vui lòng chọn hoặc nhập đề bài trước khi lưu", "warning");
+      return;
+    }
+    if (!content.trim()) {
+      showToast("Chưa có nội dung bài viết để lưu", "warning");
+      return;
+    }
+
+    setIsSavingDraft(true);
+    try {
+      const res = await saveWritingSubmission({
+        submissionId: currentSubmissionId,
+        topic: effectivePromptText,
+        content: content,
+        genre: selectedGenre,
+        targetBand: targetBand,
+        token: token,
+      });
+
+      if (res && res.submission_id) {
+        setCurrentSubmissionId(res.submission_id);
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        setLastSavedAt(timeStr);
+        setHasUnsavedChanges(false);
+        showToast("Đã lưu bài viết thành công!", "success");
+        loadHistory();
+      }
+    } catch (err) {
+      showToast(err.message || "Lỗi khi lưu bài viết", "error");
+    } finally {
+      setIsSavingDraft(false);
+    }
+  };
 
   const handleSubmitEvaluation = async () => {
     if (!isAuthenticated) {
@@ -243,6 +377,7 @@ export const WritingPage = ({ isActive = false }) => {
 
     try {
       const res = await evaluateWriting({
+        submissionId: currentSubmissionId,
         topic: effectivePromptText,
         content: content,
         genre: selectedGenre,
@@ -251,7 +386,9 @@ export const WritingPage = ({ isActive = false }) => {
       });
 
       if (res && res.evaluation) {
+        if (res.submission_id) setCurrentSubmissionId(res.submission_id);
         setEvaluationResult(res.evaluation);
+        setHasUnsavedChanges(false);
         showToast("AI đã chấm bài hoàn tất!", "success");
         loadHistory();
       }
@@ -300,6 +437,9 @@ export const WritingPage = ({ isActive = false }) => {
     try {
       await deleteSubmission(submissionId, token);
       setHistoryItems((prev) => prev.filter((it) => it.id !== submissionId));
+      if (currentSubmissionId === submissionId) {
+        setCurrentSubmissionId(null);
+      }
       showToast("Đã xóa bài viết khỏi lịch sử", "success");
     } catch (err) {
       showToast(err.message || "Không thể xóa bài viết", "error");
@@ -307,15 +447,23 @@ export const WritingPage = ({ isActive = false }) => {
   };
 
   const handleSelectHistoryItem = (item) => {
+    setCurrentSubmissionId(item.id);
     setContent(item.content || "");
-    if (item.feedback) {
-      setEvaluationResult(item.feedback);
-      setActiveRightTab("feedback");
-    }
+    if (item.genre) setSelectedGenre(item.genre);
+    if (item.target_band) setTargetBand(item.target_band);
     if (item.topic) {
       setIsCustomPrompt(true);
       setCustomPromptInput(item.topic);
     }
+    if (item.feedback) {
+      setEvaluationResult(item.feedback);
+      setActiveRightTab("feedback");
+      showToast("Đã tải bài viết và kết quả chấm điểm!", "success");
+    } else {
+      setEvaluationResult(null);
+      showToast("Đã tải bản nháp bài viết!", "info");
+    }
+    setHasUnsavedChanges(false);
   };
 
   return (
@@ -455,15 +603,61 @@ export const WritingPage = ({ isActive = false }) => {
                     <span className="timer-dot" title="Tạm dừng"></span>
                   )}
                 </div>
+
+                {/* Save status badge */}
+                <div className="save-status-indicator" title="Trạng thái lưu trữ bài viết">
+                  <span className={`save-status-dot ${hasUnsavedChanges ? "unsaved" : "saved"}`}></span>
+                  <span>
+                    {isSavingDraft
+                      ? "Đang lưu..."
+                      : lastSavedAt
+                      ? `Đã lưu ${lastSavedAt}`
+                      : hasUnsavedChanges
+                      ? "Chưa lưu"
+                      : "Sẵn sàng"}
+                  </span>
+                </div>
               </div>
 
               <div className="workspace-options">
+                {/* Button: Kho Cụm từ & Cấu trúc theo Band */}
+                <button
+                  type="button"
+                  className="btn-workspace-structures"
+                  onClick={() => setIsStructuresOpen(true)}
+                  title="Mở kho cụm từ học thuật, collocations & cấu trúc câu theo Band IELTS"
+                >
+                  <BookOpen size={14} />
+                  <span>Cụm từ & Cấu trúc</span>
+                </button>
+
+                {/* Button: Lưu bài viết (Save Draft) */}
+                <button
+                  type="button"
+                  className="btn-workspace-save"
+                  onClick={handleSaveDraft}
+                  disabled={isSavingDraft || !isAuthorized || !content.trim()}
+                  title={
+                    !isAuthorized
+                      ? "Chỉ 2 tài khoản được cấp phép mới dùng tính năng này"
+                      : !content.trim()
+                      ? "Viết nội dung để lưu bài"
+                      : "Lưu lại bài viết hiện tại vào lịch sử"
+                  }
+                >
+                  <BookmarkCheck size={14} />
+                  <span>{isSavingDraft ? "Đang lưu..." : "Lưu bài"}</span>
+                </button>
+
                 <div className="target-band-select-wrapper" title="Chọn mục tiêu điểm để AI chấm sát chuẩn">
                   <span className="band-select-label">Mục tiêu:</span>
                   <select
                     className="band-select"
                     value={targetBand}
-                    onChange={(e) => setTargetBand(parseFloat(e.target.value))}
+                    onChange={(e) => {
+                      setTargetBand(parseFloat(e.target.value));
+                      setHasUnsavedChanges(true);
+                    }}
                   >
                     {TARGET_BANDS.map((b) => (
                       <option key={b.value} value={b.value}>{b.label}</option>
@@ -483,6 +677,7 @@ export const WritingPage = ({ isActive = false }) => {
             </div>
 
             <textarea
+              ref={textareaRef}
               className="writing-textarea"
               placeholder="Bắt đầu viết bài luận tiếng Anh của bạn tại đây. Hệ thống tự động đếm từ và tính giờ..."
               value={content}
@@ -581,7 +776,11 @@ export const WritingPage = ({ isActive = false }) => {
                       >
                         <div className="history-card-header">
                           <span className="history-genre-pill">{item.genre}</span>
-                          <span className="history-band-pill">Band {item.overall_score || "N/A"}</span>
+                          {item.overall_score ? (
+                            <span className="history-band-pill">Band {item.overall_score}</span>
+                          ) : (
+                            <span className="history-draft-pill">Bản nháp</span>
+                          )}
                           <button
                             type="button"
                             className="btn-del-history"
@@ -797,6 +996,140 @@ export const WritingPage = ({ isActive = false }) => {
           </div>
         </div>
       </div>
+
+      {/* Modal: Kho Cụm từ & Cấu trúc theo Band */}
+      {isStructuresOpen && (
+        <div className="structures-modal-backdrop" onClick={() => setIsStructuresOpen(false)}>
+          <div className="structures-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="structures-modal-header">
+              <div className="structures-modal-title-group">
+                <div className="structures-modal-icon">
+                  <BookOpen size={20} />
+                </div>
+                <div>
+                  <h3 className="structures-modal-title">Kho Cụm Từ & Cấu Trúc Theo Band</h3>
+                  <p className="structures-modal-subtitle">
+                    Tuyển tập collocations, câu dẫn luận điểm & cấu trúc ngữ pháp học thuật (Band 6.5 - 9.0)
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn-close-structures"
+                onClick={() => setIsStructuresOpen(false)}
+                title="Đóng cửa sổ"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="structures-modal-toolbar">
+              <div className="structures-search-box">
+                <Search size={16} color="var(--text-muted)" />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm mẫu câu, cụm từ, nghĩa tiếng Việt (ví dụ: debate, rationale, inversion, consensus...)..."
+                  value={structureSearch}
+                  onChange={(e) => setStructureSearch(e.target.value)}
+                  autoFocus
+                />
+                {structureSearch && (
+                  <button
+                    type="button"
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: "2px" }}
+                    onClick={() => setStructureSearch("")}
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              <div className="structures-filters-row">
+                {/* Band Pills */}
+                <div className="band-filter-pills">
+                  {[
+                    { id: "all", label: "Tất cả Band" },
+                    { id: "band8", label: "Band 8.0 - 9.0" },
+                    { id: "band7", label: "Band 7.0 - 7.5" },
+                    { id: "band6", label: "Band 6.0 - 6.5" },
+                  ].map((b) => (
+                    <button
+                      key={b.id}
+                      type="button"
+                      className={`band-filter-btn ${structureBandFilter === b.id ? "active" : ""}`}
+                      onClick={() => setStructureBandFilter(b.id)}
+                    >
+                      {b.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Categories */}
+                <div className="structures-category-nav">
+                  {WRITING_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      className={`cat-filter-btn ${structureCategoryFilter === cat.id ? "active" : ""}`}
+                      onClick={() => setStructureCategoryFilter(cat.id)}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="structures-modal-body">
+              {filteredStructures.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+                  <FileText size={36} style={{ opacity: 0.4, marginBottom: "8px" }} />
+                  <p>Không tìm thấy cụm từ hay cấu trúc phù hợp với bộ lọc hiện tại.</p>
+                </div>
+              ) : (
+                filteredStructures.map((item, idx) => (
+                  <div key={idx} className="structure-card-item">
+                    <div className="structure-card-top">
+                      <span className={`structure-band-tag ${item.band}`}>
+                        {item.band === "band8" ? "Band 8.0 - 9.0" : item.band === "band7" ? "Band 7.0 - 7.5" : "Band 6.0 - 6.5"}
+                      </span>
+                      <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
+                        {WRITING_CATEGORIES.find((c) => c.id === item.category)?.label || item.category}
+                      </span>
+                    </div>
+                    <div className="structure-phrase-text">{item.phrase}</div>
+                    <div className="structure-meaning-text">{item.meaning}</div>
+                    {item.usage && <div className="structure-usage-note">{item.usage}</div>}
+                    <div className="structure-actions-row">
+                      <button
+                        type="button"
+                        className="btn-copy-structure"
+                        onClick={() => {
+                          navigator.clipboard.writeText(item.template || item.phrase);
+                          showToast("Đã sao chép cấu trúc!", "success");
+                        }}
+                        title="Sao chép vào clipboard"
+                      >
+                        <Copy size={13} />
+                        <span>Sao chép</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-insert-structure"
+                        onClick={() => handleInsertPhrase(item.template || item.phrase)}
+                        title="Chèn ngay vào con trỏ bài viết"
+                      >
+                        <Plus size={14} />
+                        <span>Chèn vào bài</span>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
