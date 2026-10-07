@@ -29,7 +29,6 @@ import {
   refreshVocabMeaning,
   fetchDueVocabSession,
 } from "../../services/authVocabService";
-import VocabReviewModal from "./VocabReviewModal";
 import VocabExerciseHubModal from "./VocabExerciseHubModal";
 import { AddVocabModal } from "../Modals/AddVocabModal";
 import { EditVocabModal } from "../Modals/EditVocabModal";
@@ -47,7 +46,6 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [refreshingMeaningId, setRefreshingMeaningId] = useState(null);
   const [dueItems, setDueItems] = useState([]);
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isExerciseHubOpen, setIsExerciseHubOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAIImportModalOpen, setIsAIImportModalOpen] = useState(false);
@@ -391,7 +389,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
               <span>AI Tách & Import</span>
             </button>
 
-            {/* 20 Exercise Modes & Interactive Games Button */}
+            {/* Practice Vocabulary Button (Dạng 1) */}
             <button
               className="btn btn-primary btn-with-icon"
               onClick={() => setIsExerciseHubOpen(true)}
@@ -404,10 +402,10 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 border: "none",
                 boxShadow: "0 2px 10px rgba(2, 132, 199, 0.35)",
               }}
-              title="Luyện tập từ vựng qua 20 dạng bài tập tương tác, trắc nghiệm, phản xạ & trò chơi"
+              title="Luyện tập từ vựng chuẩn Dạng 1: Từ tiếng Anh ➔ Nghĩa tiếng Việt"
             >
               <Zap size={14} fill="currentColor" />
-              <span>Luyện tập (20 dạng)</span>
+              <span>Luyện tập từ vựng</span>
             </button>
 
             {/* Export Dropdown Menu */}
@@ -499,7 +497,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 Hôm nay bạn có <span style={{ color: "#38bdf8" }}>{dueItems.length} từ</span> đến hạn ôn tập!
               </div>
               <div style={{ fontSize: "0.85rem", color: "var(--text-secondary, #94a3b8)", marginTop: "2px" }}>
-                Thực hành qua 20 dạng bài tập tương tác & trò chơi (Trắc nghiệm, Lật thẻ, Ghép cặp siêu tốc, Spelling Bee, Hangman, Phản xạ Đúng/Sai, Flashcard 3D...)
+                Luyện tập chuẩn hóa Dạng 1: Từ tiếng Anh ➔ Chọn nghĩa tiếng Việt, kèm phát âm &amp; ngữ cảnh câu mẫu.
               </div>
             </div>
           </div>
@@ -522,35 +520,18 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
             onClick={() => setIsExerciseHubOpen(true)}
           >
             <Zap size={18} fill="currentColor" />
-            Bắt đầu Ôn tập 20 Dạng ({dueItems.length} từ)
+            Bắt đầu Luyện tập ({dueItems.length} từ)
           </button>
         </div>
       )}
 
-      {/* 20 Exercise Modes & Games Modal */}
+      {/* Vocabulary Practice Exercise Modal (Dạng 1) */}
       {isExerciseHubOpen && (
         <VocabExerciseHubModal
           vocabPool={dueItems.length > 0 ? dueItems : items}
           token={token}
           onClose={() => {
             setIsExerciseHubOpen(false);
-            loadWords();
-            if (refreshStreak) refreshStreak();
-          }}
-          onFinished={() => {
-            markVocabStudiedToday();
-            loadWords();
-            if (refreshStreak) refreshStreak();
-          }}
-        />
-      )}
-
-      {isReviewModalOpen && (
-        <VocabReviewModal
-          dueItems={dueItems}
-          token={token}
-          onClose={() => {
-            setIsReviewModalOpen(false);
             loadWords();
             if (refreshStreak) refreshStreak();
           }}
