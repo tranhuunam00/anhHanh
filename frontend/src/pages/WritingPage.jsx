@@ -31,6 +31,7 @@ import {
 } from "../services/writingService";
 import { WRITING_CATEGORIES, WRITING_STRUCTURES } from "../constants/writingStructures";
 import { createVocabWord } from "../services/authVocabService";
+import { Task1Visualizer } from "../components/Writing/Task1Visualizer";
 import "../styles/writing.css";
 
 export const LANGUAGES = [
@@ -132,6 +133,20 @@ export const WritingPage = ({ isActive = false }) => {
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState(null);
   const [activeRightTab, setActiveRightTab] = useState("feedback"); // "feedback" | "history"
+  const [feedbackViewTab, setFeedbackViewTab] = useState("sentences"); // "sentences" | "criteria"
+  const [sentenceFilter, setSentenceFilter] = useState("all"); // "all" | "error" | "upgrade" | "correct"
+
+  const sentencesList = useMemo(() => {
+    return evaluationResult?.sentence_breakdown || [];
+  }, [evaluationResult]);
+
+  const filteredSentences = useMemo(() => {
+    if (!sentencesList || sentencesList.length === 0) return [];
+    if (sentenceFilter === "error") return sentencesList.filter((s) => !s.is_grammar_correct);
+    if (sentenceFilter === "correct") return sentencesList.filter((s) => s.is_grammar_correct);
+    if (sentenceFilter === "upgrade") return sentencesList.filter((s) => s.upgrade_needed);
+    return sentencesList;
+  }, [sentencesList, sentenceFilter]);
 
   // History state
   const [historyItems, setHistoryItems] = useState([]);
@@ -825,6 +840,13 @@ export const WritingPage = ({ isActive = false }) => {
                 <div className={`prompt-text ${isPromptCollapsed ? "collapsed" : ""}`}>
                   "{currentPrompt?.prompt || "Vui lòng chọn hoặc tạo đề bài..."}"
                 </div>
+                {!isPromptCollapsed && selectedGenre === "ielts_task1" && (
+                  <Task1Visualizer
+                    visualData={currentPrompt?.visual_data}
+                    promptData={currentPrompt}
+                    subType={selectedSubType}
+                  />
+                )}
                 {!isPromptCollapsed && currentPrompt?.keywords && currentPrompt.keywords.length > 0 && (
                   <div className="prompt-keywords-bar">
                     <span className="keywords-label">Gợi ý từ khóa:</span>
@@ -1134,62 +1156,226 @@ export const WritingPage = ({ isActive = false }) => {
                   </div>
                 </div>
 
-                {/* 4 IELTS Criteria Grid */}
-                <div className="criteria-grid">
-                  <div className="criteria-card">
-                    <div className="criteria-head">
-                      <span>Task Response</span>
-                      <strong className="criteria-score">{evaluationResult.criteria_scores?.task_response?.score || "N/A"}</strong>
-                    </div>
-                    <p className="criteria-feedback">{evaluationResult.criteria_scores?.task_response?.feedback}</p>
-                  </div>
-
-                  <div className="criteria-card">
-                    <div className="criteria-head">
-                      <span>Coherence & Cohesion</span>
-                      <strong className="criteria-score">{evaluationResult.criteria_scores?.coherence_cohesion?.score || "N/A"}</strong>
-                    </div>
-                    <p className="criteria-feedback">{evaluationResult.criteria_scores?.coherence_cohesion?.feedback}</p>
-                  </div>
-
-                  <div className="criteria-card">
-                    <div className="criteria-head">
-                      <span>Lexical Resource</span>
-                      <strong className="criteria-score">{evaluationResult.criteria_scores?.lexical_resource?.score || "N/A"}</strong>
-                    </div>
-                    <p className="criteria-feedback">{evaluationResult.criteria_scores?.lexical_resource?.feedback}</p>
-                  </div>
-
-                  <div className="criteria-card">
-                    <div className="criteria-head">
-                      <span>Grammar Range & Accuracy</span>
-                      <strong className="criteria-score">{evaluationResult.criteria_scores?.grammatical_range_accuracy?.score || "N/A"}</strong>
-                    </div>
-                    <p className="criteria-feedback">{evaluationResult.criteria_scores?.grammatical_range_accuracy?.feedback}</p>
-                  </div>
+                {/* Sub-nav switcher between Sentence-by-Sentence Breakdown & 4 Criteria */}
+                <div style={{ display: "flex", gap: "6px", margin: "10px 0 12px 0", background: "var(--bg-secondary)", padding: "4px", borderRadius: "8px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setFeedbackViewTab("sentences")}
+                    style={{
+                      flex: 1,
+                      padding: "7px 10px",
+                      fontSize: "0.78rem",
+                      fontWeight: 700,
+                      border: "none",
+                      borderRadius: "6px",
+                      background: feedbackViewTab === "sentences" ? "var(--bg-card)" : "transparent",
+                      color: feedbackViewTab === "sentences" ? "#7c3aed" : "var(--text-muted)",
+                      cursor: "pointer",
+                      boxShadow: feedbackViewTab === "sentences" ? "0 1px 4px rgba(0,0,0,0.1)" : "none",
+                      transition: "all 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "5px"
+                    }}
+                  >
+                    <IconSparkles size={13} />
+                    <span>Chữa TỪNG CÂU {sentencesList.length > 0 ? `(${sentencesList.length})` : ""}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFeedbackViewTab("criteria")}
+                    style={{
+                      flex: 1,
+                      padding: "7px 10px",
+                      fontSize: "0.78rem",
+                      fontWeight: 700,
+                      border: "none",
+                      borderRadius: "6px",
+                      background: feedbackViewTab === "criteria" ? "var(--bg-card)" : "transparent",
+                      color: feedbackViewTab === "criteria" ? "#3b82f6" : "var(--text-muted)",
+                      cursor: "pointer",
+                      boxShadow: feedbackViewTab === "criteria" ? "0 1px 4px rgba(0,0,0,0.1)" : "none",
+                      transition: "all 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "5px"
+                    }}
+                  >
+                    <IconBook size={13} />
+                    <span>4 Tiêu chí IELTS</span>
+                  </button>
                 </div>
 
-                {/* Detailed Inline Corrections */}
-                {evaluationResult.corrections && evaluationResult.corrections.length > 0 && (
-                  <div className="section-block">
-                    <div className="section-title">
-                      <IconAlert size={16} className="text-warning" />
-                      <span>Sửa lỗi chi tiết ({evaluationResult.corrections.length} vị trí)</span>
+                {/* View 1: Sentence-by-Sentence Analysis */}
+                {feedbackViewTab === "sentences" && (
+                  <div className="sentence-breakdown-section">
+                    {/* Filter buttons */}
+                    <div className="sentence-filter-bar">
+                      <button
+                        type="button"
+                        className={`sentence-filter-btn ${sentenceFilter === "all" ? "active" : ""}`}
+                        onClick={() => setSentenceFilter("all")}
+                      >
+                        Tất cả ({sentencesList.length})
+                      </button>
+                      <button
+                        type="button"
+                        className={`sentence-filter-btn ${sentenceFilter === "error" ? "active" : ""}`}
+                        onClick={() => setSentenceFilter("error")}
+                      >
+                        ⚠ Có lỗi ngữ pháp ({sentencesList.filter((s) => !s.is_grammar_correct).length})
+                      </button>
+                      <button
+                        type="button"
+                        className={`sentence-filter-btn ${sentenceFilter === "upgrade" ? "active" : ""}`}
+                        onClick={() => setSentenceFilter("upgrade")}
+                      >
+                        🚀 Có gợi ý nâng cấp ({sentencesList.filter((s) => s.upgrade_needed).length})
+                      </button>
+                      <button
+                        type="button"
+                        className={`sentence-filter-btn ${sentenceFilter === "correct" ? "active" : ""}`}
+                        onClick={() => setSentenceFilter("correct")}
+                      >
+                        ✓ Ngữ pháp chuẩn ({sentencesList.filter((s) => s.is_grammar_correct).length})
+                      </button>
                     </div>
-                    <div className="corrections-list">
-                      {evaluationResult.corrections.map((corr, idx) => (
-                        <div key={idx} className="correction-card">
-                          <div className="corr-type-badge">{corr.type || "Grammar"}</div>
-                          <div className="corr-diff">
-                            <span className="diff-original">{corr.original}</span>
-                            <IconArrowRight size={13} className="diff-arrow" />
-                            <span className="diff-corrected">{corr.corrected}</span>
+
+                    {/* Sentences List */}
+                    <div className="sentence-cards-list">
+                      {filteredSentences.map((sent) => (
+                        <div
+                          key={sent.sentence_num}
+                          className={`sentence-card ${sent.is_grammar_correct ? "is-correct" : "has-error"}`}
+                        >
+                          <div className="sentence-card-header">
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span className="sentence-num-badge">Câu {sent.sentence_num}</span>
+                              {sent.is_grammar_correct ? (
+                                <span className="sentence-status-pill correct">
+                                  <IconCheckCircle size={12} />
+                                  <span>Ngữ pháp chuẩn xác</span>
+                                </span>
+                              ) : (
+                                <span className="sentence-status-pill error">
+                                  <IconAlert size={12} />
+                                  <span>Có lỗi ngữ pháp</span>
+                                </span>
+                              )}
+                            </div>
+                            {sent.upgrade_needed ? (
+                              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7c3aed", background: "rgba(124, 58, 237, 0.12)", padding: "2px 6px", borderRadius: "4px" }}>
+                                🚀 Có gợi ý nâng cấp Band 8.5+
+                              </span>
+                            ) : (
+                              <span className="sentence-no-upgrade-tag">✓ Đã tự nhiên, không cần bổ sung</span>
+                            )}
                           </div>
-                          <div className="corr-explanation">{corr.explanation}</div>
+
+                          {/* Câu gốc của học viên */}
+                          <div className="sentence-original-text">
+                            "{sent.original}"
+                          </div>
+
+                          {/* Phân tích ngữ pháp */}
+                          <div className={`sentence-detail-box ${sent.is_grammar_correct ? "analysis-correct" : "analysis-error"}`}>
+                            <div className="box-title-label">
+                              {sent.is_grammar_correct ? "✓ Nhận xét ngữ pháp:" : "❌ Sai ở đâu & Vì sao:"}
+                            </div>
+                            <div className="box-content-text">{sent.grammar_analysis}</div>
+                          </div>
+
+                          {/* Sửa đúng ngữ pháp trước */}
+                          {!sent.is_grammar_correct && sent.grammar_fix && (
+                            <div className="sentence-detail-box grammar-fix">
+                              <div className="box-title-label">🔧 Sửa đúng ngữ pháp:</div>
+                              <div className="box-content-text">
+                                <strong>{sent.grammar_fix}</strong>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Nâng cấp câu học thuật sau đó */}
+                          {sent.upgrade_needed && sent.upgraded_sentence && (
+                            <div className="sentence-detail-box upgrade">
+                              <div className="box-title-label">🚀 Nâng cấp câu học thuật (Band 8.5+):</div>
+                              <div className="box-content-text">
+                                <strong>{sent.upgraded_sentence}</strong>
+                              </div>
+                              {sent.upgrade_notes && (
+                                <div style={{ fontSize: "0.75rem", marginTop: "4px", opacity: 0.9 }}>
+                                  💡 <em>{sent.upgrade_notes}</em>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
                   </div>
+                )}
+
+                {/* View 2: 4 IELTS Criteria & Detailed Inline Corrections */}
+                {feedbackViewTab === "criteria" && (
+                  <>
+                    <div className="criteria-grid">
+                      <div className="criteria-card">
+                        <div className="criteria-head">
+                          <span>Task Response</span>
+                          <strong className="criteria-score">{evaluationResult.criteria_scores?.task_response?.score || "N/A"}</strong>
+                        </div>
+                        <p className="criteria-feedback">{evaluationResult.criteria_scores?.task_response?.feedback}</p>
+                      </div>
+
+                      <div className="criteria-card">
+                        <div className="criteria-head">
+                          <span>Coherence & Cohesion</span>
+                          <strong className="criteria-score">{evaluationResult.criteria_scores?.coherence_cohesion?.score || "N/A"}</strong>
+                        </div>
+                        <p className="criteria-feedback">{evaluationResult.criteria_scores?.coherence_cohesion?.feedback}</p>
+                      </div>
+
+                      <div className="criteria-card">
+                        <div className="criteria-head">
+                          <span>Lexical Resource</span>
+                          <strong className="criteria-score">{evaluationResult.criteria_scores?.lexical_resource?.score || "N/A"}</strong>
+                        </div>
+                        <p className="criteria-feedback">{evaluationResult.criteria_scores?.lexical_resource?.feedback}</p>
+                      </div>
+
+                      <div className="criteria-card">
+                        <div className="criteria-head">
+                          <span>Grammar Range & Accuracy</span>
+                          <strong className="criteria-score">{evaluationResult.criteria_scores?.grammatical_range_accuracy?.score || "N/A"}</strong>
+                        </div>
+                        <p className="criteria-feedback">{evaluationResult.criteria_scores?.grammatical_range_accuracy?.feedback}</p>
+                      </div>
+                    </div>
+
+                    {evaluationResult.corrections && evaluationResult.corrections.length > 0 && (
+                      <div className="section-block">
+                        <div className="section-title">
+                          <IconAlert size={16} className="text-warning" />
+                          <span>Sửa lỗi chi tiết ({evaluationResult.corrections.length} vị trí)</span>
+                        </div>
+                        <div className="corrections-list">
+                          {evaluationResult.corrections.map((corr, idx) => (
+                            <div key={idx} className="correction-card">
+                              <div className="corr-type-badge">{corr.type || "Grammar"}</div>
+                              <div className="corr-diff">
+                                <span className="diff-original">{corr.original}</span>
+                                <IconArrowRight size={13} className="diff-arrow" />
+                                <span className="diff-corrected">{corr.corrected}</span>
+                              </div>
+                              <div className="corr-explanation">{corr.explanation}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {/* Vocabulary Upgrades */}

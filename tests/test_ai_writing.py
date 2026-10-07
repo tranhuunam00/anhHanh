@@ -106,6 +106,10 @@ async def test_evaluate_writing_success_mock():
         assert len(result["corrections"]) == 1
         assert len(result["vocab_upgrades"]) == 1
         assert result["vocab_upgrades"][0]["word"] == "paramount"
+        assert "sentence_breakdown" in result
+        assert len(result["sentence_breakdown"]) >= 1
+        assert "is_grammar_correct" in result["sentence_breakdown"][0]
+        assert "grammar_analysis" in result["sentence_breakdown"][0]
 
 
 def test_server_app_import_and_routes():

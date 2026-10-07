@@ -23,116 +23,221 @@ CURATED_PROMPTS_BY_LANG: Dict[str, Dict[str, List[Dict[str, Any]]]] = {
     "en": {
         "ielts_task2": [
             {
-                "id": "t2_en_1",
-                "title": "Artificial Intelligence in Education",
-                "prompt": "Some people believe that artificial intelligence will soon replace teachers in the classroom, while others think that human educators will always remain essential. Discuss both views and give your own opinion.",
-                "type": "Discussion & Opinion",
-                "sub_type": "discussion",
-                "keywords": ["automated tutoring", "pedagogical empathy", "personalized learning", "digital literacy", "irreplaceable guidance"],
-                "min_words": 250,
-                "recommended_time": 40
-            },
-            {
-                "id": "t2_en_2",
-                "title": "Environmental Protection vs Economic Growth",
-                "prompt": "Many developing countries argue that economic development should take priority over environmental conservation. To what extent do you agree or disagree with this viewpoint?",
-                "type": "Agree / Disagree",
+                "id": "t2_cam16_t1",
+                "title": "Compulsory Community Service for High School Students (Cambridge 16 Test 1)",
+                "prompt": "Some people believe that unpaid community service should be a compulsory part of high school programmes (for example working for a charity, improving the neighborhood or teaching sports to younger children). To what extent do you agree or disagree?",
+                "type": "Agree / Disagree (Cambridge 16)",
                 "sub_type": "opinion",
-                "keywords": ["sustainable development", "ecological degradation", "industrial expansion", "carbon footprint", "renewable transition"],
+                "keywords": ["compulsory community service", "civic responsibility", "altruistic mindset", "practical life skills", "academic overload"],
                 "min_words": 250,
                 "recommended_time": 40
             },
             {
-                "id": "t2_en_3",
-                "title": "Remote Working and Social Isolation",
-                "prompt": "An increasing number of employees now work remotely from home rather than in traditional offices. Do the advantages of this trend outweigh the disadvantages?",
-                "type": "Advantages & Disadvantages",
-                "sub_type": "advantages_disadvantages",
-                "keywords": ["work-life balance", "geographical flexibility", "telecommuting", "social disconnect", "productivity metrics"],
+                "id": "t2_cam14_t2",
+                "title": "Global vs National Environmental Solutions (Cambridge 14 Test 2)",
+                "prompt": "Some people think that environmental problems should be solved on a global scale, while others believe that it is better to deal with them individually at a national level. Discuss both views and give your own opinion.",
+                "type": "Discuss Both Views (Cambridge 14)",
+                "sub_type": "discussion",
+                "keywords": ["transnational cooperation", "cross-border carbon emissions", "multilateral treaties", "domestic legislation", "localized initiatives"],
                 "min_words": 250,
                 "recommended_time": 40
             },
             {
-                "id": "t2_en_4",
-                "title": "Youth Mental Health and Social Media",
-                "prompt": "In recent years, anxiety and depression rates among young people have surged drastically. Many attribute this phenomenon to pervasive social media usage. What are the primary causes of this issue, and what feasible solutions can be implemented?",
-                "type": "Causes & Solutions",
+                "id": "t2_cam14_t1",
+                "title": "Urban Overcrowding, Traffic Congestion & Housing (Cambridge 14 Test 1)",
+                "prompt": "The rapid expansion of cities has led to severe traffic congestion and housing shortages in many countries. What are the causes of these problems, and what measures can governments take to resolve them?",
+                "type": "Causes & Solutions (Cambridge 14)",
                 "sub_type": "causes_solutions",
-                "keywords": ["digital addiction", "cyberbullying", "peer validation", "psychological well-being", "screen time regulation"],
+                "keywords": ["unbridled urbanization", "chronic traffic congestion", "affordable housing deficits", "decentralization policies", "public transit infrastructure"],
                 "min_words": 250,
                 "recommended_time": 40
             },
             {
-                "id": "t2_en_5",
-                "title": "Modern Consumerism and True Happiness",
-                "prompt": "In contemporary society, individuals are purchasing vastly more consumer goods than ever before. Why is this occurring? Does possessing more material goods make individuals genuinely happier?",
-                "type": "Two-part Question",
+                "id": "t2_cam16_t2",
+                "title": "Tourism in Remote Natural Environments (Cambridge 16 Test 2)",
+                "prompt": "In many parts of the world, tourists are increasingly visiting remote and pristine natural environments such as the Arctic, deserts, or tropical rainforests. Do the advantages of this development outweigh the disadvantages?",
+                "type": "Advantages & Disadvantages (Cambridge 16)",
+                "sub_type": "advantages_disadvantages",
+                "keywords": ["ecotourism expansion", "pristine wilderness", "ecological disturbance", "economic stimulus", "environmental degradation"],
+                "min_words": 250,
+                "recommended_time": 40
+            },
+            {
+                "id": "t2_cam17_t2",
+                "title": "Solo Living in Contemporary Society (Cambridge 17 Test 2)",
+                "prompt": "In many countries around the world, an increasing number of individuals are choosing to live alone rather than with family or roommates. What are the primary reasons for this trend? Is this a positive or negative development?",
+                "type": "Two-part Question (Cambridge 17)",
                 "sub_type": "two_part",
-                "keywords": ["materialistic pursuits", "conspicuous consumption", "transient gratification", "psychological contentment", "consumer-driven economy"],
+                "keywords": ["one-person households", "financial autonomy", "hyper-individualism", "social alienation", "housing market strain"],
                 "min_words": 250,
                 "recommended_time": 40
             }
         ],
         "ielts_task1": [
             {
-                "id": "t1_en_line",
-                "title": "Global Electric Vehicle Sales (2015-2025)",
-                "prompt": "The line graph compares the sales figures of electric vehicles (in millions) across China, Europe, and the United States between 2015 and 2025. Summarise the information by selecting and reporting the main features, and make comparisons where relevant.\n\n[Data Summary]: In 2015, all three regions recorded under 0.4 million sales. By 2020, China reached 1.3M, Europe 1.4M, and the US 0.3M. By 2025, China experienced an exponential surge to 6.8M, Europe reached 3.2M, while the US grew moderately to 1.4M.",
+                "id": "t1_cam13_line",
+                "title": "Tourist Visits to Four Attractions in Brighton (Cambridge 13 Test 2)",
+                "prompt": "The line graph shows the percentage of tourists to England who visited four distinct attractions in Brighton (Pavilion, Pier, Art Gallery, and Festival) between 1980 and 2010.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
                 "type": "Biểu đồ đường (Line Graph)",
                 "sub_type": "line_graph",
-                "keywords": ["exponential surge", "upward trajectory", "outpaced", "moderate expansion", "peaked at"],
+                "keywords": ["upward trajectory", "peaked dramatically", "marginal fluctuation", "sharp decline", "overtook"],
                 "min_words": 150,
-                "recommended_time": 20
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "line_graph",
+                    "title": "Percentage of Tourists Visiting 4 Brighton Attractions (1980 - 2010)",
+                    "unit": "% du khách",
+                    "x_labels": ["1980", "1990", "2000", "2010"],
+                    "series": [
+                        {"name": "Pavilion", "color": "#3b82f6", "data": [23, 22, 34, 31]},
+                        {"name": "Art Gallery", "color": "#10b981", "data": [21, 38, 38, 8]},
+                        {"name": "Pier", "color": "#f59e0b", "data": [10, 15, 22, 22]},
+                        {"name": "Festival", "color": "#8b5cf6", "data": [30, 28, 25, 28]}
+                    ]
+                }
             },
             {
-                "id": "t1_en_bar",
-                "title": "Household Waste Recycling Rates in 4 European Cities",
-                "prompt": "The bar chart compares the percentage of municipal household waste recycled across four major cities (Berlin, London, Tokyo, Sydney) across three benchmark years: 2010, 2018, and 2024. Summarise the key trends and draw comparisons.\n\n[Data Summary]: Berlin led throughout, rising from 48% (2010) to 65% (2024). Tokyo followed steadily from 38% to 54%. London progressed from 25% to 44%, while Sydney exhibited the slowest growth, moving from 20% to 28%.",
+                "id": "t1_cam14_bar",
+                "title": "Male & Female Students Across 6 Fields of Study (Cambridge 14 Test 1)",
+                "prompt": "The bar chart compares the proportion of male and female students studying six different academic disciplines at a university in the UK in 2019.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
                 "type": "Biểu đồ cột (Bar Chart)",
                 "sub_type": "bar_chart",
-                "keywords": ["predominant recycling rate", "consistent upward climb", "lagged behind", "significant disparity"],
+                "keywords": ["predominant gender", "considerable disparity", "roughly equal proportion", "marked divergence", "outnumbered"],
                 "min_words": 150,
-                "recommended_time": 20
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "bar_chart",
+                    "title": "Gender Distribution Across 6 University Subjects (2019)",
+                    "unit": "% sinh viên",
+                    "categories": ["Computer Science", "Engineering", "Medicine", "Law", "Languages", "Arts"],
+                    "series": [
+                        {"name": "Nam (Male)", "color": "#3b82f6", "data": [78, 85, 42, 48, 28, 35]},
+                        {"name": "Nữ (Female)", "color": "#ec4899", "data": [22, 15, 58, 52, 72, 65]}
+                    ]
+                }
             },
             {
-                "id": "t1_en_pie",
-                "title": "Electricity Generation by Energy Source in Australia",
-                "prompt": "The pie charts illustrate the proportion of electricity generated from various energy sources in Australia in 2000 and 2020. Summarise the main features and note major shifts.\n\n[Data Summary]: In 2000, Coal dominated with 75%, Gas accounted for 12%, Hydro 8%, and Solar/Wind only 5%. By 2020, Coal contracted sharply to 52%, Solar/Wind expanded dramatically to 24%, Gas increased slightly to 16%, and Hydro remained stable at 8%.",
+                "id": "t1_cam11_pie",
+                "title": "Water Consumption by Sector in Two Continents (Cambridge 11 Test 1)",
+                "prompt": "The pie charts illustrate the proportion of water consumed across three primary sectors (Industrial, Agricultural, and Domestic) in North America and Southeast Asia in 2000.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
                 "type": "Biểu đồ tròn (Pie Chart)",
                 "sub_type": "pie_chart",
-                "keywords": ["commanded a majority", "drastic expansion", "sharp contraction", "marginal fluctuation"],
+                "keywords": ["commanded the vast majority", "substantial disparity", "industrial demand", "minimal domestic share", "heavy reliance on agriculture"],
                 "min_words": 150,
-                "recommended_time": 20
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "pie_chart",
+                    "title": "Water Usage Distribution by Sector (Year 2000)",
+                    "unit": "%",
+                    "charts": [
+                        {
+                            "label": "Bắc Mỹ (North America)",
+                            "slices": [
+                                {"name": "Industrial (Công nghiệp)", "value": 48, "color": "#3b82f6"},
+                                {"name": "Agricultural (Nông nghiệp)", "value": 39, "color": "#10b981"},
+                                {"name": "Domestic (Sinh hoạt)", "value": 13, "color": "#f59e0b"}
+                            ]
+                        },
+                        {
+                            "label": "Đông Nam Á (Southeast Asia)",
+                            "slices": [
+                                {"name": "Industrial (Công nghiệp)", "value": 12, "color": "#3b82f6"},
+                                {"name": "Agricultural (Nông nghiệp)", "value": 81, "color": "#10b981"},
+                                {"name": "Domestic (Sinh hoạt)", "value": 7, "color": "#f59e0b"}
+                            ]
+                        }
+                    ]
+                }
             },
             {
-                "id": "t1_en_table",
-                "title": "Transit Network Commuter Volumes and Satisfaction",
-                "prompt": "The table compares daily passenger volumes (millions) and commuter satisfaction ratings across five capital metropolitan transit systems in 2023. Summarise the key metrics and comparisons.\n\n[Data Summary]: Tokyo: 8.5M riders/day, 94% satisfaction; Paris: 4.8M riders, 82% satisfaction; New York: 4.1M riders, 68% satisfaction; London: 3.7M riders, 86% satisfaction; Singapore: 3.2M riders, 96% satisfaction.",
+                "id": "t1_cam10_table",
+                "title": "Fairtrade Coffee & Banana Sales in 5 European Countries (Cambridge 10 Test 2)",
+                "prompt": "The table compares the sales turnover of Fairtrade-certified coffee and bananas (in millions of euros) across five European nations in 1999 and 2004.\n\nSummarise the key metrics, trends and comparisons.",
                 "type": "Bảng số liệu (Table)",
                 "sub_type": "table",
-                "keywords": ["highest ridership", "satisfaction index", "discrepancy", "surpassed", "lowest approval"],
+                "keywords": ["highest sales volume", "exponential surge", "eclipsed", "modest growth", "revenue discrepancy"],
                 "min_words": 150,
-                "recommended_time": 20
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "table",
+                    "title": "Fairtrade Coffee & Banana Revenue (Millions of Euros - 1999 vs 2004)",
+                    "columns": ["Quốc gia (Country)", "Coffee (1999)", "Coffee (2004)", "Bananas (1999)", "Bananas (2004)"],
+                    "rows": [
+                        ["Vương quốc Anh (UK)", "1.5", "20.0", "15.0", "47.0"],
+                        ["Thụy Sĩ (Switzerland)", "3.0", "6.0", "5.5", "4.5"],
+                        ["Đan Mạch (Denmark)", "1.8", "2.0", "0.6", "4.0"],
+                        ["Bỉ (Belgium)", "1.0", "1.7", "0.6", "4.0"],
+                        ["Thụy Điển (Sweden)", "0.8", "1.0", "1.8", "1.2"]
+                    ]
+                }
             },
             {
-                "id": "t1_en_process",
-                "title": "Industrial Paper Recycling Process",
-                "prompt": "The diagram illustrates the 6 sequential stages involved in converting discarded waste paper into recycled commercial printer paper. Summarise the key operations and transition steps.\n\n[Process Stages]: 1. Collection & sorting of discarded paper -> 2. Pulverising in a high-capacity water tank to generate raw pulp -> 3. Chemical de-inking and filtering out ink particles -> 4. Eco-friendly hydrogen peroxide bleaching -> 5. Compression through heated heavy rollers to squeeze out water -> 6. Continuous drying, winding into giant reels, and precision slicing into reams.",
+                "id": "t1_cam8_process",
+                "title": "Industrial Cement & Concrete Manufacturing Process (Cambridge 8 Test 3)",
+                "prompt": "The two diagrams illustrate the stages involved in the industrial production of cement and how cement is subsequently combined with other materials to produce concrete for the construction sector.\n\nSummarise the key operations, steps, and proportional components.",
                 "type": "Quy trình (Process)",
                 "sub_type": "process",
-                "keywords": ["sequential operations", "initial collection", "de-inking phase", "compressed through rollers", "final packaging"],
+                "keywords": ["crushed into fine powder", "cylindrical rotating kiln", "extreme heat up to 1400°C", "concrete formulation", "proportional combination"],
                 "min_words": 150,
-                "recommended_time": 20
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "process",
+                    "title": "Industrial Cement Manufacturing & Concrete Production",
+                    "process_a": {
+                        "title": "Giai đoạn 1: Quy trình sản xuất Xi măng (Cement)",
+                        "steps": [
+                            {"step": 1, "title": "Nghiền nguyên liệu (Crushing)", "desc": "Đá vôi (Limestone) và Đất sét (Clay) đưa vào máy nghiền tạo bột mịn.", "icon": "crush"},
+                            {"step": 2, "title": "Phối trộn (Mixing pipe)", "desc": "Bột nguyên liệu đi qua ống xoay phối trộn đều thành hỗn hợp đồng nhất.", "icon": "mix"},
+                            {"step": 3, "title": "Nung lò quay (Rotating Kiln)", "desc": "Hỗn hợp nung trong lò quay nghiêng ở nhiệt độ cực cao 1400°C - 1500°C.", "icon": "heat"},
+                            {"step": 4, "title": "Làm nguội & Nghiền mịn (Grinding)", "desc": "Xỉ clinker làm nguội, trộn thêm Thạch cao (Gypsum) và nghiền thành xi măng.", "icon": "grind"},
+                            {"step": 5, "title": "Đóng bao & Xuất xưởng (Packaging)", "desc": "Xi măng thành phẩm tự động đóng bao 50kg và xếp lên xe vận chuyển.", "icon": "pack"}
+                        ]
+                    },
+                    "process_b": {
+                        "title": "Giai đoạn 2: Tỷ lệ phối trộn Bê tông (Concrete Formulation)",
+                        "ingredients": [
+                            {"name": "Sỏi / Đá dăm (Gravel)", "pct": 50, "color": "#64748b"},
+                            {"name": "Cát xây dựng (Sand)", "pct": 25, "color": "#eab308"},
+                            {"name": "Xi măng (Cement)", "pct": 15, "color": "#3b82f6"},
+                            {"name": "Nước sạch (Water)", "pct": 10, "color": "#06b6d4"}
+                        ],
+                        "machine": "Cả 4 thành phần được nạp vào Máy trộn bê tông (Concrete Mixer) quay đều tạo hỗn hợp vữa xây dựng."
+                    }
+                }
             },
             {
-                "id": "t1_en_map",
-                "title": "Redevelopment of Portside Town Center (2010 vs Present)",
-                "prompt": "The two maps illustrate the extensive infrastructural modifications that transformed the town center of Portside between 2010 and the present day. Summarise the structural changes and spatial developments.\n\n[Key Developments]: On the north riverbank, a derelict industrial warehouse and dock were demolished and replaced with a modern riverside park and pedestrian promenade. The western vehicular road was converted into a car-free pedestrian shopping boulevard. The old eastern train station was expanded into a multimodal transit hub with an underground metro link.",
+                "id": "t1_cam14_map",
+                "title": "The Village of Stokeford Redevelopment (Cambridge 14 Test 4)",
+                "prompt": "The two maps show the village of Stokeford in 1930 and in 2010, illustrating its transformation from a rural settlement into a modern residential suburb.\n\nSummarise the structural changes and spatial developments.",
                 "type": "Bản đồ / Quy hoạch (Map)",
                 "sub_type": "map",
-                "keywords": ["demolished to make way for", "transformed into", "converted into pedestrianized zone", "infrastructural overhaul"],
+                "keywords": ["farmland converted into residential estates", "school expanded with additional classrooms", "large manor repurposed as retirement home", "new side roads constructed", "demolished to make way for"],
                 "min_words": 150,
-                "recommended_time": 20
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "map",
+                    "title": "Bản đồ quy hoạch Làng Stokeford (1930 so với 2010)",
+                    "period_a": {
+                        "year": "Năm 1930 (Làng Nông thôn thuần túy)",
+                        "zones": [
+                            {"area": "Đông Bắc (North-East)", "name": "Sông River Stoke với cầu gỗ qua sông", "status": "existing"},
+                            {"area": "Phía Đông & Đông Nam", "name": "Đất nông nghiệp rộng lớn (Farmland)", "status": "demolished"},
+                            {"area": "Trung tâm (Center)", "name": "Trục đường chính làng với Bưu điện & Trường tiểu học nhỏ", "status": "existing"},
+                            {"area": "Tây Bắc (North-West)", "name": "Biệt thự cổ (Large Manor House) với vườn tư gia rộng", "status": "converted"},
+                            {"area": "Phía Tây & Tây Nam", "name": "Vài căn nhà gỗ nông dân rải rác (10 - 15 nóc nhà)", "status": "existing"}
+                        ]
+                    },
+                    "period_b": {
+                        "year": "Năm 2010 (Khu đô thị cư dân hiện đại)",
+                        "zones": [
+                            {"area": "Đông Bắc (North-East)", "name": "Cầu bê tông cốt thép hiện đại hóa bắc qua sông", "status": "expanded"},
+                            {"area": "Phía Đông & Đông Nam", "name": "Đất nông nghiệp bị xóa bỏ hoàn toàn, thay bằng 2 Khu đô thị nhà ở (Housing Estates) và các tuyến đường nhánh", "status": "new"},
+                            {"area": "Trung tâm (Center)", "name": "Đường chính mở rộng; Trường tiểu học xây thêm 2 dãy phòng học mới tăng gấp đôi quy mô", "status": "expanded"},
+                            {"area": "Tây Bắc (North-West)", "name": "Biệt thự cổ được cải tạo và mở rộng thành Viện dưỡng lão (Retirement Home)", "status": "converted"},
+                            {"area": "Phía Tây & Tây Nam", "name": "Nhiều dãy nhà ở liền kề mới mọc lên dọc 2 bên tuyến đường", "status": "new"}
+                        ]
+                    }
+                }
             }
         ],
         "email": [
@@ -698,6 +803,15 @@ YÊU CẦU DẠNG BÁO CÁO DỮ LIỆU / QUY TRÌNH TASK 1:
             elif sub_type == "two_part":
                 sub_type_rule = "YÊU CẦU ĐẶC BIỆT: Đề bài dạng 'Two-part Question' (Đặt ra 2 câu hỏi trực tiếp liên quan đến một hiện tượng xã hội)."
 
+        ielts_real_exam_rule = ""
+        if language == "en" and genre in ["ielts_task1", "ielts_task2"]:
+            ielts_real_exam_rule = """
+ĐẶC BIỆT BẮT BUỘC ĐỐI VỚI IELTS TIẾNG ANH:
+- Đề bài PHẢI BÁM SÁT 100% ĐỀ THI THẬT IELTS CHÍNH THỨC (Cambridge IELTS Past Examination Papers hoặc IDP/British Council official tests).
+- KHÔNG TỰ BỊA RA những câu hỏi không thực tế hoặc xa rời chuẩn đề thi IELTS.
+- Đối với Task 1: BẮT BUỘC sinh ra trường "visual_data" chứa số liệu cụ thể (loại chart/table/process/map, tiêu đề, các chuỗi số liệu hoặc các bước quy trình, hoặc bản đồ 2 giai đoạn) để giao diện hiển thị biểu đồ trực quan!
+"""
+
         prompt_instruction = f"""Bạn là một chuyên gia khảo thí ngôn ngữ và giảng viên luyện viết học thuật hàng đầu ({cfg['examiner']}).
 Hãy tạo MỘT đề bài luyện viết hoàn chỉnh {area_hint}.
 Thể loại yêu cầu: {genre}
@@ -705,6 +819,7 @@ Dạng đề chi tiết yêu cầu: {sub_type or 'tự chọn phù hợp'}
 Ngôn ngữ của đề bài: BẮT BUỘC VIẾT TOÀN BỘ BẰNG {lang_name} ({cfg['native']})!
 
 {sub_type_rule}
+{ielts_real_exam_rule}
 
 QUY TẮC BẮT BUỘC:
 - Toàn bộ 'title', 'prompt', 'keywords' PHẢI được viết bằng ngôn ngữ {lang_name} ({cfg['native']}).
@@ -719,8 +834,17 @@ Trả về kết quả DUY NHẤT định dạng JSON:
   "sub_type": "{sub_type or 'general'}",
   "keywords": ["từ khóa 1", "từ khóa 2", "từ khóa 3", "từ khóa 4", "từ khóa 5"],
   "min_words": {min_words},
-  "recommended_time": {rec_time}
+  "recommended_time": {rec_time},
+  "visual_data": null
 }}
+(Lưu ý: Nếu là Task 1, trường visual_data là object chứa thông tin vẽ biểu đồ:
+- nếu line_graph: {{"type": "line_graph", "title": "...", "unit": "%", "x_labels": ["2010", "2015", "2020"], "series": [{{"name": "A", "color": "#3b82f6", "data": [10, 20, 30]}}]}}
+- nếu bar_chart: {{"type": "bar_chart", "title": "...", "unit": "%", "categories": ["A", "B", "C"], "series": [{{"name": "Group 1", "color": "#3b82f6", "data": [40, 50, 60]}}]}}
+- nếu pie_chart: {{"type": "pie_chart", "title": "...", "unit": "%", "charts": [{{"label": "2010", "slices": [{{"name": "X", "value": 60, "color": "#3b82f6"}}, {{"name": "Y", "value": 40, "color": "#10b981"}}]}}]}}
+- nếu table: {{"type": "table", "title": "...", "columns": ["Cột 1", "Cột 2"], "rows": [["A", "10"], ["B", "20"]]}}
+- nếu process: {{"type": "process", "title": "...", "process_a": {{"title": "Giai đoạn chính", "steps": [{{"step": 1, "title": "Bước 1", "desc": "Mô tả...", "icon": "crush"}}]}}}}
+- nếu map: {{"type": "map", "title": "...", "period_a": {{"year": "Năm 2000", "zones": [{{"area": "North", "name": "...", "status": "existing"}}]}}, "period_b": {{"year": "Năm 2020", "zones": [{{"area": "North", "name": "...", "status": "expanded"}}]}}}}
+)
 """
         models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
         async with httpx.AsyncClient(timeout=60.0) as client:
@@ -866,6 +990,44 @@ TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
         raise RuntimeError(f"Không thể tạo gợi ý cấu trúc AI: {last_error}")
 
     @classmethod
+    def _generate_fallback_sentence_breakdown(cls, content: str, corrections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Split essay into sequential sentences and evaluate each sentence thoroughly."""
+        import re
+        raw_sentences = re.split(r'(?<=[.!?])\s+', content.strip())
+        breakdown = []
+        for idx, s in enumerate(raw_sentences, 1):
+            s_clean = s.strip()
+            if not s_clean:
+                continue
+            matching_corr = next((c for c in corrections if c.get("original") and c["original"] in s_clean), None)
+            if matching_corr:
+                orig_err = matching_corr.get("original", "")
+                fixed_snippet = matching_corr.get("corrected", "")
+                fixed_s = s_clean.replace(orig_err, fixed_snippet) if orig_err else s_clean
+                breakdown.append({
+                    "sentence_num": idx,
+                    "original": s_clean,
+                    "is_grammar_correct": False,
+                    "grammar_analysis": f"Lỗi ở cụm '{orig_err}': {matching_corr.get('explanation', 'Lỗi ngữ pháp cần chỉnh sửa.')}",
+                    "grammar_fix": fixed_s,
+                    "upgrade_needed": True,
+                    "upgraded_sentence": fixed_s,
+                    "upgrade_notes": "Sửa đúng ngữ pháp cơ bản trước, sau đó có thể nâng cấp cấu trúc học thuật."
+                })
+            else:
+                breakdown.append({
+                    "sentence_num": idx,
+                    "original": s_clean,
+                    "is_grammar_correct": True,
+                    "grammar_analysis": "Đúng hoàn toàn về mặt ngữ pháp rồi.",
+                    "grammar_fix": s_clean,
+                    "upgrade_needed": False,
+                    "upgraded_sentence": s_clean,
+                    "upgrade_notes": "Câu đã tự nhiên, gãy gọn, không cần bổ sung."
+                })
+        return breakdown
+
+    @classmethod
     async def evaluate_writing(
         cls,
         topic: str,
@@ -874,7 +1036,7 @@ TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
         target_band: float = 7.0,
         language: str = "en"
     ) -> Dict[str, Any]:
-        """Grade and thoroughly evaluate a student's writing submission using Gemini AI."""
+        """Grade and thoroughly evaluate a student's writing submission using Gemini AI, with detailed sentence-by-sentence analysis."""
         if not content or len(content.strip().split()) < 15:
             raise ValueError("Bài viết quá ngắn (tối thiểu 15 từ) để AI có thể đánh giá và chấm điểm chính xác.")
 
@@ -904,31 +1066,40 @@ BÀI VIẾT CỦA HỌC VIÊN:
 {content}
 \"\"\"
 
-YÊU CẦU CHẤM ĐIỂM & ĐÁNH GIÁ:
+YÊU CẦU CHẤM ĐIỂM & ĐÁNH GIÁ (BẮT BUỘC ĐỦ 5 PHẦN):
 1. Chấm điểm theo thang điểm chuẩn IELTS 0.0 - 9.0 (làm tròn đến 0.5):
    - overall_score: Điểm tổng kết (ví dụ: 6.5, 7.0, 7.5...).
    - task_response: Điểm và nhận xét mức độ hoàn thành đề bài, luận điểm, dẫn chứng.
    - coherence_cohesion: Điểm và nhận xét mạch lạc, cấu trúc đoạn, từ nối (linking devices).
    - lexical_resource: Điểm và nhận xét vốn từ, collocations, tính tự nhiên, độ đa dạng.
    - grammatical_range_accuracy: Điểm và nhận xét độ đa dạng cấu trúc ngữ pháp và độ chính xác câu.
+
 2. Danh sách sửa lỗi chi tiết (corrections):
    - Tìm ra TẤT CẢ các lỗi ngữ pháp, chính tả, dùng từ vụng về, câu cồng kềnh trong bài.
-   - Với mỗi lỗi, chỉ rõ:
-     + "original": đoạn văn bản học viên viết
-     + "corrected": phương án sửa chuẩn xác, tự nhiên
-     + "type": loại lỗi ("grammar", "vocabulary", "spelling", "style", "cohesion")
-     + "explanation": giải thích chi tiết bằng TIẾNG VIỆT vì sao sai và cách dùng đúng.
+   - Với mỗi lỗi: "original", "corrected", "type", "explanation".
+
 3. Bài viết mẫu viết lại nâng cấp (model_essay):
    - Viết lại toàn bộ bài viết này ở trình độ Band 8.5 - 9.0 (Native Academic / Professional level).
-   - Giữ nguyên các ý tưởng và lập luận ban đầu của học viên nhưng diễn đạt lại bằng từ vựng đắt giá, cấu trúc câu đa dạng, mượt mà.
+
 4. Gợi ý từ vựng & Collocations nâng cấp (vocab_upgrades):
    - Trích xuất 5 đến 8 từ vựng hoặc collocations học thuật cao cấp (C1/C2) phù hợp với bài viết này.
-   - Mỗi từ gồm:
-     + "word": Từ/cụm từ tiếng Anh
-     + "meaning": Nghĩa tiếng Việt tự nhiên
-     + "phonetic": Phiên âm quốc tế IPA (ví dụ: "/ˌɒb.lɪˈɡeɪ.ʃən/")
-     + "replace_for": Cụm từ đơn giản trong bài của học viên mà từ này có thể thay thế (ví dụ: "big problem" -> "grave dilemma")
-     + "context_sentence": Câu ví dụ minh họa cách dùng trong ngữ cảnh bài này.
+
+5. PHÂN TÍCH VÀ SỬA TỪNG CÂU MỘT (sentence_breakdown):
+   - Bạn BẮT BUỘC phải chia toàn bộ bài viết của học viên thành danh sách tuần tự TỪNG CÂU MỘT từ câu đầu tiên đến câu cuối cùng (Câu 1, Câu 2, Câu 3...).
+   - Với MỖI CÂU, bạn đánh giá tỉ mỉ theo các tiêu chí:
+     + "sentence_num": Số thứ tự câu (1, 2, 3...)
+     + "original": Câu gốc của học viên
+     + "is_grammar_correct": true nếu câu ĐÚNG HOÀN TOÀN về mặt ngữ pháp; false nếu CÓ LỖI (ngữ pháp, chia thì, giới từ, mạo từ, cấu trúc câu...).
+     + "grammar_analysis":
+       * Nếu câu đúng: BẮT BUỘC ghi rõ "Đúng hoàn toàn về mặt ngữ pháp rồi."
+       * Nếu câu có lỗi: Nêu rõ câu sai ở đâu, vì sao sai và cách nhận biết lỗi.
+     + "grammar_fix":
+       * Nếu câu có lỗi: Phiên bản sửa ĐÚNG NGỮ PHÁP (sửa lỗi trực tiếp, chuẩn xác về mặt ngữ pháp trước, giữ nguyên ý tứ câu).
+       * Nếu câu đã đúng ngữ pháp: Giữ nguyên câu gốc.
+     + "upgrade_needed": true hoặc false.
+       * QUY TẮC RẤT QUAN TRỌNG: KHÔNG PHẢI CÂU NÀO CŨNG CẦN BỔ SUNG! Chỉ những câu còn đơn điệu, có thể nâng tầm bằng từ vựng học thuật C1/C2 hoặc cấu trúc câu đảo ngữ/mệnh đề nâng cao để tăng band điểm thì mới để true. Những câu đã gãy gọn, tự nhiên, diễn đạt chuẩn mực thì BẮT BUỘC để false!
+     + "upgraded_sentence": Phiên bản nâng cấp câu ở đẳng cấp Band 8.5-9.0 Academic Style (nếu upgrade_needed là true; nếu upgrade_needed là false thì để câu gốc hoặc giống grammar_fix).
+     + "upgrade_notes": Giải thích vì sao thay đổi như vậy giúp câu hay hơn (dùng collocation nào, cấu trúc nào đắt giá hơn).
 
 ĐỊNH DẠNG TRẢ VỀ:
 BẮT BUỘC là JSON duy nhất (không bọc text giải thích bên ngoài), theo schema:
@@ -962,6 +1133,18 @@ BẮT BUỘC là JSON duy nhất (không bọc text giải thích bên ngoài), 
       "corrected": "...",
       "type": "grammar",
       "explanation": "..."
+    }}
+  ],
+  "sentence_breakdown": [
+    {{
+      "sentence_num": 1,
+      "original": "...",
+      "is_grammar_correct": true,
+      "grammar_analysis": "Đúng hoàn toàn về mặt ngữ pháp rồi.",
+      "grammar_fix": "...",
+      "upgrade_needed": false,
+      "upgraded_sentence": "...",
+      "upgrade_notes": "..."
     }}
   ],
   "model_essay": "Bài viết mẫu hoàn hảo viết lại ở Band 8.5-9.0...",
@@ -999,7 +1182,10 @@ BẮT BUỘC là JSON duy nhất (không bọc text giải thích bên ngoài), 
                         raw_text = re.sub(r"\s*```$", "", raw_text)
 
                         parsed = json.loads(raw_text)
-                        logger.info(f"Essay successfully evaluated by {model_name}. Overall Score: {parsed.get('overall_score')}")
+                        if "sentence_breakdown" not in parsed or not isinstance(parsed["sentence_breakdown"], list):
+                            parsed["sentence_breakdown"] = cls._generate_fallback_sentence_breakdown(content, parsed.get("corrections", []))
+
+                        logger.info(f"Essay successfully evaluated by {model_name}. Overall Score: {parsed.get('overall_score')}, sentences evaluated: {len(parsed['sentence_breakdown'])}")
                         return parsed
                     else:
                         logger.warning(f"Model {model_name} returned HTTP {response.status_code}: {response.text[:200]}")
