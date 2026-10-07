@@ -20,11 +20,17 @@ import {
   Layers,
   Globe,
   GraduationCap,
+  Scissors,
+  Download,
+  Eye,
+  RotateCcw,
+  FileCheck,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import {
   aiExtractVocabFromText,
   aiExtractVocabFromFile,
+  extractTextFromFile,
   batchImportVocab,
 } from "../../services/authVocabService";
 import { getPdfPageCount, extractPdfTextClient, slicePdfClient } from "../../utils/pdfExtractor";
@@ -197,6 +203,13 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
   const [usePageRange, setUsePageRange] = useState(true);
   const [isReadingPdf, setIsReadingPdf] = useState(false);
 
+  // Sliced File State (Cut PDF file review before AI call)
+  const [slicedFile, setSlicedFile] = useState(null);
+  const [slicedFileUrl, setSlicedFileUrl] = useState(null);
+  const [isSlicing, setIsSlicing] = useState(false);
+  const [isSliced, setIsSliced] = useState(false);
+  const [slicedFileInfo, setSlicedFileInfo] = useState(null);
+
   const updateRange = (s, e, total = totalPages) => {
     let sNum = Math.max(1, parseInt(s, 10) || 1);
     let eNum = Math.max(sNum, parseInt(e, 10) || sNum);
@@ -208,6 +221,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
     setEndPage(eNum);
     setStartPageInput(String(sNum));
     setEndPageInput(String(eNum));
+    setIsSliced(false);
   };
 
   const handleStartChange = (e) => {
@@ -320,6 +334,14 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
       return;
     }
 
+    if (slicedFileUrl) {
+      URL.revokeObjectURL(slicedFileUrl);
+      setSlicedFileUrl(null);
+    }
+    setSlicedFile(null);
+    setIsSliced(false);
+    setSlicedFileInfo(null);
+
     setSelectedFile(file);
     setTotalPages(null);
     updateRange(1, 1, null);
@@ -362,6 +384,67 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
     }
   };
 
+  const handleSliceFile = async () => {
+    if (!selectedFile) {
+      showToast("Vui lòng chọn tệp tài liệu trước khi cắt", "warning");
+      return;
+    }
+
+    setIsSlicing(true);
+    try {
+      const isPdf = selectedFile.name.toLowerCase().endsWith(".pdf");
+      if (isPdf) {
+        const s = Math.max(1, parseInt(startPageInput, 10) || startPage || 1);
+        const e = Math.max(s, parseInt(endPageInput, 10) || endPage || s);
+
+        showToast(`⚡ Đang cắt trang ${s} → ${e} của tệp "${selectedFile.name}"...`, "info");
+        const cutFile = await slicePdfClient(selectedFile, s, e);
+
+        if (slicedFileUrl) {
+          URL.revokeObjectURL(slicedFileUrl);
+        }
+        const url = URL.createObjectURL(cutFile);
+
+        setSlicedFile(cutFile);
+        setSlicedFileUrl(url);
+        setIsSliced(true);
+        setSlicedFileInfo({
+          name: cutFile.name,
+          size: cutFile.size,
+          startPage: s,
+          endPage: e,
+          pageCount: e - s + 1,
+          isPdf: true,
+        });
+
+        showToast(
+          `Đã cắt xong tệp "${cutFile.name}" (${(cutFile.size / 1024).toFixed(1)} KB)! Hãy kiểm tra file cắt bên dưới.`,
+          "success"
+        );
+      } else {
+        // Tệp không phải PDF (ảnh, text, word)
+        if (slicedFileUrl) {
+          URL.revokeObjectURL(slicedFileUrl);
+        }
+        const url = URL.createObjectURL(selectedFile);
+        setSlicedFile(selectedFile);
+        setSlicedFileUrl(url);
+        setIsSliced(true);
+        setSlicedFileInfo({
+          name: selectedFile.name,
+          size: selectedFile.size,
+          isPdf: false,
+        });
+        showToast(`Tệp "${selectedFile.name}" đã sẵn sàng!`, "success");
+      }
+    } catch (err) {
+      console.error("Lỗi khi cắt tệp:", err);
+      showToast(err.message || "Không thể cắt tệp", "error");
+    } finally {
+      setIsSlicing(false);
+    }
+  };
+
   const handleRunAnalysis = async () => {
     if (activeTab === "paste" && !inputText.trim()) {
       showToast("Vui lòng dán nội dung văn bản hoặc danh sách từ vựng cần bóc tách", "warning");
@@ -369,6 +452,13 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
     }
     if (activeTab === "file" && !selectedFile) {
       showToast("Vui lòng chọn tệp tài liệu (.pdf, .docx, .txt) cần bóc tách", "warning");
+      return;
+    }
+
+    const isPdf = selectedFile?.name?.toLowerCase().endsWith(".pdf");
+    if (activeTab === "file" && isPdf && !isSliced) {
+      showToast("Đang cắt tệp theo khoảng trang đã chọn để bạn kiểm tra file cắt trước...", "info");
+      await handleSliceFile();
       return;
     }
 
@@ -381,28 +471,21 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       let result;
       if (activeTab === "file") {
-        const isPdf = selectedFile.name.toLowerCase().endsWith(".pdf");
+        const fileToSend = slicedFile || selectedFile;
+        const isPdfFile = fileToSend.name.toLowerCase().endsWith(".pdf");
 
-        // Nếu là PDF: FE ưu tiên đọc chữ trực tiếp trên trình duyệt, fallback cắt file gửi lên BE
-        if (isPdf) {
-          const s = Math.max(1, parseInt(startPageInput, 10) || startPage || 1);
-          const e = Math.max(s, parseInt(endPageInput, 10) || endPage || s);
-
+        if (isPdfFile) {
+          // 1. Thử đọc chữ trực tiếp trên client từ tệp đã cắt
           let clientResult = null;
           try {
-            showToast(
-              `⚡ Trình duyệt đang đọc nội dung trang ${s} → ${e} (${selectedFile.name})...`,
-              "info"
-            );
-            clientResult = await extractPdfTextClient(selectedFile, s, e);
-          } catch (extractErr) {
-            console.warn("Client text extraction notice:", extractErr);
+            clientResult = await extractPdfTextClient(fileToSend, 1, slicedFileInfo?.pageCount || 5);
+          } catch (cErr) {
+            console.warn("Client read sliced pdf:", cErr);
           }
 
-          // Chiến lược 1: Trình duyệt đã đọc được chữ -> Gửi trực tiếp text lên AI (Tối ưu nhất, 0 lỗi máy chủ)
           if (clientResult && clientResult.text && clientResult.text.trim().length >= 10) {
             showToast(
-              `⚡ Đã đọc ${clientResult.selectedPagesCount} trang (${clientResult.wordCount} chữ). AI đang bóc tách theo cấp độ đã chọn...`,
+              `⚡ Đã đọc ${clientResult.selectedPagesCount} trang (${clientResult.wordCount} chữ) từ file cắt. AI đang bóc tách...`,
               "info"
             );
             result = await aiExtractVocabFromText(
@@ -414,27 +497,9 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
               vocabLevel
             );
           } else {
-            // Chiến lược 2: Nếu client không thấy chữ (tệp scan ảnh, chứng chỉ, hoặc mã hoá) -> Cắt tệp & gửi lên BE để dùng Gemini Vision OCR
+            // 2. Nếu là PDF scan dạng ảnh: gửi file đã cắt lên BE Gemini Vision OCR
             showToast(
-              `⚡ Phát hiện trang PDF scan/ảnh. Đang gửi lên máy chủ để nhận diện qua Gemini Vision OCR...`,
-              "info"
-            );
-            let fileToSend = selectedFile;
-            try {
-              fileToSend = await slicePdfClient(selectedFile, s, e);
-            } catch (sliceErr) {
-              console.warn("Lỗi khi cắt PDF trên client:", sliceErr);
-            }
-
-            // Kiểm tra dung lượng tệp trước khi đẩy lên BE (BE tối đa 5MB)
-            if (fileToSend.size > MAX_BE_FILE_SIZE) {
-              throw new Error(
-                `Tệp cắt vẫn vượt quá 5MB (${(fileToSend.size / (1024 * 1024)).toFixed(1)}MB). Vui lòng chọn ít trang hơn (ví dụ 1 - 5 trang).`
-              );
-            }
-
-            showToast(
-              `Đang gửi tệp cắt "${fileToSend.name}" (${(fileToSend.size / 1024).toFixed(1)} KB) lên Gemini Vision OCR...`,
+              `Đang gửi tệp cắt "${fileToSend.name}" (${(fileToSend.size / 1024).toFixed(0)} KB) lên Gemini Vision OCR...`,
               "info"
             );
             result = await aiExtractVocabFromFile(
@@ -448,37 +513,16 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
             );
           }
         } else {
-          // Xử lý tệp không phải PDF (.docx, .txt, .md, .csv, hoặc ảnh .png/.jpg/.webp)
-          const isImage = /\.(png|jpg|jpeg|webp)$/i.test(selectedFile.name);
-          let fileToSend = selectedFile;
-
+          // Xử lý tệp không phải PDF (ảnh, docx, txt)
+          const isImage = /\.(png|jpg|jpeg|webp)$/i.test(fileToSend.name);
           if (isImage) {
             showToast(
-              `⚡ Đang gửi ảnh "${selectedFile.name}" lên Gemini Vision OCR để đọc chữ & bóc tách từ vựng...`,
+              `⚡ Đang gửi ảnh "${fileToSend.name}" lên Gemini Vision OCR để đọc chữ & bóc tách từ vựng...`,
               "info"
             );
-          } else if (selectedFile.size > MAX_BE_FILE_SIZE) {
-            // Nếu là tệp text/md/csv lớn: FE tự cắt văn bản dưới 5MB
-            const isTextType = /\.(txt|md|csv)$/i.test(selectedFile.name);
-            if (isTextType) {
-              const textContent = await selectedFile.text();
-              const words = textContent.trim().split(/\s+/).slice(0, 5000).join(" ");
-              const cleanBaseName = selectedFile.name.replace(/\.[^/.]+$/, "");
-              fileToSend = new File([words], `${cleanBaseName}_sliced.txt`, { type: "text/plain" });
-              showToast(
-                `⚡ Đã cắt tệp text xuống ${(fileToSend.size / 1024).toFixed(1)} KB để tải lên máy chủ.`,
-                "info"
-              );
-            } else {
-              throw new Error(
-                `Tệp "${selectedFile.name}" có dung lượng ${(selectedFile.size / (1024 * 1024)).toFixed(1)}MB, vượt quá giới hạn tải lên máy chủ 5MB. Vui lòng chuyển sang định dạng PDF để chọn trang hoặc dán văn bản trực tiếp.`
-              );
-            }
-          }
-
-          if (!isImage) {
+          } else {
             showToast(
-              `AI đang phân tích tệp "${fileToSend.name}" (${(fileToSend.size / 1024).toFixed(1)} KB - ${currentLangObj.label})...`,
+              `AI đang phân tích tệp "${fileToSend.name}" (${(fileToSend.size / 1024).toFixed(0)} KB)...`,
               "info"
             );
           }
@@ -836,7 +880,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                   </div>
 
                   {/* Selective Page Range Box (Frontend cuts pages before sending to AI to save tokens) */}
-                  {selectedFile && (
+                  {selectedFile && selectedFile.name.toLowerCase().endsWith(".pdf") && (
                     <div className="ai-page-range-card">
                       <div className="ai-page-range-header">
                         <div className="ai-page-range-title">
@@ -1002,7 +1046,126 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
 
                       <div className="ai-page-range-notice">
                         ⚡ <strong>Đang chọn {Math.max(1, endPage - startPage + 1)} trang (Trang {startPage} → {endPage}):</strong>{" "}
-                        Trình duyệt trích xuất đúng phần nội dung này gửi lên AI, tệp PDF lớn tới 500MB xử lý siêu tốc mà không tốn token thừa.
+                        Trình duyệt trích xuất đúng phần nội dung này, tệp PDF lớn tới 500MB xử lý siêu tốc mà không tốn token thừa.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 1: Prompt to Slice / Cut File Before AI Call */}
+                  {selectedFile && selectedFile.name.toLowerCase().endsWith(".pdf") && !isSliced && (
+                    <div className="ai-file-slice-trigger-card">
+                      <div className="ai-file-slice-info">
+                        <div className="ai-file-slice-title">
+                          <Scissors size={18} style={{ color: "#6366f1" }} />
+                          <span>Cắt tệp trang <strong>{startPage} → {endPage}</strong> ({Math.max(1, endPage - startPage + 1)} trang)</span>
+                        </div>
+                        <div className="ai-file-slice-desc">
+                          Hệ thống sẽ cắt riêng {Math.max(1, endPage - startPage + 1)} trang này thành 1 file PDF mới siêu nhẹ. Bạn kiểm tra file đã cắt xong thấy OK mới gửi AI cho chắc chắn!
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="ai-btn-slice-trigger"
+                        onClick={handleSliceFile}
+                        disabled={isSlicing}
+                      >
+                        {isSlicing ? (
+                          <>
+                            <Loader2 size={18} className="spin" />
+                            <span>Đang cắt tệp...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Scissors size={18} />
+                            <span>Cắt tệp ngay</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Step 2: Display Sliced / Cut File Preview for User Inspection & Confirmation */}
+                  {selectedFile && isSliced && (
+                    <div className="ai-sliced-file-card">
+                      <div className="ai-sliced-header">
+                        <div className="ai-sliced-badge-success">
+                          <Check size={14} /> ĐÃ CẮT FILE THÀNH CÔNG
+                        </div>
+                        <div className="ai-sliced-actions-bar">
+                          <a
+                            href={slicedFileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ai-btn-file-action preview"
+                            title="Mở file đã cắt trong tab mới"
+                          >
+                            <Eye size={15} /> Xem trước file cắt
+                          </a>
+                          <a
+                            href={slicedFileUrl}
+                            download={slicedFileInfo?.name || "sliced_document.pdf"}
+                            className="ai-btn-file-action download"
+                            title="Tải file cắt về máy"
+                          >
+                            <Download size={15} /> Tải file cắt về
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsSliced(false);
+                              setSlicedFile(null);
+                            }}
+                            className="ai-btn-file-action reslice"
+                            title="Đổi khoảng trang khác"
+                          >
+                            <RotateCcw size={14} /> Cắt lại trang khác
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="ai-sliced-meta-box">
+                        <div className="ai-sliced-file-icon">
+                          <FileCheck size={28} color="#10b981" />
+                        </div>
+                        <div className="ai-sliced-file-details">
+                          <div className="ai-sliced-filename">{slicedFileInfo?.name}</div>
+                          <div className="ai-sliced-meta-stats">
+                            <span>Kích thước: <strong>{(slicedFileInfo?.size / 1024).toFixed(1)} KB</strong></span>
+                            {slicedFileInfo?.isPdf && (
+                              <>
+                                <span>•</span>
+                                <span>Số trang: <strong>{slicedFileInfo?.pageCount} trang (Trang {slicedFileInfo?.startPage} → {slicedFileInfo?.endPage})</strong></span>
+                              </>
+                            )}
+                            <span>•</span>
+                            <span className="text-success font-semibold">Đã sẵn sàng gửi AI</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Khung nhúng xem trước file cắt trực tiếp trong modal */}
+                      {slicedFileInfo?.isPdf ? (
+                        <div className="ai-sliced-preview-embed">
+                          <div className="ai-sliced-preview-header">
+                            <span>👁️ Xem trước nội dung file cắt:</span>
+                            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                              (Nếu trình duyệt không tải được khung nhúng, bấm "Xem trước file cắt" ở trên để mở tab mới)
+                            </span>
+                          </div>
+                          <iframe
+                            src={slicedFileUrl}
+                            className="ai-sliced-iframe-viewer"
+                            title="Xem trước file đã cắt"
+                          />
+                        </div>
+                      ) : (
+                        <div className="ai-image-preview-wrapper">
+                          <img src={slicedFileUrl} alt="Xem trước tệp" className="ai-image-preview" />
+                        </div>
+                      )}
+
+                      <div className="ai-sliced-ready-banner">
+                        <span>✅ Bạn đã kiểm tra file cắt thấy OK ➔ Hãy bấm nút <strong>"Bắt đầu AI Phân tích & Tách từ"</strong> bên dưới để AI tiến hành bóc tách!</span>
                       </div>
                     </div>
                   )}
@@ -1019,17 +1182,31 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                 <button
                   className="ai-btn-analyze"
                   onClick={handleRunAnalysis}
-                  disabled={isAnalyzing}
+                  disabled={isAnalyzing || isSlicing}
                 >
                   {isAnalyzing ? (
                     <>
                       <Loader2 size={18} className="spin" />
                       <span>AI đang bóc tách từ vựng...</span>
                     </>
+                  ) : isSlicing ? (
+                    <>
+                      <Loader2 size={18} className="spin" />
+                      <span>Đang cắt tệp...</span>
+                    </>
+                  ) : activeTab === "file" && selectedFile?.name?.toLowerCase().endsWith(".pdf") && !isSliced ? (
+                    <>
+                      <Scissors size={18} />
+                      <span>Cắt tệp trang {startPage} → {endPage} trước</span>
+                    </>
                   ) : (
                     <>
                       <Sparkles size={18} />
-                      <span>Bắt đầu AI Phân tích & Tách từ</span>
+                      <span>
+                        {activeTab === "file" && isSliced && slicedFileInfo?.pageCount
+                          ? `Bắt đầu AI Phân tích (${slicedFileInfo.pageCount} trang đã cắt)`
+                          : "Bắt đầu AI Phân tích & Tách từ"}
+                      </span>
                     </>
                   )}
                 </button>

@@ -748,6 +748,78 @@ async def ai_extract_vocabulary_from_text(
         )
 
 
+@router.post('/extract-text')
+async def extract_text_from_file_endpoint(
+    file: UploadFile = File(...),
+    start_page: Optional[int] = Form(None),
+    end_page: Optional[int] = Form(None),
+    current_user: User = Depends(require_ai_import_permission)
+):
+    """Trích xuất nội dung văn bản thuần từ tài liệu (PDF, Word, Text) mà KHÔNG gọi AI.
+    Cho phép người dùng xem trước, chỉnh sửa và xác nhận nội dung trước khi tốn token AI.
+    """
+    filename = file.filename or "uploaded_document"
+    allowed_exts = (".pdf", ".docx", ".txt", ".md", ".csv", ".png", ".jpg", ".jpeg", ".webp")
+    if not any(filename.lower().endswith(ext) for ext in allowed_exts):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Định dạng tệp không được hỗ trợ. Vui lòng tải lên tệp: {', '.join(allowed_exts)}"
+        )
+
+    try:
+        content_bytes = await file.read()
+        is_image_file = any(filename.lower().endswith(ext) for ext in (".png", ".jpg", ".jpeg", ".webp"))
+        if is_image_file:
+            return {
+                'success': True,
+                'filename': filename,
+                'is_image': True,
+                'is_scanned': False,
+                'text': '',
+                'word_count': 0,
+                'char_count': 0,
+                'message': 'Tệp hình ảnh - sẽ dùng Gemini Vision OCR khi bấm phân tích AI.'
+            }
+
+        extracted_text = AIVocabService.extract_text_from_file(
+            content_bytes,
+            filename,
+            start_page=start_page,
+            end_page=end_page
+        )
+
+        words = extracted_text.split() if extracted_text else []
+        return {
+            'success': True,
+            'filename': filename,
+            'is_image': False,
+            'is_scanned': False,
+            'text': extracted_text or "",
+            'word_count': len(words),
+            'char_count': len(extracted_text) if extracted_text else 0
+        }
+    except RuntimeError as re:
+        err_msg = str(re)
+        if "không chứa lớp văn bản" in err_msg or "scan" in err_msg.lower():
+            return {
+                'success': True,
+                'filename': filename,
+                'is_image': False,
+                'is_scanned': True,
+                'text': "",
+                'word_count': 0,
+                'char_count': 0,
+                'message': err_msg
+            }
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err_msg)
+    except Exception as e:
+        logger.error(f"Error in extract_text_from_file_endpoint: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Không thể đọc trích xuất tệp: {str(e)}"
+        )
+
+
 @router.post('/ai-extract-file')
 async def ai_extract_vocabulary_from_file(
     file: UploadFile = File(...),

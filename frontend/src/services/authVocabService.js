@@ -525,6 +525,28 @@ export const aiExtractVocabFromText = async (
   return await safeParseResponse(res, "Không thể trích xuất từ vựng qua AI");
 };
 
+export const extractTextFromFile = async (
+  file,
+  token = null,
+  startPage = null,
+  endPage = null
+) => {
+  const headers = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const formData = new FormData();
+  formData.append("file", file);
+  if (startPage) formData.append("start_page", String(startPage));
+  if (endPage) formData.append("end_page", String(endPage));
+
+  const res = await fetch("/api/vocab/extract-text", {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+  return await safeParseResponse(res, "Không thể trích xuất văn bản từ tệp");
+};
+
 export const aiExtractVocabFromFile = async (
   file,
   token = null,
