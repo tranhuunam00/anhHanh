@@ -374,12 +374,43 @@ export const WritingPage = ({ isActive = false }) => {
   };
 
   const handleShufflePrompt = () => {
-    const list = availablePromptsForGenre;
-    if (list.length <= 1) return;
+    // 1. Try prompts matching current sub_type
+    let list = availablePromptsForGenre;
+
+    // 2. If current sub_type only has 1 or 0 prompts, expand to all prompts in the selected genre
+    if (!list || list.length <= 1) {
+      const fullList = currentLangPrompts[selectedGenre] || [];
+      if (fullList.length > 1) {
+        list = fullList;
+      }
+    }
+
+    // 3. If still <= 1 prompt in library
+    if (!list || list.length <= 1) {
+      if (isAuthorized && !isGeneratingPrompt) {
+        showToast("Đang tạo đề bài mới bằng AI...", "info");
+        handleGenerateAIPrompt();
+        return;
+      }
+      showToast("Chỉ có 1 đề mẫu cho dạng này. Hãy bấm 'AI Tạo đề mới'!", "info");
+      return;
+    }
+
+    // 4. Cycle to the next prompt
     const currentIndex = list.findIndex((p) => p.id === currentPrompt?.id);
-    const nextIndex = (currentIndex + 1) % list.length;
-    setCurrentPrompt(list[nextIndex]);
+    let nextIndex = (currentIndex + 1) % list.length;
+    if (nextIndex === currentIndex && list.length > 1) {
+      nextIndex = (currentIndex + 1) % list.length;
+    }
+    const nextPrompt = list[nextIndex];
+    setCurrentPrompt(nextPrompt);
     setIsCustomPrompt(false);
+
+    // If new prompt has a different sub_type and we're not filtering by 'all', adjust selectedSubType
+    if (nextPrompt.sub_type && selectedSubType !== "all" && nextPrompt.sub_type !== selectedSubType) {
+      setSelectedSubType(nextPrompt.sub_type);
+    }
+    showToast(`Đã chuyển sang đề: ${nextPrompt.title || nextPrompt.type || "Đề bài mới"}`, "info");
   };
 
   const handleGenerateAIPrompt = async () => {
@@ -405,6 +436,18 @@ export const WritingPage = ({ isActive = false }) => {
     } finally {
       setIsGeneratingPrompt(false);
     }
+  };
+
+  const handleStartWriting = () => {
+    setContent("");
+    setCurrentSubmissionId(null);
+    setLastSavedAt(null);
+    setHasUnsavedChanges(false);
+    setSecondsElapsed(0);
+    setEvaluationResult(null);
+    setIsTimerRunning(true);
+    textareaRef.current?.focus();
+    showToast("Bắt đầu làm bài! Đồng hồ đã khởi động.", "info");
   };
 
   const handleReset = () => {
@@ -837,25 +880,34 @@ export const WritingPage = ({ isActive = false }) => {
               </div>
             ) : (
               <div className="prompt-body">
-                <div className={`prompt-text ${isPromptCollapsed ? "collapsed" : ""}`}>
-                  "{currentPrompt?.prompt || "Vui lòng chọn hoặc tạo đề bài..."}"
-                </div>
-                {!isPromptCollapsed && selectedGenre === "ielts_task1" && (
-                  <Task1Visualizer
-                    visualData={currentPrompt?.visual_data}
-                    promptData={currentPrompt}
-                    subType={selectedSubType}
-                  />
-                )}
-                {!isPromptCollapsed && currentPrompt?.keywords && currentPrompt.keywords.length > 0 && (
-                  <div className="prompt-keywords-bar">
-                    <span className="keywords-label">Gợi ý từ khóa:</span>
-                    <div className="keywords-list">
-                      {currentPrompt.keywords.map((kw, idx) => (
-                        <span key={idx} className="keyword-chip">{kw}</span>
-                      ))}
-                    </div>
+                {isGeneratingPrompt ? (
+                  <div className="prompt-generating-inline">
+                    <span className="spinner-sm"></span>
+                    <span>AI đang tạo đề bài mới...</span>
                   </div>
+                ) : (
+                  <>
+                    <div className={`prompt-text ${isPromptCollapsed ? "collapsed" : ""}`}>
+                      "{currentPrompt?.prompt || "Vui lòng chọn hoặc tạo đề bài..."}"
+                    </div>
+                    {!isPromptCollapsed && selectedGenre === "ielts_task1" && (
+                      <Task1Visualizer
+                        visualData={currentPrompt?.visual_data}
+                        promptData={currentPrompt}
+                        subType={selectedSubType}
+                      />
+                    )}
+                    {!isPromptCollapsed && currentPrompt?.keywords && currentPrompt.keywords.length > 0 && (
+                      <div className="prompt-keywords-bar">
+                        <span className="keywords-label">Gợi ý từ khóa:</span>
+                        <div className="keywords-list">
+                          {currentPrompt.keywords.map((kw, idx) => (
+                            <span key={idx} className="keyword-chip">{kw}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -914,12 +966,12 @@ export const WritingPage = ({ isActive = false }) => {
                   </div>
                   <button
                     type="button"
-                    className="btn-workspace-clear"
-                    onClick={handleReset}
-                    title="Xóa làm lại bài viết"
+                    className="btn-workspace-start"
+                    onClick={handleStartWriting}
+                    title="Xóa bài cũ, khởi động đồng hồ và bắt đầu viết bài mới"
                   >
-                    <IconRotate size={13} />
-                    <span>Xóa</span>
+                    <IconPen size={13} />
+                    <span>Bắt đầu làm bài</span>
                   </button>
                 </div>
               </div>
@@ -1102,11 +1154,18 @@ export const WritingPage = ({ isActive = false }) => {
                           )}
                           <button
                             type="button"
-                            className="btn-del-history"
-                            onClick={(e) => handleDeleteHistoryItem(item.id, e)}
-                            title="Xóa bài viết khỏi lịch sử"
+                            className="btn-start-history"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectHistoryItem(item);
+                              setIsTimerRunning(true);
+                              setSecondsElapsed(0);
+                              showToast("Đã tải bài viết. Bắt đầu làm bài!", "info");
+                            }}
+                            title="Tải đề này và bắt đầu làm bài"
                           >
-                            <IconTrash size={13} />
+                            <IconPen size={11} />
+                            <span>Làm bài</span>
                           </button>
                         </div>
                         <div className="history-topic-title" title={item.topic}>

@@ -238,6 +238,65 @@ CURATED_PROMPTS_BY_LANG: Dict[str, Dict[str, List[Dict[str, Any]]]] = {
                         ]
                     }
                 }
+            },
+            {
+                "id": "t1_cam15_pie",
+                "title": "Household Energy Consumption & Carbon Emissions (Cambridge 15 Test 3)",
+                "prompt": "The pie charts illustrate the percentage of electricity consumed by different appliances in an average Australian household and the resulting greenhouse gas emissions.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+                "type": "Biểu đồ tròn (Pie Chart)",
+                "sub_type": "pie_chart",
+                "keywords": ["energy consumption", "greenhouse gas emissions", "heating and cooling", "disproportionate share", "water heating"],
+                "min_words": 150,
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "pie_chart",
+                    "title": "Australian Household Electricity Use vs Greenhouse Gas Emissions",
+                    "unit": "%",
+                    "charts": [
+                        {
+                            "label": "Mức tiêu thụ điện (Electricity Use)",
+                            "slices": [
+                                {"name": "Sưởi ấm (Heating)", "value": 42, "color": "#ef4444"},
+                                {"name": "Đun nước nóng (Water heating)", "value": 30, "color": "#f97316"},
+                                {"name": "Tủ lạnh & Thiết bị (Appliances)", "value": 15, "color": "#3b82f6"},
+                                {"name": "Hệ thống làm lạnh (Cooling)", "value": 7, "color": "#06b6d4"},
+                                {"name": "Chiếu sáng (Lighting)", "value": 6, "color": "#eab308"}
+                            ]
+                        },
+                        {
+                            "label": "Khí thải nhà kính (Greenhouse Gas)",
+                            "slices": [
+                                {"name": "Đun nước nóng (Water heating)", "value": 32, "color": "#f97316"},
+                                {"name": "Thiết bị điện (Appliances)", "value": 28, "color": "#3b82f6"},
+                                {"name": "Sưởi ấm (Heating)", "value": 15, "color": "#ef4444"},
+                                {"name": "Chiếu sáng (Lighting)", "value": 8, "color": "#eab308"},
+                                {"name": "Hệ thống làm lạnh (Cooling)", "value": 17, "color": "#06b6d4"}
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "t1_cam12_table",
+                "title": "Consumer Spending on Three Categories in Five Countries (Cambridge 12 Test 5)",
+                "prompt": "The table below shows the percentages of national consumer expenditure on three categories of items in five countries in 2002.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+                "type": "Bảng số liệu (Table)",
+                "sub_type": "table",
+                "keywords": ["consumer expenditure", "food, drinks and tobacco", "clothing and footwear", "leisure and education", "highest proportion"],
+                "min_words": 150,
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "table",
+                    "title": "Percentage of Consumer Expenditure in 5 Countries (2002)",
+                    "columns": ["Quốc gia (Country)", "Lương thực, đồ uống (%)", "Quần áo & Giày dép (%)", "Giải trí & Giáo dục (%)"],
+                    "rows": [
+                        ["Ireland", "28.91%", "6.43%", "2.21%"],
+                        ["Ý (Italy)", "16.36%", "9.00%", "3.20%"],
+                        ["Tây Ban Nha (Spain)", "18.80%", "6.51%", "1.98%"],
+                        ["Thổ Nhĩ Kỳ (Turkey)", "32.14%", "4.37%", "4.35%"],
+                        ["Thụy Điển (Sweden)", "15.77%", "5.40%", "3.22%"]
+                    ]
+                }
             }
         ],
         "email": [
@@ -825,11 +884,15 @@ QUY TẮC BẮT BUỘC:
 - Toàn bộ 'title', 'prompt', 'keywords' PHẢI được viết bằng ngôn ngữ {lang_name} ({cfg['native']}).
 - Đề bài phải mang tính thực tế, văn phong khảo thí chuẩn mực theo định dạng chứng chỉ của ngôn ngữ này ({cfg['system']}).
 
+QUY TẮC ĐỘ DÀI ĐỀ BÀI:
+- Nếu là IELTS Task 2, email, paragraph, free: Đề bài trường "prompt" phải NGẮN GỌN, tối đa 2-3 câu súc tích, đúng format đề thi thật (không dài dòng, không giải thích thêm).
+- Nếu là IELTS Task 1: Đề bài trường "prompt" có thể dài hơn vì cần mô tả số liệu. BẮT BUỘC kèm trường "visual_data" chứa dữ liệu biểu đồ.
+
 Trả về kết quả DUY NHẤT định dạng JSON:
 {{
   "id": "gen_{genre}_{language}_{sub_type or 'custom'}",
   "title": "Tiêu đề ngắn gọn bằng {lang_name}",
-  "prompt": "Nội dung đề bài chi tiết bằng {lang_name} (có kèm số liệu hoặc các bước nếu là Task 1)",
+  "prompt": "Nội dung đề bài bằng {lang_name} (NGẮN GỌN 2-3 câu nếu Task 2/email/paragraph/free; có kèm mô tả số liệu nếu Task 1)",
   "type": "Tên dạng đề bằng Tiếng Việt hoặc {lang_name}",
   "sub_type": "{sub_type or 'general'}",
   "keywords": ["từ khóa 1", "từ khóa 2", "từ khóa 3", "từ khóa 4", "từ khóa 5"],

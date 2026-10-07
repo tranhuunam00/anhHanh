@@ -523,24 +523,24 @@
   outline: none;
 }
 
-.btn-workspace-clear {
+.btn-workspace-start {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  padding: 3px 8px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  color: #fff;
+  padding: 3px 10px;
   border-radius: 6px;
   font-size: 0.75rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.btn-workspace-clear:hover {
-  background: var(--bg-card);
-  color: #ef4444;
-  border-color: #ef4444;
+.btn-workspace-start:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .writing-textarea {
@@ -1158,18 +1158,37 @@
   border-radius: 4px;
 }
 
-.btn-del-history {
+.btn-start-history {
   margin-left: auto;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
   cursor: pointer;
-  padding: 3px;
+  padding: 2px 7px;
   border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
 }
 
-.btn-del-history:hover {
-  color: #ef4444;
+.btn-start-history:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+.prompt-generating-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  justify-content: center;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 .history-topic-title {
