@@ -240,6 +240,83 @@ CURATED_PROMPTS_BY_LANG: Dict[str, Dict[str, List[Dict[str, Any]]]] = {
                 }
             },
             {
+                "id": "t1_cam_lakeside",
+                "title": "Town of Lakeside Redevelopment (Cambridge - 2000 vs 2009)",
+                "prompt": "The two maps show the changes that took place in the town of Lakeside between 2000 and 2009.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+                "type": "Bản đồ / Quy hoạch (Map)",
+                "sub_type": "map",
+                "keywords": ["woodland cleared to construct car park", "industrial complex significantly expanded", "residential area replaced with commercial shopping centre", "derelict warehouses redeveloped into office buildings", "lake contracted into smaller pond"],
+                "min_words": 150,
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "map",
+                    "map_preset": "lakeside",
+                    "image_url": "/images/writing/lakeside_map.png",
+                    "title": "Town of Lakeside Urban Development (2000 vs 2009)",
+                    "period_a": {
+                        "year": "Lake side 2000",
+                        "zones": [
+                            {"area": "North-East", "name": "Woodland & Lake (Hồ nước lớn góc đông bắc)", "status": "existing"},
+                            {"area": "North", "name": "Derelict warehouses (Nhà kho bỏ hoang)", "status": "demolished"},
+                            {"area": "North-West", "name": "Residential area (Khu dân cư phía tây bắc)", "status": "existing"},
+                            {"area": "Center", "name": "Old Town (Phố cổ trung tâm)", "status": "demolished"},
+                            {"area": "Center-West", "name": "Arts Centre & School (Trung tâm nghệ thuật & Trường học)", "status": "converted"},
+                            {"area": "West", "name": "Residential area (Khu nhà ở phía tây)", "status": "demolished"},
+                            {"area": "East", "name": "Industrial complex (Khu công nghiệp quy mô nhỏ)", "status": "expanded"},
+                            {"area": "South", "name": "Residential area (Dãy nhà ở phía nam ven sông)", "status": "existing"}
+                        ]
+                    },
+                    "period_b": {
+                        "year": "Lake side 2009",
+                        "zones": [
+                            {"area": "North-East", "name": "Woodland shrunk & Lake reduced to small Pond", "status": "converted"},
+                            {"area": "North", "name": "Car park & triangular Offices (Bãi đỗ xe & Tòa nhà văn phòng)", "status": "new"},
+                            {"area": "Center", "name": "University campus built (Đại học mới)", "status": "new"},
+                            {"area": "Center-West", "name": "Multi-screen cinema replaced Arts Centre; School retained", "status": "new"},
+                            {"area": "West", "name": "Large Shopping centre replaced residential homes (Trung tâm thương mại lớn)", "status": "new"},
+                            {"area": "East", "name": "Industrial complex doubled in size (Khu công nghiệp mở rộng gấp đôi)", "status": "expanded"},
+                            {"area": "South", "name": "Residential area along southern river unchanged", "status": "existing"}
+                        ]
+                    }
+                }
+            },
+            {
+                "id": "t1_cam_island_resort",
+                "title": "Tropical Island Tourism Resort Development (Cambridge - Before & After)",
+                "prompt": "The two maps show an island before and after the construction of some tourist facilities.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
+                "type": "Bản đồ / Quy hoạch (Map)",
+                "sub_type": "map",
+                "keywords": ["uninhabited island developed into holiday resort", "western and eastern accommodation huts", "pier constructed to receive sailing yachts", "restaurant and central reception building", "footpaths and vehicle tracks connecting facilities"],
+                "min_words": 150,
+                "recommended_time": 20,
+                "visual_data": {
+                    "type": "map",
+                    "map_preset": "island_resort",
+                    "image_url": "/images/writing/island_map.png",
+                    "title": "Tropical Island Tourist Facilities (Before vs After)",
+                    "period_a": {
+                        "year": "Before (Đảo hoang sơ ban đầu)",
+                        "zones": [
+                            {"area": "West", "name": "Natural beach (Bãi cát tự nhiên)", "status": "existing"},
+                            {"area": "North & Center", "name": "Wild palm trees & vegetation (Rặng cọ hoang dã)", "status": "existing"},
+                            {"area": "East", "name": "Open land with scattered palm trees", "status": "existing"},
+                            {"area": "Surroundings", "name": "Open sea with no access infrastructure (Biển bao quanh)", "status": "existing"}
+                        ]
+                    },
+                    "period_b": {
+                        "year": "After (Khu nghỉ dưỡng du lịch hoàn chỉnh)",
+                        "zones": [
+                            {"area": "West", "name": "Designated swimming beach with connecting footpaths", "status": "expanded"},
+                            {"area": "West-Central", "name": "6 accommodation huts around palm trees (Cụm nhà gỗ phía tây)", "status": "new"},
+                            {"area": "Center", "name": "Central Reception building encircled by vehicle track (Nhà đón tiếp)", "status": "new"},
+                            {"area": "North", "name": "Restaurant facility (Nhà hàng phục vụ du khách)", "status": "new"},
+                            {"area": "East", "name": "9 accommodation huts arranged in a circular cluster (Cụm nhà gỗ phía đông)", "status": "new"},
+                            {"area": "South", "name": "Wooden Pier for boats and yachts (Cầu tàu bến du thuyền)", "status": "new"}
+                        ]
+                    }
+                }
+            },
+            {
                 "id": "t1_cam15_pie",
                 "title": "Household Energy Consumption & Carbon Emissions (Cambridge 15 Test 3)",
                 "prompt": "The pie charts illustrate the percentage of electricity consumed by different appliances in an average Australian household and the resulting greenhouse gas emissions.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
