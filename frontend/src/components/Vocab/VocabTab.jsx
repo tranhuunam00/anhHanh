@@ -20,6 +20,7 @@ import {
   Layers,
   Mic,
   CheckCircle2,
+  Pencil,
 } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
