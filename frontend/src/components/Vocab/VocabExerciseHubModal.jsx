@@ -14,6 +14,8 @@ import {
   BookOpen,
   ArrowRight,
   Layers,
+  Target,
+  Lightbulb,
 } from "../Icons";
 import { submitVocabReviewResult, fetchPracticeSession } from "../../services/authVocabService";
 import "./VocabExerciseHubModal.css";
@@ -99,62 +101,105 @@ export default function VocabExerciseHubModal({
     }
   }, []);
 
-  // Helper: Web Audio API synthesis for clean, pleasant correct/wrong SFX
-  const playSoundFeedback = useCallback((isCorrect) => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const now = ctx.currentTime;
-
-      if (isCorrect) {
-        // Bright cheerful ascending chime (D5 -> A5)
-        const osc1 = ctx.createOscillator();
-        const osc2 = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc1.type = "sine";
-        osc2.type = "sine";
-
-        osc1.frequency.setValueAtTime(587.33, now); // D5
-        osc1.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
-
-        osc2.frequency.setValueAtTime(440, now); // A4
-        osc2.frequency.exponentialRampToValueAtTime(659.25, now + 0.12); // E5
-
-        gain.gain.setValueAtTime(0.18, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-
-        osc1.connect(gain);
-        osc2.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + 0.35);
-        osc2.stop(now + 0.35);
-      } else {
-        // Gentle downward buzz for incorrect
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(240, now);
-        osc.frequency.exponentialRampToValueAtTime(140, now + 0.22);
-
-        gain.gain.setValueAtTime(0.22, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.28);
-      }
-    } catch (err) {
-      console.debug("Audio feedback notice:", err);
+// Cached AudioContext for zero-latency instantaneous sound playback
+let cachedAudioCtx = null;
+const getFeedbackAudioCtx = () => {
+  if (!cachedAudioCtx || cachedAudioCtx.state === "closed") {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtx) {
+      cachedAudioCtx = new AudioCtx();
     }
-  }, []);
+  }
+  if (cachedAudioCtx && cachedAudioCtx.state === "suspended") {
+    cachedAudioCtx.resume();
+  }
+  return cachedAudioCtx;
+};
+
+// Helper: Web Audio API synthesis for clean, instantaneous correct/wrong SFX
+const playSoundFeedback = (isCorrect) => {
+  try {
+    const ctx = getFeedbackAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    if (isCorrect) {
+      // ÂM THANH ĐÚNG: Hợp âm sáng đi lên trong trẻo (D5 -> A5 & A4 -> E5)
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc1.type = "sine";
+      osc2.type = "sine";
+
+      osc1.frequency.setValueAtTime(587.33, now); // D5
+      osc1.frequency.exponentialRampToValueAtTime(880, now + 0.1); // A5
+
+      osc2.frequency.setValueAtTime(440, now); // A4
+      osc2.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 0.32);
+      osc2.stop(now + 0.32);
+    } else {
+      // ÂM THANH SAI ĐẶC TRƯNG: 2 nhịp "bụp - bụp" đầm chắc, dứt khoát (Double-tap low thud)
+      // Nhịp 1: 175Hz -> 120Hz (0.07s)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      const filter1 = ctx.createBiquadFilter();
+
+      osc1.type = "sawtooth";
+      filter1.type = "lowpass";
+      filter1.frequency.setValueAtTime(420, now);
+
+      osc1.frequency.setValueAtTime(175, now);
+      osc1.frequency.exponentialRampToValueAtTime(110, now + 0.07);
+
+      gain1.gain.setValueAtTime(0.25, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+      osc1.connect(filter1);
+      filter1.connect(gain1);
+      gain1.connect(ctx.destination);
+
+      osc1.start(now);
+      osc1.stop(now + 0.08);
+
+      // Nhịp 2: 125Hz -> 80Hz sau 0.09s (trầm sâu hơn, dứt khoát)
+      const t2 = now + 0.09;
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      const filter2 = ctx.createBiquadFilter();
+
+      osc2.type = "sawtooth";
+      filter2.type = "lowpass";
+      filter2.frequency.setValueAtTime(380, t2);
+
+      osc2.frequency.setValueAtTime(125, t2);
+      osc2.frequency.exponentialRampToValueAtTime(80, t2 + 0.11);
+
+      gain2.gain.setValueAtTime(0.25, t2);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t2 + 0.13);
+
+      osc2.connect(filter2);
+      filter2.connect(gain2);
+      gain2.connect(ctx.destination);
+
+      osc2.start(t2);
+      osc2.stop(t2 + 0.13);
+    }
+  } catch (err) {
+    console.debug("Audio feedback notice:", err);
+  }
+};
 
   // Generate 4 randomized multiple choice options (1 correct + 3 distinct distractors)
   const mcqOptions = useMemo(() => {
@@ -417,15 +462,16 @@ export default function VocabExerciseHubModal({
                 <div className="ex-format-card active">
                   <div className="ex-format-badge">
                     <span className="ex-pill-badge active">
-                      🎯 Dạng 1 • Chuẩn phương pháp
+                      <Target size={14} />
+                      <span>Dạng 1 • Chuẩn phương pháp</span>
                     </span>
                     <span className="ex-pill-tag">Trắc nghiệm Phản xạ</span>
                   </div>
 
                   <h3 className="ex-format-title">Từ tiếng Anh ➔ Nghĩa tiếng Việt</h3>
                   <p className="ex-format-desc">
-                    Quan sát từ tiếng Anh & phiên âm IPA, suy luận nghĩa tiếng Việt qua 4 phương án.
-                    Có nút <strong>con mắt 👁️ gợi ý câu ngữ cảnh</strong> (mặc định ẩn).
+                    Quan sát từ tiếng Anh &amp; phiên âm IPA, suy luận nghĩa tiếng Việt qua 4 phương án.
+                    Có nút <strong>con mắt gợi ý câu ngữ cảnh</strong> (mặc định ẩn).
                   </p>
 
                   {/* Visual Preview Box */}
@@ -475,7 +521,8 @@ export default function VocabExerciseHubModal({
                     </div>
 
                     <div className="ex-quantity-helper">
-                      💡 Nếu chọn số lượng nhỏ hơn tổng số từ ({totalPoolWords} từ), hệ thống sẽ tự động <strong>random ngẫu nhiên</strong> từ trong Sổ tay của bạn.
+                      <Lightbulb size={14} style={{ verticalAlign: "middle", marginRight: 4, flexShrink: 0 }} />
+                      <span>Nếu chọn số lượng nhỏ hơn tổng số từ ({totalPoolWords} từ), hệ thống sẽ tự động <strong>random ngẫu nhiên</strong> từ trong Sổ tay của bạn.</span>
                     </div>
                   </div>
 
@@ -659,7 +706,8 @@ export default function VocabExerciseHubModal({
         <div className="ex-mode-banner">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <span className="ex-mode-tag">
-              🎯 Dạng 1: Trắc nghiệm Từ ➔ Nghĩa
+              <Target size={14} />
+              <span>Dạng 1: Trắc nghiệm Từ ➔ Nghĩa</span>
             </span>
           </div>
           <div className="ex-counter-tag">
@@ -762,7 +810,8 @@ export default function VocabExerciseHubModal({
 
             {/* Keyboard shortcut tip */}
             <div className="ex-keyboard-hint">
-              <span>💡 Mẹo: Bấm <strong>1, 2, 3, 4</strong> để chọn • <strong>Ctrl</strong> nghe lại • <strong>Esc</strong> bật/tắt gợi ý</span>
+              <Lightbulb size={14} style={{ verticalAlign: "middle", marginRight: 4 }} />
+              <span>Mẹo: Bấm <strong>1, 2, 3, 4</strong> để chọn • <strong>Ctrl</strong> nghe lại • <strong>Esc</strong> bật/tắt gợi ý</span>
             </div>
           </div>
         </div>

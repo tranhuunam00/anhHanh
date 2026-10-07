@@ -614,6 +614,7 @@ export const FileCheck = IconFileCheck;
 export const FileText = IconFileText;
 export const AlertCircle = IconAlert;
 export const Globe = IconGlobe;
+export const Lightbulb = IconLightbulb;
 
 
 
