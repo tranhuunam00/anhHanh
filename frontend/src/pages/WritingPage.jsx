@@ -50,6 +50,25 @@ const GENRES = [
   { id: "free", label: "Viết tự do", sub: "Nhật ký / Ý kiến cá nhân", minWords: 50, defaultTime: 20 },
 ];
 
+export const TASK1_SUBTYPES = [
+  { id: "all", label: "Tất cả dạng" },
+  { id: "line_graph", label: "Biểu đồ đường (Line)" },
+  { id: "bar_chart", label: "Biểu đồ cột (Bar)" },
+  { id: "pie_chart", label: "Biểu đồ tròn (Pie)" },
+  { id: "table", label: "Bảng số liệu (Table)" },
+  { id: "process", label: "Quy trình (Process)" },
+  { id: "map", label: "Bản đồ / Quy hoạch (Map)" },
+];
+
+export const TASK2_SUBTYPES = [
+  { id: "all", label: "Tất cả dạng" },
+  { id: "opinion", label: "Agree / Disagree" },
+  { id: "discussion", label: "Discuss Both Views" },
+  { id: "causes_solutions", label: "Causes & Solutions" },
+  { id: "advantages_disadvantages", label: "Advantages & Disadvantages" },
+  { id: "two_part", label: "Two-part Question" },
+];
+
 const TARGET_BANDS = [
   { value: 6.0, label: "Band 6.0 (Competent)" },
   { value: 6.5, label: "Band 6.5 (Upper Intermediate)" },
@@ -80,6 +99,7 @@ export const WritingPage = ({ isActive = false }) => {
   // Prompt library and selection state
   const [promptsLibrary, setPromptsLibrary] = useState({});
   const [selectedGenre, setSelectedGenre] = useState("ielts_task2");
+  const [selectedSubType, setSelectedSubType] = useState("all");
   const [targetBand, setTargetBand] = useState(7.0);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [currentPrompt, setCurrentPrompt] = useState(null);
@@ -102,6 +122,7 @@ export const WritingPage = ({ isActive = false }) => {
   const [structuresTab, setStructuresTab] = useState("ai_topic"); // "ai_topic" | "general"
   const [aiTopicStructures, setAiTopicStructures] = useState([]);
   const [isLoadingAiStructures, setIsLoadingAiStructures] = useState(false);
+  const [aiKindFilter, setAiKindFilter] = useState("all"); // "all" | "collocation" | "structure"
   const [structureSearch, setStructureSearch] = useState("");
   const [structureBandFilter, setStructureBandFilter] = useState("all");
   const [structureCategoryFilter, setStructureCategoryFilter] = useState("all");
@@ -121,25 +142,48 @@ export const WritingPage = ({ isActive = false }) => {
   const timerRef = useRef(null);
   const textareaRef = useRef(null);
 
+  // Get prompt library slice for current language
+  const currentLangPrompts = useMemo(() => {
+    if (!promptsLibrary) return {};
+    if (promptsLibrary[selectedLanguage]) return promptsLibrary[selectedLanguage];
+    if (promptsLibrary.en) return promptsLibrary.en;
+    return promptsLibrary;
+  }, [promptsLibrary, selectedLanguage]);
+
+  // Available prompts for current genre and sub-type
+  const availablePromptsForGenre = useMemo(() => {
+    const list = currentLangPrompts[selectedGenre] || [];
+    if (!list || list.length === 0) return [];
+    if (selectedSubType === "all") return list;
+    const filtered = list.filter((p) => p.sub_type === selectedSubType);
+    return filtered.length > 0 ? filtered : list;
+  }, [currentLangPrompts, selectedGenre, selectedSubType]);
+
   // Load prompts on mount
   useEffect(() => {
     const loadPrompts = async () => {
       const data = await fetchWritingPrompts();
-      setPromptsLibrary(data);
-      if (data && data.ielts_task2 && data.ielts_task2.length > 0) {
-        setCurrentPrompt(data.ielts_task2[0]);
+      setPromptsLibrary(data || {});
+      const initialSlice = data?.en || data || {};
+      if (initialSlice && initialSlice.ielts_task2 && initialSlice.ielts_task2.length > 0) {
+        setCurrentPrompt(initialSlice.ielts_task2[0]);
       }
     };
     loadPrompts();
   }, []);
 
-  // When changing genre, pick the first prompt of that genre
+  // When changing genre, pick the matching prompt of that genre & sub-type
   useEffect(() => {
-    if (promptsLibrary && promptsLibrary[selectedGenre] && promptsLibrary[selectedGenre].length > 0) {
-      setCurrentPrompt(promptsLibrary[selectedGenre][0]);
+    if (currentLangPrompts && currentLangPrompts[selectedGenre] && currentLangPrompts[selectedGenre].length > 0) {
+      if (selectedSubType === "all") {
+        setCurrentPrompt(currentLangPrompts[selectedGenre][0]);
+      } else {
+        const match = currentLangPrompts[selectedGenre].find((p) => p.sub_type === selectedSubType);
+        setCurrentPrompt(match || currentLangPrompts[selectedGenre][0]);
+      }
       setIsCustomPrompt(false);
     }
-  }, [selectedGenre, promptsLibrary]);
+  }, [selectedGenre, currentLangPrompts, selectedSubType]);
 
   // Load history immediately on mount / when token becomes available
   useEffect(() => {
@@ -223,8 +267,34 @@ export const WritingPage = ({ isActive = false }) => {
     return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
+  const handleLanguageChange = (newLang) => {
+    setSelectedLanguage(newLang);
+    setAiTopicStructures([]);
+    setSelectedSubType("all");
+    setIsCustomPrompt(false);
+    const langDict = promptsLibrary?.[newLang] || promptsLibrary?.en || promptsLibrary || {};
+    const genreList = langDict[selectedGenre] || [];
+    if (genreList.length > 0) {
+      setCurrentPrompt(genreList[0]);
+    }
+  };
+
+  const handleSelectSubType = (subId) => {
+    setSelectedSubType(subId);
+    setIsCustomPrompt(false);
+    const list = currentLangPrompts[selectedGenre] || [];
+    if (subId === "all") {
+      if (list.length > 0) setCurrentPrompt(list[0]);
+    } else {
+      const match = list.find((p) => p.sub_type === subId);
+      if (match) {
+        setCurrentPrompt(match);
+      }
+    }
+  };
+
   const handleShufflePrompt = () => {
-    const list = promptsLibrary[selectedGenre] || [];
+    const list = availablePromptsForGenre;
     if (list.length <= 1) return;
     const currentIndex = list.findIndex((p) => p.id === currentPrompt?.id);
     const nextIndex = (currentIndex + 1) % list.length;
@@ -239,11 +309,16 @@ export const WritingPage = ({ isActive = false }) => {
     }
     setIsGeneratingPrompt(true);
     try {
-      const p = await generateWritingPrompt({ genre: selectedGenre, language: selectedLanguage, token });
+      const p = await generateWritingPrompt({
+        genre: selectedGenre,
+        language: selectedLanguage,
+        subType: selectedSubType !== "all" ? selectedSubType : null,
+        token
+      });
       if (p) {
         setCurrentPrompt(p);
         setIsCustomPrompt(false);
-        showToast(`Đã tạo đề bài mới (${currentLangObj.label}) thành công!`, "success");
+        showToast(`Đã tạo đề bài mới (${p.type || currentGenreObj.label}) thành công!`, "success");
       }
     } catch (e) {
       showToast(e.message || "Lỗi khi tạo đề bài AI", "error");
@@ -551,10 +626,7 @@ export const WritingPage = ({ isActive = false }) => {
             <select
               className="language-select-dropdown"
               value={selectedLanguage}
-              onChange={(e) => {
-                setSelectedLanguage(e.target.value);
-                setAiTopicStructures([]);
-              }}
+              onChange={(e) => handleLanguageChange(e.target.value)}
             >
               {LANGUAGES.map((lang) => (
                 <option key={lang.id} value={lang.id}>
@@ -590,7 +662,13 @@ export const WritingPage = ({ isActive = false }) => {
                 className={`genre-btn ${selectedGenre === g.id ? "active" : ""}`}
                 onClick={() => {
                   setSelectedGenre(g.id);
+                  setSelectedSubType("all");
                   setEvaluationResult(null);
+                  setIsCustomPrompt(false);
+                  const list = currentLangPrompts[g.id] || [];
+                  if (list.length > 0) {
+                    setCurrentPrompt(list[0]);
+                  }
                 }}
               >
                 <span className="genre-btn-label">{g.label}</span>
@@ -598,6 +676,27 @@ export const WritingPage = ({ isActive = false }) => {
               </button>
             ))}
           </div>
+
+          {/* Sub-type filter pills for Task 1 and Task 2 */}
+          {(selectedGenre === "ielts_task1" || selectedGenre === "ielts_task2") && (
+            <div className="writing-subtype-bar">
+              <span className="subtype-bar-label">
+                {selectedGenre === "ielts_task1" ? "Dạng Task 1:" : "Dạng Task 2:"}
+              </span>
+              <div className="subtype-pills-list">
+                {(selectedGenre === "ielts_task1" ? TASK1_SUBTYPES : TASK2_SUBTYPES).map((st) => (
+                  <button
+                    key={st.id}
+                    type="button"
+                    className={`subtype-pill-btn ${selectedSubType === st.id ? "active" : ""}`}
+                    onClick={() => handleSelectSubType(st.id)}
+                  >
+                    {st.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Prompt card */}
           <div className="writing-prompt-card">
@@ -1167,26 +1266,48 @@ export const WritingPage = ({ isActive = false }) => {
 
             {structuresTab === "ai_topic" ? (
               <>
-                <div style={{ padding: "12px 24px", background: "var(--bg-card)", borderBottom: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "var(--text-muted)" }}>
+                <div style={{ padding: "12px 24px", background: "var(--bg-card)", borderBottom: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "var(--text-muted)", flex: 1, minWidth: "260px" }}>
                     <span style={{ fontWeight: 700, color: "var(--text-primary)" }}>Đề bài:</span>
-                    <span style={{ maxWidth: "420px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontStyle: "italic" }}>
+                    <span style={{ maxWidth: "340px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontStyle: "italic" }}>
                       "{effectivePromptText || "Chưa có đề bài"}"
                     </span>
                     <span style={{ fontSize: "0.72rem", background: "var(--bg-secondary)", padding: "2px 8px", borderRadius: "12px", border: "1px solid var(--border-color)", fontWeight: 700 }}>
                       {currentLangObj.flag} {currentLangObj.label}
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    className="btn-workspace-ai-suggest"
-                    onClick={handleAiSuggestStructures}
-                    disabled={isLoadingAiStructures || !isAuthorized || !effectivePromptText}
-                    style={{ padding: "5px 12px", fontSize: "0.8rem" }}
-                  >
-                    <IconRotate size={13} />
-                    <span>{isLoadingAiStructures ? "Đang phân tích..." : "AI phân tích lại"}</span>
-                  </button>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                    {aiTopicStructures.length > 0 && (
+                      <div className="band-filter-pills" style={{ margin: 0 }}>
+                        {[
+                          { id: "all", label: `Tất cả (${aiTopicStructures.length})` },
+                          { id: "collocation", label: `Cụm từ (${aiTopicStructures.filter(x => x.kind === "collocation").length})` },
+                          { id: "structure", label: `Khung câu (${aiTopicStructures.filter(x => x.kind === "structure").length})` },
+                        ].map((btn) => (
+                          <button
+                            key={btn.id}
+                            type="button"
+                            className={`band-filter-btn ${aiKindFilter === btn.id ? "active" : ""}`}
+                            onClick={() => setAiKindFilter(btn.id)}
+                            style={{ padding: "3px 10px", fontSize: "0.76rem" }}
+                          >
+                            {btn.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      className="btn-workspace-ai-suggest"
+                      onClick={handleAiSuggestStructures}
+                      disabled={isLoadingAiStructures || !isAuthorized || !effectivePromptText}
+                      style={{ padding: "5px 12px", fontSize: "0.8rem" }}
+                    >
+                      <IconRotate size={13} />
+                      <span>{isLoadingAiStructures ? "Đang phân tích..." : "AI phân tích lại"}</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="structures-modal-body">
@@ -1197,7 +1318,7 @@ export const WritingPage = ({ isActive = false }) => {
                         Gemini AI đang phân tích đề bài...
                       </p>
                       <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", margin: 0 }}>
-                        Đang chọn lọc collocations sát đề, câu mở đoạn, lập luận & phản biện chuẩn học thuật {currentLangObj.system}
+                        Đang chọn lọc collocations đắt giá & khung câu học thuật {currentLangObj.system}
                       </p>
                     </div>
                   ) : aiTopicStructures.length === 0 ? (
@@ -1207,7 +1328,7 @@ export const WritingPage = ({ isActive = false }) => {
                         Chưa có gợi ý AI riêng cho đề bài này
                       </h4>
                       <p style={{ margin: "0 0 20px 0", fontSize: "0.86rem", maxWidth: "460px", marginLeft: "auto", marginRight: "auto", lineHeight: 1.5 }}>
-                        Bấm nút bên dưới để Gemini AI đọc đề bài ({currentLangObj.label}), trích xuất các luận điểm cốt lõi và gợi ý ngay các cụm từ & cấu trúc câu sắc bén nhất.
+                        Bấm nút bên dưới để Gemini AI đọc đề bài ({currentLangObj.label}), trích xuất cụm từ (collocations) & khung cấu trúc câu sắc bén nhất.
                       </p>
                       <button
                         type="button"
@@ -1221,44 +1342,73 @@ export const WritingPage = ({ isActive = false }) => {
                       </button>
                     </div>
                   ) : (
-                    aiTopicStructures.map((item, idx) => (
-                      <div key={idx} className="structure-card-item">
-                        <div className="structure-card-top">
-                          <span className="structure-band-tag band8">
-                            {item.band || `Target ${targetBand}`}
-                          </span>
-                          <span style={{ fontSize: "0.74rem", color: "#ec4899", textTransform: "uppercase", fontWeight: 700, background: "rgba(236, 72, 153, 0.1)", padding: "2px 8px", borderRadius: "4px" }}>
-                            {item.type || "Cấu trúc gợi ý"}
-                          </span>
-                        </div>
-                        <div className="structure-phrase-text">{item.phrase}</div>
-                        <div className="structure-meaning-text">{item.meaning}</div>
-                        {item.usage && <div className="structure-usage-note">{item.usage}</div>}
-                        <div className="structure-actions-row">
-                          <button
-                            type="button"
-                            className="btn-copy-structure"
-                            onClick={() => {
-                              navigator.clipboard.writeText(item.template || item.phrase);
-                              showToast("Đã sao chép cấu trúc!", "success");
-                            }}
-                            title="Sao chép vào clipboard"
-                          >
-                            <IconCopy size={13} />
-                            <span>Sao chép</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-insert-structure"
-                            onClick={() => handleInsertPhrase(item.template || item.phrase)}
-                            title="Chèn ngay vào con trỏ bài viết"
-                          >
-                            <IconPlus size={13} />
-                            <span>Chèn vào bài</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))
+                    (() => {
+                      const displayedItems = aiTopicStructures.filter((item) => {
+                        if (aiKindFilter === "collocation") return item.kind === "collocation";
+                        if (aiKindFilter === "structure") return item.kind === "structure";
+                        return true;
+                      });
+
+                      if (displayedItems.length === 0) {
+                        return (
+                          <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
+                            <p>Không có mục nào phù hợp trong danh mục được chọn.</p>
+                          </div>
+                        );
+                      }
+
+                      return displayedItems.map((item, idx) => {
+                        const isCollocation = item.kind === "collocation";
+                        const phraseParts = String(item.phrase || "").split(/(\[[^\]]*\])/g);
+
+                        return (
+                          <div key={idx} className="structure-card-item">
+                            <div className="structure-card-top">
+                              <span className={`structure-band-tag ${item.band || "band8"}`}>
+                                {item.band === "band8" ? "Band 8.0 - 9.0" : item.band === "band7" ? "Band 7.0 - 7.5" : "Band 6.0 - 6.5"}
+                              </span>
+                              <span className={`structure-kind-tag ${isCollocation ? "collocation" : "structure"}`}>
+                                {isCollocation ? "Cụm từ sát đề" : "Khung cấu trúc câu"}
+                              </span>
+                            </div>
+                            <div className="structure-phrase-text">
+                              {phraseParts.map((part, pIdx) =>
+                                part.startsWith("[") && part.endsWith("]") ? (
+                                  <span key={pIdx} className="placeholder-slot">{part}</span>
+                                ) : (
+                                  part
+                                )
+                              )}
+                            </div>
+                            <div className="structure-meaning-text">{item.meaning}</div>
+                            {item.usage && <div className="structure-usage-note">{item.usage}</div>}
+                            <div className="structure-actions-row">
+                              <button
+                                type="button"
+                                className="btn-copy-structure"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(item.template || item.phrase);
+                                  showToast(isCollocation ? "Đã sao chép cụm từ!" : "Đã sao chép khung cấu trúc!", "success");
+                                }}
+                                title="Sao chép vào clipboard"
+                              >
+                                <IconCopy size={13} />
+                                <span>Sao chép</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-insert-structure"
+                                onClick={() => handleInsertPhrase(item.template || item.phrase)}
+                                title="Chèn ngay vào con trỏ bài viết"
+                              >
+                                <IconPlus size={13} />
+                                <span>{isCollocation ? "Chèn cụm từ" : "Chèn khung câu"}</span>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()
                   )}
                 </div>
               </>

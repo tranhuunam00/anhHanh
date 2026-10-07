@@ -48,6 +48,7 @@ class GeneratePromptRequest(BaseModel):
     genre: Optional[str] = Field(default="ielts_task2")
     topic_area: Optional[str] = Field(default=None)
     language: Optional[str] = Field(default="en", description="Ngôn ngữ đề bài")
+    sub_type: Optional[str] = Field(default=None, description="Dạng đề chi tiết (line_graph, bar_chart, process, map, opinion, discussion...)")
 
 
 class SuggestStructuresRequest(BaseModel):
@@ -58,11 +59,11 @@ class SuggestStructuresRequest(BaseModel):
 
 
 @router.get("/prompts")
-async def get_writing_prompts():
-    """Retrieve curated library of writing prompts grouped by genre (Free for all users)."""
+async def get_writing_prompts(language: Optional[str] = Query(default=None)):
+    """Retrieve curated library of writing prompts grouped by genre and language (Free for all users)."""
     return {
         "success": True,
-        "prompts": AIWritingService.get_prompts_library()
+        "prompts": AIWritingService.get_prompts_library(language=language)
     }
 
 
@@ -134,7 +135,8 @@ async def generate_custom_prompt(
         prompt_data = await AIWritingService.generate_prompt(
             genre=body.genre or "ielts_task2",
             topic_area=body.topic_area,
-            language=body.language or "en"
+            language=body.language or "en",
+            sub_type=body.sub_type
         )
         return {
             "success": True,

@@ -14,9 +14,10 @@ const safeParseResponse = async (res, defaultMsg = "Thao tác thất bại") => 
   return data;
 };
 
-export const fetchWritingPrompts = async () => {
+export const fetchWritingPrompts = async (language = null) => {
   try {
-    const res = await fetch("/api/writing/prompts");
+    const url = language ? `/api/writing/prompts?language=${encodeURIComponent(language)}` : "/api/writing/prompts";
+    const res = await fetch(url);
     const data = await safeParseResponse(res, "Không thể tải danh sách đề bài");
     return data.prompts || {};
   } catch (e) {
@@ -25,7 +26,7 @@ export const fetchWritingPrompts = async () => {
   }
 };
 
-export const generateWritingPrompt = async ({ genre, topicArea, language = "en", token }) => {
+export const generateWritingPrompt = async ({ genre, topicArea, language = "en", subType, token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -34,7 +35,7 @@ export const generateWritingPrompt = async ({ genre, topicArea, language = "en",
   const res = await fetch("/api/writing/generate-prompt", {
     method: "POST",
     headers,
-    body: JSON.stringify({ genre, topic_area: topicArea, language }),
+    body: JSON.stringify({ genre, topic_area: topicArea, language, sub_type: subType }),
   });
 
   const data = await safeParseResponse(res, "Không thể tạo đề bài AI mới");
