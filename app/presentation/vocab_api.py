@@ -751,10 +751,13 @@ async def ai_extract_vocabulary_from_file(
     file: UploadFile = File(...),
     start_page: Optional[int] = Form(None),
     end_page: Optional[int] = Form(None),
+    source_lang: Optional[str] = Form("en"),
+    target_lang: Optional[str] = Form("vi"),
     current_user: User = Depends(require_ai_import_permission)
 ):
     """AI Vocabulary Extraction directly from uploaded PDF, Word DOCX, or text file.
     Supports optional page range selection (start_page to end_page) for PDF files.
+    Backend file size is strictly capped at 5MB to preserve server memory and bandwidth.
     Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrang.
     """
     filename = file.filename or "uploaded_document"
@@ -767,10 +770,11 @@ async def ai_extract_vocabulary_from_file(
 
     try:
         content_bytes = await file.read()
-        if len(content_bytes) > 25 * 1024 * 1024:  # 25MB max
+        max_bytes = 5 * 1024 * 1024  # 5MB max on BE
+        if len(content_bytes) > max_bytes:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Kích thước tệp vượt quá giới hạn cho phép (tối đa 25MB)."
+                detail="Kích thước tệp gửi lên máy chủ vượt quá giới hạn 5MB. Với tệp PDF lớn (hỗ trợ đến 500MB), vui lòng sử dụng tính năng trích xuất trang trực tiếp trên trình duyệt."
             )
 
         extracted_text = AIVocabService.extract_text_from_file(
@@ -787,13 +791,14 @@ async def ai_extract_vocabulary_from_file(
 
         items = await AIVocabService.extract_vocabulary(
             text=extracted_text,
-            source_lang="en",
-            target_lang="vi",
+            source_lang=source_lang or "en",
+            target_lang=target_lang or "vi",
             mode="auto"
         )
         return {
             'success': True,
             'filename': filename,
+            'source_lang': source_lang or "en",
             'raw_text_length': len(extracted_text),
             'items': items,
             'total': len(items),
