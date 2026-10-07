@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Volume2, Sparkles, Check, BookmarkCheck, X, BookOpen, CheckCircle2 } from "lucide-react";
+import { IconVolume, IconSparkles, IconBookmark, IconClose, IconCheckCircle } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import { quickLookupWord, playPronunciationAudio, createVocabWord, updateVocabStatus } from "../../services/authVocabService";
 
@@ -184,7 +184,7 @@ export const WordLookupPopover = ({
       };
 
       const res = await createVocabWord(payload, token);
-      showToast(`✨ Đã lưu "${cleanWord}" vào Sổ tay!`, "success");
+      showToast(`Đã lưu "${cleanWord}" vào Sổ tay!`, "success");
       refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
 
@@ -269,7 +269,7 @@ export const WordLookupPopover = ({
             title="Phát âm giọng Anh - Anh (UK)"
           >
             <span className="accent-label">UK</span>
-            <Volume2 size={14} className={activeAudio === "uk" ? "pulse-anim" : ""} />
+            <IconVolume size={14} className={activeAudio === "uk" ? "pulse-anim" : ""} />
           </button>
 
           <button
@@ -279,11 +279,11 @@ export const WordLookupPopover = ({
             title="Phát âm giọng Anh - Mỹ (US)"
           >
             <span className="accent-label">US</span>
-            <Volume2 size={14} className={activeAudio === "us" ? "pulse-anim" : ""} />
+            <IconVolume size={14} className={activeAudio === "us" ? "pulse-anim" : ""} />
           </button>
 
           <button type="button" className="lookup-close-btn" onClick={onClose} title="Đóng (Esc)">
-            <X size={15} />
+            <IconClose size={15} />
           </button>
         </div>
       </div>
@@ -333,7 +333,7 @@ export const WordLookupPopover = ({
         {isSaved ? (
           <div className="lookup-saved-bar">
             <div className="saved-indicator-group">
-              <BookmarkCheck size={16} className="text-emerald-500" />
+              <IconBookmark size={16} className="text-emerald-500" />
               <span className="saved-text">Đã có trong Sổ tay</span>
               {statusConfig && (
                 <span
@@ -354,7 +354,7 @@ export const WordLookupPopover = ({
             onClick={handleSaveToNotebook}
             disabled={isSaving || loading}
           >
-            <Sparkles size={14} />
+            <IconSparkles size={14} />
             <span>{isSaving ? "Đang lưu..." : "Lưu vào Sổ tay"}</span>
           </button>
         )}

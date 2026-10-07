@@ -114,9 +114,9 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
                 <div className="guide-step-item">
                   <div className="guide-step-num">2</div>
                   <div className="guide-step-text">
-                    <h4>Bấm nút "✨ Lưu từ"</h4>
+                    <h4>Bấm nút "Lưu từ"</h4>
                     <p>
-                      Nút nổi thông minh <strong>✨ Lưu [từ đã chọn]</strong> sẽ lập tức xuất hiện ngay phía trên con trỏ chuột. Nhấp vào nút đó để lưu ngay.
+                      Nút nổi thông minh <strong>Lưu [từ đã chọn]</strong> sẽ lập tức xuất hiện ngay phía trên con trỏ chuột. Nhấp vào nút đó để lưu ngay.
                     </p>
                   </div>
                 </div>
@@ -135,7 +135,7 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
 
               {/* Interactive Demo */}
               <div className="guide-demo-card">
-                <span>👉 <strong>Thử nghiệm ngay:</strong> Hãy dùng chuột quét chọn (bôi đen) từ này 👉</span>
+                <span><strong>Thử nghiệm ngay:</strong> Hãy dùng chuột quét chọn (bôi đen) từ này:</span>
                 <mark
                   style={{
                     background: "#fef08a",
@@ -150,7 +150,7 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
                   extraordinary
                 </mark>
                 <span style={{ fontSize: "0.82rem", color: "var(--text-muted, #64748b)" }}>
-                  để thấy nút "✨ Lưu từ" nổi lên ngay lập tức!
+                  để thấy nút "Lưu từ" nổi lên ngay lập tức!
                 </span>
               </div>
 

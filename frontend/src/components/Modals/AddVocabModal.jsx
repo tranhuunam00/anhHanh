@@ -68,7 +68,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
         setImgLoadError(false);
       }
 
-      showToast(`✨ Đã tự động điền phiên âm, dịch & ảnh cho "${clean}"!`, "success");
+      showToast(`Đã tự động điền phiên âm, dịch & ảnh cho "${clean}"!`, "success");
     } catch (e) {
       console.warn("Auto enrich failed:", e);
       showToast("Không thể tự động tra cứu, bạn hãy nhập thủ công nhé", "warning");
@@ -128,7 +128,7 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
         token
       );
 
-      showToast(`✨ Đã thêm "${cleanWord}" vào Sổ tay từ vựng!`, "success");
+      showToast(`Đã thêm "${cleanWord}" vào Sổ tay từ vựng!`, "success");
       setWord("");
       setPhonetic("");
       setMeaning("");

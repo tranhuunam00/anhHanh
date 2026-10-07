@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { IconSparkles } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import { createVocabWord } from "../../services/authVocabService";
 import { splitContextSentence } from "../../utils/textNormalizer";
@@ -112,7 +113,7 @@ export const FloatingVocabSaver = ({
         },
         token
       );
-      showToast(`✨ Đã lưu "${selectedWord}" vào Sổ tay từ vựng!`, "success");
+      showToast(`Đã lưu "${selectedWord}" vào Sổ tay từ vựng!`, "success");
       refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
       setPosition(null);
@@ -138,7 +139,7 @@ export const FloatingVocabSaver = ({
       onClick={handleSave}
       disabled={isSaving}
     >
-      <span>✨</span>
+      <IconSparkles size={14} />
       <span>{isSaving ? "Đang lưu..." : `Lưu "${selectedWord}"`}</span>
     </button>
   );

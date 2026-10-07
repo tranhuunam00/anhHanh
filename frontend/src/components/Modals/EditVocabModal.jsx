@@ -93,7 +93,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
         }
       }
 
-      showToast(`✨ Đã tự động cập nhật phiên âm & dịch cho "${clean}"!`, "success");
+      showToast(`Đã tự động cập nhật phiên âm & dịch cho "${clean}"!`, "success");
     } catch (e) {
       console.warn("Auto enrich failed:", e);
       showToast("Không thể tự động tra cứu, hãy nhập thủ công nhé", "warning");
@@ -148,7 +148,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
 
       const res = await updateVocabWord(vocab.id, updatePayload, token);
 
-      showToast(`✨ Đã cập nhật từ "${cleanWord}" thành công!`, "success");
+      showToast(`Đã cập nhật từ "${cleanWord}" thành công!`, "success");
       if (refreshStreak) refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
       if (onSuccess) onSuccess(res?.vocab);

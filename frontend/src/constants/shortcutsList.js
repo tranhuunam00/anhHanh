@@ -8,5 +8,5 @@ export const SHORTCUTS_LIST = [
   { key: "~ hoặc ` (dấu huyền) / Ctrl+H / Enter 2 lần", action: "Gợi ý 1 ký tự (chữ) tiếp theo" },
   { key: "Ctrl + Shift + H / Alt + W", action: "Gợi ý 1 từ tiếp theo" },
   { key: "Esc", action: "Bỏ qua câu hiện tại (tự điền đáp án chuẩn)" },
-  { key: "Bôi đen từ bất kỳ", action: "Hiện nút nổi ✨ Lưu từ vào Sổ tay (+ AI tra nghĩa & ảnh)" },
+  { key: "Bôi đen từ bất kỳ", action: "Hiện nút nổi Lưu từ vào Sổ tay (+ AI tra nghĩa & ảnh)" },
 ];

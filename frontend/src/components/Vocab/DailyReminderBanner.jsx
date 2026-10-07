@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Flame, Bell, X, ArrowRight, Sparkles } from "lucide-react";
+import { IconFlame, IconSparkles, IconClose } from "../Icons";
 import {
   getTodayDateString,
   isVocabStudiedToday,
@@ -92,11 +92,11 @@ export const DailyReminderBanner = ({ onOpenExercise, onOpenVocabTab }) => {
     <div className="daily-reminder-toast animate-slide-up" role="alert">
       <div className="daily-reminder-toast-content">
         <div className="daily-reminder-icon-badge">
-          <Flame size={20} className="flame-icon-pulse" />
+          <IconFlame size={20} className="flame-icon-pulse" />
         </div>
         <div className="daily-reminder-text">
           <div className="daily-reminder-title">
-            <span>🔥 Giữ chuỗi Streak hôm nay!</span>
+            <span>Giữ chuỗi Streak hôm nay!</span>
             <span className="daily-reminder-tag">Nhắc nhở học tập</span>
           </div>
           <div className="daily-reminder-desc">
@@ -109,16 +109,15 @@ export const DailyReminderBanner = ({ onOpenExercise, onOpenVocabTab }) => {
           className="btn-reminder-practice"
           onClick={handleStartPractice}
         >
-          <Sparkles size={14} />
+          <IconSparkles size={14} />
           <span>Luyện ngay</span>
-          <ArrowRight size={14} />
         </button>
         <button
           className="btn-reminder-close"
           onClick={handleDismiss}
           title="Để sau hôm nay"
         >
-          <X size={16} />
+          <IconClose size={15} />
         </button>
       </div>
     </div>

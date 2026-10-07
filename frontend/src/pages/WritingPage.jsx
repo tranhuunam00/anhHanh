@@ -1,29 +1,24 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
-  PenTool,
-  Sparkles,
-  BookOpen,
-  Clock,
-  RotateCcw,
-  Send,
-  CheckCircle2,
-  AlertTriangle,
-  Lightbulb,
-  Copy,
-  Plus,
-  Trash2,
-  ChevronRight,
-  History,
-  Shield,
-  Layers,
-  ArrowRight,
-  X,
-  FileText,
-  TrendingUp,
-  BookmarkCheck,
-  Search,
-  Globe,
-} from "lucide-react";
+  IconPen,
+  IconSparkles,
+  IconBook,
+  IconClock,
+  IconRotate,
+  IconCheckCircle,
+  IconAlert,
+  IconCopy,
+  IconPlus,
+  IconTrash,
+  IconHistory,
+  IconShield,
+  IconArrowRight,
+  IconClose,
+  IconFile,
+  IconBookmark,
+  IconSearch,
+  IconGlobe,
+} from "../components/Icons";
 import { useAuth } from "../context/AuthContext";
 import {
   fetchWritingPrompts,
@@ -533,7 +528,7 @@ export const WritingPage = ({ isActive = false }) => {
       <div className="writing-header">
         <div className="writing-header-left">
           <div className="writing-badge-icon">
-            <PenTool size={22} />
+            <IconPen size={20} />
           </div>
           <div>
             <h1 className="writing-title">Luyện Viết Học Thuật AI ({currentLangObj.label})</h1>
@@ -546,7 +541,7 @@ export const WritingPage = ({ isActive = false }) => {
         <div className="writing-header-right">
           {/* Multi-language Selector */}
           <div className="language-selector-badge" title="Chọn ngôn ngữ luyện viết (Anh, Nhật, Trung, Hàn, Pháp, Đức)">
-            <Globe size={15} color="var(--primary)" />
+            <IconGlobe size={15} color="var(--primary)" />
             <select
               className="language-select-dropdown"
               value={selectedLanguage}
@@ -565,12 +560,12 @@ export const WritingPage = ({ isActive = false }) => {
 
           {isAuthorized ? (
             <div className="writing-auth-tag authorized" title="Tài khoản của bạn đã được mở quyền AI Writing">
-              <Sparkles size={14} />
+              <IconSparkles size={13} />
               <span>AI Writing: Sẵn sàng</span>
             </div>
           ) : (
             <div className="writing-auth-tag restricted" title="Tính năng AI đang trong giai đoạn thử nghiệm cho 2 tài khoản được cấp phép">
-              <Shield size={14} />
+              <IconShield size={13} />
               <span>Chế độ thử nghiệm (tranhuunam23022000 & vuthiquynhtrangbl6d)</span>
             </div>
           )}
@@ -612,7 +607,7 @@ export const WritingPage = ({ isActive = false }) => {
                   onClick={handleShufflePrompt}
                   title="Đổi sang đề bài khác trong thư viện"
                 >
-                  <RotateCcw size={14} />
+                  <IconRotate size={13} />
                   <span>Đổi đề bài</span>
                 </button>
                 <button
@@ -622,7 +617,7 @@ export const WritingPage = ({ isActive = false }) => {
                   disabled={isGeneratingPrompt || !isAuthorized}
                   title={isAuthorized ? "AI sinh ngẫu nhiên đề bài mới" : "Chỉ tài khoản được cấp phép mới dùng AI sinh đề"}
                 >
-                  <Sparkles size={14} />
+                  <IconSparkles size={13} />
                   <span>{isGeneratingPrompt ? "Đang tạo..." : "AI Tạo đề mới"}</span>
                 </button>
                 <button
@@ -631,7 +626,7 @@ export const WritingPage = ({ isActive = false }) => {
                   onClick={() => setIsCustomPrompt(!isCustomPrompt)}
                   title="Tự nhập đề bài của riêng bạn"
                 >
-                  <FileText size={14} />
+                  <IconFile size={13} />
                   <span>Tự nhập đề</span>
                 </button>
               </div>
@@ -677,7 +672,7 @@ export const WritingPage = ({ isActive = false }) => {
                     <span className="stat-unit">/{currentGenreObj.minWords} {currentLangObj.unit}</span>
                   </div>
                   <div className="stat-pill timer">
-                    <Clock size={14} />
+                    <IconClock size={14} />
                     <span className="stat-val">{formatTimer(secondsElapsed)}</span>
                     {isTimerRunning ? (
                       <span className="timer-dot active" title="Đang tính giờ"></span>
@@ -723,7 +718,7 @@ export const WritingPage = ({ isActive = false }) => {
                     onClick={handleReset}
                     title="Xóa làm lại bài viết"
                   >
-                    <RotateCcw size={14} />
+                    <IconRotate size={13} />
                     <span>Xóa</span>
                   </button>
                 </div>
@@ -740,7 +735,7 @@ export const WritingPage = ({ isActive = false }) => {
                   }}
                   title="Mở kho cụm từ học thuật, collocations & cấu trúc câu theo Band"
                 >
-                  <BookOpen size={16} />
+                  <IconBook size={15} />
                   <span>Kho Cụm từ & Cấu trúc theo Band</span>
                 </button>
 
@@ -751,8 +746,8 @@ export const WritingPage = ({ isActive = false }) => {
                   disabled={isLoadingAiStructures || !isAuthorized || !effectivePromptText}
                   title="AI phân tích đề bài và gợi ý collocations & câu dẫn luận điểm chuyên biệt"
                 >
-                  <Sparkles size={16} />
-                  <span>{isLoadingAiStructures ? "Đang phân tích..." : "✨ AI gợi ý theo đề"}</span>
+                  <IconSparkles size={15} />
+                  <span>{isLoadingAiStructures ? "Đang phân tích..." : "AI gợi ý theo đề"}</span>
                 </button>
 
                 <button
@@ -768,8 +763,8 @@ export const WritingPage = ({ isActive = false }) => {
                       : "Lưu lại bài viết vào lịch sử dưới dạng bản nháp chưa chấm điểm"
                   }
                 >
-                  <BookmarkCheck size={16} />
-                  <span>{isSavingDraft ? "Đang lưu..." : "💾 Lưu nháp (chưa chấm)"}</span>
+                  <IconBookmark size={15} />
+                  <span>{isSavingDraft ? "Đang lưu..." : "Lưu nháp (chưa chấm)"}</span>
                 </button>
               </div>
             </div>
@@ -792,7 +787,7 @@ export const WritingPage = ({ isActive = false }) => {
                   </span>
                 ) : (
                   <span className="guide-success">
-                    <CheckCircle2 size={15} /> Đã đạt số lượng yêu cầu ({wordCount} {currentLangObj.unit}).
+                    <IconCheckCircle size={15} /> Đã đạt số lượng yêu cầu ({wordCount} {currentLangObj.unit}).
                   </span>
                 )}
               </div>
@@ -817,9 +812,8 @@ export const WritingPage = ({ isActive = false }) => {
                   </>
                 ) : (
                   <>
-                    <Sparkles size={16} />
+                    <IconSparkles size={16} />
                     <span>Nộp bài & AI Chấm điểm</span>
-                    <ArrowRight size={16} />
                   </>
                 )}
               </button>
@@ -835,7 +829,7 @@ export const WritingPage = ({ isActive = false }) => {
               className={`feedback-nav-btn ${activeRightTab === "feedback" ? "active" : ""}`}
               onClick={() => setActiveRightTab("feedback")}
             >
-              <Sparkles size={16} />
+              <IconSparkles size={15} />
               <span>Kết quả chấm điểm AI</span>
             </button>
             <button
@@ -845,7 +839,7 @@ export const WritingPage = ({ isActive = false }) => {
                 loadHistory();
               }}
             >
-              <History size={16} />
+              <IconHistory size={15} />
               <span>Lịch sử bài viết ({historyItems.length})</span>
             </button>
           </div>
@@ -860,7 +854,7 @@ export const WritingPage = ({ isActive = false }) => {
                   </div>
                 ) : historyItems.length === 0 ? (
                   <div className="history-empty">
-                    <FileText size={40} className="empty-icon" />
+                    <IconFile size={36} className="empty-icon" />
                     <h4>Chưa có bài viết nào</h4>
                     <p>Hãy hoàn thành bài viết đầu tiên và nộp để AI lưu trữ và theo dõi sự tiến bộ của bạn.</p>
                   </div>
@@ -877,7 +871,7 @@ export const WritingPage = ({ isActive = false }) => {
                           <span className="history-genre-pill">{item.genre}</span>
                           {item.language && (
                             <span style={{ fontSize: "0.7rem", fontWeight: 700, padding: "2px 6px", borderRadius: "4px", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}>
-                              {LANGUAGES.find((l) => l.id === item.language)?.flag || "🌐"} {item.language.toUpperCase()}
+                              {LANGUAGES.find((l) => l.id === item.language)?.flag || ""} {item.language.toUpperCase()}
                             </span>
                           )}
                           {item.overall_score ? (
@@ -896,7 +890,7 @@ export const WritingPage = ({ isActive = false }) => {
                             onClick={(e) => handleDeleteHistoryItem(item.id, e)}
                             title="Xóa bài viết khỏi lịch sử"
                           >
-                            <Trash2 size={13} />
+                            <IconTrash size={13} />
                           </button>
                         </div>
                         <div className="history-topic-title" title={item.topic}>
@@ -920,7 +914,7 @@ export const WritingPage = ({ isActive = false }) => {
               <div className="evaluating-state">
                 <div className="evaluating-animation-card">
                   <div className="pulse-circle">
-                    <Sparkles size={32} />
+                    <IconSparkles size={28} />
                   </div>
                   <h3>Giám khảo AI đang chấm bài</h3>
                   <p>Phân tích 4 tiêu chí chuẩn IELTS: Task Response, Coherence, Lexical Resource, và Ngữ pháp...</p>
@@ -985,7 +979,7 @@ export const WritingPage = ({ isActive = false }) => {
                 {evaluationResult.corrections && evaluationResult.corrections.length > 0 && (
                   <div className="section-block">
                     <div className="section-title">
-                      <AlertTriangle size={17} className="text-warning" />
+                      <IconAlert size={16} className="text-warning" />
                       <span>Sửa lỗi chi tiết ({evaluationResult.corrections.length} vị trí)</span>
                     </div>
                     <div className="corrections-list">
@@ -994,7 +988,7 @@ export const WritingPage = ({ isActive = false }) => {
                           <div className="corr-type-badge">{corr.type || "Grammar"}</div>
                           <div className="corr-diff">
                             <span className="diff-original">{corr.original}</span>
-                            <ArrowRight size={13} className="diff-arrow" />
+                            <IconArrowRight size={13} className="diff-arrow" />
                             <span className="diff-corrected">{corr.corrected}</span>
                           </div>
                           <div className="corr-explanation">{corr.explanation}</div>
@@ -1008,7 +1002,7 @@ export const WritingPage = ({ isActive = false }) => {
                 {evaluationResult.vocab_upgrades && evaluationResult.vocab_upgrades.length > 0 && (
                   <div className="section-block">
                     <div className="section-title">
-                      <Lightbulb size={17} className="text-primary" />
+                      <IconSparkles size={16} className="text-primary" />
                       <span>Gợi ý nâng cấp từ vựng C1/C2 ({evaluationResult.vocab_upgrades.length} từ)</span>
                     </div>
                     <div className="vocab-upgrades-grid">
@@ -1028,12 +1022,12 @@ export const WritingPage = ({ isActive = false }) => {
                             >
                               {addedWords[v.word] ? (
                                 <>
-                                  <BookmarkCheck size={13} />
+                                  <IconCheckCircle size={13} />
                                   <span>Đã thêm</span>
                                 </>
                               ) : (
                                 <>
-                                  <Plus size={13} />
+                                  <IconPlus size={12} />
                                   <span>+ Sổ tay</span>
                                 </>
                               )}
@@ -1059,7 +1053,7 @@ export const WritingPage = ({ isActive = false }) => {
                   <div className="section-block">
                     <div className="section-title space-between">
                       <div className="title-left">
-                        <Sparkles size={17} className="text-primary" />
+                        <IconSparkles size={16} className="text-primary" />
                         <span>Bài viết mẫu Band 8.5+ (AI Polished Version)</span>
                       </div>
                       <button
@@ -1067,7 +1061,7 @@ export const WritingPage = ({ isActive = false }) => {
                         className="btn-copy-model"
                         onClick={handleCopyModel}
                       >
-                        <Copy size={13} />
+                        <IconCopy size={13} />
                         <span>{copiedModel ? "Đã chép" : "Sao chép"}</span>
                       </button>
                     </div>
@@ -1080,7 +1074,7 @@ export const WritingPage = ({ isActive = false }) => {
             ) : (
               <div className="feedback-initial-guide">
                 <div className="guide-hero-icon">
-                  <PenTool size={36} />
+                  <IconPen size={32} />
                 </div>
                 <h3>Sẵn sàng chấm điểm bài viết</h3>
                 <p>
@@ -1118,7 +1112,7 @@ export const WritingPage = ({ isActive = false }) => {
             <div className="structures-modal-header">
               <div className="structures-modal-title-group">
                 <div className="structures-modal-icon">
-                  {structuresTab === "ai_topic" ? <Sparkles size={20} /> : <BookOpen size={20} />}
+                  {structuresTab === "ai_topic" ? <IconSparkles size={18} /> : <IconBook size={18} />}
                 </div>
                 <div>
                   <h3 className="structures-modal-title">
@@ -1139,7 +1133,7 @@ export const WritingPage = ({ isActive = false }) => {
                 onClick={() => setIsStructuresOpen(false)}
                 title="Đóng cửa sổ"
               >
-                <X size={20} />
+                <IconClose size={18} />
               </button>
             </div>
 
@@ -1151,16 +1145,16 @@ export const WritingPage = ({ isActive = false }) => {
                   className={`structures-tab-btn ${structuresTab === "ai_topic" ? "active" : ""}`}
                   onClick={() => setStructuresTab("ai_topic")}
                 >
-                  <Sparkles size={14} />
-                  <span>✨ Gợi ý theo đề bài ({aiTopicStructures.length})</span>
+                  <IconSparkles size={14} />
+                  <span>Gợi ý theo đề bài ({aiTopicStructures.length})</span>
                 </button>
                 <button
                   type="button"
                   className={`structures-tab-btn ${structuresTab === "general" ? "active" : ""}`}
                   onClick={() => setStructuresTab("general")}
                 >
-                  <BookOpen size={14} />
-                  <span>📚 Thư viện mẫu câu học thuật</span>
+                  <IconBook size={14} />
+                  <span>Thư viện mẫu câu học thuật</span>
                 </button>
               </div>
             </div>
@@ -1184,8 +1178,8 @@ export const WritingPage = ({ isActive = false }) => {
                     disabled={isLoadingAiStructures || !isAuthorized || !effectivePromptText}
                     style={{ padding: "5px 12px", fontSize: "0.8rem" }}
                   >
-                    <Sparkles size={13} />
-                    <span>{isLoadingAiStructures ? "Đang phân tích..." : "🔄 AI phân tích lại"}</span>
+                    <IconRotate size={13} />
+                    <span>{isLoadingAiStructures ? "Đang phân tích..." : "AI phân tích lại"}</span>
                   </button>
                 </div>
 
@@ -1202,7 +1196,7 @@ export const WritingPage = ({ isActive = false }) => {
                     </div>
                   ) : aiTopicStructures.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "48px 20px", color: "var(--text-muted)" }}>
-                      <Sparkles size={40} style={{ color: "#ec4899", marginBottom: "12px", opacity: 0.85 }} />
+                      <IconSparkles size={36} style={{ color: "#ec4899", marginBottom: "12px", opacity: 0.85 }} />
                       <h4 style={{ margin: "0 0 8px 0", color: "var(--text-primary)", fontSize: "1.05rem" }}>
                         Chưa có gợi ý AI riêng cho đề bài này
                       </h4>
@@ -1216,8 +1210,8 @@ export const WritingPage = ({ isActive = false }) => {
                         disabled={isLoadingAiStructures || !isAuthorized || !effectivePromptText}
                         style={{ margin: "0 auto", padding: "8px 22px", fontSize: "0.9rem" }}
                       >
-                        <Sparkles size={16} />
-                        <span>✨ Bấm để AI phân tích & gợi ý theo đề</span>
+                        <IconSparkles size={15} />
+                        <span>Bấm để AI phân tích & gợi ý theo đề</span>
                       </button>
                     </div>
                   ) : (
@@ -1244,7 +1238,7 @@ export const WritingPage = ({ isActive = false }) => {
                             }}
                             title="Sao chép vào clipboard"
                           >
-                            <Copy size={13} />
+                            <IconCopy size={13} />
                             <span>Sao chép</span>
                           </button>
                           <button
@@ -1253,7 +1247,7 @@ export const WritingPage = ({ isActive = false }) => {
                             onClick={() => handleInsertPhrase(item.template || item.phrase)}
                             title="Chèn ngay vào con trỏ bài viết"
                           >
-                            <Plus size={14} />
+                            <IconPlus size={13} />
                             <span>Chèn vào bài</span>
                           </button>
                         </div>
@@ -1266,7 +1260,7 @@ export const WritingPage = ({ isActive = false }) => {
               <>
                 <div className="structures-modal-toolbar">
                   <div className="structures-search-box">
-                    <Search size={16} color="var(--text-muted)" />
+                    <IconSearch size={15} color="var(--text-muted)" />
                     <input
                       type="text"
                       placeholder="Tìm kiếm mẫu câu, cụm từ, nghĩa tiếng Việt (ví dụ: debate, rationale, inversion, consensus...)..."
@@ -1280,7 +1274,7 @@ export const WritingPage = ({ isActive = false }) => {
                         style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: "2px" }}
                         onClick={() => setStructureSearch("")}
                       >
-                        <X size={14} />
+                        <IconClose size={13} />
                       </button>
                     )}
                   </div>
@@ -1324,7 +1318,7 @@ export const WritingPage = ({ isActive = false }) => {
                 <div className="structures-modal-body">
                   {filteredStructures.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>
-                      <FileText size={36} style={{ opacity: 0.4, marginBottom: "8px" }} />
+                      <IconFile size={32} style={{ opacity: 0.4, marginBottom: "8px" }} />
                       <p>Không tìm thấy cụm từ hay cấu trúc phù hợp với bộ lọc hiện tại.</p>
                     </div>
                   ) : (
@@ -1351,7 +1345,7 @@ export const WritingPage = ({ isActive = false }) => {
                             }}
                             title="Sao chép vào clipboard"
                           >
-                            <Copy size={13} />
+                            <IconCopy size={13} />
                             <span>Sao chép</span>
                           </button>
                           <button
@@ -1360,7 +1354,7 @@ export const WritingPage = ({ isActive = false }) => {
                             onClick={() => handleInsertPhrase(item.template || item.phrase)}
                             title="Chèn ngay vào con trỏ bài viết"
                           >
-                            <Plus size={14} />
+                            <IconPlus size={13} />
                             <span>Chèn vào bài</span>
                           </button>
                         </div>
