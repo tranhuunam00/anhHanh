@@ -533,7 +533,7 @@
 .ai-page-range-inputs {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
@@ -547,47 +547,98 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-muted, #64748b);
+  white-space: nowrap;
+}
+
+/* Stepper Box with [-] [input] [+] */
+.ai-page-stepper-box {
+  display: inline-flex;
+  align-items: center;
+  background: var(--card-bg, #ffffff);
+  border: 1.5px solid var(--border, #cbd5e1);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.ai-page-stepper-box:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.ai-stepper-btn {
+  background: var(--input-bg, #f8fafc);
+  border: none;
+  width: 32px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text, #334155);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ai-stepper-btn:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.15);
+  color: #4f46e5;
+}
+
+.ai-stepper-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .ai-page-number-input {
-  width: 80px;
-  padding: 7px 10px;
-  border: 1.5px solid var(--border, #cbd5e1);
-  border-radius: 8px;
+  width: 52px;
+  padding: 6px 4px;
+  border: none;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text, #0f172a);
-  background: var(--card-bg, #ffffff);
+  background: transparent;
   text-align: center;
   outline: none;
-  transition: all 0.15s ease;
-}
-
-.ai-page-number-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .ai-page-arrow {
   color: var(--text-muted, #94a3b8);
   font-weight: 800;
+  font-size: 0.9rem;
 }
 
-.ai-btn-all-pages {
+/* Presets pills bar */
+.ai-page-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ai-preset-chip {
   background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: #4f46e5;
   font-size: 0.78rem;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-.ai-btn-all-pages:hover {
+.ai-preset-chip:hover {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: #6366f1;
+}
+
+.ai-preset-chip.active {
   background: #6366f1;
   color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
 }
 
 .ai-page-range-notice {

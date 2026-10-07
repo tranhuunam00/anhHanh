@@ -36,6 +36,7 @@ class AIVocabService:
         fname_lower = filename.lower()
         if fname_lower.endswith(".pdf"):
             extracted_pages = []
+            has_pdf_engine = False
 
             # Determine 0-based page bounds if requested
             s_idx = max(0, (start_page - 1) if (start_page and start_page > 0) else 0)
@@ -43,6 +44,7 @@ class AIVocabService:
             # Engine 1: Try PyMuPDF (fitz)
             try:
                 import fitz
+                has_pdf_engine = True
                 doc = fitz.open(stream=file_bytes, filetype="pdf")
                 total_p = len(doc)
                 e_idx = min(total_p, end_page if (end_page and end_page > 0) else total_p)
@@ -63,6 +65,7 @@ class AIVocabService:
             # Engine 2: Try pypdf (pure Python fallback)
             try:
                 import pypdf
+                has_pdf_engine = True
                 import io
                 reader = pypdf.PdfReader(io.BytesIO(file_bytes))
                 total_p = len(reader.pages)
@@ -84,6 +87,7 @@ class AIVocabService:
             # Engine 3: Try pdfminer.six
             try:
                 import pdfminer.high_level
+                has_pdf_engine = True
                 import io
                 page_numbers = None
                 if start_page or end_page:
@@ -97,10 +101,16 @@ class AIVocabService:
                 logger.warning(f"pdfminer extraction failed: {e}")
 
             if not extracted_pages:
-                raise RuntimeError(
-                    "Máy chủ chưa cài thư viện đọc PDF (PyMuPDF hoặc pypdf). "
-                    "Vui lòng cài 'pip install pypdf PyMuPDF' trên máy chủ hoặc dán trực tiếp nội dung văn bản vào ô Dán Văn Bản."
-                )
+                if has_pdf_engine:
+                    raise RuntimeError(
+                        "Tệp PDF không chứa lớp văn bản (text) có thể đọc được (có thể là tệp scan dạng ảnh hoặc trang bìa không chứa chữ). "
+                        "Vui lòng chọn trang khác hoặc dán trực tiếp nội dung văn bản vào ô Dán Văn Bản."
+                    )
+                else:
+                    raise RuntimeError(
+                        "Máy chủ chưa cài thư viện đọc PDF (PyMuPDF hoặc pypdf). "
+                        "Vui lòng cài 'pip install pypdf PyMuPDF' trên máy chủ hoặc dán trực tiếp nội dung văn bản vào ô Dán Văn Bản."
+                    )
 
         elif fname_lower.endswith(".docx"):
             try:
