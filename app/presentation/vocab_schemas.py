@@ -37,6 +37,7 @@ class UpdateVocabDetailsRequest(BaseModel):
     image_url: Optional[str] = None
     context_sentence: Optional[str] = None
     status: Optional[str] = None
+    source_lang: Optional[str] = None
 
 
 class ReviewResultRequest(BaseModel):

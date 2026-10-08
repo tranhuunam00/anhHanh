@@ -13,15 +13,9 @@ from app.infrastructure.image_search_service import ImageSearchService
 from app.infrastructure.translation_service import TranslationService
 
 from app.presentation.vocab_schemas import (
-    CreateVocabRequest,
-    UpdateStatusRequest,
-    UpdateImageRequest,
-    UpdateVocabDetailsRequest,
-    ReviewResultRequest,
-    AIExtractTextRequest,
-    BatchImportVocabItem,
-    CheckVocabDuplicatesRequest,
-    BatchImportVocabRequest,
+    CreateVocabRequest, UpdateStatusRequest, UpdateImageRequest,
+    UpdateVocabDetailsRequest, CheckVocabDuplicatesRequest,
+    BatchImportVocabRequest, BatchImportVocabItem,
 )
 from app.presentation.vocab_study_api import router as vocab_study_router
 from app.presentation.vocab_import_api import router as vocab_import_router
@@ -143,6 +137,7 @@ async def save_vocabulary_word(
 @router.get('')
 async def list_vocabulary(
     video_id: Optional[str] = None,
+    source_lang: Optional[str] = Query(None),
     status_filter: Optional[str] = Query(None, alias='status'),
     search: Optional[str] = Query(None),
     page: Optional[int] = Query(None, ge=1),
@@ -154,6 +149,8 @@ async def list_vocabulary(
     stmt = select(UserVocabulary).where(UserVocabulary.user_id == current_user.id)
     if video_id:
         stmt = stmt.where(UserVocabulary.video_id == video_id)
+    if source_lang and source_lang.strip() and source_lang.lower() != 'all':
+        stmt = stmt.where(UserVocabulary.source_lang == source_lang.strip().lower())
     if status_filter and status_filter.upper() != 'ALL':
         stmt = stmt.where(UserVocabulary.status == status_filter.upper())
     if search and search.strip():
@@ -466,6 +463,9 @@ async def update_vocabulary_details(
 
     if payload.status is not None and payload.status in ['NEW', 'LEARNING', 'MASTERED']:
         vocab.status = payload.status
+
+    if payload.source_lang is not None and payload.source_lang.strip():
+        vocab.source_lang = payload.source_lang.strip().lower()
 
     await db.commit()
     await db.refresh(vocab)

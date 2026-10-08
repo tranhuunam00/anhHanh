@@ -398,3 +398,13 @@ def test_effective_timestamp_precedence():
     # Neither present
     req3 = CreateVocabRequest(word="test")
     assert req3.effective_timestamp is None
+
+
+def test_update_vocab_details_request_source_lang():
+    """Verify UpdateVocabDetailsRequest accepts and parses source_lang."""
+    from app.presentation.vocab_schemas import UpdateVocabDetailsRequest
+    req = UpdateVocabDetailsRequest(word="bonjour", source_lang="fr", meaning="xin chào")
+    assert req.source_lang == "fr"
+    assert req.word == "bonjour"
+    assert req.meaning == "xin chào"
+
