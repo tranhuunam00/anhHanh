@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Volume2, Sparkles, Globe } from "../Icons";
+import { Volume2, Sparkles, Globe, ChevronDown } from "../Icons";
 import {
   ACCENT_OPTIONS,
   PITCH_PRESETS,
@@ -24,9 +24,10 @@ export const ReaderVoiceSelector = ({
 
   return (
     <div className="reader-voice-control-box">
+      {/* Header bar: Title & Test Voice button */}
       <div className="reader-voice-header">
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <Globe size={14} color="var(--primary)" />
+          <Globe size={15} color="var(--primary)" />
           <span className="reader-voice-title">Giọng đọc &amp; Accent:</span>
         </div>
 
@@ -35,37 +36,37 @@ export const ReaderVoiceSelector = ({
             type="button"
             className="reader-voice-test-btn"
             onClick={onTestVoice}
-            title="Nghe thử giọng đọc đã chọn"
+            title="Nghe thử âm sắc & giọng đọc hiện tại"
           >
-            <Volume2 size={12} />
-            <span>Thử giọng</span>
+            <Volume2 size={13} />
+            <span>Nghe thử</span>
           </button>
         )}
       </div>
 
-      {/* Row 1: Accent quick pills (Mỹ, Anh, Úc, Ấn Độ...) */}
-      <div className="reader-accent-pills-row">
+      {/* Row 1: Accent filter chips with custom badges */}
+      <div className="reader-accent-chips-grid">
         {ACCENT_OPTIONS.map((acc) => {
           const isSelected = selectedAccent === acc.code;
           return (
             <button
               key={acc.code}
               type="button"
-              className={`reader-accent-pill ${isSelected ? "active" : ""}`}
+              className={`reader-accent-chip ${isSelected ? "active" : ""} ${acc.code === "en-IN" ? "accent-indian" : ""}`}
               onClick={() => onSelectAccent(acc.code)}
-              title={acc.label}
+              title={`Lọc giọng ${acc.label}`}
             >
-              <span style={{ marginRight: 3 }}>{acc.flag}</span>
-              <span>{acc.label}</span>
+              <span className="reader-chip-badge">{acc.badge}</span>
+              <span className="reader-chip-label">{acc.label}</span>
             </button>
           );
         })}
       </div>
 
       {/* Row 2: Voice dropdown select */}
-      <div className="reader-voice-select-wrap">
+      <div className="reader-voice-dropdown-wrapper">
         <select
-          className="reader-voice-select"
+          className="reader-voice-dropdown"
           value={selectedVoiceUri}
           onChange={(e) => onSelectVoiceUri(e.target.value)}
         >
@@ -79,26 +80,30 @@ export const ReaderVoiceSelector = ({
             ))
           )}
         </select>
+        <span className="reader-dropdown-arrow-icon" pointerEvents="none">
+          <ChevronDown size={14} color="var(--text-muted)" />
+        </span>
       </div>
 
-      {/* Row 3: Tone & Pitch Persona Presets (Trầm ấm, Trẻ trung, Kể chuyện...) */}
-      <div className="reader-pitch-row">
-        <span className="reader-pitch-label">
-          <Sparkles size={12} style={{ marginRight: 3, verticalAlign: "middle" }} />
-          Phong cách:
-        </span>
-        <div className="reader-pitch-pills">
+      {/* Row 3: Tone & Pitch Persona Presets */}
+      <div className="reader-pitch-section">
+        <div className="reader-pitch-header">
+          <Sparkles size={13} color="var(--primary)" />
+          <span className="reader-pitch-label">Phong cách ngữ điệu:</span>
+        </div>
+
+        <div className="reader-pitch-chips-wrap">
           {PITCH_PRESETS.map((p) => {
             const isSelected = pitchPreset === p.id;
             return (
               <button
                 key={p.id}
                 type="button"
-                className={`reader-pitch-pill ${isSelected ? "active" : ""}`}
+                className={`reader-pitch-chip ${isSelected ? "active" : ""} ${p.id === "indian_style" ? "chip-indian" : ""}`}
                 onClick={() => onSelectPitchPreset(p.id)}
                 title={`Phong cách đọc ${p.label}`}
               >
-                {p.label}
+                <span>{p.label}</span>
               </button>
             );
           })}

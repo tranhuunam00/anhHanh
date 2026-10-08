@@ -65,17 +65,58 @@ export function useReaderSpeech({
   // Compute active SpeechSynthesisVoice object
   const selectedVoice = useMemo(() => {
     if (!voices || voices.length === 0) return null;
+
+    // Handle virtual Indian voice options when no native voice is installed
+    if (selectedVoiceUri === "virtual_indian_male") {
+      const realIndianMale = voices.find((v) => {
+        const n = (v.name || "").toLowerCase();
+        const l = (v.lang || "").toLowerCase();
+        return (l.includes("in") || n.includes("india")) && (n.includes("ravi") || n.includes("male") || n.includes("prabhat"));
+      });
+      if (realIndianMale) return realIndianMale;
+      const maleEn = voices.find((v) => {
+        const n = (v.name || "").toLowerCase();
+        return (v.lang || "").toLowerCase().startsWith("en") && (n.includes("male") || n.includes("david") || n.includes("guy") || n.includes("george"));
+      });
+      return maleEn || voices[0] || null;
+    }
+
+    if (selectedVoiceUri === "virtual_indian_female") {
+      const realIndianFemale = voices.find((v) => {
+        const n = (v.name || "").toLowerCase();
+        const l = (v.lang || "").toLowerCase();
+        return (l.includes("in") || n.includes("india")) && (n.includes("neerja") || n.includes("female") || n.includes("heera") || n.includes("veena"));
+      });
+      if (realIndianFemale) return realIndianFemale;
+      const femaleEn = voices.find((v) => {
+        const n = (v.name || "").toLowerCase();
+        return (v.lang || "").toLowerCase().startsWith("en") && (n.includes("female") || n.includes("zira") || n.includes("jenny") || n.includes("samantha"));
+      });
+      return femaleEn || voices[0] || null;
+    }
+
     if (selectedVoiceUri) {
       const match = voices.find((v) => (v.voiceURI || v.name) === selectedVoiceUri);
       if (match) return match;
     }
+
     // Fallback: accent match or general English voice
     if (selectedAccent && selectedAccent !== "ALL") {
-      const accentMatch = voices.find((v) =>
-        (v.lang || "").toLowerCase().startsWith(selectedAccent.toLowerCase())
-      );
-      if (accentMatch) return accentMatch;
+      if (selectedAccent === "en-IN") {
+        const inMatch = voices.find((v) => {
+          const l = (v.lang || "").toLowerCase();
+          const n = (v.name || "").toLowerCase();
+          return l.includes("in") || n.includes("india") || n.includes("ravi") || n.includes("neerja");
+        });
+        if (inMatch) return inMatch;
+      } else {
+        const accentMatch = voices.find((v) =>
+          (v.lang || "").toLowerCase().startsWith(selectedAccent.toLowerCase())
+        );
+        if (accentMatch) return accentMatch;
+      }
     }
+
     const enMatch = voices.find((v) => (v.lang || "").toLowerCase().startsWith("en"));
     return enMatch || voices[0] || null;
   }, [voices, selectedVoiceUri, selectedAccent]);
@@ -136,14 +177,25 @@ export function useReaderSpeech({
       }
 
       const utterance = new SpeechSynthesisUtterance(sentence.text);
+      const isIndianMode =
+        selectedVoiceUri.startsWith("virtual_indian") ||
+        selectedAccent === "en-IN" ||
+        pitchPreset === "indian_style" ||
+        (selectedVoice?.lang || "").toLowerCase().includes("in");
+
       if (selectedVoice) {
         utterance.voice = selectedVoice;
-        utterance.lang = selectedVoice.lang || "en-US";
-      } else {
-        utterance.lang = "en-US";
       }
-      utterance.rate = speechRate;
-      utterance.pitch = speechPitch;
+      utterance.lang = isIndianMode ? "en-IN" : selectedVoice?.lang || "en-US";
+
+      // Indian accent rhythmic pitch and speed cadence modulation
+      const finalPitch = isIndianMode
+        ? Math.min(1.4, speechPitch * 1.15)
+        : speechPitch;
+      const finalRate = isIndianMode ? speechRate * 1.05 : speechRate;
+
+      utterance.rate = finalRate;
+      utterance.pitch = finalPitch;
 
       sentenceStartRef.current = {
         index,
@@ -184,6 +236,9 @@ export function useReaderSpeech({
       speechRate,
       speechPitch,
       selectedVoice,
+      selectedVoiceUri,
+      selectedAccent,
+      pitchPreset,
       highlightSentenceInDOM,
       clearSentenceHighlights,
       showToast,
@@ -194,22 +249,41 @@ export function useReaderSpeech({
   const handleTestVoice = useCallback(() => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
-    const testUtterance = new SpeechSynthesisUtterance(
-      "Hello! This is a speech sample. Welcome to Smart Reader!"
-    );
+
+    const isIndianMode =
+      selectedVoiceUri.startsWith("virtual_indian") ||
+      selectedAccent === "en-IN" ||
+      pitchPreset === "indian_style" ||
+      (selectedVoice?.lang || "").toLowerCase().includes("in");
+
+    const sampleText = isIndianMode
+      ? "Namaste! Welcome to Smart Reader. Let's practice English with Indian accent!"
+      : "Hello! This is a speech sample. Welcome to Smart Reader!";
+
+    const testUtterance = new SpeechSynthesisUtterance(sampleText);
     if (selectedVoice) {
       testUtterance.voice = selectedVoice;
-      testUtterance.lang = selectedVoice.lang || "en-US";
-    } else {
-      testUtterance.lang = "en-US";
     }
-    testUtterance.rate = speechRate;
-    testUtterance.pitch = speechPitch;
+    testUtterance.lang = isIndianMode ? "en-IN" : selectedVoice?.lang || "en-US";
+    testUtterance.pitch = isIndianMode ? Math.min(1.4, speechPitch * 1.15) : speechPitch;
+    testUtterance.rate = isIndianMode ? speechRate * 1.05 : speechRate;
+
     window.speechSynthesis.speak(testUtterance);
     if (showToast) {
-      showToast(`Đang thử giọng: ${selectedVoice ? selectedVoice.name : "Hệ thống"}`, "info");
+      const voiceTitle = isIndianMode
+        ? (selectedVoiceUri === "virtual_indian_female" ? "Neerja • Ấn Độ (Nữ)" : "Ravi • Ấn Độ (Nam)")
+        : (selectedVoice ? selectedVoice.name : "Hệ thống");
+      showToast(`Đang thử giọng: ${voiceTitle}`, "info");
     }
-  }, [selectedVoice, speechRate, speechPitch, showToast]);
+  }, [
+    selectedVoice,
+    selectedVoiceUri,
+    selectedAccent,
+    pitchPreset,
+    speechRate,
+    speechPitch,
+    showToast,
+  ]);
 
   const handleToggleSpeech = () => {
     if (isSpeaking) {
