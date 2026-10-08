@@ -111,3 +111,24 @@ describe("readerVoices - formatVoiceLabel", () => {
     assert.equal(formatVoiceLabel({}), "Default Voice (Quốc tế • Tự nhiên)");
   });
 });
+
+describe("readerVoices - PITCH_PRESETS & ACCENT_OPTIONS integrity", () => {
+  test("all pitch presets have valid finite float pitch values", () => {
+    assert.ok(PITCH_PRESETS.length >= 4);
+    for (const preset of PITCH_PRESETS) {
+      assert.ok(preset.id && typeof preset.id === "string");
+      assert.ok(preset.label && typeof preset.label === "string");
+      assert.ok(typeof preset.pitch === "number");
+      assert.ok(Number.isFinite(preset.pitch));
+      assert.ok(preset.pitch >= 0.5 && preset.pitch <= 2.0);
+    }
+  });
+
+  test("all accent options have non-empty code and label", () => {
+    assert.ok(ACCENT_OPTIONS.length >= 4);
+    for (const opt of ACCENT_OPTIONS) {
+      assert.ok(opt.code && typeof opt.code === "string");
+      assert.ok(opt.label && typeof opt.label === "string");
+    }
+  });
+});

@@ -59,7 +59,8 @@ export function useReaderSpeech({
   // Compute active pitch value from persona preset
   const speechPitch = useMemo(() => {
     const found = PITCH_PRESETS.find((p) => p.id === pitchPreset);
-    return found ? found.pitch : 1.0;
+    const p = typeof found?.pitch === "number" ? found.pitch : 1.0;
+    return Number.isFinite(p) ? p : 1.0;
   }, [pitchPreset]);
 
   // Compute active SpeechSynthesisVoice object
@@ -189,13 +190,16 @@ export function useReaderSpeech({
       utterance.lang = isIndianMode ? "en-IN" : selectedVoice?.lang || "en-US";
 
       // Indian accent rhythmic pitch and speed cadence modulation
-      const finalPitch = isIndianMode
-        ? Math.min(1.4, speechPitch * 1.15)
-        : speechPitch;
-      const finalRate = isIndianMode ? speechRate * 1.05 : speechRate;
+      const rawPitch = Number.isFinite(speechPitch) ? speechPitch : 1.0;
+      const rawRate = Number.isFinite(speechRate) ? speechRate : 1.0;
 
-      utterance.rate = finalRate;
-      utterance.pitch = finalPitch;
+      const finalPitch = isIndianMode
+        ? Math.min(1.4, rawPitch * 1.15)
+        : rawPitch;
+      const finalRate = isIndianMode ? rawRate * 1.05 : rawRate;
+
+      utterance.rate = Number.isFinite(finalRate) ? finalRate : 1.0;
+      utterance.pitch = Number.isFinite(finalPitch) ? finalPitch : 1.0;
 
       sentenceStartRef.current = {
         index,
@@ -265,8 +269,13 @@ export function useReaderSpeech({
       testUtterance.voice = selectedVoice;
     }
     testUtterance.lang = isIndianMode ? "en-IN" : selectedVoice?.lang || "en-US";
-    testUtterance.pitch = isIndianMode ? Math.min(1.4, speechPitch * 1.15) : speechPitch;
-    testUtterance.rate = isIndianMode ? speechRate * 1.05 : speechRate;
+    const rawPitch = Number.isFinite(speechPitch) ? speechPitch : 1.0;
+    const rawRate = Number.isFinite(speechRate) ? speechRate : 1.0;
+    const finalPitch = isIndianMode ? Math.min(1.4, rawPitch * 1.15) : rawPitch;
+    const finalRate = isIndianMode ? rawRate * 1.05 : rawRate;
+
+    testUtterance.pitch = Number.isFinite(finalPitch) ? finalPitch : 1.0;
+    testUtterance.rate = Number.isFinite(finalRate) ? finalRate : 1.0;
 
     window.speechSynthesis.speak(testUtterance);
     if (showToast) {

@@ -13,10 +13,10 @@ export const ACCENT_OPTIONS = [
 ];
 
 export const PITCH_PRESETS = [
-  { id: "standard", label: "Chuẩn" },
-  { id: "deep", label: "Trầm ấm" },
-  { id: "energetic", label: "Trẻ trung" },
-  { id: "indian_style", label: "Ấn Độ 🇮🇳" },
+  { id: "standard", label: "Chuẩn", pitch: 1.0 },
+  { id: "deep", label: "Trầm ấm", pitch: 0.82 },
+  { id: "energetic", label: "Trẻ trung", pitch: 1.2 },
+  { id: "indian_style", label: "Ấn Độ 🇮🇳", pitch: 1.15 },
 ];
 
 /**
