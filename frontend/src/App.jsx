@@ -15,7 +15,7 @@ import { AdminPortal } from "./components/Admin/AdminPortal";
 import { VocabTab } from "./components/Vocab/VocabTab";
 import { HistoryTab } from "./components/History/HistoryTab";
 import { FloatingVocabSaver } from "./components/Vocab/FloatingVocabSaver";
-import { DailyReminderBanner } from "./components/Vocab/DailyReminderBanner";
+
 import { Footer } from "./components/Footer/Footer";
 import { TranscriptPage } from "./pages/TranscriptPage";
 import { AudioStudioPage } from "./pages/AudioStudioPage";
@@ -1183,16 +1183,6 @@ export default function App() {
         }}
       />
 
-      {/* In-App Floating Daily Reminder Banner */}
-      <DailyReminderBanner
-        onOpenExercise={() => {
-          setActiveTab("tab-vocab");
-          setTimeout(() => {
-            window.dispatchEvent(new CustomEvent("open-exercise-hub-modal"));
-          }, 150);
-        }}
-        onOpenVocabTab={() => setActiveTab("tab-vocab")}
-      />
     </div>
   );
 }
