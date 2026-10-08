@@ -56,23 +56,24 @@ async def upgrade(conn) -> None:
             await conn.execute(text("PRAGMA foreign_keys = ON;"))
             logger.info("SQLite user_lessons table rebuilt with uq_user_lesson_lang constraint.")
     else:
-        # PostgreSQL
-        try:
-            await conn.execute(text("ALTER TABLE user_lessons DROP CONSTRAINT IF EXISTS uq_user_lesson;"))
-            logger.info("Dropped old uq_user_lesson constraint.")
-        except Exception as e:
-            logger.debug(f"Drop constraint notice: {e}")
-
-        try:
-            await conn.execute(text("""
-                ALTER TABLE user_lessons
-                DROP CONSTRAINT IF EXISTS uq_user_lesson_lang;
-                ALTER TABLE user_lessons
-                ADD CONSTRAINT uq_user_lesson_lang
-                UNIQUE (user_id, lesson_id, source_lang, target_lang);
-            """))
-            logger.info("Added uq_user_lesson_lang constraint on user_lessons.")
-        except Exception as e:
-            logger.debug(f"Constraint notice: {e}")
+        # PostgreSQL: Clean constraints and duplicates without transaction aborts
+        await conn.execute(text("ALTER TABLE user_lessons DROP CONSTRAINT IF EXISTS uq_user_lesson;"))
+        await conn.execute(text("ALTER TABLE user_lessons DROP CONSTRAINT IF EXISTS uq_user_lesson_lang;"))
+        await conn.execute(text("UPDATE user_lessons SET source_lang = 'en' WHERE source_lang IS NULL;"))
+        await conn.execute(text("UPDATE user_lessons SET target_lang = 'vi' WHERE target_lang IS NULL;"))
+        await conn.execute(text("""
+            DELETE FROM user_lessons a USING user_lessons b
+            WHERE a.ctid < b.ctid
+              AND a.user_id = b.user_id
+              AND a.lesson_id = b.lesson_id
+              AND a.source_lang = b.source_lang
+              AND a.target_lang = b.target_lang;
+        """))
+        await conn.execute(text("""
+            ALTER TABLE user_lessons
+            ADD CONSTRAINT uq_user_lesson_lang
+            UNIQUE (user_id, lesson_id, source_lang, target_lang);
+        """))
+        logger.info("PostgreSQL: Added uq_user_lesson_lang constraint on user_lessons.")
 
     logger.info(f"Migration {MIGRATION_ID} applied successfully.")
