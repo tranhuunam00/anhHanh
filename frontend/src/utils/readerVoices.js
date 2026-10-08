@@ -5,20 +5,18 @@
  */
 
 export const ACCENT_OPTIONS = [
-  { code: "ALL", label: "Tất cả", badge: "ALL" },
-  { code: "en-US", label: "Mỹ (US)", badge: "US" },
-  { code: "en-GB", label: "Anh (UK)", badge: "UK" },
-  { code: "en-IN", label: "Ấn Độ (IN)", badge: "IN" },
-  { code: "en-AU", label: "Úc (AU)", badge: "AU" },
-  { code: "en-CA", label: "Canada", badge: "CA" },
+  { code: "ALL", label: "Tất cả" },
+  { code: "en-US", label: "Mỹ" },
+  { code: "en-GB", label: "Anh" },
+  { code: "en-IN", label: "Ấn Độ" },
+  { code: "en-AU", label: "Úc" },
 ];
 
 export const PITCH_PRESETS = [
-  { id: "standard", label: "Chuẩn mẫu", pitch: 1.0 },
-  { id: "deep", label: "Trầm ấm", pitch: 0.8 },
-  { id: "energetic", label: "Trẻ trung", pitch: 1.25 },
-  { id: "indian_style", label: "Ấn Độ (Hinglish)", pitch: 1.15, rateMultiplier: 1.05 },
-  { id: "story", label: "Kể chuyện", pitch: 0.9 },
+  { id: "standard", label: "Chuẩn" },
+  { id: "deep", label: "Trầm ấm" },
+  { id: "energetic", label: "Trẻ trung" },
+  { id: "indian_style", label: "Ấn Độ 🇮🇳" },
 ];
 
 /**
