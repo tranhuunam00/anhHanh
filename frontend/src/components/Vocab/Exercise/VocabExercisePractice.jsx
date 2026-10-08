@@ -279,17 +279,17 @@ export const VocabExercisePractice = ({
                   ”
                 </div>
 
-                <div className="ex-cloze-hint-row">
-                  <div className="ex-cloze-meaning-badge">
-                    <span className="ex-cloze-hint-tag">Nghĩa:</span>
-                    <strong>{currentItem.meaning}</strong>
-                  </div>
+                {isAnswered && (
+                  <div className="ex-cloze-hint-row">
+                    <div className="ex-cloze-meaning-badge">
+                      <span className="ex-cloze-hint-tag">Nghĩa:</span>
+                      <strong>{currentItem.meaning}</strong>
+                    </div>
 
-                  {currentItem.phonetic && (
-                    <span className="ex-cloze-ipa-badge">{currentItem.phonetic}</span>
-                  )}
+                    {currentItem.phonetic && (
+                      <span className="ex-cloze-ipa-badge">{currentItem.phonetic}</span>
+                    )}
 
-                  {isAnswered && (
                     <button
                       type="button"
                       className={`ex-audio-mini-btn ${isPlayingAudio ? "playing" : ""}`}
@@ -298,8 +298,8 @@ export const VocabExercisePractice = ({
                     >
                       <Volume2 size={16} />
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {isAnswered && clozeData?.translation && (
                   <div className="ex-cloze-translation-box">
