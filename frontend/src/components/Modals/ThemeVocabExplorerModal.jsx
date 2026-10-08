@@ -20,6 +20,7 @@ import {
   fetchUserSavedWords,
   importSystemVocabToNotebook,
 } from "../../services/systemVocabService";
+import { VOCAB_TOPICS } from "../../constants/vocabTopics";
 import { getVoiceLang } from "../../utils/languageVoices";
 import "./ThemeVocabExplorerModal.css";
 
@@ -32,7 +33,7 @@ export const ThemeVocabExplorerModal = ({
   showToast = () => {},
   onSuccessImport = () => {},
 }) => {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(VOCAB_TOPICS);
   const [selectedLang, setSelectedLang] = useState("en"); // 'en' | 'fr'
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedWordType, setSelectedWordType] = useState("all"); // 'all' | 'single_word' | 'phrase'

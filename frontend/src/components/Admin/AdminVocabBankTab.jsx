@@ -20,11 +20,12 @@ import {
   adminDeleteSystemVocab,
   adminReseedSystemVocab,
 } from "../../services/systemVocabService";
+import { VOCAB_TOPICS } from "../../constants/vocabTopics";
 import { getVoiceLang } from "../../utils/languageVoices";
 import { AdminVocabBankModal } from "./AdminVocabBankModal";
 
 export const AdminVocabBankTab = ({ token, showToast }) => {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(VOCAB_TOPICS);
   const [selectedLang, setSelectedLang] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedWordType, setSelectedWordType] = useState("all");
