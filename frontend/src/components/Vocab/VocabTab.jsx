@@ -664,7 +664,10 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 {v.context_sentence && (() => {
                   const { orig, trans } = splitContextSentence(v.context_sentence);
                   return (
-                    <div className="vocab-context-box">
+                    <div
+                      className="vocab-context-box"
+                      title={orig ? `"${orig.replace(/^"+|"+$/g, '')}"` : undefined}
+                    >
                       {orig && (
                         <div className="vocab-context-orig">
                           "{orig.replace(/^"+|"+$/g, '')}"

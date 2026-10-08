@@ -30,12 +30,15 @@ export const VocabExerciseMenu = ({
     { key: EXERCISE_CATEGORIES.ALL, label: "Tất cả hình thức", icon: Layers },
     { key: EXERCISE_CATEGORIES.RECOGNITION, label: "Nhận diện nghĩa", icon: Target },
     { key: EXERCISE_CATEGORIES.RECALL, label: "Gợi nhớ chủ động (Active Recall)", icon: Sparkles },
+    { key: EXERCISE_CATEGORIES.CONTEXT, label: "Ứng dụng ngữ cảnh (Context Cloze)", icon: Lightbulb },
   ];
 
   const showD1 =
     activeCategory === EXERCISE_CATEGORIES.ALL || activeCategory === EXERCISE_CATEGORIES.RECOGNITION;
   const showD2 =
     activeCategory === EXERCISE_CATEGORIES.ALL || activeCategory === EXERCISE_CATEGORIES.RECALL;
+  const showD3 =
+    activeCategory === EXERCISE_CATEGORIES.ALL || activeCategory === EXERCISE_CATEGORIES.CONTEXT;
 
   return (
     <div className="exercise-modal-backdrop" onClick={onClose}>
@@ -164,6 +167,52 @@ export const VocabExerciseMenu = ({
                     <div className="ex-preview-options-grid">
                       <div className="ex-preview-opt correct">
                         A. desperate need <Check size={12} color="#10b981" style={{ verticalAlign: "middle", marginLeft: 4 }} />
+                      </div>
+                      <div className="ex-preview-opt">B. sustainable</div>
+                      <div className="ex-preview-opt">C. comprehensive</div>
+                      <div className="ex-preview-opt">D. inevitable</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* DẠNG 3: ĐIỀN TỪ VÀO CÂU NGỮ CẢNH (CONTEXT CLOZE) */}
+              {showD3 && (
+                <div
+                  className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D3 ? "active" : ""}`}
+                  onClick={() => onSelectFormat(EXERCISE_FORMATS.D3)}
+                >
+                  <div className="ex-format-badge">
+                    <span className={`ex-pill-badge ${selectedFormat === EXERCISE_FORMATS.D3 ? "active" : ""}`}>
+                      <Lightbulb size={14} />
+                      <span>Dạng 3 • Ứng dụng ngữ cảnh (Context Cloze)</span>
+                    </span>
+                    <span className="ex-pill-tag">
+                      <Globe size={12} style={{ marginRight: 3, verticalAlign: "middle" }} />
+                      Điền từ vào câu
+                    </span>
+                  </div>
+
+                  <h3 className="ex-format-title">Điền từ vào câu ngữ cảnh</h3>
+                  <p className="ex-format-desc">
+                    Quan sát câu ví dụ thực tế có chỗ trống <strong>[ ______ ]</strong> và gợi ý nghĩa tiếng Việt,
+                    chọn từ vựng chuẩn xác nhất để hoàn thiện câu hoàn chỉnh.
+                  </p>
+
+                  {/* Visual Preview Box */}
+                  <div className="ex-preview-box">
+                    <div className="ex-preview-word-row">
+                      <span className="ex-preview-cloze-demo">
+                        "Vietnam and Laos reaffirmed their <span className="ex-cloze-target-blank">[ ______ ]</span> and mutual ties."
+                      </span>
+                    </div>
+                    <div className="ex-preview-meaning-hint">
+                      <Lightbulb size={13} color="var(--primary)" />
+                      <span>Gợi ý nghĩa: "đoàn kết đặc biệt"</span>
+                    </div>
+                    <div className="ex-preview-options-grid">
+                      <div className="ex-preview-opt correct">
+                        A. special solidarity <Check size={12} color="#10b981" style={{ verticalAlign: "middle", marginLeft: 4 }} />
                       </div>
                       <div className="ex-preview-opt">B. sustainable</div>
                       <div className="ex-preview-opt">C. comprehensive</div>

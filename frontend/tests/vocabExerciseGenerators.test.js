@@ -6,6 +6,8 @@ import {
   maskTargetWordInSentence,
   generateD1Options,
   generateD2Options,
+  generateD3Options,
+  getD3ClozeSentence,
   isAnswerCorrect,
   FALLBACK_DISTRACTORS_VI,
   FALLBACK_DISTRACTORS_BY_LANG,
@@ -137,5 +139,80 @@ describe("vocabExerciseGenerators - isAnswerCorrect", () => {
     assert.equal(isAnswerCorrect(null, item, EXERCISE_FORMATS.D1), false);
     assert.equal(isAnswerCorrect("", item, EXERCISE_FORMATS.D2), false);
     assert.equal(isAnswerCorrect("test", null, EXERCISE_FORMATS.D1), false);
+  });
+
+  test("verifies Dạng 3 answers correctly (case & whitespace insensitive)", () => {
+    assert.equal(isAnswerCorrect("Resilient", item, EXERCISE_FORMATS.D3), true);
+    assert.equal(isAnswerCorrect("  resilient  ", item, EXERCISE_FORMATS.D3), true);
+    assert.equal(isAnswerCorrect("vulnerable", item, EXERCISE_FORMATS.D3), false);
+  });
+});
+
+describe("vocabExerciseGenerators - generateD3Options (Context Cloze)", () => {
+  const clozePool = [
+    { id: 1, word: "solidarity", meaning: "tinh thần đoàn kết", context_sentence: "Special solidarity was reaffirmed.", source_lang: "en" },
+    { id: 2, word: "sustainable", meaning: "bền vững", context_sentence: "Sustainable development is key.", source_lang: "en" },
+    { id: 3, word: "delegation", meaning: "phái đoàn", context_sentence: "The delegation arrived safely.", source_lang: "en" },
+    { id: 4, word: "vital", meaning: "thiết yếu", context_sentence: "Water is vital for life.", source_lang: "en" },
+  ];
+
+  test("generates 4 distinct options containing the correct target word", () => {
+    const current = clozePool[0];
+    const options = generateD3Options(current, clozePool);
+    assert.equal(options.length, 4);
+    assert.equal(options.includes("solidarity"), true);
+    const unique = new Set(options);
+    assert.equal(unique.size, 4);
+  });
+
+  test("handles null or missing item safely without throwing", () => {
+    assert.deepEqual(generateD3Options(null, []), []);
+    assert.deepEqual(generateD3Options({}, []), []);
+  });
+});
+
+describe("vocabExerciseGenerators - getD3ClozeSentence", () => {
+  test("masks target word in context_sentence accurately", () => {
+    const item = {
+      word: "delegation",
+      meaning: "phái đoàn",
+      context_sentence: "A high-ranking delegation arrived in Vientiane yesterday.",
+      source_lang: "en",
+    };
+    const res = getD3ClozeSentence(item);
+    assert.equal(res.clozeSentence.includes("[ ______ ]"), true);
+    assert.equal(res.clozeSentence, "A high-ranking [ ______ ] arrived in Vientiane yesterday.");
+    assert.equal(res.originalSentence, "A high-ranking delegation arrived in Vientiane yesterday.");
+  });
+
+  test("extracts bilingual translation from context_sentence bracket syntax", () => {
+    const item = {
+      word: "armed forces",
+      meaning: "lực lượng vũ trang",
+      context_sentence: '"Traditional Day of the Capital Armed Forces" [Ngày truyền thống lực lượng vũ trang Thủ đô]',
+      source_lang: "en",
+    };
+    const res = getD3ClozeSentence(item);
+    assert.equal(res.clozeSentence.includes("[ ______ ]"), true);
+    assert.equal(res.translation, "Ngày truyền thống lực lượng vũ trang Thủ đô");
+  });
+
+  test("provides multi-language fallback template when context_sentence is missing", () => {
+    const itemEn = { word: "crucial", meaning: "then chốt", source_lang: "en" };
+    const resEn = getD3ClozeSentence(itemEn);
+    assert.equal(resEn.clozeSentence.includes("[ ______ ]"), true);
+    assert.equal(resEn.translation, "Nghĩa: then chốt");
+
+    const itemFr = { word: "essentiel", meaning: "thiết yếu", source_lang: "fr" };
+    const resFr = getD3ClozeSentence(itemFr);
+    assert.equal(resFr.clozeSentence.includes("[ ______ ]"), true);
+    assert.equal(resFr.clozeSentence.includes("souligné"), true);
+  });
+
+  test("handles null or empty item gracefully", () => {
+    const res = getD3ClozeSentence(null);
+    assert.equal(res.clozeSentence, "[ ______ ]");
+    assert.equal(res.originalSentence, "");
+    assert.equal(res.translation, "");
   });
 });

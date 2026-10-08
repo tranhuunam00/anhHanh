@@ -17,6 +17,8 @@ import {
   EXERCISE_FORMATS,
   generateD1Options,
   generateD2Options,
+  generateD3Options,
+  getD3ClozeSentence,
   maskTargetWordInSentence,
   isAnswerCorrect,
 } from "../../../utils/vocabExerciseGenerators";
@@ -63,11 +65,20 @@ export const VocabExercisePractice = ({
   // Generate 4 randomized multiple-choice options according to format
   const mcqOptions = useMemo(() => {
     if (!currentItem) return [];
+    if (format === EXERCISE_FORMATS.D3) {
+      return generateD3Options(currentItem, items);
+    }
     if (format === EXERCISE_FORMATS.D2) {
       return generateD2Options(currentItem, items);
     }
     return generateD1Options(currentItem, items);
   }, [currentItem, format, items]);
+
+  // Compute cloze sentence data for Dạng 3
+  const clozeData = useMemo(() => {
+    if (format !== EXERCISE_FORMATS.D3 || !currentItem) return null;
+    return getD3ClozeSentence(currentItem);
+  }, [currentItem, format]);
 
   // Reset per-question state and auto-play audio for Dạng 1
   useEffect(() => {
@@ -96,8 +107,8 @@ export const VocabExercisePractice = ({
       // Phát âm thanh phản hồi đúng/sai tức thì qua Web Audio API
       playSoundFeedback(correct);
 
-      // Ở Dạng 2, phát âm thanh từ vựng chuẩn ngay khi chọn
-      if (currentItem.word) {
+      // Ở Dạng 2 & Dạng 3, phát âm thanh từ vựng chuẩn ngay khi chọn
+      if ((format === EXERCISE_FORMATS.D2 || format === EXERCISE_FORMATS.D3) && currentItem.word) {
         playAudio(currentItem.word, currentItem.source_lang);
       }
 
@@ -143,7 +154,9 @@ export const VocabExercisePractice = ({
   if (!currentItem) return null;
 
   const progressPercent = items.length > 0 ? Math.round(((currentIndex + 1) / items.length) * 100) : 0;
+  const isD1 = format === EXERCISE_FORMATS.D1;
   const isD2 = format === EXERCISE_FORMATS.D2;
+  const isD3 = format === EXERCISE_FORMATS.D3;
   const langLabel = getLanguageLabel(currentItem.source_lang);
 
   return (
@@ -192,7 +205,12 @@ export const VocabExercisePractice = ({
         <div className="ex-mode-banner">
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             <span className="ex-mode-tag">
-              {isD2 ? (
+              {isD3 ? (
+                <>
+                  <Lightbulb size={14} />
+                  <span>Dạng 3: Điền từ vào câu ngữ cảnh</span>
+                </>
+              ) : isD2 ? (
                 <>
                   <Sparkles size={14} />
                   <span>Dạng 2: Nghĩa VN ➔ Chọn Từ vựng</span>
@@ -219,27 +237,81 @@ export const VocabExercisePractice = ({
         {/* Main Exercise Arena */}
         <div className="exercise-body">
           <div className="ex-question-card">
-            {/* Question Display for Dạng 1 vs Dạng 2 */}
-            {!isD2 ? (
-              /* DẠNG 1: HIỂN THỊ TỪ VỰNG TIẾNG ANH / NGUỒN */
-              <>
-                <div className="ex-target-word">
-                  <span>{currentItem.word}</span>
-                  <button
-                    type="button"
-                    className={`ex-audio-circle-btn ${isPlayingAudio ? "playing" : ""}`}
-                    onClick={() => playAudio(currentItem.word, currentItem.source_lang)}
-                    title="Nghe phát âm (Phím Ctrl)"
-                  >
-                    <Volume2 size={22} />
-                  </button>
+            {/* Question Display for Dạng 1 vs Dạng 2 vs Dạng 3 */}
+            {isD3 ? (
+              /* DẠNG 3: ĐIỀN TỪ VÀO CÂU NGỮ CẢNH (CLOZE TEST) */
+              <div className="ex-target-cloze-wrap">
+                <div className="ex-cloze-prompt-label">
+                  <Lightbulb size={14} color="var(--primary)" />
+                  <span>Chọn từ vựng thích hợp nhất để điền vào chỗ trống:</span>
                 </div>
 
-                {currentItem.phonetic && (
-                  <div className="ex-target-ipa">{currentItem.phonetic}</div>
+                <div className="ex-cloze-sentence-display">
+                  “
+                  {(() => {
+                    const clozeText = clozeData?.clozeSentence || maskTargetWordInSentence(currentItem.context_sentence, currentItem.word);
+                    const parts = clozeText.split("[ ______ ]");
+                    if (isAnswered) {
+                      return (
+                        <>
+                          {parts.map((p, idx) => (
+                            <React.Fragment key={idx}>
+                              {p}
+                              {idx < parts.length - 1 && (
+                                <span className="ex-cloze-blank-filled">
+                                  {currentItem.word}
+                                </span>
+                              )}
+                            </React.Fragment>
+                          ))}
+                        </>
+                      );
+                    }
+                    return (
+                      <>
+                        {parts.map((p, idx) => (
+                          <React.Fragment key={idx}>
+                            {p}
+                            {idx < parts.length - 1 && (
+                              <span className="ex-cloze-blank-box">[ ______ ]</span>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </>
+                    );
+                  })()}
+                  ”
+                </div>
+
+                <div className="ex-cloze-hint-row">
+                  <div className="ex-cloze-meaning-badge">
+                    <span className="ex-cloze-hint-tag">Nghĩa:</span>
+                    <strong>{currentItem.meaning}</strong>
+                  </div>
+
+                  {currentItem.phonetic && (
+                    <span className="ex-cloze-ipa-badge">{currentItem.phonetic}</span>
+                  )}
+
+                  {isAnswered && (
+                    <button
+                      type="button"
+                      className={`ex-audio-mini-btn ${isPlayingAudio ? "playing" : ""}`}
+                      onClick={() => playAudio(currentItem.word, currentItem.source_lang)}
+                      title="Nghe phát âm từ này"
+                    >
+                      <Volume2 size={16} />
+                    </button>
+                  )}
+                </div>
+
+                {isAnswered && clozeData?.translation && (
+                  <div className="ex-cloze-translation-box">
+                    <span className="ex-cloze-trans-label">Dịch câu:</span> “{clozeData.translation}”
+                  </div>
                 )}
-              </>
-            ) : (
+              </div>
+            ) : isD2 ? (
               /* DẠNG 2: HIỂN THỊ NGHĨA TIẾNG VIỆT CẦN GỢI NHỚ */
               <div className="ex-target-meaning-wrap">
                 <div className="ex-target-meaning-label">Nghĩa tiếng Việt cần gợi nhớ:</div>
@@ -274,10 +346,29 @@ export const VocabExercisePractice = ({
                   </div>
                 )}
               </div>
+            ) : (
+              /* DẠNG 1: HIỂN THỊ TỪ VỰNG TIẾNG ANH / NGUỒN */
+              <>
+                <div className="ex-target-word">
+                  <span>{currentItem.word}</span>
+                  <button
+                    type="button"
+                    className={`ex-audio-circle-btn ${isPlayingAudio ? "playing" : ""}`}
+                    onClick={() => playAudio(currentItem.word, currentItem.source_lang)}
+                    title="Nghe phát âm (Phím Ctrl)"
+                  >
+                    <Volume2 size={22} />
+                  </button>
+                </div>
+
+                {currentItem.phonetic && (
+                  <div className="ex-target-ipa">{currentItem.phonetic}</div>
+                )}
+              </>
             )}
 
-            {/* GỢI Ý CÂU NGỮ CẢNH: MẶC ĐỊNH ẨN */}
-            {currentItem.context_sentence && (
+            {/* GỢI Ý CÂU NGỮ CẢNH CHO DẠNG 1 & DẠNG 2 (MẶC ĐỊNH ẨN) */}
+            {!isD3 && currentItem.context_sentence && (
               <div className="ex-context-container">
                 <button
                   type="button"
