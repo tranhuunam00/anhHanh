@@ -4,10 +4,9 @@ import {
   Target,
   Sparkles,
   Check,
-  Eye,
   ArrowRight,
   Lightbulb,
-  Globe,
+  Volume2,
   Layers,
 } from "../../Icons";
 import { EXERCISE_FORMATS, EXERCISE_CATEGORIES } from "../../../utils/vocabExerciseGenerators";
@@ -29,8 +28,9 @@ export const VocabExerciseMenu = ({
   const categories = [
     { key: EXERCISE_CATEGORIES.ALL, label: "Tất cả hình thức", icon: Layers },
     { key: EXERCISE_CATEGORIES.RECOGNITION, label: "Nhận diện nghĩa", icon: Target },
-    { key: EXERCISE_CATEGORIES.RECALL, label: "Gợi nhớ chủ động (Active Recall)", icon: Sparkles },
-    { key: EXERCISE_CATEGORIES.CONTEXT, label: "Ứng dụng ngữ cảnh (Context Cloze)", icon: Lightbulb },
+    { key: EXERCISE_CATEGORIES.RECALL, label: "Gợi nhớ chủ động", icon: Sparkles },
+    { key: EXERCISE_CATEGORIES.CONTEXT, label: "Điền câu ngữ cảnh", icon: Lightbulb },
+    { key: EXERCISE_CATEGORIES.LISTENING, label: "Nghe phản xạ", icon: Volume2 },
   ];
 
   const showD1 =
@@ -39,6 +39,26 @@ export const VocabExerciseMenu = ({
     activeCategory === EXERCISE_CATEGORIES.ALL || activeCategory === EXERCISE_CATEGORIES.RECALL;
   const showD3 =
     activeCategory === EXERCISE_CATEGORIES.ALL || activeCategory === EXERCISE_CATEGORIES.CONTEXT;
+  const showD4 =
+    activeCategory === EXERCISE_CATEGORIES.ALL || activeCategory === EXERCISE_CATEGORIES.LISTENING;
+
+  const getFormatLabel = () => {
+    switch (selectedFormat) {
+      case EXERCISE_FORMATS.D2:
+        return "Dạng 2 (Nghĩa TV ➔ Từ vựng)";
+      case EXERCISE_FORMATS.D3:
+        return "Dạng 3 (Điền từ vào câu)";
+      case EXERCISE_FORMATS.D4:
+        return "Dạng 4 (Nghe phát âm chọn từ)";
+      default:
+        return "Dạng 1 (Từ vựng ➔ Nghĩa TV)";
+    }
+  };
+
+  const currentLimitDisplay =
+    selectedLimit === "ALL"
+      ? totalWords
+      : Math.min(selectedLimit, totalWords || selectedLimit);
 
   return (
     <div className="exercise-modal-backdrop" onClick={onClose}>
@@ -66,7 +86,7 @@ export const VocabExerciseMenu = ({
           <div className="ex-menu-container">
             <div className="ex-menu-headline">
               <h4>Chọn hình thức bài tập luyện tập</h4>
-              <p>Rèn luyện trí nhớ từ vựng qua phản xạ trắc nghiệm đa chiều &amp; hỗ trợ đa ngôn ngữ.</p>
+              <p>Rèn luyện trí nhớ từ vựng qua phản xạ trắc nghiệm 4 dạng thông minh &amp; đa chiều.</p>
             </div>
 
             {/* Category Filter Pills */}
@@ -88,7 +108,7 @@ export const VocabExerciseMenu = ({
               })}
             </div>
 
-            {/* Format Cards Grid */}
+            {/* Format Cards Grid: 4 cards per row */}
             <div className="ex-cards-grid">
               {/* DẠNG 1: TỪ VỰNG -> NGHĨA TIẾNG VIỆT */}
               {showD1 && (
@@ -96,38 +116,30 @@ export const VocabExerciseMenu = ({
                   className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D1 ? "active" : ""}`}
                   onClick={() => onSelectFormat(EXERCISE_FORMATS.D1)}
                 >
-                  <div className="ex-format-badge">
-                    <span className={`ex-pill-badge ${selectedFormat === EXERCISE_FORMATS.D1 ? "active" : ""}`}>
-                      <Target size={14} />
-                      <span>Dạng 1 • Nhận diện nghĩa</span>
-                    </span>
-                    <span className="ex-pill-tag">Từ vựng ➔ Nghĩa tiếng Việt</span>
+                  <div className="ex-card-top">
+                    <div className="ex-card-icon-wrap d1">
+                      <Target size={18} />
+                    </div>
+                    <div className="ex-card-status">
+                      {selectedFormat === EXERCISE_FORMATS.D1 ? (
+                        <span className="ex-selected-chip">
+                          <Check size={12} /> Đang chọn
+                        </span>
+                      ) : (
+                        <span className="ex-format-code">Dạng 1</span>
+                      )}
+                    </div>
                   </div>
 
-                  <h3 className="ex-format-title">Từ vựng ➔ Nghĩa tiếng Việt</h3>
-                  <p className="ex-format-desc">
-                    Quan sát từ vựng &amp; phiên âm IPA, suy luận nghĩa tiếng Việt qua 4 phương án.
-                    Có nút <strong>con mắt gợi ý ngữ cảnh đầy đủ</strong> (mặc định ẩn • Phím Esc).
-                  </p>
+                  <div className="ex-card-main">
+                    <h4 className="ex-card-title">Từ vựng ➔ Nghĩa TV</h4>
+                    <p className="ex-card-desc">
+                      Nhìn từ vựng &amp; phiên âm IPA, chọn nghĩa tiếng Việt chính xác.
+                    </p>
+                  </div>
 
-                  {/* Visual Preview Box */}
-                  <div className="ex-preview-box">
-                    <div className="ex-preview-word-row">
-                      <span className="ex-preview-word">desperate need</span>
-                      <span className="ex-preview-ipa">/dˈɛsprɪt nˈid/</span>
-                    </div>
-                    <div className="ex-preview-eye-demo">
-                      <Eye size={13} />
-                      <span>Gợi ý câu ngữ cảnh (Mặc định ẩn • Phím Esc)</span>
-                    </div>
-                    <div className="ex-preview-options-grid">
-                      <div className="ex-preview-opt">A. tràn ngập</div>
-                      <div className="ex-preview-opt correct">
-                        B. nhu cầu cấp bách <Check size={12} color="#10b981" style={{ verticalAlign: "middle", marginLeft: 4 }} />
-                      </div>
-                      <div className="ex-preview-opt">C. thanh lịch, tao nhã</div>
-                      <div className="ex-preview-opt">D. được coi là đương nhiên</div>
-                    </div>
+                  <div className="ex-card-footer">
+                    <span className="ex-card-tag">Gợi ý câu Esc</span>
                   </div>
                 </div>
               )}
@@ -138,40 +150,30 @@ export const VocabExerciseMenu = ({
                   className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D2 ? "active" : ""}`}
                   onClick={() => onSelectFormat(EXERCISE_FORMATS.D2)}
                 >
-                  <div className="ex-format-badge">
-                    <span className={`ex-pill-badge ${selectedFormat === EXERCISE_FORMATS.D2 ? "active" : ""}`}>
-                      <Sparkles size={14} />
-                      <span>Dạng 2 • Gợi nhớ chủ động (Active Recall)</span>
-                    </span>
-                    <span className="ex-pill-tag">
-                      <Globe size={12} style={{ marginRight: 3, verticalAlign: "middle" }} />
-                      Đa ngôn ngữ
-                    </span>
+                  <div className="ex-card-top">
+                    <div className="ex-card-icon-wrap d2">
+                      <Sparkles size={18} />
+                    </div>
+                    <div className="ex-card-status">
+                      {selectedFormat === EXERCISE_FORMATS.D2 ? (
+                        <span className="ex-selected-chip">
+                          <Check size={12} /> Đang chọn
+                        </span>
+                      ) : (
+                        <span className="ex-format-code">Dạng 2</span>
+                      )}
+                    </div>
                   </div>
 
-                  <h3 className="ex-format-title">Nghĩa tiếng Việt ➔ Chọn Từ vựng</h3>
-                  <p className="ex-format-desc">
-                    Quan sát nghĩa tiếng Việt &amp; hình ảnh minh họa, chủ động gợi nhớ mặt chữ và chọn từ vựng đúng.
-                    Có nút <strong>gợi ý câu ví dụ được che từ mục tiêu [ ______ ]</strong> (mặc định ẩn • Phím Esc).
-                  </p>
+                  <div className="ex-card-main">
+                    <h4 className="ex-card-title">Nghĩa TV ➔ Chọn Từ</h4>
+                    <p className="ex-card-desc">
+                      Gợi nhớ mặt chữ từ tiếng Việt, che từ trong câu ngữ cảnh.
+                    </p>
+                  </div>
 
-                  {/* Visual Preview Box */}
-                  <div className="ex-preview-box">
-                    <div className="ex-preview-word-row">
-                      <span className="ex-preview-meaning-target">"nhu cầu cấp bách"</span>
-                    </div>
-                    <div className="ex-preview-eye-demo">
-                      <Eye size={13} />
-                      <span>Gợi ý câu có che từ: "They are in [ ______ ] of shelter."</span>
-                    </div>
-                    <div className="ex-preview-options-grid">
-                      <div className="ex-preview-opt correct">
-                        A. desperate need <Check size={12} color="#10b981" style={{ verticalAlign: "middle", marginLeft: 4 }} />
-                      </div>
-                      <div className="ex-preview-opt">B. sustainable</div>
-                      <div className="ex-preview-opt">C. comprehensive</div>
-                      <div className="ex-preview-opt">D. inevitable</div>
-                    </div>
+                  <div className="ex-card-footer">
+                    <span className="ex-card-tag">Active Recall</span>
                   </div>
                 </div>
               )}
@@ -182,42 +184,64 @@ export const VocabExerciseMenu = ({
                   className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D3 ? "active" : ""}`}
                   onClick={() => onSelectFormat(EXERCISE_FORMATS.D3)}
                 >
-                  <div className="ex-format-badge">
-                    <span className={`ex-pill-badge ${selectedFormat === EXERCISE_FORMATS.D3 ? "active" : ""}`}>
-                      <Lightbulb size={14} />
-                      <span>Dạng 3 • Ứng dụng ngữ cảnh (Context Cloze)</span>
-                    </span>
-                    <span className="ex-pill-tag">
-                      <Globe size={12} style={{ marginRight: 3, verticalAlign: "middle" }} />
-                      Điền từ vào câu
-                    </span>
+                  <div className="ex-card-top">
+                    <div className="ex-card-icon-wrap d3">
+                      <Lightbulb size={18} />
+                    </div>
+                    <div className="ex-card-status">
+                      {selectedFormat === EXERCISE_FORMATS.D3 ? (
+                        <span className="ex-selected-chip">
+                          <Check size={12} /> Đang chọn
+                        </span>
+                      ) : (
+                        <span className="ex-format-code">Dạng 3</span>
+                      )}
+                    </div>
                   </div>
 
-                  <h3 className="ex-format-title">Điền từ vào câu ngữ cảnh</h3>
-                  <p className="ex-format-desc">
-                    Quan sát câu ví dụ thực tế có chỗ trống <strong>[ ______ ]</strong> và gợi ý nghĩa tiếng Việt,
-                    chọn từ vựng chuẩn xác nhất để hoàn thiện câu hoàn chỉnh.
-                  </p>
+                  <div className="ex-card-main">
+                    <h4 className="ex-card-title">Điền từ vào câu</h4>
+                    <p className="ex-card-desc">
+                      Quan sát câu ví dụ khuyết từ [ ___ ] &amp; gợi ý nghĩa để hoàn thiện câu.
+                    </p>
+                  </div>
 
-                  {/* Visual Preview Box */}
-                  <div className="ex-preview-box">
-                    <div className="ex-preview-word-row">
-                      <span className="ex-preview-cloze-demo">
-                        "Vietnam and Laos reaffirmed their <span className="ex-cloze-target-blank">[ ______ ]</span> and mutual ties."
-                      </span>
+                  <div className="ex-card-footer">
+                    <span className="ex-card-tag">Context Cloze</span>
+                  </div>
+                </div>
+              )}
+
+              {/* DẠNG 4: NGHE PHÁT ÂM -> CHỌN TỪ (LISTENING RECALL) */}
+              {showD4 && (
+                <div
+                  className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D4 ? "active" : ""}`}
+                  onClick={() => onSelectFormat(EXERCISE_FORMATS.D4)}
+                >
+                  <div className="ex-card-top">
+                    <div className="ex-card-icon-wrap d4">
+                      <Volume2 size={18} />
                     </div>
-                    <div className="ex-preview-meaning-hint">
-                      <Lightbulb size={13} color="var(--primary)" />
-                      <span>Gợi ý nghĩa: "đoàn kết đặc biệt"</span>
+                    <div className="ex-card-status">
+                      {selectedFormat === EXERCISE_FORMATS.D4 ? (
+                        <span className="ex-selected-chip">
+                          <Check size={12} /> Đang chọn
+                        </span>
+                      ) : (
+                        <span className="ex-format-code">Dạng 4</span>
+                      )}
                     </div>
-                    <div className="ex-preview-options-grid">
-                      <div className="ex-preview-opt correct">
-                        A. special solidarity <Check size={12} color="#10b981" style={{ verticalAlign: "middle", marginLeft: 4 }} />
-                      </div>
-                      <div className="ex-preview-opt">B. sustainable</div>
-                      <div className="ex-preview-opt">C. comprehensive</div>
-                      <div className="ex-preview-opt">D. inevitable</div>
-                    </div>
+                  </div>
+
+                  <div className="ex-card-main">
+                    <h4 className="ex-card-title">Nghe phát âm ➔ Chọn từ</h4>
+                    <p className="ex-card-desc">
+                      Nghe âm thanh phát âm bản ngữ chuẩn, rèn phản xạ nhận diện từ vựng.
+                    </p>
+                  </div>
+
+                  <div className="ex-card-footer">
+                    <span className="ex-card-tag">Luyện nghe phản xạ</span>
                   </div>
                 </div>
               )}
@@ -226,7 +250,7 @@ export const VocabExerciseMenu = ({
             {/* Quantity Selector Section */}
             <div className="ex-quantity-section">
               <div className="ex-quantity-label">
-                <span>Chọn số lượng câu hỏi luyện tập:</span>
+                <span>Số lượng câu hỏi:</span>
                 <span className="ex-quantity-subtext">
                   {selectedLimit === "ALL"
                     ? `Tất cả (${totalWords} từ)`
@@ -254,7 +278,7 @@ export const VocabExerciseMenu = ({
               <div className="ex-quantity-helper">
                 <Lightbulb size={14} style={{ verticalAlign: "middle", marginRight: 4, flexShrink: 0 }} />
                 <span>
-                  Nếu chọn số lượng nhỏ hơn tổng số ({totalWords} từ), hệ thống sẽ tự động <strong>random ngẫu nhiên</strong> từ trong Sổ tay của bạn.
+                  Hệ thống tự động <strong>random ngẫu nhiên</strong> từ trong Sổ tay của bạn khi luyện tập.
                 </span>
               </div>
             </div>
@@ -271,7 +295,7 @@ export const VocabExerciseMenu = ({
               ) : (
                 <>
                   <span>
-                    Bắt đầu Luyện tập {selectedFormat === EXERCISE_FORMATS.D2 ? "Dạng 2" : "Dạng 1"} ({selectedLimit === "ALL" ? totalWords : Math.min(selectedLimit, totalWords || selectedLimit)} từ)
+                    Bắt đầu Luyện tập {getFormatLabel()} ({currentLimitDisplay} từ)
                   </span>
                   <ArrowRight size={18} />
                 </>

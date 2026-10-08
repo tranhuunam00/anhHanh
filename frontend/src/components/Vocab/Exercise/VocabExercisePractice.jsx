@@ -18,6 +18,7 @@ import {
   generateD1Options,
   generateD2Options,
   generateD3Options,
+  generateD4Options,
   getD3ClozeSentence,
   maskTargetWordInSentence,
   isAnswerCorrect,
@@ -42,7 +43,6 @@ export const VocabExercisePractice = ({
 
   const currentItem = items[currentIndex];
 
-  // Helper: native audio speech synthesis
   const playAudio = useCallback(
     (wordToSpeak, wordLang = null) => {
       if (typeof window === "undefined" || !("speechSynthesis" in window) || !wordToSpeak) return;
@@ -62,31 +62,25 @@ export const VocabExercisePractice = ({
     [currentItem]
   );
 
-  // Generate 4 randomized multiple-choice options according to format
   const mcqOptions = useMemo(() => {
     if (!currentItem) return [];
-    if (format === EXERCISE_FORMATS.D3) {
-      return generateD3Options(currentItem, items);
-    }
-    if (format === EXERCISE_FORMATS.D2) {
-      return generateD2Options(currentItem, items);
-    }
+    if (format === EXERCISE_FORMATS.D4) return generateD4Options(currentItem, items);
+    if (format === EXERCISE_FORMATS.D3) return generateD3Options(currentItem, items);
+    if (format === EXERCISE_FORMATS.D2) return generateD2Options(currentItem, items);
     return generateD1Options(currentItem, items);
   }, [currentItem, format, items]);
 
-  // Compute cloze sentence data for Dạng 3
   const clozeData = useMemo(() => {
     if (format !== EXERCISE_FORMATS.D3 || !currentItem) return null;
     return getD3ClozeSentence(currentItem);
   }, [currentItem, format]);
 
-  // Reset per-question state and auto-play audio for Dạng 1
   useEffect(() => {
     setSelectedOption(null);
     setIsAnswered(false);
     setShowContext(false);
 
-    if (format === EXERCISE_FORMATS.D1 && currentItem?.word) {
+    if ((format === EXERCISE_FORMATS.D1 || format === EXERCISE_FORMATS.D4) && currentItem?.word) {
       const timer = setTimeout(() => {
         playAudio(currentItem.word, currentItem.source_lang);
       }, 250);
@@ -94,7 +88,6 @@ export const VocabExercisePractice = ({
     }
   }, [currentIndex, currentItem, format, playAudio]);
 
-  // Handle user selecting an option
   const handleSelectOption = useCallback(
     (opt) => {
       if (isAnswered || !currentItem) return;
@@ -103,16 +96,12 @@ export const VocabExercisePractice = ({
       setIsAnswered(true);
 
       const correct = isAnswerCorrect(opt, currentItem, format);
-
-      // Phát âm thanh phản hồi đúng/sai tức thì qua Web Audio API
       playSoundFeedback(correct);
 
-      // Ở Dạng 2 & Dạng 3, phát âm thanh từ vựng chuẩn ngay khi chọn
-      if ((format === EXERCISE_FORMATS.D2 || format === EXERCISE_FORMATS.D3) && currentItem.word) {
+      if (format !== EXERCISE_FORMATS.D1 && currentItem.word) {
         playAudio(currentItem.word, currentItem.source_lang);
       }
 
-      // Tự động chuyển câu sau 950ms để người học kịp quan sát kết quả
       setTimeout(() => {
         onProceed(correct, opt);
       }, 950);
@@ -120,26 +109,22 @@ export const VocabExercisePractice = ({
     [currentItem, format, isAnswered, onProceed, playAudio]
   );
 
-  // Keyboard navigation shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (isAnswered) return;
 
-      // Escape: toggle context hint
       if (e.key === "Escape" || e.key === "Esc") {
         e.preventDefault();
         setShowContext((prev) => !prev);
         return;
       }
 
-      // Ctrl or Space: replay audio
-      if (e.key === "Control" || (e.ctrlKey && !e.altKey && !e.shiftKey) || e.key === " " || e.key === "Spacebar") {
+      if (e.key === "Control" || (e.ctrlKey && !e.altKey && !e.shiftKey) || e.key === " ") {
         e.preventDefault();
         if (currentItem?.word) playAudio(currentItem.word, currentItem.source_lang);
         return;
       }
 
-      // Number keys 1-4: select option
       const keyIndex = ["1", "2", "3", "4"].indexOf(e.key);
       if (keyIndex !== -1 && mcqOptions[keyIndex]) {
         e.preventDefault();
@@ -157,6 +142,7 @@ export const VocabExercisePractice = ({
   const isD1 = format === EXERCISE_FORMATS.D1;
   const isD2 = format === EXERCISE_FORMATS.D2;
   const isD3 = format === EXERCISE_FORMATS.D3;
+  const isD4 = format === EXERCISE_FORMATS.D4;
   const langLabel = getLanguageLabel(currentItem.source_lang);
 
   return (
@@ -183,9 +169,7 @@ export const VocabExercisePractice = ({
           <div className="ex-header-meta">
             <div className="ex-score-badge">
               <Trophy size={14} />
-              <span>
-                {score} / {items.length}
-              </span>
+              <span>{score} / {items.length}</span>
             </div>
 
             {combo > 1 && (
@@ -205,21 +189,14 @@ export const VocabExercisePractice = ({
         <div className="ex-mode-banner">
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             <span className="ex-mode-tag">
-              {isD3 ? (
-                <>
-                  <Lightbulb size={14} />
-                  <span>Dạng 3: Điền từ vào câu ngữ cảnh</span>
-                </>
+              {isD4 ? (
+                <><Volume2 size={14} /><span>Dạng 4: Nghe phát âm ➔ Chọn từ</span></>
+              ) : isD3 ? (
+                <><Lightbulb size={14} /><span>Dạng 3: Điền từ vào câu</span></>
               ) : isD2 ? (
-                <>
-                  <Sparkles size={14} />
-                  <span>Dạng 2: Nghĩa VN ➔ Chọn Từ vựng</span>
-                </>
+                <><Sparkles size={14} /><span>Dạng 2: Nghĩa TV ➔ Chọn từ</span></>
               ) : (
-                <>
-                  <Target size={14} />
-                  <span>Dạng 1: Từ vựng ➔ Nghĩa tiếng Việt</span>
-                </>
+                <><Target size={14} /><span>Dạng 1: Từ vựng ➔ Nghĩa TV</span></>
               )}
             </span>
 
@@ -237,9 +214,37 @@ export const VocabExercisePractice = ({
         {/* Main Exercise Arena */}
         <div className="exercise-body">
           <div className="ex-question-card">
-            {/* Question Display for Dạng 1 vs Dạng 2 vs Dạng 3 */}
-            {isD3 ? (
-              /* DẠNG 3: ĐIỀN TỪ VÀO CÂU NGỮ CẢNH (CLOZE TEST) */
+            {/* DẠNG 4: NGHE PHÁT ÂM */}
+            {isD4 ? (
+              <div className="ex-target-audio-wrap">
+                <div className="ex-audio-prompt-label">
+                  Nghe âm thanh phát âm và chọn từ vựng tương ứng:
+                </div>
+
+                <div className="ex-audio-center-box">
+                  <button
+                    type="button"
+                    className={`ex-audio-large-btn ${isPlayingAudio ? "playing" : ""}`}
+                    onClick={() => playAudio(currentItem.word, currentItem.source_lang)}
+                    title="Bấm để nghe phát âm (hoặc phím Space / Ctrl)"
+                  >
+                    <Volume2 size={36} />
+                  </button>
+                  <span className="ex-audio-click-hint">
+                    {isPlayingAudio ? "Đang phát âm..." : "Bấm để nghe lại (hoặc phím Space)"}
+                  </span>
+                </div>
+
+                {isAnswered && (
+                  <div className="ex-target-revealed-row">
+                    <span className="ex-revealed-word">{currentItem.word}</span>
+                    {currentItem.phonetic && <span className="ex-revealed-ipa">{currentItem.phonetic}</span>}
+                    <span className="ex-revealed-meaning">“{currentItem.meaning}”</span>
+                  </div>
+                )}
+              </div>
+            ) : isD3 ? (
+              /* DẠNG 3: ĐIỀN TỪ VÀO CÂU NGỮ CẢNH */
               <div className="ex-target-cloze-wrap">
                 <div className="ex-cloze-prompt-label">
                   <Lightbulb size={14} color="var(--primary)" />
@@ -252,33 +257,23 @@ export const VocabExercisePractice = ({
                     const clozeText = clozeData?.clozeSentence || maskTargetWordInSentence(currentItem.context_sentence, currentItem.word);
                     const parts = clozeText.split("[ ______ ]");
                     if (isAnswered) {
-                      return (
-                        <>
-                          {parts.map((p, idx) => (
-                            <React.Fragment key={idx}>
-                              {p}
-                              {idx < parts.length - 1 && (
-                                <span className="ex-cloze-blank-filled">
-                                  {currentItem.word}
-                                </span>
-                              )}
-                            </React.Fragment>
-                          ))}
-                        </>
-                      );
+                      return parts.map((p, idx) => (
+                        <React.Fragment key={idx}>
+                          {p}
+                          {idx < parts.length - 1 && (
+                            <span className="ex-cloze-blank-filled">{currentItem.word}</span>
+                          )}
+                        </React.Fragment>
+                      ));
                     }
-                    return (
-                      <>
-                        {parts.map((p, idx) => (
-                          <React.Fragment key={idx}>
-                            {p}
-                            {idx < parts.length - 1 && (
-                              <span className="ex-cloze-blank-box">[ ______ ]</span>
-                            )}
-                          </React.Fragment>
-                        ))}
-                      </>
-                    );
+                    return parts.map((p, idx) => (
+                      <React.Fragment key={idx}>
+                        {p}
+                        {idx < parts.length - 1 && (
+                          <span className="ex-cloze-blank-box">[ ______ ]</span>
+                        )}
+                      </React.Fragment>
+                    ));
                   })()}
                   ”
                 </div>
@@ -312,29 +307,21 @@ export const VocabExercisePractice = ({
                 )}
               </div>
             ) : isD2 ? (
-              /* DẠNG 2: HIỂN THỊ NGHĨA TIẾNG VIỆT CẦN GỢI NHỚ */
+              /* DẠNG 2: NGHĨA TIẾNG VIỆT */
               <div className="ex-target-meaning-wrap">
                 <div className="ex-target-meaning-label">Nghĩa tiếng Việt cần gợi nhớ:</div>
                 <div className="ex-target-meaning-text">“{currentItem.meaning}”</div>
 
-                {/* Optional thumbnail image if word has an image */}
                 {currentItem.image_url && (
                   <div className="ex-target-thumb-wrap">
-                    <img
-                      src={currentItem.image_url}
-                      alt={currentItem.word}
-                      className="ex-target-thumb"
-                    />
+                    <img src={currentItem.image_url} alt={currentItem.word} className="ex-target-thumb" />
                   </div>
                 )}
 
-                {/* Speaker button to listen after answering */}
                 {isAnswered && (
                   <div className="ex-target-revealed-row">
                     <span className="ex-revealed-word">{currentItem.word}</span>
-                    {currentItem.phonetic && (
-                      <span className="ex-revealed-ipa">{currentItem.phonetic}</span>
-                    )}
+                    {currentItem.phonetic && <span className="ex-revealed-ipa">{currentItem.phonetic}</span>}
                     <button
                       type="button"
                       className={`ex-audio-mini-btn ${isPlayingAudio ? "playing" : ""}`}
@@ -347,7 +334,7 @@ export const VocabExercisePractice = ({
                 )}
               </div>
             ) : (
-              /* DẠNG 1: HIỂN THỊ TỪ VỰNG TIẾNG ANH / NGUỒN */
+              /* DẠNG 1: TỪ VỰNG TIẾNG ANH */
               <>
                 <div className="ex-target-word">
                   <span>{currentItem.word}</span>
@@ -367,8 +354,8 @@ export const VocabExercisePractice = ({
               </>
             )}
 
-            {/* GỢI Ý CÂU NGỮ CẢNH CHO DẠNG 1 & DẠNG 2 (MẶC ĐỊNH ẨN) */}
-            {!isD3 && currentItem.context_sentence && (
+            {/* GỢI Ý CÂU NGỮ CẢNH CHO D1 & D2 */}
+            {(isD1 || isD2) && currentItem.context_sentence && (
               <div className="ex-context-container">
                 <button
                   type="button"
@@ -377,35 +364,21 @@ export const VocabExercisePractice = ({
                   title="Nhấn phím Esc hoặc bấm để bật/tắt gợi ý câu ví dụ"
                 >
                   {showContext ? (
-                    <>
-                      <EyeOff size={15} />
-                      <span>Ẩn gợi ý ngữ cảnh (Phím Esc)</span>
-                    </>
+                    <><EyeOff size={15} /><span>Ẩn gợi ý ngữ cảnh (Phím Esc)</span></>
                   ) : (
-                    <>
-                      <Eye size={15} />
-                      <span>
-                        {isD2
-                          ? "Gợi ý câu có che từ [ ______ ] (Phím Esc)"
-                          : "Gợi ý trong câu (Mặc định ẩn • Phím Esc)"}
-                      </span>
-                    </>
+                    <><Eye size={15} /><span>{isD2 ? "Gợi ý câu [ ______ ] (Phím Esc)" : "Gợi ý ngữ cảnh (Phím Esc)"}</span></>
                   )}
                 </button>
 
                 {showContext && (
                   <div className="ex-context-quote">
-                    “
-                    {isD2
-                      ? maskTargetWordInSentence(currentItem.context_sentence, currentItem.word)
-                      : currentItem.context_sentence}
-                    ”
+                    “{isD2 ? maskTargetWordInSentence(currentItem.context_sentence, currentItem.word) : currentItem.context_sentence}”
                   </div>
                 )}
               </div>
             )}
 
-            {/* 4 Multiple Choice Options (2x2 Grid) */}
+            {/* 4 MCQ OPTIONS */}
             <div className="ex-mcq-grid">
               {mcqOptions.map((opt, i) => {
                 const isSelected = selectedOption === opt;
@@ -447,11 +420,11 @@ export const VocabExercisePractice = ({
               })}
             </div>
 
-            {/* Keyboard shortcut tip */}
+            {/* Hint bar */}
             <div className="ex-keyboard-hint">
               <Lightbulb size={14} style={{ verticalAlign: "middle", marginRight: 4 }} />
               <span>
-                Mẹo: Bấm <strong>1, 2, 3, 4</strong> để chọn • <strong>Ctrl</strong> nghe lại • <strong>Esc</strong> bật/tắt gợi ý
+                Mẹo: Bấm <strong>1, 2, 3, 4</strong> để chọn • <strong>Space/Ctrl</strong> nghe lại • <strong>Esc</strong> gợi ý
               </span>
             </div>
           </div>

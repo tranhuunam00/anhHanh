@@ -8,6 +8,7 @@ export const EXERCISE_FORMATS = {
   D1: "FORMAT_D1", // Dạng 1: Từ vựng -> Nghĩa tiếng Việt (Recognition)
   D2: "FORMAT_D2", // Dạng 2: Nghĩa tiếng Việt -> Chọn Từ vựng (Active Recall)
   D3: "FORMAT_D3", // Dạng 3: Điền từ vào câu ngữ cảnh (Context Cloze / Sentence Completion)
+  D4: "FORMAT_D4", // Dạng 4: Nghe phát âm -> Chọn từ vựng (Listening Recall)
 };
 
 export const EXERCISE_CATEGORIES = {
@@ -15,6 +16,7 @@ export const EXERCISE_CATEGORIES = {
   RECOGNITION: "RECOGNITION",
   RECALL: "RECALL",
   CONTEXT: "CONTEXT",
+  LISTENING: "LISTENING",
 };
 
 export const FALLBACK_DISTRACTORS_VI = [
@@ -290,13 +292,20 @@ export const generateD3Options = (currentItem, pool = []) => {
 };
 
 /**
+ * Generate 4 multiple-choice options for Dạng 4 (Listening Recall)
+ */
+export const generateD4Options = (currentItem, pool = []) => {
+  return generateD2Options(currentItem, pool);
+};
+
+/**
  * Verify if selected answer is correct
  */
 export const isAnswerCorrect = (selected, currentItem, format = EXERCISE_FORMATS.D1) => {
   if (!selected || !currentItem) return false;
   const sel = String(selected).trim().toLowerCase();
 
-  if (format === EXERCISE_FORMATS.D2 || format === EXERCISE_FORMATS.D3) {
+  if (format === EXERCISE_FORMATS.D2 || format === EXERCISE_FORMATS.D3 || format === EXERCISE_FORMATS.D4) {
     return sel === String(currentItem.word || "").trim().toLowerCase();
   }
 

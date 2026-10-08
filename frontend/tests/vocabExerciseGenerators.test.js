@@ -7,6 +7,7 @@ import {
   generateD1Options,
   generateD2Options,
   generateD3Options,
+  generateD4Options,
   getD3ClozeSentence,
   isAnswerCorrect,
   FALLBACK_DISTRACTORS_VI,
@@ -216,3 +217,46 @@ describe("vocabExerciseGenerators - getD3ClozeSentence", () => {
     assert.equal(res.translation, "");
   });
 });
+
+describe("vocabExerciseGenerators - generateD4Options & isAnswerCorrect (Listening Recall)", () => {
+  const listeningPool = [
+    { id: 1, word: "pronunciation", meaning: "cách phát âm", source_lang: "en" },
+    { id: 2, word: "accent", meaning: "giọng điệu", source_lang: "en" },
+    { id: 3, word: "fluency", meaning: "sự lưu loát", source_lang: "en" },
+    { id: 4, word: "intonation", meaning: "ngữ điệu", source_lang: "en" },
+  ];
+
+  test("generates 4 distinct options containing the correct target word for listening test", () => {
+    const current = listeningPool[0];
+    const options = generateD4Options(current, listeningPool);
+    assert.equal(Array.isArray(options), true);
+    assert.equal(options.length, 4);
+    assert.equal(options.includes("pronunciation"), true);
+    const unique = new Set(options);
+    assert.equal(unique.size, 4);
+  });
+
+  test("utilizes fallback distractors when pool has single item", () => {
+    const single = { id: 10, word: "listening", meaning: "kỹ năng nghe", source_lang: "en" };
+    const options = generateD4Options(single, [single]);
+    assert.equal(options.length, 4);
+    assert.equal(options.includes("listening"), true);
+    const unique = new Set(options);
+    assert.equal(unique.size, 4);
+  });
+
+  test("handles null or missing item safely without crashing", () => {
+    assert.deepEqual(generateD4Options(null, []), []);
+    assert.deepEqual(generateD4Options({}, []), []);
+  });
+
+  test("verifies Dạng 4 answers correctly (case & whitespace insensitive)", () => {
+    const item = { id: 5, word: "Fluency", meaning: "sự lưu loát" };
+    assert.equal(isAnswerCorrect("Fluency", item, EXERCISE_FORMATS.D4), true);
+    assert.equal(isAnswerCorrect("  fluency  ", item, EXERCISE_FORMATS.D4), true);
+    assert.equal(isAnswerCorrect("wrongWord", item, EXERCISE_FORMATS.D4), false);
+    assert.equal(isAnswerCorrect(null, item, EXERCISE_FORMATS.D4), false);
+    assert.equal(isAnswerCorrect("", item, EXERCISE_FORMATS.D4), false);
+  });
+});
+
