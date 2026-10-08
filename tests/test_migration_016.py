@@ -56,6 +56,9 @@ async def test_migration_016_upgrade_and_downgrade():
     async for session in get_db():
         conn = await session.connection()
 
+        # Ensure clean state by running downgrade first
+        await m016.downgrade(conn)
+
         # 1. Upgrade seeds 3,000 items
         await m016.upgrade(conn)
 
