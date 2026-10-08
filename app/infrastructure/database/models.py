@@ -13,7 +13,8 @@ from sqlalchemy import (
     ForeignKey,
     JSON,
     func,
-    inspect
+    inspect,
+    Index
 )
 from sqlalchemy.orm import relationship
 from app.infrastructure.database.connection import Base
@@ -398,6 +399,44 @@ class WritingSubmission(Base):
             'feedback': feedback_data,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
+
+
+class SystemVocabBank(Base):
+    """System-wide curated vocabulary bank with 30 categories for multi-language learning."""
+    __tablename__ = 'system_vocab_bank'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    word = Column(String(255), nullable=False, index=True)
+    phonetic = Column(String(100), nullable=True)
+    meaning = Column(Text, nullable=False)
+    context_sentence = Column(Text, nullable=True)
+    source_lang = Column(String(10), nullable=False, default='en', index=True)
+    category = Column(String(50), nullable=False, index=True)
+    word_type = Column(String(20), nullable=False, default='single_word', index=True)
+    level = Column(String(10), nullable=True, default='B1')
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)
+
+    __table_args__ = (
+        Index('idx_sys_vocab_lang_cat', 'source_lang', 'category'),
+        Index('idx_sys_vocab_lang_type', 'source_lang', 'word_type'),
+    )
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'word': self.word,
+            'phonetic': self.phonetic,
+            'meaning': self.meaning,
+            'context_sentence': self.context_sentence,
+            'source_lang': self.source_lang,
+            'category': self.category,
+            'word_type': self.word_type,
+            'level': self.level,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+
 
 
 

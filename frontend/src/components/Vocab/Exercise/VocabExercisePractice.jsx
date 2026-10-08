@@ -29,6 +29,7 @@ import { getVoiceLang, getLanguageLabel } from "../../../utils/languageVoices";
 export const VocabExercisePractice = ({
   format = EXERCISE_FORMATS.D1,
   items = [],
+  extraDistractors = [],
   currentIndex = 0,
   score = 0,
   combo = 0,
@@ -64,11 +65,11 @@ export const VocabExercisePractice = ({
 
   const mcqOptions = useMemo(() => {
     if (!currentItem) return [];
-    if (format === EXERCISE_FORMATS.D4) return generateD4Options(currentItem, items);
-    if (format === EXERCISE_FORMATS.D3) return generateD3Options(currentItem, items);
-    if (format === EXERCISE_FORMATS.D2) return generateD2Options(currentItem, items);
-    return generateD1Options(currentItem, items);
-  }, [currentItem, format, items]);
+    if (format === EXERCISE_FORMATS.D4) return generateD4Options(currentItem, items, extraDistractors);
+    if (format === EXERCISE_FORMATS.D3) return generateD3Options(currentItem, items, extraDistractors);
+    if (format === EXERCISE_FORMATS.D2) return generateD2Options(currentItem, items, extraDistractors);
+    return generateD1Options(currentItem, items, extraDistractors);
+  }, [currentItem, format, items, extraDistractors]);
 
   const clozeData = useMemo(() => {
     if (format !== EXERCISE_FORMATS.D3 || !currentItem) return null;

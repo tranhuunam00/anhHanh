@@ -75,6 +75,24 @@ describe("vocabExerciseGenerators - generateD1Options (Từ vựng -> Nghĩa VN)
     assert.equal(fallbackMatches.length >= 3, true);
   });
 
+  test("incorporates extraDistractors from system bank into options", () => {
+    const currentItem = { id: 101, word: "meticulous", meaning: "tỉ mỉ, cẩn thận", source_lang: "en" };
+    const bankDistractors = [
+      { id: 201, word: "pragmatic", meaning: "thực dụng" },
+      { id: 202, word: "innovative", meaning: "đột phá, sáng tạo" },
+      { id: 203, word: "resilient", meaning: "kiên cường" },
+    ];
+    const options = generateD1Options(currentItem, [currentItem], bankDistractors);
+
+    assert.equal(options.length, 4);
+    assert.equal(options.includes(currentItem.meaning), true);
+    // Extra distractors meanings should be present among the options
+    const bankMatches = options.filter((opt) =>
+      bankDistractors.some((bd) => bd.meaning === opt)
+    );
+    assert.equal(bankMatches.length >= 2, true);
+  });
+
   test("handles null or missing item safely", () => {
     assert.deepEqual(generateD1Options(null, []), []);
     assert.deepEqual(generateD1Options({}, []), []);
@@ -109,6 +127,23 @@ describe("vocabExerciseGenerators - generateD2Options (Nghĩa VN -> Chọn Từ 
     assert.equal(options.includes("essential"), true);
     const unique = new Set(options);
     assert.equal(unique.size, 4);
+  });
+
+  test("incorporates extraDistractors matching source language into D2 options", () => {
+    const currentItem = { id: 102, word: "développement", meaning: "phát triển", source_lang: "fr" };
+    const bankDistractors = [
+      { id: 201, word: "croissance", meaning: "tăng trưởng", source_lang: "fr" },
+      { id: 202, word: "progrès", meaning: "tiến bộ", source_lang: "fr" },
+      { id: 203, word: "changement", meaning: "thay đổi", source_lang: "fr" },
+    ];
+    const options = generateD2Options(currentItem, [currentItem], bankDistractors);
+
+    assert.equal(options.length, 4);
+    assert.equal(options.includes("développement"), true);
+    const bankMatches = options.filter((opt) =>
+      bankDistractors.some((bd) => bd.word === opt)
+    );
+    assert.equal(bankMatches.length >= 2, true);
   });
 
   test("handles null or missing item safely", () => {
@@ -164,6 +199,22 @@ describe("vocabExerciseGenerators - generateD3Options (Context Cloze)", () => {
     assert.equal(options.includes("solidarity"), true);
     const unique = new Set(options);
     assert.equal(unique.size, 4);
+  });
+
+  test("incorporates extraDistractors into D3 options", () => {
+    const current = clozePool[0];
+    const bankDistractors = [
+      { id: 301, word: "cooperation", source_lang: "en" },
+      { id: 302, word: "partnership", source_lang: "en" },
+      { id: 303, word: "alliance", source_lang: "en" },
+    ];
+    const options = generateD3Options(current, [current], bankDistractors);
+    assert.equal(options.length, 4);
+    assert.equal(options.includes(current.word), true);
+    const bankMatches = options.filter((opt) =>
+      bankDistractors.some((bd) => bd.word === opt)
+    );
+    assert.equal(bankMatches.length >= 2, true);
   });
 
   test("handles null or missing item safely without throwing", () => {

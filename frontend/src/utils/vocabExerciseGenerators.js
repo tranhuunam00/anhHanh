@@ -58,11 +58,13 @@ export const FALLBACK_DISTRACTORS_BY_LANG = {
     "substantial",
     "indispensable",
     "remarkable",
-    "perspective",
-    "consequence",
-    "implementation",
-    "enhancement",
-    "collaboration",
+    "strategic partnership",
+    "bilateral relations",
+    "mutual trust",
+    "supply chain",
+    "work-life balance",
+    "artificial intelligence",
+    "purchasing power",
   ],
   fr: [
     "durable",
@@ -70,11 +72,12 @@ export const FALLBACK_DISTRACTORS_BY_LANG = {
     "considérable",
     "remarquable",
     "indispensable",
-    "perspective",
-    "collaboration",
-    "amélioration",
-    "opportunité",
-    "stratégie",
+    "relations bilatérales",
+    "partenariat stratégique",
+    "confiance mutuelle",
+    "pouvoir d'achat",
+    "chaîne d'approvisionnement",
+    "équilibre de vie",
   ],
   de: [
     "nachhaltig",
@@ -162,7 +165,7 @@ export const maskTargetWordInSentence = (sentence, targetWord) => {
 /**
  * Generate 4 multiple-choice options for Dạng 1 (Target: Vietnamese Meaning)
  */
-export const generateD1Options = (currentItem, pool = []) => {
+export const generateD1Options = (currentItem, pool = [], extraDistractors = []) => {
   if (!currentItem || !currentItem.meaning) return [];
 
   // If options already enriched by BE
@@ -172,18 +175,29 @@ export const generateD1Options = (currentItem, pool = []) => {
 
   const correctMeaning = currentItem.meaning.trim();
   const poolArray = Array.isArray(pool) ? pool : [];
+  const extraArray = Array.isArray(extraDistractors) ? extraDistractors : [];
 
-  // Collect other meanings from pool
-  const otherMeanings = poolArray
-    .filter((it) => it && it.id !== currentItem.id && it.meaning && it.meaning.trim() !== correctMeaning)
-    .map((it) => it.meaning.trim());
+  // Collect other meanings from pool and extra bank distractors
+  const otherMeanings = Array.from(
+    new Set([
+      ...poolArray.filter((it) => it && it.id !== currentItem.id && it.meaning).map((it) => it.meaning.trim()),
+      ...extraArray.filter((it) => it && it.meaning).map((it) => it.meaning.trim()),
+    ])
+  ).filter((m) => m && m.toLowerCase() !== correctMeaning.toLowerCase());
 
-  // Merge with fallback Vietnamese distractors
-  const candidateDistractors = Array.from(new Set([...otherMeanings, ...FALLBACK_DISTRACTORS_VI]))
-    .filter((m) => m && m.toLowerCase() !== correctMeaning.toLowerCase())
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
+  // Shuffle pool/bank distractors first
+  const prioritized = otherMeanings.sort(() => Math.random() - 0.5);
 
+  // If fewer than 3, backfill from fallback Vietnamese distractors
+  const needed = 3 - prioritized.length;
+  const fallbacks = needed > 0
+    ? FALLBACK_DISTRACTORS_VI
+        .filter((m) => m && m.toLowerCase() !== correctMeaning.toLowerCase() && !prioritized.includes(m))
+        .sort(() => Math.random() - 0.5)
+        .slice(0, needed)
+    : [];
+
+  const candidateDistractors = [...prioritized.slice(0, 3), ...fallbacks].slice(0, 3);
   const combined = [...candidateDistractors, correctMeaning];
   return combined.sort(() => Math.random() - 0.5);
 };
@@ -191,27 +205,38 @@ export const generateD1Options = (currentItem, pool = []) => {
 /**
  * Generate 4 multiple-choice options for Dạng 2 (Target: Target Word in source language)
  */
-export const generateD2Options = (currentItem, pool = []) => {
+export const generateD2Options = (currentItem, pool = [], extraDistractors = []) => {
   if (!currentItem || !currentItem.word) return [];
 
   const correctWord = currentItem.word.trim();
   const poolArray = Array.isArray(pool) ? pool : [];
+  const extraArray = Array.isArray(extraDistractors) ? extraDistractors : [];
   const sourceLang = (currentItem.source_lang || "en").toLowerCase();
 
-  // 1. Collect candidate words from pool with same language priority
-  const sameLangWords = poolArray
-    .filter((it) => it && it.id !== currentItem.id && it.word && it.word.trim().toLowerCase() !== correctWord.toLowerCase())
-    .map((it) => it.word.trim());
+  // 1. Collect candidate words from pool and bank distractors with same language priority
+  const sameLangWords = Array.from(
+    new Set([
+      ...poolArray.filter((it) => it && it.id !== currentItem.id && it.word).map((it) => it.word.trim()),
+      ...extraArray
+        .filter((it) => it && it.word && (!it.source_lang || it.source_lang.toLowerCase() === sourceLang))
+        .map((it) => it.word.trim()),
+    ])
+  ).filter((w) => w && w.toLowerCase() !== correctWord.toLowerCase());
 
-  // 2. Fallbacks for target language
+  // Prioritize pool and bank words
+  const prioritized = sameLangWords.sort(() => Math.random() - 0.5);
+
+  // 2. If fewer than 3, backfill from language-specific fallbacks
+  const needed = 3 - prioritized.length;
   const langFallbacks = FALLBACK_DISTRACTORS_BY_LANG[sourceLang] || FALLBACK_DISTRACTORS_BY_LANG.en;
+  const fallbacks = needed > 0
+    ? langFallbacks
+        .filter((w) => w && w.toLowerCase() !== correctWord.toLowerCase() && !prioritized.includes(w))
+        .sort(() => Math.random() - 0.5)
+        .slice(0, needed)
+    : [];
 
-  // 3. Assemble at least 3 distinct distractors
-  const candidateDistractors = Array.from(new Set([...sameLangWords, ...langFallbacks]))
-    .filter((w) => w && w.toLowerCase() !== correctWord.toLowerCase())
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
-
+  const candidateDistractors = [...prioritized.slice(0, 3), ...fallbacks].slice(0, 3);
   const combined = [...candidateDistractors, correctWord];
   return combined.sort(() => Math.random() - 0.5);
 };
@@ -287,8 +312,8 @@ export const getD3ClozeSentence = (currentItem) => {
 /**
  * Generate 4 multiple-choice options for Dạng 3 (Target: Word to fit cloze blank)
  */
-export const generateD3Options = (currentItem, pool = []) => {
-  return generateD2Options(currentItem, pool);
+export const generateD3Options = (currentItem, pool = [], extraDistractors = []) => {
+  return generateD2Options(currentItem, pool, extraDistractors);
 };
 
 /**

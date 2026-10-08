@@ -33,6 +33,7 @@ import VocabExerciseHubModal from "./VocabExerciseHubModal";
 import { AddVocabModal } from "../Modals/AddVocabModal";
 import { EditVocabModal } from "../Modals/EditVocabModal";
 import { AIVocabImportModal } from "../Modals/AIVocabImportModal";
+import { ThemeVocabExplorerModal } from "../Modals/ThemeVocabExplorerModal";
 import { exportVocabToCSV, exportVocabToAnki } from "../../utils/vocabExporter";
 import { splitContextSentence } from "../../utils/textNormalizer";
 import { markVocabStudiedToday } from "../../utils/dailyReminderManager";
@@ -49,6 +50,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [isExerciseHubOpen, setIsExerciseHubOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAIImportModalOpen, setIsAIImportModalOpen] = useState(false);
+  const [isThemeExplorerOpen, setIsThemeExplorerOpen] = useState(false);
   const [editingVocab, setEditingVocab] = useState(null);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [listeningWordId, setListeningWordId] = useState(null);
@@ -448,6 +450,25 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
             >
               <Zap size={14} fill="currentColor" />
               <span>Luyện tập từ vựng</span>
+            </button>
+
+            {/* Theme Vocab Explorer Button */}
+            <button
+              className="btn btn-primary btn-with-icon"
+              onClick={() => setIsThemeExplorerOpen(true)}
+              style={{
+                padding: "6px 14px",
+                fontSize: "0.82rem",
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
+                fontWeight: 700,
+                border: "none",
+                boxShadow: "0 2px 10px rgba(16, 185, 129, 0.35)",
+              }}
+              title="Khám phá và thêm từ vựng theo 30 chủ đề (Tiếng Anh & Tiếng Pháp)"
+            >
+              <Layers size={14} />
+              <span>Từ vựng theo chủ đề</span>
             </button>
 
             {/* Export Dropdown Menu */}
@@ -867,6 +888,19 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
         isOpen={isAIImportModalOpen}
         onClose={() => setIsAIImportModalOpen(false)}
         onSuccess={() => {
+          loadWords();
+          if (refreshStreak) refreshStreak();
+          if (refreshSavedVocab) refreshSavedVocab();
+        }}
+      />
+
+      {/* 30 Topics System Vocab Bank Explorer Modal */}
+      <ThemeVocabExplorerModal
+        isOpen={isThemeExplorerOpen}
+        onClose={() => setIsThemeExplorerOpen(false)}
+        token={token}
+        showToast={showToast}
+        onSuccessImport={() => {
           loadWords();
           if (refreshStreak) refreshStreak();
           if (refreshSavedVocab) refreshSavedVocab();

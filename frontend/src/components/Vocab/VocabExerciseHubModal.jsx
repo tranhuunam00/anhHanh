@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { submitVocabReviewResult, fetchPracticeSession } from "../../services/authVocabService";
+import { fetchSystemDistractors } from "../../services/systemVocabService";
 import { EXERCISE_FORMATS } from "../../utils/vocabExerciseGenerators";
 import { VocabExerciseMenu } from "./Exercise/VocabExerciseMenu";
 import { VocabExercisePractice } from "./Exercise/VocabExercisePractice";
@@ -22,8 +23,9 @@ export default function VocabExerciseHubModal({
   const [selectedLimit, setSelectedLimit] = useState(20);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
 
-  // Active practice session words and score tracking
+  // Active practice session words, bank distractors and score tracking
   const [items, setItems] = useState([]);
+  const [bankDistractors, setBankDistractors] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
@@ -71,6 +73,13 @@ export default function VocabExerciseHubModal({
       setCombo(0);
       setMaxCombo(0);
       setResultsHistory([]);
+
+      // Pre-fetch bank distractors to enrich multiple-choice options
+      const targetLang = sessionWords[0]?.source_lang || "en";
+      fetchSystemDistractors(targetLang, 40)
+        .then((dist) => setBankDistractors(dist || []))
+        .catch(() => {});
+
       setViewMode("PRACTICE");
     } catch (err) {
       console.error("Error starting practice session:", err);
@@ -195,6 +204,7 @@ export default function VocabExerciseHubModal({
     <VocabExercisePractice
       format={selectedFormat}
       items={items}
+      extraDistractors={bankDistractors}
       currentIndex={currentIndex}
       score={score}
       combo={combo}

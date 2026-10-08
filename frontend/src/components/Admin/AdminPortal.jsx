@@ -38,9 +38,10 @@ import {
   sendFeedbackReply,
   uploadFeedbackImage
 } from '../../services/feedbackService';
+import { AdminVocabBankTab } from './AdminVocabBankTab';
 
 export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'users' | 'feedbacks'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'users' | 'feedbacks' | 'vocab_bank'
   const [overview, setOverview] = useState(null);
   const [users, setUsers] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
@@ -414,6 +415,15 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                 {overview.feedbacks_pending}
               </span>
             ) : null}
+          </button>
+          <button
+            type="button"
+            className={`admin-tab-btn ${activeTab === 'vocab_bank' ? 'active' : ''}`}
+            onClick={() => setActiveTab('vocab_bank')}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Layers size={15} /> Ngân hàng từ vựng (30 chủ đề)
+            </span>
           </button>
         </div>
       </div>
@@ -1145,6 +1155,11 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* TAB 4: SYSTEM VOCABULARY BANK (30 CATEGORIES) */}
+      {activeTab === 'vocab_bank' && (
+        <AdminVocabBankTab token={token} showToast={showToast} />
       )}
 
       {/* LIGHTBOX MODAL */}

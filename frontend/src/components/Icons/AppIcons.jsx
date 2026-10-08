@@ -754,6 +754,7 @@ export const ListFilter = (props) => (
     <path d="M3 6h18M7 12h10M10 18h4" />
   </BaseIcon>
 );
+export const Filter = ListFilter;
 
 export const ListOrdered = (props) => (
   <BaseIcon {...props}>
