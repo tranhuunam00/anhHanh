@@ -124,7 +124,7 @@ export function ReaderSidebar({
             </button>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="reader-player-sub-row">
             <button
               className={`reader-single-sentence-pill ${onlyCurrentSentence ? "active" : ""}`}
               onClick={onToggleSingleSentenceMode}

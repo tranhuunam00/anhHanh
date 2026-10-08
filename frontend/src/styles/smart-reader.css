@@ -631,26 +631,37 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 14px 18px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .reader-player-main-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
 .reader-player-controls-left {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.reader-player-controls-left .btn-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .reader-player-controls-right {
@@ -660,9 +671,23 @@
 }
 
 .reader-play-btn {
-  min-width: 125px;
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 8px;
   font-weight: 700;
+  font-size: 0.82rem;
   justify-content: center;
+  white-space: nowrap;
+  gap: 6px;
+}
+
+.reader-player-sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
 }
 
 .reader-sentence-badge {
