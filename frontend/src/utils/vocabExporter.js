@@ -11,17 +11,14 @@ const STATUS_LABELS = {
   MASTERED: "Đã thuộc",
 };
 
-const escapeCsvCell = (val) => {
+export const escapeCsvCell = (val) => {
   if (val === null || val === undefined) return '""';
   const str = String(val).replace(/"/g, '""');
   return `"${str}"`;
 };
 
-/**
- * Export vocabulary list to CSV file with UTF-8 BOM
- */
-export const exportVocabToCSV = (items, filename = "ShotLang_TuVung") => {
-  if (!items || items.length === 0) return false;
+export const buildVocabCSVContent = (items) => {
+  if (!items || items.length === 0) return "";
 
   const headers = [
     "STT",
@@ -52,19 +49,23 @@ export const exportVocabToCSV = (items, filename = "ShotLang_TuVung") => {
       .join(",");
   });
 
-  // UTF-8 BOM (\uFEFF) ensures Excel renders Vietnamese diacritics perfectly
-  const csvContent = "\uFEFF" + [headers.map(escapeCsvCell).join(","), ...rows].join("\r\n");
+  return "\uFEFF" + [headers.map(escapeCsvCell).join(","), ...rows].join("\r\n");
+};
+
+/**
+ * Export vocabulary list to CSV file with UTF-8 BOM
+ */
+export const exportVocabToCSV = (items, filename = "ShotLang_TuVung") => {
+  const csvContent = buildVocabCSVContent(items);
+  if (!csvContent) return false;
 
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   triggerDownload(blob, `${filename}_${formatDate(new Date())}.csv`);
   return true;
 };
 
-/**
- * Export vocabulary list to Anki Deck TSV format
- */
-export const exportVocabToAnki = (items, filename = "ShotLang_Anki") => {
-  if (!items || items.length === 0) return false;
+export const buildVocabAnkiContent = (items) => {
+  if (!items || items.length === 0) return "";
 
   const rows = items.map((item) => {
     // Front side: Word + IPA + Context Sentence
@@ -89,7 +90,16 @@ export const exportVocabToAnki = (items, filename = "ShotLang_Anki") => {
     return `${front}\t${back}\tShotLang`;
   });
 
-  const ankiContent = rows.join("\r\n");
+  return rows.join("\r\n");
+};
+
+/**
+ * Export vocabulary list to Anki Deck TSV format
+ */
+export const exportVocabToAnki = (items, filename = "ShotLang_Anki") => {
+  const ankiContent = buildVocabAnkiContent(items);
+  if (!ankiContent) return false;
+
   const blob = new Blob([ankiContent], { type: "text/plain;charset=utf-8;" });
   triggerDownload(blob, `${filename}_Deck_${formatDate(new Date())}.txt`);
   return true;
@@ -112,7 +122,7 @@ const formatDate = (d) => {
   return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
 };
 
-const escapeHtml = (unsafe) => {
+export const escapeHtml = (unsafe) => {
   if (!unsafe) return "";
   return unsafe
     .replace(/&/g, "&amp;")

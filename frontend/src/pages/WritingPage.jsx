@@ -768,6 +768,7 @@ export const WritingPage = ({ isActive = false }) => {
           meaning: vocabItem.meaning,
           phonetic: vocabItem.phonetic,
           context_sentence: vocabItem.context_sentence,
+          source_lang: vocabItem.source_lang || "en",
         },
         token
       );

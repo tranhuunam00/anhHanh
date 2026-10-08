@@ -16,6 +16,8 @@ export const WordLookupPopover = ({
   contextTranslation = "",
   videoId = "",
   timestamp = 0,
+  sourceLang = "en",
+  targetLang = "vi",
   onClose,
 }) => {
   const { token, refreshStreak, refreshSavedVocab, showToast, savedVocabMap } = useAuth();
@@ -179,8 +181,8 @@ export const WordLookupPopover = ({
         phonetic: lookupData.ipa || "",
         video_id: videoId || "",
         timestamp: timestamp || 0,
-        source_lang: "en",
-        target_lang: "vi",
+        source_lang: sourceLang || "en",
+        target_lang: targetLang || "vi",
       };
 
       const res = await createVocabWord(payload, token);

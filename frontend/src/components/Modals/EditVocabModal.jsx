@@ -2,15 +2,9 @@ import React, { useState, useEffect } from "react";
 import {
   Pencil,
   X,
-  Sparkles,
   Volume2,
-  Image as ImageIcon,
-  RotateCw,
   Check,
   Loader2,
-  AlertCircle,
-  BookOpen,
-  Lightbulb,
   Zap,
 } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
@@ -21,8 +15,9 @@ import {
   fetchImageCandidates,
 } from "../../services/authVocabService";
 import { getVoiceLang } from "../../utils/languageVoices";
+import { VocabImagePickerField } from "../Vocab/VocabImagePickerField";
 
-export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
+export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: initialSourceLang }) => {
   const { token, refreshStreak, refreshSavedVocab, showToast } = useAuth();
 
   const [word, setWord] = useState("");
@@ -31,11 +26,11 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
   const [imageUrl, setImageUrl] = useState("");
   const [contextSentence, setContextSentence] = useState("");
   const [vocabStatus, setVocabStatus] = useState("LEARNING");
+  const [sourceLang, setSourceLang] = useState("en");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAutoEnriching, setIsAutoEnriching] = useState(false);
   const [isSearchingImages, setIsSearchingImages] = useState(false);
-  const [imageCandidates, setImageCandidates] = useState([]);
   const [imgLoadError, setImgLoadError] = useState(false);
 
   // Sync form inputs when active vocab item changes
@@ -47,19 +42,19 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
       setImageUrl(vocab.image_url || "");
       setContextSentence(vocab.context_sentence || "");
       setVocabStatus(vocab.status || "LEARNING");
-      setImageCandidates([]);
+      setSourceLang(vocab.source_lang || initialSourceLang || "en");
       setImgLoadError(false);
     }
-  }, [vocab]);
+  }, [vocab, initialSourceLang]);
 
   if (!isOpen || !vocab) return null;
 
   // Audio preview helper using browser Speech Synthesis
-  const handleTestPronounce = (textToSpeak, lang = null) => {
+  const handleTestPronounce = (textToSpeak) => {
     if (!textToSpeak || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = getVoiceLang(lang || vocab?.source_lang, textToSpeak);
+    utterance.lang = getVoiceLang(sourceLang || vocab?.source_lang, textToSpeak);
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   };
@@ -89,7 +84,6 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
         setMeaning(transRes.meaning);
       }
       if (candidates && candidates.length > 0) {
-        setImageCandidates(candidates);
         if (!imageUrl || imageUrl.includes("unsplash.com/photo-1456513080510")) {
           setImageUrl(candidates[0]);
           setImgLoadError(false);
@@ -102,31 +96,6 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
       showToast("Không thể tự động tra cứu, hãy nhập thủ công nhé", "warning");
     } finally {
       setIsAutoEnriching(false);
-    }
-  };
-
-  // Cycle or search alternative images
-  const handleFindAlternativeImages = async () => {
-    const clean = word.trim();
-    if (!clean) return;
-
-    setIsSearchingImages(true);
-    try {
-      const candidates = await fetchImageCandidates(clean, contextSentence, token);
-      if (candidates && candidates.length > 0) {
-        setImageCandidates(candidates);
-        const available = candidates.filter((u) => u !== imageUrl);
-        const nextImg = available[Math.floor(Math.random() * available.length)] || candidates[0];
-        setImageUrl(nextImg);
-        setImgLoadError(false);
-        showToast("Đã đổi sang ảnh gợi ý mới", "info");
-      } else {
-        showToast("Không tìm thấy thêm ảnh gợi ý nào khác", "info");
-      }
-    } catch (e) {
-      showToast("Lỗi khi tìm ảnh gợi ý", "error");
-    } finally {
-      setIsSearchingImages(false);
     }
   };
 
@@ -147,6 +116,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
         image_url: imageUrl.trim() || undefined,
         context_sentence: contextSentence.trim() || "",
         status: vocabStatus,
+        source_lang: sourceLang || "en",
       };
 
       const res = await updateVocabWord(vocab.id, updatePayload, token);
@@ -354,125 +324,19 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Row 3: Image URL & Live Preview */}
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-              <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
-                Link ảnh minh họa (Image URL)
-              </label>
-              <button
-                type="button"
-                onClick={handleFindAlternativeImages}
-                disabled={isSearchingImages || !word.trim()}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#0891b2",
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                }}
-                title="Tìm ảnh minh họa liên quan khác"
-              >
-                <RotateCw size={12} className={isSearchingImages ? "spinning" : ""} />
-                <span>{isSearchingImages ? "Đang tìm..." : "Đổi ảnh khác"}</span>
-              </button>
-            </div>
-
-            <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-              {/* Thumbnail Live Preview */}
-              <div
-                style={{
-                  width: "72px",
-                  height: "72px",
-                  borderRadius: "10px",
-                  border: "1px solid var(--border-color, #cbd5e1)",
-                  overflow: "hidden",
-                  flexShrink: 0,
-                  background: "var(--bg-secondary, #f8fafc)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  position: "relative",
-                }}
-              >
-                {imageUrl && !imgLoadError ? (
-                  <img
-                    src={imageUrl}
-                    alt="Preview"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    onError={() => setImgLoadError(true)}
-                  />
-                ) : (
-                  <div style={{ textAlign: "center", color: "#94a3b8" }}>
-                    <ImageIcon size={22} />
-                    <div style={{ fontSize: "0.6rem" }}>{imgLoadError ? "Lỗi link" : "Chưa có"}</div>
-                  </div>
-                )}
-              </div>
-
-              {/* URL Input */}
-              <div style={{ flex: 1 }}>
-                <input
-                  type="url"
-                  className="dict-input"
-                  style={{
-                    width: "100%",
-                    padding: "8px 12px",
-                    borderRadius: "8px",
-                    border: "1px solid var(--border-color, #e2e8f0)",
-                    background: "var(--bg-input, #fff)",
-                    color: "var(--text-primary, #0f172a)",
-                    fontSize: "0.82rem",
-                    boxSizing: "border-box",
-                  }}
-                  value={imageUrl}
-                  onChange={(e) => {
-                    setImageUrl(e.target.value);
-                    setImgLoadError(false);
-                  }}
-                  placeholder="https://... dán link ảnh trực tiếp tại đây"
-                />
-                <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "0.72rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
-                  <Lightbulb size={12} style={{ flexShrink: 0 }} />
-                  <span>Bạn có thể dán trực tiếp bất kỳ link ảnh nào (PNG, JPG, WebP) hoặc bấm nút "Đổi ảnh khác".</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Candidate image thumbnails strip if available */}
-            {imageCandidates.length > 1 && (
-              <div style={{ display: "flex", gap: "6px", marginTop: "8px", overflowX: "auto", paddingBottom: "4px" }}>
-                {imageCandidates.slice(0, 5).map((candidate, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setImageUrl(candidate);
-                      setImgLoadError(false);
-                    }}
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "6px",
-                      border: imageUrl === candidate ? "2px solid #2563eb" : "1px solid #cbd5e1",
-                      padding: 0,
-                      overflow: "hidden",
-                      cursor: "pointer",
-                      flexShrink: 0,
-                      opacity: imageUrl === candidate ? 1 : 0.7,
-                    }}
-                    title={`Chọn ảnh gợi ý #${idx + 1}`}
-                  >
-                    <img src={candidate} alt="option" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Row 3: Image Picker */}
+          <VocabImagePickerField
+            word={word}
+            contextSentence={contextSentence}
+            imageUrl={imageUrl}
+            setImageUrl={setImageUrl}
+            imgLoadError={imgLoadError}
+            setImgLoadError={setImgLoadError}
+            isSearchingImages={isSearchingImages}
+            setIsSearchingImages={setIsSearchingImages}
+            showToast={showToast}
+            token={token}
+          />
 
           {/* Row 4: Context Sentence */}
           <div>

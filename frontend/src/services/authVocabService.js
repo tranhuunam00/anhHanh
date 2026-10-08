@@ -1,122 +1,47 @@
 /**
- * Safely parse response JSON, falling back cleanly to text or default message if body is not valid JSON
+ * Core Vocabulary Management API Service & Facade for DailyDictation Studio
+ * Delegates Authentication to ./authService.js and AI Import to ./vocabImportService.js
  */
-const safeParseResponse = async (res, defaultMsg = "Thao tác thất bại") => {
-  let data = {};
-  try {
-    const text = await res.text();
-    data = text ? JSON.parse(text) : {};
-  } catch {
-    data = { detail: defaultMsg };
-  }
-  if (!res.ok) {
-    throw new Error(data.detail || defaultMsg);
-  }
-  return data;
-};
+import { safeParseResponse } from "./authService.js";
 
-export const fetchAuthConfig = async () => {
-  try {
-    const res = await fetch("/api/auth/config");
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (e) {
-    console.debug("Could not fetch auth config:", e);
-  }
-  return { google_client_id: "" };
-};
+// Re-export authentication functions for backward compatibility
+export {
+  safeParseResponse,
+  fetchAuthConfig,
+  isTokenExpired,
+  loginWithGoogle,
+  loginWithEmail,
+  registerWithEmail,
+  fetchCurrentUser,
+  fetchStreak,
+} from "./authService.js";
 
-export const isTokenExpired = (token) => {
-  if (!token) return true;
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return false;
-    const base64Url = parts[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    const payload = JSON.parse(jsonPayload);
-    if (!payload.exp) return false;
-    // Grace period of 30 seconds
-    return payload.exp * 1000 < Date.now() - 30000;
-  } catch {
-    return false;
-  }
-};
+// Re-export AI extraction and batch import functions for backward compatibility
+export {
+  aiExtractVocabFromText,
+  extractTextFromFile,
+  aiExtractVocabFromFile,
+  checkVocabDuplicates,
+  batchImportVocab,
+} from "./vocabImportService.js";
 
-export const loginWithGoogle = async (credential, rememberMe = true) => {
-  const res = await fetch("/api/auth/google", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ credential, remember_me: rememberMe }),
-  });
-  return await safeParseResponse(res, "Đăng nhập Google thất bại");
-};
+// Re-export lesson session and history functions for backward compatibility
+export {
+  fetchLessonPreview,
+  startLessonSession,
+  updateLessonProgress,
+  fetchLessonHistory,
+  deleteLessonHistory,
+} from "./lessonSessionService.js";
 
-export const loginWithEmail = async (email, password, rememberMe = true) => {
-  const res = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, remember_me: rememberMe }),
-  });
-  return await safeParseResponse(res, "Đăng nhập thất bại");
-};
-
-export const registerWithEmail = async (email, password, name = "", b_trap = "", rememberMe = true) => {
-  const res = await fetch("/api/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, name, b_trap, remember_me: rememberMe }),
-  });
-  return await safeParseResponse(res, "Đăng ký thất bại");
-};
-
-export const fetchCurrentUser = async (token) => {
-  if (!token) return { ok: false, error: "no_token" };
-  try {
-    const res = await fetch("/api/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return { ok: true, user: data.user };
-    }
-    if (res.status === 401 || res.status === 403) {
-      return { ok: false, error: "unauthorized" };
-    }
-    return { ok: false, error: "server_error" };
-  } catch (e) {
-    console.warn("Could not fetch current user:", e);
-    return { ok: false, error: "network_error" };
-  }
-};
-
-export const fetchStreak = async (token) => {
-  try {
-    const headers = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    const res = await fetch("/api/streak", { headers });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (e) {
-    console.debug("Could not fetch streak:", e);
-  }
-  return { current_streak: 0, max_streak: 0, words_today: 0 };
-};
-
-export const fetchVocabList = async (status = "ALL", search = "", token = null) => {
+export const fetchVocabList = async (status = "ALL", search = "", token = null, sourceLang = null) => {
   try {
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
     const params = new URLSearchParams();
     if (status && status !== "ALL") params.append("status", status);
-    if (search) params.append("search", search);
+    if (search && search.trim()) params.append("search", search.trim());
+    if (sourceLang && sourceLang !== "ALL") params.append("source_lang", sourceLang.trim().toLowerCase());
 
     const res = await fetch(`/api/vocab?${params.toString()}`, { headers });
     if (res.ok) {
@@ -209,12 +134,13 @@ export const fetchPhoneticLookup = async (word, token = null) => {
     if (token) headers["Authorization"] = `Bearer ${token}`;
     const res = await fetch(`/api/vocab/phonetic?word=${encodeURIComponent(word.trim())}`, { headers });
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      return data.phonetic || "";
     }
   } catch (e) {
-    console.debug("Error fetching phonetic:", e);
+    console.debug("Error fetching phonetic lookup:", e);
   }
-  return { word, phonetic: null };
+  return "";
 };
 
 export const fetchWordTranslation = async (word, targetLang = "vi", token = null) => {
@@ -222,16 +148,17 @@ export const fetchWordTranslation = async (word, targetLang = "vi", token = null
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
     const res = await fetch(
-      `/api/vocab/translate?word=${encodeURIComponent(word.trim())}&target_lang=${encodeURIComponent(targetLang)}`,
+      `/api/vocab/translate?word=${encodeURIComponent(word.trim())}&target_lang=${targetLang}`,
       { headers }
     );
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      return data.translation || "";
     }
   } catch (e) {
-    console.debug("Error translating word:", e);
+    console.debug("Error fetching word translation lookup:", e);
   }
-  return { word, meaning: word };
+  return "";
 };
 
 export const fetchImageCandidates = async (word, contextSentence = "", token = null) => {
@@ -274,29 +201,27 @@ export const fetchDueVocabSession = async (limit = 20, token = null) => {
   } catch (e) {
     console.error("Error fetching due vocab session:", e);
   }
-  return { total_due: 0, items: [] };
+  return { items: [], total_due: 0 };
 };
 
-export const fetchPracticeSession = async (limit = null, status = "ALL", token = null) => {
+export const fetchPracticeSession = async (limit = 10, token = null) => {
   try {
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
-    const params = new URLSearchParams();
-    if (limit) params.append("limit", limit);
-    if (status && status !== "ALL") params.append("status", status);
-    const res = await fetch(`/api/vocab/practice-session?${params.toString()}`, { headers });
+    const res = await fetch(`/api/vocab/practice-session?limit=${limit}`, { headers });
     if (res.ok) {
       return await res.json();
     }
   } catch (e) {
     console.error("Error fetching practice session:", e);
   }
-  return { total_available: 0, count: 0, items: [] };
+  return { items: [] };
 };
 
-export const submitVocabReviewResult = async (vocabId, isCorrect, token = null) => {
+export const submitVocabReviewResult = async (vocabId, isCorrect, token) => {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
+
   const res = await fetch("/api/vocab/review-result", {
     method: "POST",
     headers,
@@ -305,197 +230,66 @@ export const submitVocabReviewResult = async (vocabId, isCorrect, token = null) 
   return await safeParseResponse(res, "Không thể cập nhật kết quả ôn tập");
 };
 
-export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang = "vi", token = null) => {
-  const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  const res = await fetch("/api/lesson/preview", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      url_or_id: urlOrId,
-      source_lang: sourceLang,
-      target_lang: targetLang,
-    }),
-  });
-  return await safeParseResponse(res, "Không thể tải xem trước bài học");
-};
-
-export const startLessonSession = async (videoId, token, sourceLang = "en", targetLang = "vi") => {
-  try {
-    const headers = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
-    const res = await fetch("/api/lesson/start", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        video_id: videoId,
-        source_lang: sourceLang,
-        target_lang: targetLang,
-      }),
-    });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (e) {
-    console.warn("Could not record start session:", e);
-  }
-  return null;
-};
-
-export const updateLessonProgress = async (
-  videoId,
-  currentPosition,
-  isCompleted = false,
-  token,
-  wordsTyped = 0,
-  sourceLang = "en",
-  targetLang = "vi"
-) => {
-  try {
-    const headers = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
-    const res = await fetch("/api/lesson/progress", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        video_id: videoId,
-        current_position: Math.max(1, currentPosition),
-        is_completed: isCompleted,
-        words_typed: wordsTyped,
-        source_lang: sourceLang,
-        target_lang: targetLang,
-      }),
-    });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (e) {
-    console.warn("Could not update progress:", e);
-  }
-  return null;
-};
-
-export const fetchLessonHistory = async (token) => {
-  if (!token) return [];
-  try {
-    const res = await fetch("/api/lesson/history", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (e) {
-    console.warn("fetchLessonHistory error:", e);
-  }
-  return [];
-};
-
-export const deleteLessonHistory = async (videoId, token, sourceLang = "en", targetLang = "vi") => {
-  if (!token) return false;
-  try {
-    const query = new URLSearchParams({ source_lang: sourceLang, target_lang: targetLang });
-    const res = await fetch(`/api/lesson/history/${encodeURIComponent(videoId)}?${query.toString()}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.ok;
-  } catch (e) {
-    console.warn("deleteLessonHistory error:", e);
-    return false;
-  }
-};
-
-// In-memory cache for ultra-fast word lookups
-const lookupCache = new Map();
-
-export const quickLookupWord = async (word, contextSentence = "", token = null) => {
-  const cleanWord = (word || "").trim();
-  if (!cleanWord) return null;
-
-  const cacheKey = cleanWord.toLowerCase();
-  if (lookupCache.has(cacheKey)) {
-    return lookupCache.get(cacheKey);
-  }
-
+export const quickLookupWord = async (word, videoId = null, timestamp = null, token = null) => {
   try {
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
-
-    const params = new URLSearchParams({ word: cleanWord });
-    if (contextSentence) params.append("context", contextSentence);
+    const params = new URLSearchParams({ word: word.trim() });
+    if (videoId) params.append("video_id", videoId);
+    if (timestamp !== null && timestamp !== undefined) params.append("timestamp", String(timestamp));
 
     const res = await fetch(`/api/vocab/lookup?${params.toString()}`, { headers });
     if (res.ok) {
-      const data = await res.json();
-      lookupCache.set(cacheKey, data);
-      return data;
+      return await res.json();
     }
-  } catch (err) {
-    console.debug("quickLookupWord error:", err);
+  } catch (e) {
+    console.error("Error doing quick lookup:", e);
   }
-
-  // Graceful fallback
-  const fallback = {
-    word: cleanWord,
-    ipa: null,
-    ipa_uk: null,
-    ipa_us: null,
-    part_of_speech: null,
-    definition: null,
-    meaning: cleanWord,
-    is_saved: false,
-    saved_vocab: null,
-  };
-  return fallback;
+  return null;
 };
 
 let currentAudio = null;
 
-export const playPronunciationAudio = (word, accent = "us") => {
-  const cleanWord = (word || "").trim();
-  if (!cleanWord) return Promise.resolve();
-
-  if (currentAudio) {
-    try {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-    } catch {}
-  }
+export const playPronunciationAudio = (word, ttsLang = "en") => {
+  if (!word) return Promise.resolve();
 
   return new Promise((resolve) => {
-    const isUk = accent.toLowerCase() === "uk";
-    const langCode = isUk ? "en-GB" : "en-US";
-    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanWord)}&tl=${langCode}&client=tw-ob`;
+    if (currentAudio) {
+      try {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      } catch (e) {
+        console.debug("Audio pause err:", e);
+      }
+      currentAudio = null;
+    }
+
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
+      word.trim()
+    )}&tl=${ttsLang}&client=tw-ob`;
 
     let resolved = false;
     const finish = () => {
       if (!resolved) {
         resolved = true;
+        currentAudio = null;
         resolve();
       }
     };
 
     const fallbackTTS = () => {
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(cleanWord);
-        utter.lang = langCode;
-        utter.rate = 0.88;
-
-        const voices = window.speechSynthesis.getVoices();
-        const voice = voices.find((v) =>
-          isUk
-            ? v.lang.includes("GB") || v.name.includes("UK") || v.name.includes("British")
-            : v.lang.includes("US") || v.name.includes("United States")
-        );
-        if (voice) utter.voice = voice;
-
-        utter.onend = finish;
-        utter.onerror = finish;
-        window.speechSynthesis.speak(utter);
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(word.trim());
+          utterance.lang = ttsLang === "en" ? "en-US" : ttsLang;
+          utterance.rate = 0.9;
+          utterance.onend = finish;
+          utterance.onerror = finish;
+          window.speechSynthesis.speak(utterance);
+        } catch {
+          finish();
+        }
       } else {
         finish();
       }
@@ -516,106 +310,3 @@ export const playPronunciationAudio = (word, accent = "us") => {
     }
   });
 };
-
-export const aiExtractVocabFromText = async (
-  text,
-  sourceLang = "en",
-  targetLang = "vi",
-  mode = "auto",
-  token = null,
-  vocabLevel = "intermediate"
-) => {
-  const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  const res = await fetch("/api/vocab/ai-extract", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      text,
-      source_lang: sourceLang,
-      target_lang: targetLang,
-      mode,
-      vocab_level: vocabLevel,
-    }),
-  });
-  return await safeParseResponse(res, "Không thể trích xuất từ vựng qua AI");
-};
-
-export const extractTextFromFile = async (
-  file,
-  token = null,
-  startPage = null,
-  endPage = null
-) => {
-  const headers = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  const formData = new FormData();
-  formData.append("file", file);
-  if (startPage) formData.append("start_page", String(startPage));
-  if (endPage) formData.append("end_page", String(endPage));
-
-  const res = await fetch("/api/vocab/extract-text", {
-    method: "POST",
-    headers,
-    body: formData,
-  });
-  return await safeParseResponse(res, "Không thể trích xuất văn bản từ tệp");
-};
-
-export const aiExtractVocabFromFile = async (
-  file,
-  token = null,
-  startPage = null,
-  endPage = null,
-  sourceLang = "en",
-  targetLang = "vi",
-  vocabLevel = "intermediate"
-) => {
-  const headers = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  const formData = new FormData();
-  formData.append("file", file);
-  if (startPage) formData.append("start_page", String(startPage));
-  if (endPage) formData.append("end_page", String(endPage));
-  formData.append("source_lang", sourceLang || "en");
-  formData.append("target_lang", targetLang || "vi");
-  formData.append("vocab_level", vocabLevel || "intermediate");
-
-  const res = await fetch("/api/vocab/ai-extract-file", {
-    method: "POST",
-    headers,
-    body: formData,
-  });
-  return await safeParseResponse(res, "Không thể trích xuất từ tệp qua AI");
-};
-
-export const checkVocabDuplicates = async (words, token = null) => {
-  const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  const res = await fetch("/api/vocab/check-duplicates", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ words }),
-  });
-  return await safeParseResponse(res, "Không thể kiểm tra trùng lặp từ vựng");
-};
-
-export const batchImportVocab = async (items, token = null, conflictResolution = "skip_existing") => {
-  const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  const res = await fetch("/api/vocab/batch-import", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      items,
-      conflict_resolution: conflictResolution,
-    }),
-  });
-  return await safeParseResponse(res, "Không thể lưu danh sách từ vựng");
-};
-
