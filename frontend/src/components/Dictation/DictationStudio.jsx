@@ -17,6 +17,7 @@ import {
   ArrowRight,
   Sparkles,
   BookOpen,
+  Trophy,
 } from "../Icons";
 import { evaluateMasked, getNextLetterHint, getNextWordHint } from "../../utils/diffCalculator";
 import { analyzeSentencePhonology } from "../../utils/phonologyEngine";

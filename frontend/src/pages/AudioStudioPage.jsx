@@ -11,6 +11,7 @@ import {
   Volume2,
   FileAudio,
   Lightbulb,
+  AlertCircle,
 } from "../components/Icons";
 import { DictationStudio } from "../components/Dictation/DictationStudio";
 import { WordLookupPopover } from "../components/Vocab/WordLookupPopover";

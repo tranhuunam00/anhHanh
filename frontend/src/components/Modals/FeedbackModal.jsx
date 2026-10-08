@@ -20,6 +20,7 @@ import {
   Loader2,
   ZoomIn,
   Crown,
+  ArrowLeft,
 } from '../Icons';
 import {
   submitFeedback,

@@ -8,6 +8,7 @@ import {
   BookOpen,
   RotateCcw,
   X,
+  ArrowRight,
 } from "../Icons";
 
 export const LessonCompleteModal = ({
