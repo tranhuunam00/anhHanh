@@ -805,40 +805,41 @@
 
 .smart-reader-container.reader-split-mode {
   max-width: 1420px;
-  height: calc(100vh - 135px) !important;
-  max-height: calc(100vh - 135px) !important;
-  padding: 0 !important;
   margin: 0 auto !important;
-  overflow: hidden !important;
-  overscroll-behavior: none !important;
+  padding: 16px 20px 48px !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overscroll-behavior: auto !important;
   box-sizing: border-box;
 }
 
 .reader-split-layout {
   display: grid;
   grid-template-columns: 360px 1fr;
-  gap: 16px;
-  align-items: stretch;
-  height: 100% !important;
-  max-height: 100% !important;
+  gap: 20px;
+  align-items: start;
+  height: auto !important;
+  max-height: none !important;
   width: 100%;
-  overflow: hidden !important;
+  overflow: visible !important;
   box-sizing: border-box;
 }
 
-/* Left Sidebar Panel - Fixed Height & Internal Scroll */
+/* Left Sidebar Panel - Sticky on Desktop so it stays visible while scrolling */
 .reader-sidebar-panel {
-  height: 100% !important;
-  max-height: 100% !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain !important;
+  position: sticky;
+  top: 76px;
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 12px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
-  padding: 14px;
+  padding: 16px;
   box-shadow: var(--shadow-sm);
   scrollbar-width: thin;
   z-index: 10;
@@ -959,24 +960,26 @@
 /* Right Column Content Panel */
 .reader-content-panel {
   min-width: 0;
-  height: 100% !important;
-  max-height: 100% !important;
+  height: auto;
+  max-height: none;
   display: flex;
   flex-direction: column;
-  overflow: hidden !important;
+  overflow: visible;
   box-sizing: border-box;
 }
 
-/* Article Reading View - ONLY THIS AREA SCROLLS */
+/* Article Reading View */
 .reader-content-panel .reader-article-card {
-  height: 100% !important;
-  max-height: 100% !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain !important;
-  scrollbar-width: thin;
-  padding: 32px 46px 60px;
+  min-height: calc(100vh - 140px);
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  padding: 36px 48px 60px;
   box-sizing: border-box;
-  scroll-behavior: smooth;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
 }
 
 .reader-content-panel .reader-article-card::-webkit-scrollbar {
