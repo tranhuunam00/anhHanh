@@ -129,13 +129,3 @@ export async function adminDeleteSystemVocab(id, token) {
   return data;
 }
 
-export async function adminReseedSystemVocab(token) {
-  const res = await fetch(`${API_BASE}/admin/reseed`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || "Không thể nạp dữ liệu ngân hàng");
-  return data;
-}
-

@@ -18,7 +18,6 @@ import {
   adminCreateSystemVocab,
   adminUpdateSystemVocab,
   adminDeleteSystemVocab,
-  adminReseedSystemVocab,
 } from "../../services/systemVocabService";
 import { VOCAB_TOPICS } from "../../constants/vocabTopics";
 import { getVoiceLang } from "../../utils/languageVoices";
@@ -41,7 +40,6 @@ export const AdminVocabBankTab = ({ token, showToast }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isReseeding, setIsReseeding] = useState(false);
 
   const [formData, setFormData] = useState({
     word: "",
@@ -165,22 +163,6 @@ export const AdminVocabBankTab = ({ token, showToast }) => {
     }
   };
 
-  const handleReseed = async () => {
-    if (!window.confirm("Bạn có muốn nạp dữ liệu 6,000 từ vựng hệ thống gốc không?")) return;
-    setIsReseeding(true);
-    try {
-      const res = await adminReseedSystemVocab(token);
-      showToast(res.message || "Đã nạp thành công 6,000 từ vựng!", "success");
-      loadWords();
-      const catData = await fetchVocabCategories();
-      if (catData?.categories) setCategories(catData.categories);
-    } catch (err) {
-      showToast(err.message || "Lỗi khi nạp dữ liệu", "error");
-    } finally {
-      setIsReseeding(false);
-    }
-  };
-
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
@@ -197,27 +179,6 @@ export const AdminVocabBankTab = ({ token, showToast }) => {
         </div>
 
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <button
-            type="button"
-            onClick={handleReseed}
-            disabled={isReseeding}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              borderRadius: "10px",
-              padding: "8px 14px",
-              background: "var(--bg-secondary)",
-              border: "1px solid var(--border-color)",
-              color: "var(--text-primary)",
-              fontWeight: 600,
-              fontSize: "0.85rem",
-              cursor: isReseeding ? "not-allowed" : "pointer",
-            }}
-          >
-            <span>{isReseeding ? "Đang nạp..." : "⚡ Nạp 6,000 từ gốc"}</span>
-          </button>
-
           <button
             type="button"
             onClick={handleOpenCreate}

@@ -49,45 +49,7 @@ async def upgrade(conn) -> None:
         except Exception as e:
             logger.warning(f"Notice creating index: {e}")
 
-    # Seed 6,000 curated terms from system_vocab_bank.json.gz
-    data_file = os.path.join(os.path.dirname(__file__), "..", "data", "system_vocab_bank.json.gz")
-    if not os.path.exists(data_file):
-        logger.warning(f"Vocab bank seed file not found at {data_file}. Skipping seed.")
-        return
-
-    logger.info("Loading 6,000 curated vocabulary bank dataset...")
-    try:
-        with gzip.open(data_file, "rt", encoding="utf-8") as f:
-            items = json.load(f)
-    except Exception as e:
-        logger.error(f"Failed to read {data_file}: {e}")
-        return
-
-    if not items:
-        return
-
-    insert_sql = text("""
-        INSERT OR IGNORE INTO system_vocab_bank (
-            id, word, phonetic, meaning, context_sentence, source_lang, category, word_type, level, created_at, updated_at
-        ) VALUES (
-            :id, :word, :phonetic, :meaning, :context_sentence, :source_lang, :category, :word_type, :level, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-        );
-    """ if is_sqlite else """
-        INSERT INTO system_vocab_bank (
-            id, word, phonetic, meaning, context_sentence, source_lang, category, word_type, level, created_at, updated_at
-        ) VALUES (
-            :id, :word, :phonetic, :meaning, :context_sentence, :source_lang, :category, :word_type, :level, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-        )
-        ON CONFLICT (id) DO NOTHING;
-    """)
-
-    batch_size = 300
-    total = len(items)
-    for i in range(0, total, batch_size):
-        batch = items[i : i + batch_size]
-        await conn.execute(insert_sql, batch)
-
-    logger.info(f"Migration {MIGRATION_ID} completed: Seeded {total} curated vocabulary bank terms.")
+    logger.info(f"Migration {MIGRATION_ID} completed: Created system_vocab_bank table.")
 
 
 async def downgrade(conn) -> None:

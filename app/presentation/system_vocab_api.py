@@ -48,31 +48,13 @@ class AdminUpdateVocabRequest(BaseModel):
     level: Optional[str] = None
 
 
-async def _ensure_vocab_populated(db: AsyncSession) -> bool:
-    """Self-healing trigger: if system_vocab_bank is empty, load 6,000 items on the fly."""
-    check_res = await db.execute(select(func.count(SystemVocabBank.id)))
-    current_count = check_res.scalar_one_or_none() or 0
-    if current_count > 0:
-        return False
-    from app.infrastructure.database.seed_system_vocab import load_seed_items, seed_system_vocab_batch
-    items = load_seed_items()
-    if not items:
-        return False
-    bind = db.get_bind()
-    is_sqlite = bind.dialect.name == "sqlite" if bind else True
-    await seed_system_vocab_batch(db, items, is_sqlite)
-    await db.commit()
-    logger.info("Auto-seeded 6,000 system vocabulary items on-demand.")
-    return True
-
-
 @router.get("/categories")
 async def get_vocab_categories(
     lang: Optional[str] = Query(None, description="Lọc ngôn ngữ ('en', 'fr')"),
     db: AsyncSession = Depends(get_db)
 ):
     """Return catalog of 30 categories with total count per category."""
-    await _ensure_vocab_populated(db)
+
 
     query = select(
         SystemVocabBank.category,
@@ -107,8 +89,6 @@ async def get_system_vocab_words(
     db: AsyncSession = Depends(get_db)
 ):
     """Query curated vocabulary items with filters and pagination."""
-    await _ensure_vocab_populated(db)
-
     query = select(SystemVocabBank)
     count_query = select(func.count(SystemVocabBank.id))
 
@@ -327,27 +307,4 @@ async def admin_delete_system_vocab(
     await db.delete(item)
     await db.commit()
     return {"success": True, "deleted_id": vocab_id}
-
-
-@router.post("/admin/reseed")
-async def admin_reseed_system_vocab(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    """Admin-only endpoint to re-seed 6,000 words into system vocab bank."""
-    _require_admin(current_user)
-
-    from app.infrastructure.database.seed_system_vocab import load_seed_items, seed_system_vocab_batch
-    items = load_seed_items()
-    if not items:
-        raise HTTPException(status_code=500, detail="Không tìm thấy file dữ liệu 6,000 từ vựng.")
-
-    bind = db.get_bind()
-    is_sqlite = bind.dialect.name == "sqlite" if bind else True
-    await seed_system_vocab_batch(db, items, is_sqlite)
-    await db.commit()
-
-    count_res = await db.execute(select(func.count(SystemVocabBank.id)))
-    count = count_res.scalar_one_or_none() or 0
-    return {"message": f"Nạp dữ liệu thành công! Tổng số từ hiện tại: {count}", "count": count}
 
