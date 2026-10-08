@@ -1002,5 +1002,3 @@ export const Mail = (props) => (
 
 
 
-
-
