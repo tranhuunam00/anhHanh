@@ -221,6 +221,14 @@ export function SmartReaderPage({ isActive = true }) {
     totalDuration,
     onlyCurrentSentence,
     setOnlyCurrentSentence,
+    voices,
+    selectedVoiceUri,
+    selectedAccent,
+    pitchPreset,
+    handleSelectVoiceUri,
+    handleSelectAccent,
+    handleSelectPitchPreset,
+    handleTestVoice,
     speakSentence,
     handleToggleSpeech,
     handleToggleSingleSentenceMode,
@@ -362,6 +370,14 @@ export function SmartReaderPage({ isActive = true }) {
             onToggleSingleSentenceMode={handleToggleSingleSentenceMode}
             speechRate={speechRate}
             onRateChange={handleRateChange}
+            voices={voices}
+            selectedVoiceUri={selectedVoiceUri}
+            onSelectVoiceUri={handleSelectVoiceUri}
+            selectedAccent={selectedAccent}
+            onSelectAccent={handleSelectAccent}
+            pitchPreset={pitchPreset}
+            onSelectPitchPreset={handleSelectPitchPreset}
+            onTestVoice={handleTestVoice}
             elapsedSeconds={elapsedSeconds}
             totalDuration={totalDuration}
             onSeekChange={handleSeekChange}

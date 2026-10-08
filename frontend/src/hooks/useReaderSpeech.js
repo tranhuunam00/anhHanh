@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { PITCH_PRESETS } from "../utils/readerVoices";
 
 export function useReaderSpeech({
   sentencesList,
@@ -17,10 +18,82 @@ export function useReaderSpeech({
   const onlyCurrentSentenceRef = useRef(onlyCurrentSentence);
   const sentenceStartRef = useRef(null);
 
+  // Available Web Speech voices and Accent / Persona customization
+  const [voices, setVoices] = useState([]);
+  const [selectedVoiceUri, setSelectedVoiceUri] = useState(
+    () => localStorage.getItem("shotlang_reader_voice_uri") || ""
+  );
+  const [selectedAccent, setSelectedAccent] = useState(
+    () => localStorage.getItem("shotlang_reader_accent") || "ALL"
+  );
+  const [pitchPreset, setPitchPreset] = useState(
+    () => localStorage.getItem("shotlang_reader_pitch_preset") || "standard"
+  );
+
   useEffect(() => {
     onlyCurrentSentenceRef.current = onlyCurrentSentence;
     localStorage.setItem("shotlang_reader_single_sentence", onlyCurrentSentence);
   }, [onlyCurrentSentence]);
+
+  // Load browser speech synthesis voices
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+
+    const loadVoices = () => {
+      const available = window.speechSynthesis.getVoices() || [];
+      if (available.length > 0) {
+        setVoices(available);
+      }
+    };
+
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = null;
+      }
+    };
+  }, []);
+
+  // Compute active pitch value from persona preset
+  const speechPitch = useMemo(() => {
+    const found = PITCH_PRESETS.find((p) => p.id === pitchPreset);
+    return found ? found.pitch : 1.0;
+  }, [pitchPreset]);
+
+  // Compute active SpeechSynthesisVoice object
+  const selectedVoice = useMemo(() => {
+    if (!voices || voices.length === 0) return null;
+    if (selectedVoiceUri) {
+      const match = voices.find((v) => (v.voiceURI || v.name) === selectedVoiceUri);
+      if (match) return match;
+    }
+    // Fallback: accent match or general English voice
+    if (selectedAccent && selectedAccent !== "ALL") {
+      const accentMatch = voices.find((v) =>
+        (v.lang || "").toLowerCase().startsWith(selectedAccent.toLowerCase())
+      );
+      if (accentMatch) return accentMatch;
+    }
+    const enMatch = voices.find((v) => (v.lang || "").toLowerCase().startsWith("en"));
+    return enMatch || voices[0] || null;
+  }, [voices, selectedVoiceUri, selectedAccent]);
+
+  const handleSelectVoiceUri = useCallback((uri) => {
+    setSelectedVoiceUri(uri);
+    localStorage.setItem("shotlang_reader_voice_uri", uri);
+  }, []);
+
+  const handleSelectAccent = useCallback((accent) => {
+    setSelectedAccent(accent);
+    localStorage.setItem("shotlang_reader_accent", accent);
+  }, []);
+
+  const handleSelectPitchPreset = useCallback((presetId) => {
+    setPitchPreset(presetId);
+    localStorage.setItem("shotlang_reader_pitch_preset", presetId);
+  }, []);
 
   // Total audio duration at current speechRate
   const totalDuration = useMemo(() => {
@@ -63,8 +136,14 @@ export function useReaderSpeech({
       }
 
       const utterance = new SpeechSynthesisUtterance(sentence.text);
-      utterance.lang = "en-US";
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        utterance.lang = selectedVoice.lang || "en-US";
+      } else {
+        utterance.lang = "en-US";
+      }
       utterance.rate = speechRate;
+      utterance.pitch = speechPitch;
 
       sentenceStartRef.current = {
         index,
@@ -100,93 +179,109 @@ export function useReaderSpeech({
       window.speechSynthesis.speak(utterance);
       setIsSpeaking(true);
     },
-    [sentencesList, speechRate, clearSentenceHighlights, highlightSentenceInDOM, showToast]
+    [
+      sentencesList,
+      speechRate,
+      speechPitch,
+      selectedVoice,
+      highlightSentenceInDOM,
+      clearSentenceHighlights,
+      showToast,
+    ]
   );
 
-  // Play / Pause Toggle
+  // Quick test voice sample
+  const handleTestVoice = useCallback(() => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const testUtterance = new SpeechSynthesisUtterance(
+      "Hello! This is a speech sample. Welcome to Smart Reader!"
+    );
+    if (selectedVoice) {
+      testUtterance.voice = selectedVoice;
+      testUtterance.lang = selectedVoice.lang || "en-US";
+    } else {
+      testUtterance.lang = "en-US";
+    }
+    testUtterance.rate = speechRate;
+    testUtterance.pitch = speechPitch;
+    window.speechSynthesis.speak(testUtterance);
+    if (showToast) {
+      showToast(`Đang thử giọng: ${selectedVoice ? selectedVoice.name : "Hệ thống"}`, "info");
+    }
+  }, [selectedVoice, speechRate, speechPitch, showToast]);
+
   const handleToggleSpeech = () => {
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
+      window.speechSynthesis?.cancel();
       setIsSpeaking(false);
     } else {
-      const startIdx = currentSentenceIdx >= (sentencesList?.length || 0) ? 0 : currentSentenceIdx;
-      speakSentence(startIdx, true);
+      speakSentence(currentSentenceIdx, true);
     }
   };
 
-  // Toggle between Continuous reading and Single designated sentence mode
   const handleToggleSingleSentenceMode = () => {
-    const next = !onlyCurrentSentence;
-    setOnlyCurrentSentence(next);
-    if (next && !isSpeaking) {
-      const targetIdx = currentSentenceIdx >= (sentencesList?.length || 0) ? 0 : currentSentenceIdx;
-      speakSentence(targetIdx, true);
+    setOnlyCurrentSentence((prev) => !prev);
+  };
+
+  const handlePrevSentence = () => {
+    if (currentSentenceIdx > 0) {
+      speakSentence(currentSentenceIdx - 1, isSpeaking);
     }
   };
 
-  // Jump to previous sentence
-  const handlePrevSentence = () => {
-    const prevIdx = Math.max(0, currentSentenceIdx - 1);
-    speakSentence(prevIdx, isSpeaking);
-  };
-
-  // Jump to next sentence
   const handleNextSentence = () => {
-    const nextIdx = Math.min((sentencesList?.length || 1) - 1, currentSentenceIdx + 1);
-    speakSentence(nextIdx, isSpeaking);
+    if (currentSentenceIdx < (sentencesList?.length || 1) - 1) {
+      speakSentence(currentSentenceIdx + 1, isSpeaking);
+    }
   };
 
-  // Restart from beginning
   const handleRestartSpeech = () => {
     speakSentence(0, true);
   };
 
-  // Change speech playback rate
-  const handleRateChange = (rate) => {
-    setSpeechRate(rate);
+  const handleRateChange = (newRate) => {
+    setSpeechRate(newRate);
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setTimeout(() => {
-        speakSentence(currentSentenceIdx, true);
-      }, 50);
+      speakSentence(currentSentenceIdx, true);
     }
   };
 
-  // Interactive timeline scrubber
-  const handleSeekChange = (e) => {
-    const newTime = Number(e.target.value);
-    setElapsedSeconds(newTime);
-
+  const handleSeekChange = (newTime) => {
     if (!sentencesList || sentencesList.length === 0) return;
-
-    const baseTime = newTime * speechRate;
-    const targetIdx = sentencesList.findIndex((s) => baseTime >= s.startTime && baseTime < s.endTime);
-    const finalIdx = targetIdx >= 0 ? targetIdx : (newTime >= totalDuration ? sentencesList.length - 1 : 0);
-
-    if (finalIdx !== currentSentenceIdx) {
-      setCurrentSentenceIdx(finalIdx);
-      highlightSentenceInDOM(finalIdx);
+    const scaledTime = newTime * speechRate;
+    let targetIdx = sentencesList.findIndex(
+      (s) => s.startTime <= scaledTime && scaledTime <= s.endTime
+    );
+    if (targetIdx === -1) {
+      targetIdx = sentencesList.findIndex((s) => s.startTime >= scaledTime);
     }
-
-    if (isSpeaking) {
-      speakSentence(finalIdx, true);
-    }
+    if (targetIdx === -1) targetIdx = sentencesList.length - 1;
+    if (targetIdx < 0) targetIdx = 0;
+    speakSentence(targetIdx, isSpeaking);
   };
 
-  // Smooth seeker progress ticker while speaking
+  // Real-time animation loop for progress bar
   useEffect(() => {
-    if (!isSpeaking) return;
-
-    const timer = setInterval(() => {
-      if (sentenceStartRef.current) {
+    let animId;
+    const updateProgress = () => {
+      if (isSpeaking && sentenceStartRef.current) {
         const { baseElapsed, startTime, duration } = sentenceStartRef.current;
-        const elapsedInSentence = (Date.now() - startTime) / 1000;
-        const current = Math.min(totalDuration, baseElapsed + Math.min(duration, elapsedInSentence));
-        setElapsedSeconds(Number(current.toFixed(1)));
+        const now = Date.now();
+        const diffSec = (now - startTime) / 1000;
+        const currentProgress = baseElapsed + Math.min(diffSec, duration);
+        setElapsedSeconds(Number(Math.min(currentProgress, totalDuration).toFixed(1)));
       }
-    }, 150);
+      animId = requestAnimationFrame(updateProgress);
+    };
 
-    return () => clearInterval(timer);
+    if (isSpeaking) {
+      animId = requestAnimationFrame(updateProgress);
+    }
+
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+    };
   }, [isSpeaking, totalDuration]);
 
   // Cleanup on unmount or tab switch
@@ -218,6 +313,14 @@ export function useReaderSpeech({
     totalDuration,
     onlyCurrentSentence,
     setOnlyCurrentSentence,
+    voices,
+    selectedVoiceUri,
+    selectedAccent,
+    pitchPreset,
+    handleSelectVoiceUri,
+    handleSelectAccent,
+    handleSelectPitchPreset,
+    handleTestVoice,
     speakSentence,
     handleToggleSpeech,
     handleToggleSingleSentenceMode,

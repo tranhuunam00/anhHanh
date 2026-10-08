@@ -9,6 +9,7 @@ import {
   RotateCcw,
 } from "../Icons";
 import { formatTime } from "../../utils/readerUtils";
+import { ReaderVoiceSelector } from "./ReaderVoiceSelector";
 
 export function ReaderSidebar({
   onSwitchToPaste,
@@ -24,6 +25,14 @@ export function ReaderSidebar({
   onToggleSingleSentenceMode,
   speechRate,
   onRateChange,
+  voices,
+  selectedVoiceUri,
+  onSelectVoiceUri,
+  selectedAccent,
+  onSelectAccent,
+  pitchPreset,
+  onSelectPitchPreset,
+  onTestVoice,
   elapsedSeconds,
   totalDuration,
   onSeekChange,
@@ -153,6 +162,18 @@ export function ReaderSidebar({
             ))}
           </div>
         </div>
+
+        {/* Bộ chọn Accent & Giọng đọc Web Speech */}
+        <ReaderVoiceSelector
+          voices={voices}
+          selectedVoiceUri={selectedVoiceUri}
+          onSelectVoiceUri={onSelectVoiceUri}
+          selectedAccent={selectedAccent}
+          onSelectAccent={onSelectAccent}
+          pitchPreset={pitchPreset}
+          onSelectPitchPreset={onSelectPitchPreset}
+          onTestVoice={onTestVoice}
+        />
 
         {/* Row 3: Timeline Scrubber Bar */}
         <div className="reader-scrubber-row">
