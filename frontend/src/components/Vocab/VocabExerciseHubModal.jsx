@@ -488,7 +488,9 @@ const playSoundFeedback = (isCorrect) => {
                     </div>
                     <div className="ex-preview-options-grid">
                       <div className="ex-preview-opt">A. tràn ngập</div>
-                      <div className="ex-preview-opt correct">B. nhu cầu tuyệt vọng ✓</div>
+                      <div className="ex-preview-opt correct">
+                        B. nhu cầu tuyệt vọng <Check size={12} color="#10b981" style={{ verticalAlign: "middle", marginLeft: 4 }} />
+                      </div>
                       <div className="ex-preview-opt">C. thanh lịch, tao nhã</div>
                       <div className="ex-preview-opt">D. được coi là đương nhiên</div>
                     </div>
@@ -591,7 +593,9 @@ const playSoundFeedback = (isCorrect) => {
                 <span className="ex-stat-title">Độ chính xác</span>
               </div>
               <div className="ex-stat-card">
-                <span className="ex-stat-num">{maxCombo} 🔥</span>
+                <span className="ex-stat-num" style={{ display: "inline-flex", alignItems: "center", gap: "4px", justifyContent: "center" }}>
+                  {maxCombo} <Flame size={18} color="#f97316" fill="#f97316" />
+                </span>
                 <span className="ex-stat-title">Combo cao nhất</span>
               </div>
             </div>

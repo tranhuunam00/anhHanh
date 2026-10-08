@@ -592,14 +592,29 @@ export const aiExtractVocabFromFile = async (
   return await safeParseResponse(res, "Không thể trích xuất từ tệp qua AI");
 };
 
-export const batchImportVocab = async (items, token = null) => {
+export const checkVocabDuplicates = async (words, token = null) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch("/api/vocab/check-duplicates", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ words }),
+  });
+  return await safeParseResponse(res, "Không thể kiểm tra trùng lặp từ vựng");
+};
+
+export const batchImportVocab = async (items, token = null, conflictResolution = "skip_existing") => {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const res = await fetch("/api/vocab/batch-import", {
     method: "POST",
     headers,
-    body: JSON.stringify({ items }),
+    body: JSON.stringify({
+      items,
+      conflict_resolution: conflictResolution,
+    }),
   });
   return await safeParseResponse(res, "Không thể lưu danh sách từ vựng");
 };

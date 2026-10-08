@@ -1,4 +1,5 @@
 import React from "react";
+import { Target, Clock, Globe, Bookmark, CheckCircle2, Zap } from "../Icons";
 
 export const PreviewModal = ({ isOpen, onClose, previewData, onConfirmStart }) => {
   if (!isOpen || !previewData) return null;
@@ -18,22 +19,22 @@ export const PreviewModal = ({ isOpen, onClose, previewData, onConfirmStart }) =
 
           <div className="preview-meta-row">
             <div className="preview-meta-item">
-              <span>🎯</span>
+              <Target size={16} color="var(--primary, #3b82f6)" />
               <span><strong>{previewData.totalChallenges} câu</strong> (≤ 20 từ/câu)</span>
             </div>
             <div className="preview-meta-item">
-              <span>⏱️</span>
+              <Clock size={16} color="var(--text-muted, #64748b)" />
               <span>Khoảng <strong>{previewData.estimatedMinutes} phút</strong> luyện nghe</span>
             </div>
             <div className="preview-meta-item">
-              <span>🌐</span>
+              <Globe size={16} color="var(--text-muted, #64748b)" />
               <span>{previewData.sourceLang?.toUpperCase()} ➔ {previewData.targetLang?.toUpperCase()}</span>
             </div>
           </div>
 
           {resumePos > 0 && !isCompleted && (
             <div className="preview-resume-alert">
-              <span>📍</span>
+              <Bookmark size={16} color="#f59e0b" />
               <span>
                 Bạn đang học dở dang ở <strong>Câu {resumePos}</strong>. Hệ thống sẽ tự động tua tới đúng câu này để bạn tiếp tục!
               </span>
@@ -42,7 +43,7 @@ export const PreviewModal = ({ isOpen, onClose, previewData, onConfirmStart }) =
 
           {isCompleted && (
             <div className="preview-resume-alert" style={{ background: "#ecfdf5", borderColor: "#a7f3d0", color: "#047857" }}>
-              <span>✓</span>
+              <CheckCircle2 size={16} color="#047857" />
               <span>Bạn đã hoàn thành bài học này 100%! Bấm để luyện tập lại.</span>
             </div>
           )}
@@ -63,7 +64,10 @@ export const PreviewModal = ({ isOpen, onClose, previewData, onConfirmStart }) =
                 onClose();
               }}
             >
-              <span>🚀 Bắt đầu học bài này</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <Zap size={16} />
+                <span>Bắt đầu học bài này</span>
+              </span>
             </button>
           </div>
         </div>

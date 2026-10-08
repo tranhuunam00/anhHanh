@@ -10,6 +10,8 @@ import {
   Loader2,
   AlertCircle,
   BookOpen,
+  Lightbulb,
+  Zap,
 } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -250,8 +252,8 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
                 }}
                 title="Tự động tra cứu phiên âm IPA, dịch nghĩa và tìm ảnh"
               >
-                {isAutoEnriching ? <Loader2 size={12} className="spinning" /> : <Sparkles size={12} />}
-                <span>{isAutoEnriching ? "Đang tra..." : "⚡ Tra cứu tự động cả 3"}</span>
+                {isAutoEnriching ? <Loader2 size={12} className="spinning" /> : <Zap size={12} />}
+                <span>{isAutoEnriching ? "Đang tra..." : "Tra cứu tự động cả 3"}</span>
               </button>
             </div>
             <input
@@ -434,8 +436,9 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess }) => {
                   }}
                   placeholder="https://... dán link ảnh trực tiếp tại đây"
                 />
-                <div style={{ fontSize: "0.72rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
-                  💡 Bạn có thể dán trực tiếp bất kỳ link ảnh nào (PNG, JPG, WebP) hoặc bấm nút "Đổi ảnh khác".
+                <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "0.72rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
+                  <Lightbulb size={12} style={{ flexShrink: 0 }} />
+                  <span>Bạn có thể dán trực tiếp bất kỳ link ảnh nào (PNG, JPG, WebP) hoặc bấm nút "Đổi ảnh khác".</span>
                 </div>
               </div>
             </div>

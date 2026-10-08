@@ -69,3 +69,27 @@ def test_vocab_pagination_math():
     assert len(p4) == 1
 
 
+def test_conflict_resolution_strategies_models():
+    from app.presentation.vocab_api import CheckVocabDuplicatesRequest, BatchImportVocabRequest, BatchImportVocabItem
+
+    req = CheckVocabDuplicatesRequest(words=["hello", "world", "HELLO"])
+    assert len(req.words) == 3
+
+    items = [
+        BatchImportVocabItem(word="bonjour", meaning="xin chào", source_lang="fr"),
+        BatchImportVocabItem(word="merci", meaning="cảm ơn", source_lang="fr")
+    ]
+    
+    # 1. skip_existing
+    import_skip = BatchImportVocabRequest(items=items, conflict_resolution="skip_existing")
+    assert import_skip.conflict_resolution == "skip_existing"
+
+    # 2. overwrite
+    import_overwrite = BatchImportVocabRequest(items=items, conflict_resolution="overwrite")
+    assert import_overwrite.conflict_resolution == "overwrite"
+
+    # 3. keep_both
+    import_both = BatchImportVocabRequest(items=items, conflict_resolution="keep_both")
+    assert import_both.conflict_resolution == "keep_both"
+
+

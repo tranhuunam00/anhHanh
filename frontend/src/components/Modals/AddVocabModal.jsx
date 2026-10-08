@@ -8,6 +8,8 @@ import {
   Volume2,
   Image as ImageIcon,
   RotateCw,
+  Lightbulb,
+  Zap,
 } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -234,8 +236,8 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                 }}
                 title="Tự động tra cứu phiên âm, dịch nghĩa và tìm ảnh"
               >
-                {isAutoEnriching ? <Loader2 size={12} className="spinning" /> : <Sparkles size={12} />}
-                <span>{isAutoEnriching ? "Đang tra..." : "⚡ Tra cứu tự động cả 3"}</span>
+                {isAutoEnriching ? <Loader2 size={12} className="spinning" /> : <Zap size={12} />}
+                <span>{isAutoEnriching ? "Đang tra..." : "Tra cứu tự động cả 3"}</span>
               </button>
             </div>
             <input
@@ -416,8 +418,9 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess }) => {
                   }}
                   placeholder="Dán link ảnh hoặc để trống để AI tự động tìm"
                 />
-                <div style={{ fontSize: "0.72rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
-                  💡 Để trống hệ thống sẽ tự động gán ảnh minh họa phù hợp với nghĩa của từ.
+                <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "0.72rem", color: "var(--text-muted, #64748b)", marginTop: "4px" }}>
+                  <Lightbulb size={12} style={{ flexShrink: 0 }} />
+                  <span>Để trống hệ thống sẽ tự động gán ảnh minh họa phù hợp với nghĩa của từ.</span>
                 </div>
               </div>
             </div>

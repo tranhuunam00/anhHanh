@@ -195,7 +195,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
     recognition.maxAlternatives = 3;
 
     setListeningWordId(item.id);
-    showToast(`🎙️ Đang nghe... Hãy phát âm từ "${item.word}"`, "info");
+    showToast(`Đang nghe... Hãy phát âm từ "${item.word}"`, "info");
 
     recognition.onresult = (event) => {
       const heard = event.results[0][0]?.transcript?.trim() || "";
@@ -217,9 +217,9 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
       }));
 
       if (isMatch) {
-        showToast(`🎯 Xuất sắc! Phát âm từ "${item.word}" chuẩn 100%!`, "success");
+        showToast(`Xuất sắc! Phát âm từ "${item.word}" chuẩn 100%!`, "success");
       } else {
-        showToast(`👂 Máy nghe được: "${heard}". Hãy nghe lại phát âm mẫu và thử lại nhé!`, "warning");
+        showToast(`Máy nghe được: "${heard}". Hãy nghe lại phát âm mẫu và thử lại nhé!`, "warning");
       }
       setListeningWordId(null);
     };

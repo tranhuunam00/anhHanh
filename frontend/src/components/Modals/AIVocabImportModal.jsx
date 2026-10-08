@@ -25,6 +25,8 @@ import {
   Eye,
   RotateCcw,
   FileCheck,
+  Lightbulb,
+  Zap,
 } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -32,6 +34,7 @@ import {
   aiExtractVocabFromFile,
   extractTextFromFile,
   batchImportVocab,
+  checkVocabDuplicates,
 } from "../../services/authVocabService";
 import { getPdfPageCount, extractPdfTextClient, slicePdfClient } from "../../utils/pdfExtractor";
 import { getVoiceLang } from "../../utils/languageVoices";
@@ -194,6 +197,13 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
   const [extractedItems, setExtractedItems] = useState([]);
   const [selectedIndices, setSelectedIndices] = useState(new Set());
   const [dragOver, setDragOver] = useState(false);
+
+  // Duplicate Conflict Resolution State
+  const [showConflictModal, setShowConflictModal] = useState(false);
+  const [duplicateList, setDuplicateList] = useState([]);
+  const [pendingItems, setPendingItems] = useState([]);
+  const [conflictStrategy, setConflictStrategy] = useState("skip_existing"); // "skip_existing" | "overwrite" | "keep_both"
+  const [isCheckingDuplicates, setIsCheckingDuplicates] = useState(false);
 
   // Selective Page Range State (for PDF & documents)
   const [totalPages, setTotalPages] = useState(null);
@@ -390,7 +400,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
         const s = Math.max(1, parseInt(startPageInput, 10) || startPage || 1);
         const e = Math.max(s, parseInt(endPageInput, 10) || endPage || s);
 
-        showToast(`⚡ Đang cắt trang ${s} → ${e} của tệp "${selectedFile.name}"...`, "info");
+        showToast(`Đang cắt trang ${s} → ${e} của tệp "${selectedFile.name}"...`, "info");
         const cutFile = await slicePdfClient(selectedFile, s, e);
 
         if (slicedFileUrl) {
@@ -478,7 +488,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
 
           if (clientResult && clientResult.text && clientResult.text.trim().length >= 10) {
             showToast(
-              `⚡ Đã đọc ${clientResult.selectedPagesCount} trang (${clientResult.wordCount} chữ) từ file cắt. AI đang bóc tách...`,
+              `Đã đọc ${clientResult.selectedPagesCount} trang (${clientResult.wordCount} chữ) từ file cắt. AI đang bóc tách...`,
               "info"
             );
             result = await aiExtractVocabFromText(
@@ -510,7 +520,7 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
           const isImage = /\.(png|jpg|jpeg|webp)$/i.test(fileToSend.name);
           if (isImage) {
             showToast(
-              `⚡ Đang gửi ảnh "${fileToSend.name}" lên Gemini Vision OCR để đọc chữ & bóc tách từ vựng...`,
+              `Đang gửi ảnh "${fileToSend.name}" lên Gemini Vision OCR để đọc chữ & bóc tách từ vựng...`,
               "info"
             );
           } else {
@@ -630,19 +640,68 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
       return;
     }
 
+    setIsCheckingDuplicates(true);
     setIsSaving(true);
     try {
-      const res = await batchImportVocab(selectedList, token);
+      // 1. Kiểm tra xem các từ đã có trong Sổ từ của tài khoản hay chưa
+      const wordsToCheck = selectedList.map((it) => it.word.trim());
+      const checkRes = await checkVocabDuplicates(wordsToCheck, token);
+
+      if (checkRes && checkRes.has_duplicates && checkRes.duplicates && checkRes.duplicates.length > 0) {
+        // Có từ trùng lặp! Bật Modal lựa chọn 3 hướng giải quyết cho người dùng
+        const dupMap = new Map(checkRes.duplicates.map((d) => [d.word.toLowerCase().trim(), d]));
+        const mergedConflicts = selectedList
+          .filter((it) => dupMap.has(it.word.toLowerCase().trim()))
+          .map((it) => {
+            const existing = dupMap.get(it.word.toLowerCase().trim());
+            return {
+              word: it.word,
+              existingMeaning: existing.meaning,
+              existingPhonetic: existing.phonetic,
+              newMeaning: it.meaning,
+              newPhonetic: it.phonetic,
+            };
+          });
+
+        setDuplicateList(mergedConflicts);
+        setPendingItems(selectedList);
+        setConflictStrategy("skip_existing"); // mặc định phương án an toàn nhất
+        setShowConflictModal(true);
+        setIsSaving(false);
+        return;
+      }
+
+      // Không có từ nào trùng: Lưu trực tiếp
+      await executeSaveToNotebook(selectedList, "skip_existing");
+    } catch (err) {
+      console.warn("Check duplicates error, fallback saving directly:", err);
+      await executeSaveToNotebook(selectedList, "skip_existing");
+    } finally {
+      setIsCheckingDuplicates(false);
+    }
+  };
+
+  const executeSaveToNotebook = async (listToSave, strategy = "skip_existing") => {
+    setIsSaving(true);
+    try {
+      const res = await batchImportVocab(listToSave, token, strategy);
       const added = res.added_count || 0;
       const updated = res.updated_count || 0;
-      showToast(
-        `Đã lưu thành công ${added} từ mới${updated > 0 ? ` (cập nhật ${updated} từ đã có)` : ""} vào Sổ từ!`,
-        "success"
-      );
+      const skipped = res.skipped_count || 0;
+
+      let msgParts = [];
+      if (added > 0) msgParts.push(`thêm ${added} từ mới`);
+      if (updated > 0) msgParts.push(`cập nhật ${updated} từ`);
+      if (skipped > 0) msgParts.push(`giữ nguyên ${skipped} từ cũ`);
+
+      const summaryText = msgParts.length > 0 ? msgParts.join(", ") : `${listToSave.length} từ`;
+      showToast(`Đã lưu thành công (${summaryText}) vào Sổ từ!`, "success");
 
       if (refreshStreak) refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
-      if (onSuccess) onSuccess({ added, updated });
+      if (onSuccess) onSuccess({ added, updated, skipped });
+
+      setShowConflictModal(false);
       onClose();
     } catch (err) {
       console.error("Batch save failed:", err);
@@ -860,11 +919,13 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                         </div>
                         {selectedFile.size > MAX_BE_FILE_SIZE ? (
                           <div className="ai-large-file-badge">
-                            ⚡ Tệp lớn &gt;5MB: Trình duyệt sẽ đọc & trích xuất văn bản trực tiếp trên máy (hỗ trợ tệp đến 500MB) để không làm nặng máy chủ.
+                            <Zap size={14} style={{ verticalAlign: "middle", marginRight: 5, flexShrink: 0 }} />
+                            <span>Tệp lớn &gt;5MB: Trình duyệt sẽ đọc &amp; trích xuất văn bản trực tiếp trên máy (hỗ trợ tệp đến 500MB) để không làm nặng máy chủ.</span>
                           </div>
                         ) : (
                           <div className="ai-normal-file-badge">
-                            ✓ Kích thước phù hợp (dưới 5MB)
+                            <Check size={14} style={{ verticalAlign: "middle", marginRight: 5, flexShrink: 0 }} />
+                            <span>Kích thước phù hợp (dưới 5MB)</span>
                           </div>
                         )}
                       </div>
@@ -1046,7 +1107,8 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                       </div>
 
                       <div className="ai-page-range-notice">
-                        ⚡ <strong>Đang chọn {Math.max(1, endPage - startPage + 1)} trang (Trang {startPage} → {endPage}):</strong>{" "}
+                        <Zap size={14} style={{ verticalAlign: "middle", marginRight: 5, flexShrink: 0 }} />
+                        <strong>Đang chọn {Math.max(1, endPage - startPage + 1)} trang (Trang {startPage} → {endPage}):</strong>{" "}
                         Trình duyệt trích xuất đúng phần nội dung này, tệp PDF lớn tới 500MB xử lý siêu tốc mà không tốn token thừa.
                       </div>
                     </div>
@@ -1148,7 +1210,10 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
                       {slicedFileInfo?.isPdf ? (
                         <div className="ai-sliced-preview-embed">
                           <div className="ai-sliced-preview-header">
-                            <span>👁️ Xem trước nội dung file cắt:</span>
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                              <Eye size={14} />
+                              <span>Xem trước nội dung file cắt:</span>
+                            </span>
                             <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
                               (Nếu trình duyệt không tải được khung nhúng, bấm "Xem trước file cắt" ở trên để mở tab mới)
                             </span>
@@ -1362,7 +1427,8 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
             {/* Footer */}
             <div className="ai-import-footer">
               <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "var(--text-muted, #64748b)" }}>
-                <span>💡 Từ vựng được lưu sẽ tự động gắn vào Sổ tay, hỗ trợ SRS và 20 dạng bài tập tương tác.</span>
+                <Lightbulb size={14} style={{ flexShrink: 0 }} />
+                <span>Từ vựng được lưu sẽ tự động gắn vào Sổ tay, hỗ trợ SRS và 20 dạng bài tập tương tác.</span>
               </div>
               <div style={{ display: "flex", gap: "10px" }}>
                 <button className="btn btn-secondary" onClick={onClose} disabled={isSaving}>
@@ -1391,6 +1457,160 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
           </>
         )}
       </div>
+
+      {/* DUPLICATE CONFLICT RESOLUTION MODAL */}
+      {showConflictModal && (
+        <div className="ai-conflict-modal-overlay" onClick={() => !isSaving && setShowConflictModal(false)}>
+          <div className="ai-conflict-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="ai-conflict-header">
+              <div className="ai-conflict-header-left">
+                <div className="ai-conflict-badge-icon">
+                  <Layers size={20} />
+                </div>
+                <div>
+                  <h3 className="ai-conflict-title">
+                    Phát hiện {duplicateList.length} từ đã có trong Sổ từ
+                  </h3>
+                  <p className="ai-conflict-subtitle">
+                    Có <strong>{duplicateList.length}</strong> trong số <strong>{pendingItems.length}</strong> từ bạn chọn đã tồn tại trong Sổ tay từ vựng. Vui lòng chọn cách xử lý:
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="ai-modal-close-btn"
+                onClick={() => !isSaving && setShowConflictModal(false)}
+                disabled={isSaving}
+                aria-label="Đóng"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="ai-conflict-body">
+              {/* 3 Lựa chọn Card */}
+              <div className="ai-conflict-options-list">
+                {/* Lựa chọn 1 */}
+                <div
+                  className={`ai-conflict-card ${conflictStrategy === "skip_existing" ? "selected" : ""}`}
+                  onClick={() => setConflictStrategy("skip_existing")}
+                >
+                  <div className="ai-conflict-radio">
+                    <span className={`ai-radio-dot ${conflictStrategy === "skip_existing" ? "active" : ""}`} />
+                  </div>
+                  <div className="ai-conflict-card-info">
+                    <div className="ai-conflict-card-head">
+                      <span className="ai-conflict-card-name">1. Giữ từ cũ, bỏ từ vừa mới extract</span>
+                      <span className="ai-strategy-badge badge-green">Giữ tiến độ SRS</span>
+                    </div>
+                    <p className="ai-conflict-card-desc">
+                      Bỏ qua {duplicateList.length} từ trùng lặp, giữ nguyên nghĩa cũ và tiến độ học SRS đã có trong sổ từ. Chỉ lưu {Math.max(0, pendingItems.length - duplicateList.length)} từ hoàn toàn mới.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Lựa chọn 2 */}
+                <div
+                  className={`ai-conflict-card ${conflictStrategy === "overwrite" ? "selected" : ""}`}
+                  onClick={() => setConflictStrategy("overwrite")}
+                >
+                  <div className="ai-conflict-radio">
+                    <span className={`ai-radio-dot ${conflictStrategy === "overwrite" ? "active" : ""}`} />
+                  </div>
+                  <div className="ai-conflict-card-info">
+                    <div className="ai-conflict-card-head">
+                      <span className="ai-conflict-card-name">2. Bỏ từ cũ, lưu từ vừa extract</span>
+                      <span className="ai-strategy-badge badge-blue">Cập nhật nghĩa mới</span>
+                    </div>
+                    <p className="ai-conflict-card-desc">
+                      Ghi đè {duplicateList.length} từ cũ trong Sổ tay bằng nghĩa tiếng Việt, phiên âm và câu ví dụ mới do AI vừa bóc tách.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Lựa chọn 3 */}
+                <div
+                  className={`ai-conflict-card ${conflictStrategy === "keep_both" ? "selected" : ""}`}
+                  onClick={() => setConflictStrategy("keep_both")}
+                >
+                  <div className="ai-conflict-radio">
+                    <span className={`ai-radio-dot ${conflictStrategy === "keep_both" ? "active" : ""}`} />
+                  </div>
+                  <div className="ai-conflict-card-info">
+                    <div className="ai-conflict-card-head">
+                      <span className="ai-conflict-card-name">3. Giữ cả 2</span>
+                      <span className="ai-strategy-badge badge-purple">Lưu bản ghi song song</span>
+                    </div>
+                    <p className="ai-conflict-card-desc">
+                      Lưu thêm {duplicateList.length} từ vừa bóc tách thành các bản ghi mới độc lập. Sổ tay sẽ có cả bản ghi cũ lẫn mới để bạn đối chiếu nhiều ngữ cảnh.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Danh sách các từ trùng lặp */}
+              <div className="ai-conflict-preview-box">
+                <div className="ai-conflict-preview-title">
+                  <span>Chi tiết {duplicateList.length} từ trùng lặp:</span>
+                </div>
+                <div className="ai-conflict-table-wrapper">
+                  <table className="ai-conflict-table">
+                    <thead>
+                      <tr>
+                        <th style={{ width: "26%" }}>Từ vựng</th>
+                        <th style={{ width: "37%" }}>Nghĩa cũ trong Sổ tay</th>
+                        <th style={{ width: "37%" }}>Nghĩa mới vừa bóc tách</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {duplicateList.map((item, idx) => (
+                        <tr key={idx}>
+                          <td>
+                            <strong>{item.word}</strong>
+                            {item.newPhonetic && <span className="ai-dup-ipa"> /{item.newPhonetic}/</span>}
+                          </td>
+                          <td className="ai-dup-old">{item.existingMeaning || "—"}</td>
+                          <td className="ai-dup-new">{item.newMeaning || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div className="ai-conflict-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowConflictModal(false)}
+                disabled={isSaving}
+              >
+                Quay lại kiểm tra
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => executeSaveToNotebook(pendingItems, conflictStrategy)}
+                disabled={isSaving}
+                style={{ minWidth: "180px", gap: "6px" }}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 size={16} className="spin" />
+                    <span>Đang lưu từ vựng...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check size={16} />
+                    <span>Xác nhận &amp; Lưu</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

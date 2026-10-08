@@ -821,9 +821,14 @@ class BatchImportVocabItem(BaseModel):
     source_lang: Optional[str] = "en"
 
 
+class CheckVocabDuplicatesRequest(BaseModel):
+    words: List[str]
+
+
 class BatchImportVocabRequest(BaseModel):
     items: List[BatchImportVocabItem]
     source_lang: Optional[str] = None
+    conflict_resolution: Optional[str] = "skip_existing"  # "skip_existing" | "overwrite" | "keep_both"
 
 
 @router.post('/ai-extract')
@@ -1038,18 +1043,64 @@ async def ai_extract_vocabulary_from_file(
         )
 
 
+@router.post('/check-duplicates')
+async def check_vocabulary_duplicates(
+    payload: CheckVocabDuplicatesRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Check which words from a candidate list already exist in the user's notebook."""
+    raw_words = [w.strip() for w in payload.words if w and w.strip()]
+    if not raw_words:
+        return {'has_duplicates': False, 'duplicates_count': 0, 'duplicates': []}
+
+    words_lower = list({w.lower() for w in raw_words})
+    stmt = select(UserVocabulary).where(
+        UserVocabulary.user_id == current_user.id,
+        func.lower(UserVocabulary.word).in_(words_lower)
+    )
+    res = await db.execute(stmt)
+    existing_items = res.scalars().all()
+
+    duplicates = [
+        {
+            'id': item.id,
+            'word': item.word,
+            'meaning': item.meaning,
+            'phonetic': item.phonetic,
+            'context_sentence': item.context_sentence,
+            'status': item.status,
+            'source_lang': getattr(item, 'source_lang', 'en') or 'en',
+        }
+        for item in existing_items
+    ]
+
+    return {
+        'has_duplicates': len(duplicates) > 0,
+        'duplicates_count': len(duplicates),
+        'total_checked': len(raw_words),
+        'duplicates': duplicates
+    }
+
+
 @router.post('/batch-import')
 async def batch_import_vocabulary_words(
     payload: BatchImportVocabRequest,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Batch import multiple vocabulary words into user notebook."""
+    """Batch import multiple vocabulary words into user notebook with 3 conflict resolution strategies:
+    - skip_existing: Giữ từ cũ, bỏ từ vừa mới extract
+    - overwrite: Bỏ từ cũ, lưu từ vừa extract (cập nhật thông tin mới)
+    - keep_both: Giữ cả 2 (lưu thêm bản ghi mới độc lập)
+    """
     if not payload.items:
         raise HTTPException(status_code=400, detail="Danh sách từ vựng rỗng")
 
+    conflict_mode = (payload.conflict_resolution or "skip_existing").lower().strip()
     added_count = 0
     updated_count = 0
+    skipped_count = 0
     now = datetime.now(timezone.utc)
 
     # Pre-fetch existing words for this user to minimize individual queries
@@ -1074,8 +1125,14 @@ async def batch_import_vocabulary_words(
             phonetic = ImageSearchService.get_word_phonetic(clean_word)
 
         key = clean_word.lower()
-        if key in existing_map:
-            # Update existing
+        is_existing = key in existing_map
+
+        if is_existing and conflict_mode == "skip_existing":
+            # 1. Giữ từ cũ, bỏ từ vừa mới extract
+            skipped_count += 1
+            continue
+        elif is_existing and conflict_mode == "overwrite":
+            # 2. Bỏ từ cũ, lưu từ vừa extract (cập nhật bản ghi cũ)
             existing_vocab = existing_map[key]
             existing_vocab.meaning = clean_meaning
             if phonetic:
@@ -1088,7 +1145,7 @@ async def batch_import_vocabulary_words(
                 existing_vocab.source_lang = item_lang
             updated_count += 1
         else:
-            # Create new
+            # 3. Giữ cả 2 HOẶC từ mới hoàn toàn
             new_v = UserVocabulary(
                 user_id=current_user.id,
                 word=clean_word,
@@ -1103,7 +1160,8 @@ async def batch_import_vocabulary_words(
                 mastery_score=0
             )
             db.add(new_v)
-            existing_map[key] = new_v
+            if conflict_mode != "keep_both":
+                existing_map[key] = new_v
             added_count += 1
 
         # Also register in global DictionaryWord
@@ -1124,9 +1182,11 @@ async def batch_import_vocabulary_words(
 
     return {
         'success': True,
-        'message': f"Đã lưu thành công: thêm mới {added_count} từ, cập nhật {updated_count} từ.",
+        'message': f"Đã lưu thành công: thêm mới {added_count} từ, cập nhật {updated_count} từ, bỏ qua {skipped_count} từ trùng.",
         'added_count': added_count,
         'updated_count': updated_count,
+        'skipped_count': skipped_count,
+        'conflict_mode': conflict_mode,
         'total_processed': len(payload.items)
     }
 
