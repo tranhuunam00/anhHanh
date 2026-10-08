@@ -135,3 +135,11 @@ async def init_db() -> None:
             await seed_super_admin(session)
     except Exception as e:
         logger.warning(f"Could not seed admin: {e}")
+
+    # Ensure system_vocab_bank has seeded data if empty
+    try:
+        from app.infrastructure.database.seed_system_vocab import ensure_system_vocab_seeded
+        await ensure_system_vocab_seeded(engine)
+    except Exception as e:
+        logger.warning(f"Could not auto-seed system vocab bank: {e}")
+
