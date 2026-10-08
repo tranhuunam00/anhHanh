@@ -35,7 +35,7 @@ async def test_migration_015_upgrade_and_downgrade():
     """Test migration 015 upgrade and downgrade logic."""
     import importlib
     from app.infrastructure.database.connection import get_db
-    m015 = importlib.import_module("app.infrastructure.database.migrations.015_clean_and_truncate_system_vocab_bank")
+    m015 = importlib.import_module("app.infrastructure.database.migrations.015a_clean_and_truncate_system_vocab_bank")
 
     async for session in get_db():
         conn = await session.connection()
