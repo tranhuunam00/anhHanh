@@ -10,6 +10,36 @@
   gap: 20px;
 }
 
+/* Keyboard shortcut badge shown on play button */
+.reader-kbd {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.63rem;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  color: inherit;
+  line-height: 1.5;
+  margin-left: 4px;
+  opacity: 0.78;
+  pointer-events: none;
+  user-select: none;
+}
+
+.btn-primary .reader-kbd {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .reader-kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
 /* Header & Controls */
 .reader-header-card {
   background: var(--bg-card);

@@ -86,14 +86,15 @@ export function ReaderSidebar({
               onClick={onToggleSpeech}
               title={
                 isSpeaking
-                  ? "Tạm dừng đọc"
+                  ? "Tạm dừng đọc [Space]"
                   : onlyCurrentSentence
-                  ? "Đọc câu chỉ định hiện tại"
-                  : "Bắt đầu nghe đọc bài viết bằng AI"
+                  ? "Đọc câu chỉ định hiện tại [Space]"
+                  : "Bắt đầu nghe đọc bài viết bằng AI [Space]"
               }
             >
               {isSpeaking ? <Pause size={15} /> : <Play size={15} />}
               <span>{isSpeaking ? "Tạm dừng" : onlyCurrentSentence ? "Đọc câu này" : "Nghe đọc"}</span>
+              <kbd className="reader-kbd">Space</kbd>
             </button>
 
             <button
@@ -108,7 +109,7 @@ export function ReaderSidebar({
             <button
               className="btn btn-secondary btn-icon"
               onClick={onRestartSpeech}
-              title="Đọc lại từ đầu bài viết"
+              title="Đọc lại từ đầu bài viết [R]"
             >
               <RotateCcw size={14} />
             </button>

@@ -237,6 +237,28 @@ export function SmartReaderPage({ isActive = true }) {
     isActive,
   });
 
+  // Keyboard shortcut: Space = play/pause, R = restart (only in reading mode, not when editor/input focused)
+  useEffect(() => {
+    if (mode !== "reading" || !isActive) return;
+
+    const handleKeyDown = (e) => {
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      const isEditing = tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable;
+      if (isEditing) return;
+
+      if (e.code === "Space") {
+        e.preventDefault();
+        handleToggleSpeech();
+      } else if (e.code === "KeyR" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        handleRestartSpeech();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mode, isActive, handleToggleSpeech, handleRestartSpeech]);
+
   // Click on highlighted mark inside article OR click on sentence to speak
   const handleArticleClick = (e) => {
     const markEl = e.target.closest(".smart-vocab-mark");
