@@ -25,6 +25,7 @@ import {
   Flame,
   ChevronDown,
   ChevronUp,
+  Layers,
 } from '../Icons';
 import {
   fetchAdminOverview,
