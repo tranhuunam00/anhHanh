@@ -1,5 +1,5 @@
 import React from "react";
-import { Code2, PhoneCall, Keyboard, HelpCircle, MessageSquareHeart } from "lucide-react";
+import { Code2, PhoneCall, Keyboard, HelpCircle, MessageSquareHeart } from "../Icons";
 import "./footer.css";
 
 export const Footer = React.memo(function Footer({ onOpenShortcuts, onOpenFeedback }) {
@@ -7,7 +7,7 @@ export const Footer = React.memo(function Footer({ onOpenShortcuts, onOpenFeedba
   return (
     <footer className="shotlang-footer">
       <div className="footer-invite-banner">
-        <span>Cần mở rộng tính năng riêng hoặc tìm &quot;cạ cứng&quot; học cùng? Cứ ới tác giả một tiếng nhé 😉</span>
+        <span>Cần mở rộng tính năng riêng hoặc tìm &quot;cạ cứng&quot; học cùng? Cứ liên hệ tác giả nhé!</span>
         <a
           href="https://zalo.me/0961766816"
           target="_blank"
@@ -15,7 +15,8 @@ export const Footer = React.memo(function Footer({ onOpenShortcuts, onOpenFeedba
           className="footer-invite-contact-link"
           title="Nhắn Zalo hoặc gọi tác giả (Namth: 0961.766.816)"
         >
-          💬 Zalo/Call: 0961.766.816
+          <PhoneCall size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+          <span>Zalo/Call: 0961.766.816</span>
         </a>
       </div>
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Mic, X, RefreshCw } from "lucide-react";
+import { Mic, X, RefreshCw } from "../Icons";
 
 export const MicrophonePermissionModal = ({ isOpen, onClose, onRetry }) => {
   if (!isOpen) return null;

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { PRESET_LANGUAGES, PRESET_LESSONS_BY_CATEGORY } from "../../constants/presets";
 import { extractYouTubeId } from "../../utils/textNormalizer";
+import { Lightbulb, Clock, PlayCircle } from "../Icons";
 
 export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading }) => {
   const [selectedLang, setSelectedLang] = useState("en");
@@ -40,7 +41,8 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
           <span className="presets-header-badge">5 Cấp độ Dễ ➔ Khó</span>
         </div>
         <p className="presets-header-subtitle">
-          💡 Chọn bài tập mẫu sẵn có bên dưới, hoặc <strong>tự do dán bất kỳ link YouTube nào bạn thích</strong> vào ô tìm kiếm phía trên để bắt đầu luyện tập ngay!
+          <Lightbulb size={16} color="var(--primary, #6366f1)" style={{ verticalAlign: "middle", marginRight: 6 }} />
+          Chọn bài tập mẫu sẵn có bên dưới, hoặc <strong>tự do dán bất kỳ link YouTube nào bạn thích</strong> vào ô tìm kiếm phía trên để bắt đầu luyện tập ngay!
         </p>
       </div>
 
@@ -141,7 +143,10 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
                   />
                   <span className="preset-level-text">Cấp {lesson.levelNumber}</span>
                 </div>
-                <span className="preset-card-duration">⏱️ {lesson.duration}</span>
+                <span className="preset-card-duration">
+                  <Clock size={12} style={{ verticalAlign: "middle", marginRight: 4 }} />
+                  {lesson.duration}
+                </span>
               </div>
 
               {/* Title & summary */}
@@ -157,7 +162,10 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
               {/* Card footer */}
               <div className="preset-card-footer">
                 <div className="preset-card-meta-left">
-                  <span className="preset-card-channel">📺 {lesson.author}</span>
+                  <span className="preset-card-channel">
+                    <PlayCircle size={12} style={{ verticalAlign: "middle", marginRight: 4 }} />
+                    {lesson.author}
+                  </span>
                   <span className="preset-card-lang-target">{lesson.langLabel}</span>
                 </div>
                 <button
@@ -168,7 +176,7 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
                     onSelectPreset(lesson);
                   }}
                 >
-                  {isActive ? "Đang học" : "Luyện ngay ▶"}
+                  {isActive ? "Đang học" : "Luyện ngay"}
                 </button>
               </div>
             </div>

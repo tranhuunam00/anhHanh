@@ -13,8 +13,7 @@ import {
   Trees,
   ArrowRight,
   Globe,
-  Settings,
-} from "lucide-react";
+} from "../Icons";
 import { SOURCE_LANGUAGES, TARGET_LANGUAGES } from "../../constants/languages";
 import { useAuth } from "../../context/AuthContext";
 import { fetchAdminFeedbackCount } from "../../services/adminService";
@@ -342,7 +341,7 @@ export const Header = React.memo(({
               title={`${adminFeedbackStats.pending} góp ý mới, ${adminFeedbackStats.unread_messages || 0} tin nhắn mới từ học viên, ${adminFeedbackStats.in_progress} đang xử lý`}
             >
               {adminFeedbackStats.unread_messages > 0
-                ? `${adminFeedbackStats.total_active} (💬${adminFeedbackStats.unread_messages})`
+                ? `${adminFeedbackStats.total_active} (+${adminFeedbackStats.unread_messages})`
                 : adminFeedbackStats.total_active}
             </span>
           ) : userUnreadCount > 0 ? (

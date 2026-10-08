@@ -623,6 +623,384 @@ export const MapPin = (props) => (
   </BaseIcon>
 );
 
+// 61. Additional Lucide-Compatible Core Icons
+export const AlertTriangle = (props) => (
+  <BaseIcon {...props}>
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+    <line x1="12" y1="9" x2="12" y2="13" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </BaseIcon>
+);
+
+export const Bell = (props) => (
+  <BaseIcon {...props}>
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </BaseIcon>
+);
+
+export const BookmarkPlus = (props) => (
+  <BaseIcon {...props}>
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    <line x1="12" y1="7" x2="12" y2="13" />
+    <line x1="9" y1="10" x2="15" y2="10" />
+  </BaseIcon>
+);
+
+export const Bug = (props) => (
+  <BaseIcon {...props}>
+    <rect width="8" height="14" x="8" y="6" rx="4" />
+    <path d="m19 7-3 2" />
+    <path d="m5 7 3 2" />
+    <path d="m19 19-3-2" />
+    <path d="m5 19 3-2" />
+    <path d="M20 13h-4" />
+    <path d="M4 13h4" />
+    <path d="m10 4 1 2" />
+    <path d="m14 4-1 2" />
+  </BaseIcon>
+);
+
+export const ChevronsDown = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="7 13 12 18 17 13" />
+    <polyline points="7 6 12 11 17 6" />
+  </BaseIcon>
+);
+
+export const ClipboardPaste = (props) => (
+  <BaseIcon {...props}>
+    <path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z" />
+    <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2" />
+    <rect x="8" y="10" width="8" height="10" rx="1" />
+  </BaseIcon>
+);
+
+export const Code2 = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="16 18 22 12 16 6" />
+    <polyline points="8 6 2 12 8 18" />
+  </BaseIcon>
+);
+
+export const Compass = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+  </BaseIcon>
+);
+
+export const CornerDownLeft = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="9 10 4 15 9 20" />
+    <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+  </BaseIcon>
+);
+
+export const Crown = (props) => (
+  <BaseIcon {...props}>
+    <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
+  </BaseIcon>
+);
+
+export const ExternalLink = (props) => (
+  <BaseIcon {...props}>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+  </BaseIcon>
+);
+
+export const FileAudio = (props) => (
+  <BaseIcon {...props}>
+    <path d="M17.5 22h.5a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3" />
+    <path d="M14 2v6h6" />
+    <circle cx="10" cy="18" r="2" />
+    <path d="M12 18v-6h3" />
+  </BaseIcon>
+);
+
+export const Headphones = (props) => (
+  <BaseIcon {...props}>
+    <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+  </BaseIcon>
+);
+
+export const KeyRound = (props) => (
+  <BaseIcon {...props}>
+    <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" />
+    <circle cx="16.5" cy="7.5" r=".5" fill="currentColor" />
+  </BaseIcon>
+);
+
+export const Keyboard = (props) => (
+  <BaseIcon {...props}>
+    <rect width="20" height="16" x="2" y="4" rx="2" />
+    <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10" />
+  </BaseIcon>
+);
+
+export const Link2 = (props) => (
+  <BaseIcon {...props}>
+    <path d="M9 17H7A5 5 0 0 1 7 7h2" />
+    <path d="M15 7h2a5 5 0 1 1 0 10h-2" />
+    <line x1="8" y1="12" x2="16" y2="12" />
+  </BaseIcon>
+);
+
+export const ListFilter = (props) => (
+  <BaseIcon {...props}>
+    <path d="M3 6h18M7 12h10M10 18h4" />
+  </BaseIcon>
+);
+
+export const ListOrdered = (props) => (
+  <BaseIcon {...props}>
+    <line x1="10" y1="6" x2="21" y2="6" />
+    <line x1="10" y1="12" x2="21" y2="12" />
+    <line x1="10" y1="18" x2="21" y2="18" />
+    <path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
+  </BaseIcon>
+);
+
+export const LogIn = (props) => (
+  <BaseIcon {...props}>
+    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+    <polyline points="10 17 15 12 10 7" />
+    <line x1="15" y1="12" x2="3" y2="12" />
+  </BaseIcon>
+);
+
+export const LogOut = (props) => (
+  <BaseIcon {...props}>
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </BaseIcon>
+);
+
+export const Maximize2 = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="15 3 21 3 21 9" />
+    <polyline points="9 21 3 21 3 15" />
+    <line x1="21" y1="3" x2="14" y2="10" />
+    <line x1="3" y1="21" x2="10" y2="14" />
+  </BaseIcon>
+);
+
+export const MessageCircle = (props) => (
+  <BaseIcon {...props}>
+    <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
+  </BaseIcon>
+);
+
+export const MessageSquareHeart = (props) => (
+  <BaseIcon {...props}>
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    <path d="M14.5 7.5a2.12 2.12 0 0 0-2.5 0 2.12 2.12 0 0 0-2.5 0 2 2 0 0 0 0 3L12 13l2.5-2.5a2 2 0 0 0 0-3z" />
+  </BaseIcon>
+);
+
+export const MessageSquarePlus = (props) => (
+  <BaseIcon {...props}>
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    <line x1="12" y1="7" x2="12" y2="13" />
+    <line x1="9" y1="10" x2="15" y2="10" />
+  </BaseIcon>
+);
+
+export const MicOff = (props) => (
+  <BaseIcon {...props}>
+    <line x1="2" y1="2" x2="22" y2="22" />
+    <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2" />
+    <path d="M5 10v2a7 7 0 0 0 12 5" />
+    <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" />
+    <path d="M9 9v3a3 3 0 0 0 5.12 2.12" />
+    <line x1="12" y1="19" x2="12" y2="22" />
+  </BaseIcon>
+);
+
+export const Moon = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  </BaseIcon>
+);
+
+export const MousePointer = (props) => (
+  <BaseIcon {...props}>
+    <path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
+    <path d="m13 13 6 6" />
+  </BaseIcon>
+);
+
+export const Newspaper = (props) => (
+  <BaseIcon {...props}>
+    <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+    <path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z" />
+  </BaseIcon>
+);
+
+export const PenLine = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+  </BaseIcon>
+);
+
+export const PhoneCall = (props) => (
+  <BaseIcon {...props}>
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    <path d="M14.05 2a9 9 0 0 1 8 7.94M14.05 6A5 5 0 0 1 18 10" />
+  </BaseIcon>
+);
+
+export const PlayCircle = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="10 8 16 12 10 16 10 8" />
+  </BaseIcon>
+);
+
+export const RefreshCw = (props) => (
+  <BaseIcon {...props}>
+    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+    <path d="M3 3v5h5" />
+    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+    <path d="M16 21h5v-5" />
+  </BaseIcon>
+);
+
+export const Repeat = (props) => (
+  <BaseIcon {...props}>
+    <path d="m17 2 4 4-4 4" />
+    <path d="M3 11v-1a4 4 0 0 1 4-4h14" />
+    <path d="m7 22-4-4 4-4" />
+    <path d="M21 13v1a4 4 0 0 1-4 4H3" />
+  </BaseIcon>
+);
+
+export const Send = (props) => (
+  <BaseIcon {...props}>
+    <line x1="22" y1="2" x2="11" y2="13" />
+    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+  </BaseIcon>
+);
+
+export const Settings = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+    <circle cx="12" cy="12" r="3" />
+  </BaseIcon>
+);
+
+export const Shield = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </BaseIcon>
+);
+
+export const ShieldCheck = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <path d="m9 12 2 2 4-4" />
+  </BaseIcon>
+);
+
+export const SkipBack = (props) => (
+  <BaseIcon {...props}>
+    <polygon points="19 20 9 12 19 4 19 20" />
+    <line x1="5" y1="19" x2="5" y2="5" />
+  </BaseIcon>
+);
+
+export const SkipForward = (props) => (
+  <BaseIcon {...props}>
+    <polygon points="5 4 15 12 5 20 5 4" />
+    <line x1="19" y1="5" x2="19" y2="19" />
+  </BaseIcon>
+);
+
+export const Star = (props) => (
+  <BaseIcon {...props}>
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </BaseIcon>
+);
+
+export const Sun = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  </BaseIcon>
+);
+
+export const Trees = (props) => (
+  <BaseIcon {...props}>
+    <path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z" />
+    <path d="M7 16v6" />
+    <path d="M13 19v3" />
+    <path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-4 4.3a1 1 0 0 0 .8 1.7H10l-3 3.3a1 1 0 0 0 .7 1.7H8" />
+  </BaseIcon>
+);
+
+export const Type = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="4 7 4 4 20 4 20 7" />
+    <line x1="9" y1="20" x2="15" y2="20" />
+    <line x1="12" y1="4" x2="12" y2="20" />
+  </BaseIcon>
+);
+
+export const UploadCloud = (props) => (
+  <BaseIcon {...props}>
+    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+    <path d="M12 12v9" />
+    <path d="m16 16-4-4-4 4" />
+  </BaseIcon>
+);
+
+export const VolumeX = (props) => (
+  <BaseIcon {...props}>
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+    <line x1="22" y1="9" x2="16" y2="15" />
+    <line x1="16" y1="9" x2="22" y2="15" />
+  </BaseIcon>
+);
+
+export const ZoomIn = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    <line x1="11" y1="8" x2="11" y2="14" />
+    <line x1="8" y1="11" x2="14" y2="11" />
+  </BaseIcon>
+);
+
+export const BarChart3 = (props) => (
+  <BaseIcon {...props}>
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+  </BaseIcon>
+);
+
+export const Users = (props) => (
+  <BaseIcon {...props}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </BaseIcon>
+);
+
+export const Mail = (props) => (
+  <BaseIcon {...props}>
+    <rect width="20" height="16" x="2" y="4" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </BaseIcon>
+);
+
+
 
 
 

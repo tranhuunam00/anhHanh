@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { ListOrdered, X, RefreshCw, ChevronLeft, ChevronRight, CornerDownLeft } from "lucide-react";
+import { ListOrdered, X, RefreshCw, ChevronLeft, ChevronRight, CornerDownLeft } from "../Icons";
 
 const CHUNK_SIZE = 100;
 

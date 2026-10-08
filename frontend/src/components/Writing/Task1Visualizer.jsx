@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { IconBook, IconSparkles } from "../Icons";
+import { IconBook, IconSparkles, Settings } from "../Icons";
 
 /**
  * Visual renderer for IELTS Writing Task 1
@@ -555,7 +555,7 @@ const ProcessViewer = ({ data }) => {
           </div>
           {processB.machine && (
             <div className="process-machine-note">
-              ⚙️ <strong>Thiết bị:</strong> {processB.machine}
+              <Settings size={13} style={{ verticalAlign: 'middle', marginRight: 4, display: 'inline-block' }} /> <strong>Thiết bị:</strong> {processB.machine}
             </div>
           )}
         </div>

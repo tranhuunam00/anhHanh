@@ -12,7 +12,11 @@ import {
   RotateCcw,
   CheckCircle2,
   Compass,
-} from "lucide-react";
+  Zap,
+  Flame,
+  Headphones,
+  Info,
+} from "../Icons";
 
 export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
   const [activeTab, setActiveTab] = useState(initialTab); // 'vocab' | 'shortcuts' | 'tips'
@@ -154,8 +158,9 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
                 </span>
               </div>
 
-              <div style={{ marginTop: "14px", fontSize: "0.82rem", color: "var(--text-muted, #64748b)", lineHeight: 1.4 }}>
-                ℹ️ <em>Mẹo:</em> Sau khi lưu, bạn hãy vào mục <strong>Sổ tay từ vựng</strong> để ôn tập qua 4 dạng bài tập tương tác (Flashcard, Trắc nghiệm, Nghe đoán từ, Điền câu).
+              <div style={{ marginTop: "14px", fontSize: "0.82rem", color: "var(--text-muted, #64748b)", lineHeight: 1.4, display: "flex", alignItems: "center", gap: "6px" }}>
+                <Info size={14} color="var(--primary, #6366f1)" />
+                <span><em>Mẹo:</em> Sau khi lưu, bạn hãy vào mục <strong>Sổ tay từ vựng</strong> để ôn tập qua 4 dạng bài tập tương tác (Flashcard, Trắc nghiệm, Nghe đoán từ, Điền câu).</span>
               </div>
             </div>
           )}
@@ -267,7 +272,7 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
 
               <div className="tip-card">
                 <div className="tip-card-header">
-                  <span>🎧</span>
+                  <Headphones size={16} color="#6366f1" />
                   <span>Quy tắc nghe 3 lần vàng</span>
                 </div>
                 <p className="tip-card-body">
@@ -279,7 +284,7 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
 
               <div className="tip-card">
                 <div className="tip-card-header">
-                  <span>⚡</span>
+                  <Zap size={16} color="#f59e0b" />
                   <span>Tập trung vào phím Ctrl</span>
                 </div>
                 <p className="tip-card-body">
@@ -289,7 +294,7 @@ export const ShortcutsModal = ({ isOpen, onClose, initialTab = "vocab" }) => {
 
               <div className="tip-card">
                 <div className="tip-card-header">
-                  <span>🔥</span>
+                  <Flame size={16} color="#ef4444" />
                   <span>Duy trì chuỗi ngày học liên tục (Streak)</span>
                 </div>
                 <p className="tip-card-body">

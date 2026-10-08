@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { fetchLessonHistory, deleteLessonHistory } from "../../services/authVocabService";
+import { Clock, History, BookOpen, Trash2, Play, RotateCcw, CheckCircle2 } from "../Icons";
 
 export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => {
   const { token, isAuthenticated, showToast } = useAuth();
@@ -97,8 +98,10 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
   if (!isAuthenticated) {
     return (
       <div className="vocab-tab-container" style={{ maxWidth: "800px", margin: "2rem auto", textAlign: "center", padding: "3rem 1.5rem" }}>
-        <div style={{ fontSize: "3.5rem", marginBottom: "1rem" }}>🕒</div>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.75rem", color: "var(--text, #0f172a)" }}>
+        <div style={{ display: 'inline-flex', padding: '18px', borderRadius: '50%', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary, #6366f1)', marginBottom: '1rem' }}>
+          <Clock size={48} />
+        </div>
+        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.75rem", color: "var(--text-primary, #0f172a)" }}>
           Lịch Sử Học Tập & Tiến Độ Từng Bài
         </h2>
         <p style={{ color: "var(--text-muted, #64748b)", fontSize: "1rem", maxWidth: "520px", margin: "0 auto 1.5rem", lineHeight: 1.6 }}>
@@ -120,8 +123,9 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
       {/* Header bar */}
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
         <div>
-          <h2 style={{ fontSize: "1.5rem", fontWeight: 800, margin: 0, color: "var(--text, #0f172a)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <span>🕒</span> Lịch Sử Học Tập
+          <h2 style={{ fontSize: "1.5rem", fontWeight: 800, margin: 0, color: "var(--text-primary, #0f172a)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <History size={24} style={{ color: "var(--primary, #6366f1)" }} />
+            <span>Lịch Sử Học Tập</span>
           </h2>
           <p style={{ margin: "4px 0 0", fontSize: "0.875rem", color: "var(--text-muted, #64748b)" }}>
             Theo dõi tiến độ, tỷ lệ hoàn thành và tiếp tục các bài nghe đang học dở.
@@ -183,8 +187,10 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
         </div>
       ) : filteredList.length === 0 ? (
         <div style={{ textAlign: "center", padding: "3.5rem 1rem", background: "var(--surface, #ffffff)", borderRadius: "16px", border: "1px dashed var(--border, #cbd5e1)" }}>
-          <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>📖</div>
-          <h3 style={{ fontSize: "1.15rem", fontWeight: 700, margin: "0 0 0.5rem", color: "var(--text, #0f172a)" }}>
+          <div style={{ display: 'inline-flex', padding: '16px', borderRadius: '50%', background: 'rgba(100, 116, 139, 0.1)', color: 'var(--text-muted, #64748b)', marginBottom: '0.75rem' }}>
+            <BookOpen size={36} />
+          </div>
+          <h3 style={{ fontSize: "1.15rem", fontWeight: 700, margin: "0 0 0.5rem", color: "var(--text-primary, #0f172a)" }}>
             {historyList.length === 0 ? "Chưa có lịch sử học tập" : "Không tìm thấy bài học phù hợp"}
           </h3>
           <p style={{ fontSize: "0.9rem", color: "var(--text-muted, #64748b)", margin: 0 }}>
@@ -264,7 +270,13 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
                       backdropFilter: "blur(4px)"
                     }}
                   >
-                    {item.isCompleted ? "✓ Hoàn thành" : `Câu ${item.currentPosition}/${item.totalChallenges}`}
+                    {item.isCompleted ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <CheckCircle2 size={12} /> Hoàn thành
+                      </span>
+                    ) : (
+                      `Câu ${item.currentPosition}/${item.totalChallenges}`
+                    )}
                   </div>
                 </div>
 
@@ -316,11 +328,11 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
                       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <button
                           className="btn btn-secondary"
-                          style={{ padding: "4px 8px", fontSize: "0.8rem", color: "#ef4444", border: "none", background: "transparent" }}
+                          style={{ padding: "4px 8px", fontSize: "0.8rem", color: "#ef4444", border: "none", background: "transparent", display: "inline-flex", alignItems: "center" }}
                           title="Xóa khỏi lịch sử"
                           onClick={(e) => handleDelete(item.id, item.videoId, item.title, item.sourceLang, item.targetLang, e)}
                         >
-                          🗑️
+                          <Trash2 size={15} />
                         </button>
                         <button
                           className="btn btn-primary"
@@ -330,7 +342,7 @@ export const HistoryTab = ({ onSelectLesson, onOpenAuth, isActive = false }) => 
                             onSelectLesson(item.videoId, item.currentPosition, item.sourceLang, item.targetLang);
                           }}
                         >
-                          {item.isCompleted ? "Học lại" : "Tiếp tục ▶"}
+                          {item.isCompleted ? "Học lại" : "Tiếp tục"}
                         </button>
                       </div>
                     </div>

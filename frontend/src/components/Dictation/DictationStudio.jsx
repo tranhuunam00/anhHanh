@@ -17,8 +17,7 @@ import {
   ArrowRight,
   Sparkles,
   BookOpen,
-  Trophy,
-} from "lucide-react";
+} from "../Icons";
 import { evaluateMasked, getNextLetterHint, getNextWordHint } from "../../utils/diffCalculator";
 import { analyzeSentencePhonology } from "../../utils/phonologyEngine";
 import { translateText } from "../../services/api";
@@ -255,7 +254,7 @@ export const DictationStudio = React.memo(({
 
           <button
             className="btn btn-secondary btn-icon"
-            title={isLastChallenge ? (isCompleted ? "Hoàn thành bài học 🎉" : "Đã đến câu cuối cùng") : "Câu sau (Alt+→)"}
+            title={isLastChallenge ? (isCompleted ? "Hoàn thành bài học" : "Đã đến câu cuối cùng") : "Câu sau (Alt+→)"}
             onClick={isLastChallenge ? (isCompleted ? (onCompleteLesson || onNextChallenge) : undefined) : onNext}
             disabled={isLastChallenge && !isCompleted}
           >
@@ -387,8 +386,9 @@ export const DictationStudio = React.memo(({
           {(currentChallenge?.translation || dynamicTranslation) && (
             <div className="translation-sentence">{currentChallenge?.translation || dynamicTranslation}</div>
           )}
-          <div className="vocab-save-hint-card">
-            <span>💡 Chạm vào từ để xem phát âm & nghĩa, hoặc bôi đen cụm từ để lưu</span>
+          <div className="vocab-save-hint-card" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Lightbulb size={15} color="var(--primary, #6366f1)" style={{ flexShrink: 0 }} />
+            <span>Chạm vào từ để xem phát âm & nghĩa, hoặc bôi đen cụm từ để lưu</span>
           </div>
           <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
             {isLastChallenge ? (
@@ -408,7 +408,7 @@ export const DictationStudio = React.memo(({
                 title="Hoàn thành bài học (hoặc ấn Enter)"
               >
                 <Trophy size={17} strokeWidth={2.4} style={{ color: "#fef08a" }} />
-                <span>Hoàn thành bài học 🎉</span>
+                <span>Hoàn thành bài học</span>
                 <kbd style={{ fontSize: "0.72rem", opacity: 0.9, padding: "1px 6px", background: "rgba(255,255,255,0.25)", borderRadius: "4px", marginLeft: "6px" }}>Enter</kbd>
               </button>
             ) : (

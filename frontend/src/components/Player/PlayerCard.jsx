@@ -7,8 +7,7 @@ import {
   RotateCw,
   Play,
   Pause,
-  Repeat,
-} from "lucide-react";
+} from "../Icons";
 
 export const PlayerCard = React.memo(({
   playerController,

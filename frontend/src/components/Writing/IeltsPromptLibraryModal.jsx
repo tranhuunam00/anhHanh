@@ -6,14 +6,15 @@ import {
   IconCheckCircle,
   IconSparkles,
   IconFile,
+  BarChart3,
 } from "../Icons";
 
 const YEARS_FILTER = [
   { id: "all", label: "Tất cả các năm" },
-  { id: "2026", label: "🔥 2026 (Mới nhất)" },
+  { id: "2026", label: "2026 (Mới nhất)" },
   { id: "2025", label: "2025" },
   { id: "2024", label: "2024" },
-  { id: "cambridge", label: "📘 Cambridge 15-19" },
+  { id: "cambridge", label: "Cambridge 15-19" },
   { id: "2023", label: "2023" },
   { id: "2022", label: "2022" },
   { id: "2021", label: "2021" },
@@ -467,7 +468,9 @@ export const IeltsPromptLibraryModal = ({
                       <span>Mục tiêu: {item.min_words || 250}+ từ</span>
                       <span>Thời gian: {item.recommended_time || 40} phút</span>
                       {item.visual_data && (
-                        <span className="badge-has-data">📊 Có số liệu trực quan</span>
+                        <span className="badge-has-data" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <BarChart3 size={11} /> Có số liệu trực quan
+                        </span>
                       )}
                     </div>
 

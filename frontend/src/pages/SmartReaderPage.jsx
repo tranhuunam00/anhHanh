@@ -19,8 +19,7 @@ import {
   BookOpen,
   ArrowRight,
   ArrowLeft,
-  Info,
-} from "lucide-react";
+} from "../components/Icons";
 import { useAuth } from "../context/AuthContext";
 import { WordLookupPopover } from "../components/Vocab/WordLookupPopover";
 import "../styles/smart-reader.css";

@@ -17,7 +17,7 @@ class GroqWhisperService:
         self.api_key = api_key
 
     def get_api_key(self) -> str:
-        key = self.api_key or os.getenv("GROQ_API_KEY", "")
+        key = self.api_key if self.api_key is not None else os.getenv("GROQ_API_KEY", "")
         return key.strip() if key else ""
 
     def is_configured(self) -> bool:

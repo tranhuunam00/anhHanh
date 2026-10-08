@@ -10,8 +10,22 @@ import {
   CheckCircle2,
   Clock,
   Eye,
-  AlertCircle
-} from 'lucide-react';
+  AlertCircle,
+  Shield,
+  Settings,
+  BarChart3,
+  Users,
+  Mail,
+  PlayCircle,
+  Trophy,
+  BookOpen,
+  Bug,
+  Lightbulb,
+  FileText,
+  Flame,
+  ChevronDown,
+  ChevronUp,
+} from '../Icons';
 import {
   fetchAdminOverview,
   fetchAdminUsers,
@@ -316,7 +330,9 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
   if (!isAdmin) {
     return (
       <div className="admin-portal-container" style={{ textAlign: 'center', padding: '80px 20px' }}>
-        <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🛡️</div>
+        <div style={{ display: 'inline-flex', padding: '18px', borderRadius: '50%', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary, #6366f1)', marginBottom: '16px' }}>
+          <Shield size={48} />
+        </div>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Khu vực Quản trị Hạn chế</h2>
         <p style={{ color: '#64748b', maxWidth: '460px', margin: '0 auto 20px', lineHeight: 1.5 }}>
           Bạn cần đăng nhập bằng tài khoản Quản trị viên (Admin) để có quyền truy cập dữ liệu và công cụ quản trị hệ thống.
@@ -338,20 +354,20 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'RESOLVED':
-        return <span className="badge badge-resolved">✓ Đã giải quyết</span>;
+        return <span className="badge badge-resolved" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={12} /> Đã giải quyết</span>;
       case 'REVIEWED':
-        return <span className="badge badge-reviewed">👁 Đã tiếp nhận</span>;
+        return <span className="badge badge-reviewed" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Eye size={12} /> Đã tiếp nhận</span>;
       default:
-        return <span className="badge badge-pending">⏳ Chờ xem xét</span>;
+        return <span className="badge badge-pending" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Clock size={12} /> Chờ xem xét</span>;
     }
   };
 
   const getCategoryLabel = (cat) => {
     switch (cat) {
-      case 'BUG': return '🐛 Báo lỗi';
-      case 'SUGGESTION': return '💡 Đề xuất';
-      case 'CONTENT': return '📖 Nội dung';
-      default: return '💬 Chung';
+      case 'BUG': return <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Bug size={13} /> Báo lỗi</span>;
+      case 'SUGGESTION': return <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Lightbulb size={13} /> Đề xuất</span>;
+      case 'CONTENT': return <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><BookOpen size={13} /> Nội dung</span>;
+      default: return <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><MessageCircle size={13} /> Chung</span>;
     }
   };
 
@@ -361,7 +377,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
       <div className="admin-header-bar">
         <div className="admin-title-group">
           <h1>
-            <span>⚙️</span>
+            <Settings size={22} style={{ verticalAlign: 'middle', marginRight: 8, color: 'var(--primary, #6366f1)' }} />
             <span>Bảng Điều Khiển Quản Trị</span>
           </h1>
           <p>Giám sát tiến độ học tập của người dùng và hòm thư phản hồi hệ thống</p>
@@ -374,24 +390,24 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
             className={`admin-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
           >
-            📊 Tổng quan
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><BarChart3 size={15} /> Tổng quan</span>
           </button>
           <button
             type="button"
             className={`admin-tab-btn ${activeTab === 'users' ? 'active' : ''}`}
             onClick={() => setActiveTab('users')}
           >
-            👥 Người dùng & Tiến độ
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Users size={15} /> Người dùng & Tiến độ</span>
           </button>
           <button
             type="button"
             className={`admin-tab-btn ${activeTab === 'feedbacks' ? 'active' : ''}`}
             onClick={() => setActiveTab('feedbacks')}
           >
-            📬 Hòm thư góp ý
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Mail size={15} /> Hòm thư góp ý</span>
             {overview?.feedbacks_unread_messages > 0 ? (
-              <span className="badge" style={{ marginLeft: 6, background: '#ef4444', color: '#fff', fontSize: '0.72rem', padding: '2px 7px', borderRadius: 999 }}>
-                💬 {overview.feedbacks_unread_messages}
+              <span className="badge" style={{ marginLeft: 6, background: '#ef4444', color: '#fff', fontSize: '0.72rem', padding: '2px 7px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <MessageCircle size={11} /> {overview.feedbacks_unread_messages}
               </span>
             ) : overview?.feedbacks_pending > 0 ? (
               <span className="badge" style={{ marginLeft: 6, background: '#f59e0b', color: '#fff', fontSize: '0.72rem', padding: '2px 7px', borderRadius: 999 }}>
@@ -411,7 +427,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
             <>
               <div className="admin-stats-grid">
                 <div className="stat-card">
-                  <div className="stat-icon-wrapper stat-icon-users">👥</div>
+                  <div className="stat-icon-wrapper stat-icon-users"><Users size={20} /></div>
                   <div className="stat-info">
                     <div className="stat-value">{overview?.users_count ?? 0}</div>
                     <div className="stat-label">Tổng người dùng đã đăng ký</div>
@@ -419,7 +435,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                 </div>
 
                 <div className="stat-card">
-                  <div className="stat-icon-wrapper stat-icon-lessons">🎬</div>
+                  <div className="stat-icon-wrapper stat-icon-lessons"><PlayCircle size={20} /></div>
                   <div className="stat-info">
                     <div className="stat-value">{overview?.lessons_count ?? 0}</div>
                     <div className="stat-label">Bài học YouTube được lưu trữ</div>
@@ -427,7 +443,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                 </div>
 
                 <div className="stat-card">
-                  <div className="stat-icon-wrapper stat-icon-sessions">✍️</div>
+                  <div className="stat-icon-wrapper stat-icon-sessions"><FileText size={20} /></div>
                   <div className="stat-info">
                     <div className="stat-value">{overview?.sessions_count ?? 0}</div>
                     <div className="stat-label">Lượt phiên luyện chép bắt đầu</div>
@@ -435,7 +451,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                 </div>
 
                 <div className="stat-card">
-                  <div className="stat-icon-wrapper stat-icon-completed">🏆</div>
+                  <div className="stat-icon-wrapper stat-icon-completed"><Trophy size={20} /></div>
                   <div className="stat-info">
                     <div className="stat-value">{overview?.completed_sessions_count ?? 0}</div>
                     <div className="stat-label">Lượt bài hoàn thành 100%</div>
@@ -443,7 +459,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                 </div>
 
                 <div className="stat-card">
-                  <div className="stat-icon-wrapper stat-icon-feedbacks">📬</div>
+                  <div className="stat-icon-wrapper stat-icon-feedbacks"><Mail size={20} /></div>
                   <div className="stat-info">
                     <div className="stat-value">{overview?.feedbacks_pending ?? 0}</div>
                     <div className="stat-label">Góp ý đang chờ xử lý</div>
@@ -451,7 +467,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                 </div>
 
                 <div className="stat-card">
-                  <div className="stat-icon-wrapper stat-icon-vocab">📚</div>
+                  <div className="stat-icon-wrapper stat-icon-vocab"><BookOpen size={20} /></div>
                   <div className="stat-info">
                     <div className="stat-value">{overview?.vocab_total ?? 0}</div>
                     <div className="stat-label">Từ vựng người dùng đã lưu</div>
@@ -543,20 +559,24 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                       </div>
 
                       <div className="user-right-metrics">
-                        <span className="metric-pill" title="Tổng số bài đã bắt đầu">
-                          📖 <strong>{u.total_lessons_attempted || u.total_lessons_started || 0}</strong> bài học
+                        <span className="metric-pill" title="Tổng số bài đã bắt đầu" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <BookOpen size={12} />
+                          <span><strong>{u.total_lessons_attempted || u.total_lessons_started || 0}</strong> bài học</span>
                         </span>
-                        <span className="metric-pill" style={{ color: '#059669' }} title="Số bài đã hoàn thành 100%">
-                          🏆 <strong>{u.completed_lessons || u.total_lessons_completed || 0}</strong> hoàn thành
+                        <span className="metric-pill" style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '4px' }} title="Số bài đã hoàn thành 100%">
+                          <Trophy size={12} />
+                          <span><strong>{u.completed_lessons || u.total_lessons_completed || 0}</strong> hoàn thành</span>
                         </span>
-                        <span className="metric-pill" title="Chuỗi Streak ngày">
-                          🔥 <strong>{u.streak?.current_streak || 0}</strong> ngày
+                        <span className="metric-pill" title="Chuỗi Streak ngày" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <Flame size={12} color="#f97316" />
+                          <span><strong>{u.streak?.current_streak || 0}</strong> ngày</span>
                         </span>
-                        <span className="metric-pill" title="Từ vựng đã lưu">
-                          📚 <strong>{u.total_vocab_count || 0}</strong> từ
+                        <span className="metric-pill" title="Từ vựng đã lưu" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <BookOpen size={12} color="#6366f1" />
+                          <span><strong>{u.total_vocab_count || 0}</strong> từ</span>
                         </span>
-                        <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                          {isExpanded ? '▲ Thu gọn' : '▼ Chi tiết'}
+                        <span style={{ fontSize: '0.85rem', color: '#64748b', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          {isExpanded ? <><ChevronUp size={14} /> Thu gọn</> : <><ChevronDown size={14} /> Chi tiết</>}
                         </span>
                         {/* Role management button */}
                         <button
@@ -567,10 +587,15 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                           onClick={(e) => { e.stopPropagation(); handleUpdateRole(u.id, u.role); }}
                           title={u.role === 'ADMIN' ? 'Hạ xuống USER' : 'Nâng lên ADMIN'}
                         >
-                          {updatingRoleId === u.id
-                            ? '⏳ Đang xử lý...'
-                            : u.role === 'ADMIN' ? '🔽 Hạ về USER' : '🔼 Cấp ADMIN'
-                          }
+                          {updatingRoleId === u.id ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <Loader2 className="animate-spin" size={12} /> Đang xử lý...
+                            </span>
+                          ) : u.role === 'ADMIN' ? (
+                            'Hạ về USER'
+                          ) : (
+                            'Cấp ADMIN'
+                          )}
                         </button>
                       </div>
                     </div>
@@ -660,19 +685,24 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
             <div className="feedback-type-pills">
               {[
                 { id: 'ALL', label: 'Tất cả' },
-                { id: 'PENDING', label: '⏳ Chờ xem xét' },
-                { id: 'REVIEWED', label: '👁 Đã tiếp nhận' },
-                { id: 'RESOLVED', label: '✓ Đã giải quyết' }
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  className={`type-pill ${feedbackFilter === f.id ? 'active' : ''}`}
-                  onClick={() => setFeedbackFilter(f.id)}
-                >
-                  {f.label}
-                </button>
-              ))}
+                { id: 'PENDING', label: 'Chờ xem xét', icon: Clock },
+                { id: 'REVIEWED', label: 'Đã tiếp nhận', icon: Eye },
+                { id: 'RESOLVED', label: 'Đã giải quyết', icon: CheckCircle2 }
+              ].map((f) => {
+                const IconComp = f.icon;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    className={`type-pill ${feedbackFilter === f.id ? 'active' : ''}`}
+                    onClick={() => setFeedbackFilter(f.id)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                  >
+                    {IconComp && <IconComp size={12} />}
+                    <span>{f.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -702,7 +732,8 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                         <span className="badge badge-admin">{getCategoryLabel(fb.feedback_type)}</span>
                         {fb.has_unread_messages && (
                           <span className="badge" style={{ background: '#ef4444', color: '#ffffff', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                            💬 Tin nhắn mới từ học viên {fb.unread_user_messages ? `(${fb.unread_user_messages})` : ''}
+                            <MessageCircle size={11} />
+                            <span>Tin nhắn mới từ học viên {fb.unread_user_messages ? `(${fb.unread_user_messages})` : ''}</span>
                           </span>
                         )}
                       </div>
@@ -790,11 +821,12 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                     {fb.status !== 'RESOLVED' && (
                       <button
                         className="btn btn-primary"
-                        style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+                        style={{ fontSize: '0.8rem', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                         disabled={updatingFbId === fb.id}
                         onClick={() => handleUpdateStatus(fb.id, 'RESOLVED')}
                       >
-                        Đánh dấu đã giải quyết ✓
+                        <CheckCircle2 size={12} />
+                        <span>Đánh dấu đã giải quyết</span>
                       </button>
                     )}
                     {fb.status !== 'PENDING' && (
@@ -887,35 +919,38 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                 <button
                   type="button"
                   className={`btn ${chatFeedback.status === 'PENDING' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ fontSize: '0.75rem', padding: '3px 8px' }}
+                  style={{ fontSize: '0.75rem', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                   onClick={async () => {
                     await handleUpdateStatus(chatFeedback.id, 'PENDING');
                     setChatFeedback((prev) => ({ ...prev, status: 'PENDING' }));
                   }}
                 >
-                  ⏳ Chờ xem xét
+                  <Clock size={11} />
+                  <span>Chờ xem xét</span>
                 </button>
                 <button
                   type="button"
                   className={`btn ${chatFeedback.status === 'REVIEWED' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ fontSize: '0.75rem', padding: '3px 8px' }}
+                  style={{ fontSize: '0.75rem', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                   onClick={async () => {
                     await handleUpdateStatus(chatFeedback.id, 'REVIEWED');
                     setChatFeedback((prev) => ({ ...prev, status: 'REVIEWED' }));
                   }}
                 >
-                  👁 Đã tiếp nhận
+                  <Eye size={11} />
+                  <span>Đã tiếp nhận</span>
                 </button>
                 <button
                   type="button"
                   className={`btn ${chatFeedback.status === 'RESOLVED' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ fontSize: '0.75rem', padding: '3px 8px' }}
+                  style={{ fontSize: '0.75rem', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                   onClick={async () => {
                     await handleUpdateStatus(chatFeedback.id, 'RESOLVED');
                     setChatFeedback((prev) => ({ ...prev, status: 'RESOLVED' }));
                   }}
                 >
-                  ✓ Đã giải quyết
+                  <CheckCircle2 size={11} />
+                  <span>Đã giải quyết</span>
                 </button>
               </div>
             </div>
@@ -989,7 +1024,7 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
                       className={`chat-message-row ${isStaff ? 'from-me' : 'from-them'}`}
                     >
                       <div className={`chat-avatar-circle ${isStaff ? 'admin' : 'user'}`}>
-                        {isStaff ? '🛡️' : (msg.sender_name ? msg.sender_name.charAt(0).toUpperCase() : 'U')}
+                        {isStaff ? <Shield size={14} /> : (msg.sender_name ? msg.sender_name.charAt(0).toUpperCase() : 'U')}
                       </div>
                       <div className="chat-bubble-wrapper">
                         <div className="chat-bubble-meta">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SlidersHorizontal, X, RefreshCw, Bell, Volume2, ShieldCheck, AlertCircle, PlayCircle } from "lucide-react";
+import { SlidersHorizontal, X, RefreshCw, Bell, Volume2, ShieldCheck, AlertCircle, PlayCircle } from "../Icons";
 import {
   getReminderSettings,
   saveReminderSettings,

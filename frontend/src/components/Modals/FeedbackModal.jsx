@@ -20,8 +20,7 @@ import {
   Loader2,
   ZoomIn,
   Crown,
-  ArrowLeft,
-} from 'lucide-react';
+} from '../Icons';
 import {
   submitFeedback,
   fetchMyFeedbacks,
@@ -767,8 +766,9 @@ export const FeedbackModal = ({ isOpen, onClose, user, token, onOpenAuth, onOpen
                         <span>Đang tải cuộc hội thoại...</span>
                       </div>
                     ) : threadMessages.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '20px 10px', color: '#64748b', fontSize: '0.84rem' }}>
-                        💬 Chưa có phản hồi nào. Bạn có thể gửi thêm chi tiết hoặc chờ Quản trị viên phản hồi tại đây!
+                      <div style={{ textAlign: 'center', padding: '20px 10px', color: '#64748b', fontSize: '0.84rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                        <MessageCircle size={15} />
+                        <span>Chưa có phản hồi nào. Bạn có thể gửi thêm chi tiết hoặc chờ Quản trị viên phản hồi tại đây!</span>
                       </div>
                     ) : (
                       threadMessages.map((msg) => {

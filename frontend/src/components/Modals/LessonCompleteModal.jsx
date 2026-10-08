@@ -8,8 +8,7 @@ import {
   BookOpen,
   RotateCcw,
   X,
-  ArrowRight,
-} from "lucide-react";
+} from "../Icons";
 
 export const LessonCompleteModal = ({
   isOpen,
@@ -99,7 +98,7 @@ export const LessonCompleteModal = ({
               color: "#ffffff",
             }}
           >
-            Chúc mừng bạn đã hoàn thành bài học! 🎉
+            Chúc mừng bạn đã hoàn thành bài học!
           </h2>
           <p
             style={{

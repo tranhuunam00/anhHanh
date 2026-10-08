@@ -80,11 +80,7 @@
 
 .feedback-close-btn:hover {
   background: rgba(100, 116, 139, 0.15);
-  color: #0f172a;
-}
-
-[data-theme="dark"] .feedback-close-btn:hover {
-  color: #f8fafc;
+  color: var(--text-primary);
 }
 
 .feedback-modal-body {
@@ -282,11 +278,7 @@
 }
 
 .admin-tab-btn:hover {
-  color: #0f172a;
-}
-
-[data-theme="dark"] .admin-tab-btn:hover {
-  color: #f8fafc;
+  color: var(--text-primary);
 }
 
 .admin-tab-btn.active {
@@ -876,8 +868,8 @@
   right: -16px;
   width: 36px;
   height: 36px;
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
   border-radius: 50%;
   border: none;
   cursor: pointer;
@@ -1025,16 +1017,10 @@
 }
 
 .chat-bubble.admin {
-  background: #f1f5f9;
-  color: #0f172a;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #0f172a);
   border-bottom-left-radius: 4px;
-  border: 1px solid #e2e8f0;
-}
-
-[data-theme="dark"] .chat-bubble.admin {
-  background: #1e293b;
-  color: #f8fafc;
-  border-color: #334155;
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .chat-bubble.user {

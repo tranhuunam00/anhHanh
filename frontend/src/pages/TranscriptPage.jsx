@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Headphones, ChevronsDown, Play, Pause, ArrowRight, Sparkles, Search } from "lucide-react";
+import { Headphones, ChevronsDown, Play, Pause, ArrowRight, Sparkles, Search } from "../components/Icons";
 import { HighlightedVocabSentence } from "../components/Vocab/HighlightedVocabSentence";
 
 const BATCH_SIZE = 60;

@@ -18,6 +18,7 @@ import {
   IconBookmark,
   IconSearch,
   IconGlobe,
+  IconLightbulb,
 } from "../components/Icons";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -1411,10 +1412,22 @@ export const WritingPage = ({ isActive = false }) => {
                   <h3>Giám khảo AI đang chấm bài</h3>
                   <p>Phân tích 4 tiêu chí chuẩn IELTS: Task Response, Coherence, Lexical Resource, và Ngữ pháp...</p>
                   <div className="evaluating-steps">
-                    <div className="step-item active">✓ Đọc và đếm từ vựng</div>
-                    <div className="step-item active">✓ Rà soát lỗi ngữ pháp và chính tả</div>
-                    <div className="step-item active">⏳ Viết lại bản mẫu Band 8.5+</div>
-                    <div className="step-item">⏳ Đề xuất nâng cấp từ vựng C1/C2</div>
+                    <div className="step-item active" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <IconCheckCircle size={14} color="#10b981" />
+                      <span>Đọc và đếm từ vựng</span>
+                    </div>
+                    <div className="step-item active" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <IconCheckCircle size={14} color="#10b981" />
+                      <span>Rà soát lỗi ngữ pháp và chính tả</span>
+                    </div>
+                    <div className="step-item active" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <IconClock size={14} color="#f59e0b" />
+                      <span>Viết lại bản mẫu Band 8.5+</span>
+                    </div>
+                    <div className="step-item" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <IconClock size={14} color="#94a3b8" />
+                      <span>Đề xuất nâng cấp từ vựng C1/C2</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1501,21 +1514,24 @@ export const WritingPage = ({ isActive = false }) => {
                         className={`sentence-filter-btn ${sentenceFilter === "error" ? "active" : ""}`}
                         onClick={() => setSentenceFilter("error")}
                       >
-                        ⚠ Có lỗi ngữ pháp ({sentencesList.filter((s) => !s.is_grammar_correct).length})
+                        <IconAlert size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                        <span>Có lỗi ngữ pháp ({sentencesList.filter((s) => !s.is_grammar_correct).length})</span>
                       </button>
                       <button
                         type="button"
                         className={`sentence-filter-btn ${sentenceFilter === "upgrade" ? "active" : ""}`}
                         onClick={() => setSentenceFilter("upgrade")}
                       >
-                        🚀 Có gợi ý nâng cấp ({sentencesList.filter((s) => s.upgrade_needed).length})
+                        <IconSparkles size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                        <span>Có gợi ý nâng cấp ({sentencesList.filter((s) => s.upgrade_needed).length})</span>
                       </button>
                       <button
                         type="button"
                         className={`sentence-filter-btn ${sentenceFilter === "correct" ? "active" : ""}`}
                         onClick={() => setSentenceFilter("correct")}
                       >
-                        ✓ Ngữ pháp chuẩn ({sentencesList.filter((s) => s.is_grammar_correct).length})
+                        <IconCheckCircle size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                        <span>Ngữ pháp chuẩn ({sentencesList.filter((s) => s.is_grammar_correct).length})</span>
                       </button>
                     </div>
 
@@ -1542,11 +1558,15 @@ export const WritingPage = ({ isActive = false }) => {
                               )}
                             </div>
                             {sent.upgrade_needed ? (
-                              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7c3aed", background: "rgba(124, 58, 237, 0.12)", padding: "2px 6px", borderRadius: "4px" }}>
-                                🚀 Có gợi ý nâng cấp Band 8.5+
+                              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7c3aed", background: "rgba(124, 58, 237, 0.12)", padding: "2px 6px", borderRadius: "4px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                <IconSparkles size={11} />
+                                <span>Có gợi ý nâng cấp Band 8.5+</span>
                               </span>
                             ) : (
-                              <span className="sentence-no-upgrade-tag">✓ Đã tự nhiên, không cần bổ sung</span>
+                              <span className="sentence-no-upgrade-tag" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                <IconCheckCircle size={11} />
+                                <span>Đã tự nhiên, không cần bổ sung</span>
+                              </span>
                             )}
                           </div>
 
@@ -1558,7 +1578,15 @@ export const WritingPage = ({ isActive = false }) => {
                           {/* Phân tích ngữ pháp */}
                           <div className={`sentence-detail-box ${sent.is_grammar_correct ? "analysis-correct" : "analysis-error"}`}>
                             <div className="box-title-label">
-                              {sent.is_grammar_correct ? "✓ Nhận xét ngữ pháp:" : "❌ Sai ở đâu & Vì sao:"}
+                              {sent.is_grammar_correct ? (
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                  <IconCheckCircle size={12} /> Nhận xét ngữ pháp:
+                                </span>
+                              ) : (
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                  <IconClose size={12} /> Sai ở đâu & Vì sao:
+                                </span>
+                              )}
                             </div>
                             <div className="box-content-text">{sent.grammar_analysis}</div>
                           </div>
@@ -1566,7 +1594,10 @@ export const WritingPage = ({ isActive = false }) => {
                           {/* Sửa đúng ngữ pháp trước */}
                           {!sent.is_grammar_correct && sent.grammar_fix && (
                             <div className="sentence-detail-box grammar-fix">
-                              <div className="box-title-label">🔧 Sửa đúng ngữ pháp:</div>
+                              <div className="box-title-label" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                <IconPen size={12} />
+                                <span>Sửa đúng ngữ pháp:</span>
+                              </div>
                               <div className="box-content-text">
                                 <strong>{sent.grammar_fix}</strong>
                               </div>
@@ -1576,13 +1607,17 @@ export const WritingPage = ({ isActive = false }) => {
                           {/* Nâng cấp câu học thuật sau đó */}
                           {sent.upgrade_needed && sent.upgraded_sentence && (
                             <div className="sentence-detail-box upgrade">
-                              <div className="box-title-label">🚀 Nâng cấp câu học thuật (Band 8.5+):</div>
+                              <div className="box-title-label" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                <IconSparkles size={12} />
+                                <span>Nâng cấp câu học thuật (Band 8.5+):</span>
+                              </div>
                               <div className="box-content-text">
                                 <strong>{sent.upgraded_sentence}</strong>
                               </div>
                               {sent.upgrade_notes && (
-                                <div style={{ fontSize: "0.75rem", marginTop: "4px", opacity: 0.9 }}>
-                                  💡 <em>{sent.upgrade_notes}</em>
+                                <div style={{ fontSize: "0.75rem", marginTop: "4px", opacity: 0.9, display: "flex", alignItems: "center", gap: "4px" }}>
+                                  <IconLightbulb size={12} />
+                                  <em>{sent.upgrade_notes}</em>
                                 </div>
                               )}
                             </div>
