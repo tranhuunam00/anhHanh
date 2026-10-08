@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import {
   BookOpen,
   Search,
-  Target,
   Zap,
   RotateCw,
   Volume2,
@@ -29,7 +28,6 @@ import {
   rotateVocabImage,
   deleteVocabWord,
   refreshVocabMeaning,
-  fetchDueVocabSession,
 } from "../../services/authVocabService";
 import VocabExerciseHubModal from "./VocabExerciseHubModal";
 import { AddVocabModal } from "../Modals/AddVocabModal";
@@ -48,7 +46,6 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [refreshingMeaningId, setRefreshingMeaningId] = useState(null);
-  const [dueItems, setDueItems] = useState([]);
   const [isExerciseHubOpen, setIsExerciseHubOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAIImportModalOpen, setIsAIImportModalOpen] = useState(false);
@@ -112,10 +109,6 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
       const list = data?.items || data?.vocabulary || [];
       setItems(list);
       setTotal(data?.total !== undefined ? data.total : (data?.stats?.total || list.length));
-
-      // Also load due review session items
-      const dueRes = await fetchDueVocabSession(20, token);
-      setDueItems(dueRes?.items || []);
     } catch (e) {
       console.error("Failed to load vocab:", e);
     } finally {
@@ -510,69 +503,6 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
         </div>
       </div>
 
-      {dueItems.length > 0 && (
-        <div
-          style={{
-            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.15))",
-            border: "1px solid rgba(59, 130, 246, 0.3)",
-            borderRadius: "14px",
-            padding: "16px 20px",
-            marginBottom: "1.5rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "12px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <div
-              style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "12px",
-                background: "rgba(56, 189, 248, 0.15)",
-                border: "1px solid rgba(56, 189, 248, 0.3)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#38bdf8",
-              }}
-            >
-              <Target size={24} strokeWidth={2} />
-            </div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: "1.05rem", color: "var(--text, #f8fafc)" }}>
-                Hôm nay bạn có <span style={{ color: "#38bdf8" }}>{dueItems.length} từ</span> đến hạn ôn tập!
-              </div>
-              <div style={{ fontSize: "0.85rem", color: "var(--text-secondary, #94a3b8)", marginTop: "2px" }}>
-                Luyện tập chuẩn hóa Dạng 1: Từ vựng ➔ Chọn nghĩa tiếng Việt, kèm phát âm &amp; ngữ cảnh câu mẫu.
-              </div>
-            </div>
-          </div>
-          <button
-            className="btn-primary"
-            style={{
-              padding: "10px 20px",
-              borderRadius: "10px",
-              fontWeight: 700,
-              fontSize: "0.95rem",
-              background: "linear-gradient(90deg, #3b82f6, #10b981)",
-              border: "none",
-              color: "#fff",
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-            onClick={() => setIsExerciseHubOpen(true)}
-          >
-            <Zap size={18} fill="currentColor" />
-            Bắt đầu Luyện tập ({dueItems.length} từ)
-          </button>
-        </div>
-      )}
 
       {/* Vocabulary Practice Exercise Modal (Dạng 1) */}
       {isExerciseHubOpen && (
