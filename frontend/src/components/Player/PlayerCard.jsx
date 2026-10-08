@@ -7,6 +7,7 @@ import {
   RotateCw,
   Play,
   Pause,
+  Repeat,
 } from "../Icons";
 
 export const PlayerCard = React.memo(({
