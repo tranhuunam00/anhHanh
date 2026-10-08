@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { IconBook, IconSparkles, Settings } from "../Icons";
+import React, { useMemo, useState, useEffect } from "react";
+import { IconBook, IconSparkles, Settings, BarChart3, Image as ImageIcon, Maximize2, X } from "../Icons";
 
 /**
  * Visual renderer for IELTS Writing Task 1
@@ -129,22 +129,98 @@ export const Task1Visualizer = ({ visualData, promptData, subType = "line_graph"
     };
   }, [visualData, promptData, subType]);
 
+  const [showFullImage, setShowFullImage] = useState(false);
+  const imageUrl = data?.image_url || promptData?.image_url || visualData?.image_url;
+  const [viewMode, setViewMode] = useState(imageUrl ? "image" : "visual");
+
+  useEffect(() => {
+    if (imageUrl) {
+      setViewMode("image");
+    } else {
+      setViewMode("visual");
+    }
+  }, [imageUrl]);
+
   if (!data) return null;
 
   return (
     <div className="task1-visual-container">
       <div className="task1-visual-header">
-        <span className="task1-badge">IELTS TASK 1 DATA & VISUALS</span>
-        <h4 className="task1-visual-title">{data.title}</h4>
+        <div>
+          <span className="task1-badge">IELTS TASK 1 DATA & VISUALS</span>
+          <h4 className="task1-visual-title">{data.title}</h4>
+        </div>
+
+        {imageUrl && (
+          <div className="task1-view-mode-tabs">
+            <button
+              type="button"
+              className={`btn-mode-tab ${viewMode === "image" ? "active" : ""}`}
+              onClick={() => setViewMode("image")}
+            >
+              <ImageIcon size={13} />
+              <span>Ảnh đề thi gốc</span>
+            </button>
+            <button
+              type="button"
+              className={`btn-mode-tab ${viewMode === "visual" ? "active" : ""}`}
+              onClick={() => setViewMode("visual")}
+            >
+              <BarChart3 size={13} />
+              <span>Biểu đồ tương tác</span>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Render according to visual type */}
-      {data.type === "line_graph" && <LineGraphViewer data={data} />}
-      {data.type === "bar_chart" && <BarChartViewer data={data} />}
-      {data.type === "pie_chart" && <PieChartViewer data={data} />}
-      {data.type === "table" && <TableViewer data={data} />}
-      {data.type === "process" && <ProcessViewer data={data} />}
-      {data.type === "map" && <MapViewer data={data} />}
+      {imageUrl && viewMode === "image" && (
+        <div className="task1-official-image-card">
+          <div className="official-image-actions">
+            <span className="official-image-badge">✓ Đề thi gốc Cambridge / Hội đồng khảo thí</span>
+            <button
+              type="button"
+              className="btn-expand-official-image"
+              onClick={() => setShowFullImage(true)}
+              title="Phóng to ảnh đề bài"
+            >
+              <Maximize2 size={13} />
+              <span>Phóng to</span>
+            </button>
+          </div>
+          <div
+            className="official-image-img-wrap"
+            onClick={() => setShowFullImage(true)}
+            title="Bấm để xem kích thước đầy đủ"
+          >
+            <img src={imageUrl} alt={data.title} className="official-image-img" />
+          </div>
+        </div>
+      )}
+
+      {showFullImage && imageUrl && (
+        <div className="prompt-image-lightbox-overlay" onClick={() => setShowFullImage(false)}>
+          <div className="prompt-image-lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <div className="lightbox-header">
+              <h4>{data.title}</h4>
+              <button type="button" className="btn-close-lightbox" onClick={() => setShowFullImage(false)}>
+                <X size={18} />
+              </button>
+            </div>
+            <img src={imageUrl} alt={data.title} className="lightbox-full-img" />
+          </div>
+        </div>
+      )}
+
+      {(!imageUrl || viewMode === "visual") && (
+        <>
+          {data.type === "line_graph" && <LineGraphViewer data={data} />}
+          {data.type === "bar_chart" && <BarChartViewer data={data} />}
+          {data.type === "pie_chart" && <PieChartViewer data={data} />}
+          {data.type === "table" && <TableViewer data={data} />}
+          {data.type === "process" && <ProcessViewer data={data} />}
+          {data.type === "map" && <MapViewer data={data} />}
+        </>
+      )}
     </div>
   );
 };

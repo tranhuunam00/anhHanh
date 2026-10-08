@@ -3,11 +3,9 @@ import {
   IconClose,
   IconSearch,
   IconBook,
-  IconCheckCircle,
-  IconSparkles,
   IconFile,
-  BarChart3,
 } from "../Icons";
+import { IeltsPromptCard } from "./IeltsPromptCard";
 
 const YEARS_FILTER = [
   { id: "all", label: "Tất cả các năm" },
@@ -363,130 +361,16 @@ export const IeltsPromptLibraryModal = ({
               </button>
             </div>
           ) : (
-            filteredPrompts.map((item) => {
-              const isCurrent = currentPrompt?.id === item.id;
-              const isExpanded = expandedOutlineId === item.id;
-              const hasOutline = !!item.outline;
-              const hasKeywords = item.keywords && item.keywords.length > 0;
-
-              return (
-                <div
-                  key={item.id}
-                  className={`prompt-item-card ${isCurrent ? "current-active" : ""}`}
-                >
-                  {/* Card Header Badges */}
-                  <div className="prompt-card-top-row">
-                    <div className="prompt-badges-wrap">
-                      {item.exam_date && (
-                        <span className="badge-exam-date">
-                          📅 {item.exam_date}
-                        </span>
-                      )}
-                      {item.source && (
-                        <span className="badge-exam-source">
-                          🏛️ {item.source}
-                        </span>
-                      )}
-                      {item.topic_category && (
-                        <span className="badge-topic-category">
-                          🏷️ {item.topic_category}
-                        </span>
-                      )}
-                      <span className="badge-exam-subtype">
-                        {item.type || item.sub_type}
-                      </span>
-                    </div>
-
-                    {isCurrent && (
-                      <span className="badge-currently-writing">
-                        <IconCheckCircle size={13} /> Đang chọn viết
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Title & Question */}
-                  <h3 className="prompt-card-title">{item.title}</h3>
-                  <div className="prompt-card-question-box">
-                    <p className="prompt-card-question-text">{item.prompt}</p>
-                  </div>
-
-                  {/* Keywords Preview */}
-                  {hasKeywords && (
-                    <div className="prompt-card-keywords-row">
-                      <span className="keywords-label">Band 8+ Collocations:</span>
-                      <div className="keywords-pills-list">
-                        {item.keywords.map((kw, idx) => (
-                          <span key={idx} className="keyword-pill">
-                            {kw}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Accordion: Dàn ý & Gợi ý lập luận */}
-                  {hasOutline && (
-                    <div className="prompt-outline-accordion">
-                      <button
-                        type="button"
-                        className="btn-toggle-outline"
-                        onClick={() => toggleOutline(item.id)}
-                      >
-                        <IconSparkles size={14} />
-                        <span>
-                          {isExpanded
-                            ? "Ẩn dàn ý & hướng dẫn phát triển luận điểm"
-                            : "Xem gợi ý dàn ý phát triển luận điểm (Band 8.0+ Outline)"}
-                        </span>
-                        <span className="outline-toggle-arrow">
-                          {isExpanded ? "▲" : "▼"}
-                        </span>
-                      </button>
-
-                      {isExpanded && (
-                        <div className="prompt-outline-content">
-                          {item.outline.body1 && (
-                            <div className="outline-section">
-                              <span className="outline-sec-label">📌 Body Paragraph 1:</span>
-                              <p className="outline-sec-text">{item.outline.body1}</p>
-                            </div>
-                          )}
-                          {item.outline.body2 && (
-                            <div className="outline-section">
-                              <span className="outline-sec-label">📌 Body Paragraph 2:</span>
-                              <p className="outline-sec-text">{item.outline.body2}</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Card Bottom Actions */}
-                  <div className="prompt-card-footer-actions">
-                    <div className="prompt-meta-info">
-                      <span>Mục tiêu: {item.min_words || 250}+ từ</span>
-                      <span>Thời gian: {item.recommended_time || 40} phút</span>
-                      {item.visual_data && (
-                        <span className="badge-has-data" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <BarChart3 size={11} /> Có số liệu trực quan
-                        </span>
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      className={`btn-select-prompt-now ${
-                        isCurrent ? "btn-already-selected" : ""
-                      }`}
-                      onClick={() => handleSelect(item)}
-                    >
-                      {isCurrent ? "Đang mở đề này" : "Luyện viết đề này ngay →"}
-                    </button>
-                  </div>
-                </div>
-              );
-            })
+            filteredPrompts.map((item) => (
+              <IeltsPromptCard
+                key={item.id}
+                item={item}
+                isCurrent={currentPrompt?.id === item.id}
+                isExpanded={expandedOutlineId === item.id}
+                onToggleOutline={toggleOutline}
+                onSelect={handleSelect}
+              />
+            ))
           )}
         </div>
       </div>
