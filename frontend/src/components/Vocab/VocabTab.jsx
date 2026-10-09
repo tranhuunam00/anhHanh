@@ -755,7 +755,11 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                       <a
                         className="vocab-audio-btn"
                         href={`https://dictionary.cambridge.org/vi/dictionary/english/${encodeURIComponent(
-                          v.word.trim().toLowerCase().replace(/\s+/g, "-")
+                          (v.word || "")
+                            .toLowerCase()
+                            .trim()
+                            .replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, "")
+                            .replace(/[\s_]+/g, "-")
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
