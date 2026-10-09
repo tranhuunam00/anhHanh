@@ -1,0 +1,1943 @@
+{
+  "units": [
+    {
+      "id": "unit_01",
+      "unit_number": 1,
+      "title": "Present time: present simple, present continuous, present perfect simple, present perfect continuous, stative verbs",
+      "unit_type": "grammar",
+      "cefr_level": "B2",
+      "summary": "Master all 4 present tenses and stative verbs: habits, ongoing actions, experiences, ongoing duration, and non-action verbs.",
+      "theory": {
+        "sections": [
+          {
+            "id": "present_simple",
+            "title": "Present Simple",
+            "forms": {
+              "statement": "I/you/we/they travel... | He/she/it travels...",
+              "negative": "I/you/we/they don't travel... | He/she/it doesn't travel...",
+              "question": "Do I/you/we/they travel...? | Does he/she/it travel...?"
+            },
+            "rules": [
+              {
+                "use": "Current habits",
+                "example": "Toby walks to work."
+              },
+              {
+                "use": "To talk about how often things happen",
+                "example": "Angela doesn't visit us very often."
+              },
+              {
+                "use": "Permanent situations",
+                "example": "Carlo works in a travel agent's."
+              },
+              {
+                "use": "States",
+                "example": "Do you have an up-to-date passport?"
+              },
+              {
+                "use": "General truths and facts",
+                "example": "Poland is in the European Union."
+              }
+            ],
+            "watch_out": [
+              "We can also use do/does in present simple statements for emphasis: 'You don't like going by bus, do you?' 'Actually, I do like going by bus for short distances.'"
+            ]
+          },
+          {
+            "id": "present_continuous",
+            "title": "Present Continuous",
+            "forms": {
+              "statement": "I am driving... | You/we/they are driving... | He/she/it is driving...",
+              "negative": "I'm not driving... | You/we/they aren't driving... | He/she/it isn't driving...",
+              "question": "Am I driving...? | Are you/we/they driving...? | Is he/she/it driving...?"
+            },
+            "rules": [
+              {
+                "use": "Actions happening now",
+                "example": "Mike is driving to work at the moment."
+              },
+              {
+                "use": "Temporary series of actions",
+                "example": "Taxi drivers aren't stopping at the train station because of the roadworks."
+              },
+              {
+                "use": "Temporary situations",
+                "example": "Are they staying in a hotel near the Olympic stadium?"
+              },
+              {
+                "use": "Changing and developing situations",
+                "example": "Holidays abroad are becoming increasingly popular."
+              },
+              {
+                "use": "Annoying habits (usually with always)",
+                "example": "Dad is always cleaning the car when I want to use it!"
+              }
+            ],
+            "watch_out": []
+          },
+          {
+            "id": "present_perfect_simple",
+            "title": "Present Perfect Simple",
+            "forms": {
+              "statement": "have/has + past participle (I have flown... | He has flown...)",
+              "negative": "haven't/hasn't + past participle (I haven't flown... | He hasn't flown...)",
+              "question": "Have/Has + subject + past participle (Have you flown...? | Has he flown...?)"
+            },
+            "rules": [
+              {
+                "use": "Situations and states that started in the past and are still true",
+                "example": "She's had her motorbike for over six years."
+              },
+              {
+                "use": "A series of actions continuing up to now",
+                "example": "We've travelled by taxi, bus, plane and train - all in the last twenty-four hours!"
+              },
+              {
+                "use": "Completed actions at a time in the past which is not mentioned",
+                "example": "Have you ever flown in a helicopter?"
+              },
+              {
+                "use": "Completed actions where the important thing is the present result",
+                "example": "I've booked the coach tickets."
+              }
+            ],
+            "watch_out": [
+              "Phrases such as 'It's the first/second/etc time...' are followed by the present perfect simple: It's the second time I've been on a plane.",
+              "Speakers of American English often use past simple where British English uses present perfect simple: US: We already saw the Sphinx. UK: We've already seen the Sphinx.",
+              "Speakers of American English use 'gotten' as past participle of 'get' (except when get means have/possess). British English only uses 'got'."
+            ]
+          },
+          {
+            "id": "present_perfect_continuous",
+            "title": "Present Perfect Continuous",
+            "forms": {
+              "statement": "I/you/we/they have been travelling... | He/she/it has been travelling...",
+              "negative": "I/you/we/they haven't been travelling... | He/she/it hasn't been travelling...",
+              "question": "Have I/you/we/they been travelling...? | Has he/she/it been travelling...?"
+            },
+            "rules": [
+              {
+                "use": "Actions continuing up to the present moment",
+                "example": "We have been driving for hours. Can't we have a break soon?"
+              },
+              {
+                "use": "Actions stopping just before the present moment",
+                "example": "I'm out of breath because I've been running to get here in time."
+              }
+            ],
+            "watch_out": [
+              "Often used with words and phrases like all day/week/year, for, since, just: We've been walking for hours and I need a rest.",
+              "Not normally used with 'ever' and 'never': Have you ever flown in a helicopter before? (NOT Have you ever been flying...)",
+              "Difference in meaning: 'I have read that book' (finished) vs 'I have been reading that book' (not finished)."
+            ]
+          },
+          {
+            "id": "stative_verbs",
+            "title": "Stative Verbs",
+            "forms": {
+              "statement": "Not normally used in continuous tenses because they describe states, not actions."
+            },
+            "rules": [
+              {
+                "use": "Thinking",
+                "example": "believe, imagine, know, mean, think, understand"
+              },
+              {
+                "use": "Existence",
+                "example": "be, exist"
+              },
+              {
+                "use": "Emotions",
+                "example": "hate, like, love, need, prefer, satisfy, want"
+              },
+              {
+                "use": "The human senses",
+                "example": "hear, see, smell, sound, taste"
+              },
+              {
+                "use": "Appearance",
+                "example": "appear, look, resemble, seem"
+              },
+              {
+                "use": "Possession & relationships",
+                "example": "belong to, consist of, have, include, involve, own"
+              }
+            ],
+            "watch_out": [
+              "Some verbs can be stative with one meaning and non-stative with another: Do you have your plane ticket? (state: possession) vs Are you having lunch? (action: eating)."
+            ]
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "id": "unit_01_ex_a",
+          "exercise_code": "A",
+          "title": "Circle the correct word or phrase",
+          "instruction": "Choose the correct present tense form for each sentence.",
+          "exercise_type": "binary_choice",
+          "items": [
+            {
+              "id": 1,
+              "text": "Elizabeth usually [goes / is usually going] to bed at around eleven o'clock.",
+              "options": [
+                "goes",
+                "is usually going"
+              ],
+              "answer": "goes"
+            },
+            {
+              "id": 2,
+              "text": "Dan [talks / is talking] on the other phone right now.",
+              "options": [
+                "talks",
+                "is talking"
+              ],
+              "answer": "is talking"
+            },
+            {
+              "id": 3,
+              "text": "We [don't eat / aren't eating] any meat at the moment as we're both on a diet.",
+              "options": [
+                "don't eat",
+                "aren't eating"
+              ],
+              "answer": "aren't eating"
+            },
+            {
+              "id": 4,
+              "text": "[Does air travel get / Is air travel getting] increasingly safe?",
+              "options": [
+                "Does air travel get",
+                "Is air travel getting"
+              ],
+              "answer": "Is air travel getting"
+            },
+            {
+              "id": 5,
+              "text": "My mum [calls / is calling] me every weekend without fail.",
+              "options": [
+                "calls",
+                "is calling"
+              ],
+              "answer": "calls"
+            },
+            {
+              "id": 6,
+              "text": "How much [do babysitters generally earn / are babysitters generally earning]?",
+              "options": [
+                "do babysitters generally earn",
+                "are babysitters generally earning"
+              ],
+              "answer": "do babysitters generally earn"
+            },
+            {
+              "id": 7,
+              "text": "[You always come / You're always coming] up with excuses for not having done your homework. It's so annoying!",
+              "options": [
+                "You always come",
+                "You're always coming"
+              ],
+              "answer": "You're always coming"
+            },
+            {
+              "id": 8,
+              "text": "[I don't go / I'm not going] out much during the week but I [always try / I'm always trying] to go out somewhere on Saturday night.",
+              "options": [
+                "I don't go / I always try",
+                "I'm not going / I'm always trying"
+              ],
+              "answer": "I don't go / I always try"
+            },
+            {
+              "id": 9,
+              "text": "No, the train [does stop / is stopping] at Cirencester on Saturdays.",
+              "options": [
+                "does stop",
+                "is stopping"
+              ],
+              "answer": "does stop"
+            },
+            {
+              "id": 10,
+              "text": "My mum [takes / is taking] part in ice-skating competitions almost every weekend.",
+              "options": [
+                "takes",
+                "is taking"
+              ],
+              "answer": "takes"
+            }
+          ]
+        },
+        {
+          "id": "unit_01_ex_b",
+          "exercise_code": "B",
+          "title": "Rewrite correctly",
+          "instruction": "Change the words or phrases in bold to correct each sentence.",
+          "exercise_type": "correction",
+          "items": [
+            {
+              "id": 1,
+              "prompt": "My dad is often getting up late on Saturday mornings.",
+              "target": "is often getting up",
+              "answer": "often gets up"
+            },
+            {
+              "id": 2,
+              "prompt": "Are you speaking any other languages apart from English?",
+              "target": "Are you speaking",
+              "answer": "Do you speak"
+            },
+            {
+              "id": 3,
+              "prompt": "I already buy all my Christmas presents and it's only October!",
+              "target": "already buy",
+              "answer": "I've already bought"
+            },
+            {
+              "id": 4,
+              "prompt": "It's the first time I'm ever having a party at home.",
+              "target": "I'm ever having",
+              "answer": "I've ever had"
+            },
+            {
+              "id": 5,
+              "prompt": "Actually, I think Darren does works quite hard sometimes.",
+              "target": "does works",
+              "answer": "works"
+            },
+            {
+              "id": 6,
+              "prompt": "Carlo is never eating Chinese food before.",
+              "target": "is never eating",
+              "answer": "has never eaten"
+            },
+            {
+              "id": 7,
+              "prompt": "Sean already books a table for tonight.",
+              "target": "already books",
+              "answer": "Sean has already booked"
+            },
+            {
+              "id": 8,
+              "prompt": "Needs Melanie any help painting her new flat?",
+              "target": "Needs Melanie",
+              "answer": "Does Melanie need"
+            }
+          ]
+        },
+        {
+          "id": "unit_01_ex_c",
+          "exercise_code": "C",
+          "title": "Complete using the correct form of the verb in brackets",
+          "instruction": "Fill in the blank with the correct present tense form of the verb in brackets.",
+          "exercise_type": "bracket_fill",
+          "items": [
+            {
+              "id": 1,
+              "sentence": "It's the first time _____ (I / ever / eat) octopus!",
+              "answer": "I've ever eaten"
+            },
+            {
+              "id": 2,
+              "sentence": "Sandy _____ (not / see) his sister since she went to university.",
+              "answer": "hasn't seen"
+            },
+            {
+              "id": 3,
+              "sentence": "They _____ (go) on holiday to Spain and won't be back until the end of the month.",
+              "answer": "have gone"
+            },
+            {
+              "id": 4,
+              "sentence": "Poor Tracy! She _____ (write) that essay for hours now and she still hasn't finished!",
+              "answer": "has been writing"
+            },
+            {
+              "id": 5,
+              "sentence": "_____ (you / ever / meet) anyone famous?",
+              "answer": "Have you ever met"
+            },
+            {
+              "id": 6,
+              "sentence": "_____ (I / try) to get in touch with Jenny all morning but I can't find her anywhere.",
+              "answer": "I've been trying"
+            },
+            {
+              "id": 7,
+              "sentence": "_____ (I / not finish) the book yet so I can't tell you what happens.",
+              "answer": "I haven't finished"
+            },
+            {
+              "id": 8,
+              "sentence": "_____ (you / already / decide) where you're going this summer?",
+              "answer": "Have you already decided"
+            },
+            {
+              "id": 9,
+              "sentence": "_____ (We / live) here for the last six years.",
+              "answer": "We've lived"
+            },
+            {
+              "id": 10,
+              "sentence": "_____ (I / never / hear) such nonsense!",
+              "answer": "I've never heard"
+            }
+          ]
+        },
+        {
+          "id": "unit_01_ex_d",
+          "exercise_code": "D",
+          "title": "Complete using the words in the box",
+          "instruction": "Fill in each gap using the correct time word from the box.",
+          "exercise_type": "word_bank",
+          "word_bank": [
+            "already",
+            "before",
+            "ever",
+            "for",
+            "just",
+            "rarely",
+            "since",
+            "so",
+            "still",
+            "yet"
+          ],
+          "items": [
+            {
+              "id": 1,
+              "sentence": "Have you _____ dreamt of winning the lottery?",
+              "answer": "ever"
+            },
+            {
+              "id": 2,
+              "sentence": "I haven't worked out how to set the timer on the video _____.",
+              "answer": "yet"
+            },
+            {
+              "id": 3,
+              "sentence": "My dad's lived in the same house _____ he was born.",
+              "answer": "since"
+            },
+            {
+              "id": 4,
+              "sentence": "The film's only been on _____ a couple of minutes.",
+              "answer": "for"
+            },
+            {
+              "id": 5,
+              "sentence": "Bruce has knocked three men out of the competition _____ far.",
+              "answer": "so"
+            },
+            {
+              "id": 6,
+              "sentence": "I _____ get the chance to get any exercise - I'm just too busy.",
+              "answer": "rarely"
+            },
+            {
+              "id": 7,
+              "sentence": "He's only _____ got home.",
+              "answer": "just"
+            },
+            {
+              "id": 8,
+              "sentence": "It's eleven o'clock and Todd _____ hasn't come home. Where could he be?",
+              "answer": "still"
+            },
+            {
+              "id": 9,
+              "sentence": "I've never met Ruth _____. What's she like?",
+              "answer": "before"
+            },
+            {
+              "id": 10,
+              "sentence": "Have you finished _____? That was quick!",
+              "answer": "already"
+            }
+          ]
+        },
+        {
+          "id": "unit_01_ex_e",
+          "exercise_code": "E",
+          "title": "Choose the correct answer",
+          "instruction": "Select the correct option A, B, C, or D for each sentence.",
+          "exercise_type": "multiple_choice",
+          "items": [
+            {
+              "id": 1,
+              "question": "Ian _____ a shower at the moment, so could you call back in about half an hour?",
+              "options": [
+                "A. takes",
+                "B. is taking",
+                "C. has taken",
+                "D. has been taking"
+              ],
+              "answer": "B"
+            },
+            {
+              "id": 2,
+              "question": "_____ to Ipswich before?",
+              "options": [
+                "A. Do you ever go",
+                "B. Are you ever going",
+                "C. Have you ever been",
+                "D. Have you ever been going"
+              ],
+              "answer": "C"
+            },
+            {
+              "id": 3,
+              "question": "I _____ to all the local newspapers and TV stations to complain.",
+              "options": [
+                "A. already write",
+                "B. already writing",
+                "C. have already written",
+                "D. have already been writing"
+              ],
+              "answer": "C"
+            },
+            {
+              "id": 4,
+              "question": "_____ TV for the last four hours? Turn it off and get some exercise!",
+              "options": [
+                "A. Do you watch",
+                "B. Are you watching",
+                "C. Watched you",
+                "D. Have you been watching"
+              ],
+              "answer": "D"
+            },
+            {
+              "id": 5,
+              "question": "Eric, _____ hockey competitively or just for fun?",
+              "options": [
+                "A. do you usually play",
+                "B. are you usually playing",
+                "C. have you usually played",
+                "D. have you usually been playing"
+              ],
+              "answer": "A"
+            },
+            {
+              "id": 6,
+              "question": "That's the first time _____ an answer right today!",
+              "options": [
+                "A. I get",
+                "B. I am getting",
+                "C. I have got",
+                "D. I have been getting"
+              ],
+              "answer": "C"
+            },
+            {
+              "id": 7,
+              "question": "Jessica has _____ left, I'm afraid.",
+              "options": [
+                "A. already",
+                "B. yet",
+                "C. still",
+                "D. so far"
+              ],
+              "answer": "A"
+            },
+            {
+              "id": 8,
+              "question": "Dan _____ in the living room while we redecorate his bedroom.",
+              "options": [
+                "A. sleeps",
+                "B. is sleeping",
+                "C. has slept",
+                "D. does sleep"
+              ],
+              "answer": "B"
+            },
+            {
+              "id": 9,
+              "question": "Unfortunately, Simone _____ a day off very often.",
+              "options": [
+                "A. doesn't get",
+                "B. isn't getting",
+                "C. hasn't got",
+                "D. hasn't been getting"
+              ],
+              "answer": "A"
+            },
+            {
+              "id": 10,
+              "question": "Actually, I _____ a cup of tea first thing every morning but then I switch to coffee.",
+              "options": [
+                "A. do drink",
+                "B. am drinking",
+                "C. have drunk",
+                "D. have been drinking"
+              ],
+              "answer": "A"
+            }
+          ]
+        },
+        {
+          "id": "unit_01_ex_f",
+          "exercise_code": "F",
+          "title": "Complete using the correct form of the words in the box",
+          "instruction": "Read the passage 'Ancient aviators?' and fill each gap with the correct present form of the words in the box.",
+          "exercise_type": "passage_gap_fill",
+          "word_bank": [
+            "be",
+            "disagree",
+            "do",
+            "include",
+            "know",
+            "look",
+            "see",
+            "seem",
+            "understand"
+          ],
+          "passage": "Everyone (1) [gap] that humans have been flying for only a few hundred years. But (2) [gap] it possible that ancient civilizations also had the ability and technology to fly? In the Nazcan Desert in southern Peru, there are hundreds of lines which an ancient culture drew in the dust. On the ground, they just (3) [gap] like straight lines. But when you (4) [gap] them from the air, you (5) [gap] exactly what they are. They are incredible and enormous pictures. The pictures (6) [gap] animals, birds and symbols. One bizarre theory, which most mainstream scientists (7) [gap] with, is that the people who made the lines thousands and thousands of years ago flew above the lines in balloons. It (8) [gap] incredible, but a few people (9) [gap] believe it's possible.",
+          "items": [
+            {
+              "gap_id": 1,
+              "answer": "knows"
+            },
+            {
+              "gap_id": 2,
+              "answer": "is"
+            },
+            {
+              "gap_id": 3,
+              "answer": "look"
+            },
+            {
+              "gap_id": 4,
+              "answer": "see"
+            },
+            {
+              "gap_id": 5,
+              "answer": "understand"
+            },
+            {
+              "gap_id": 6,
+              "answer": "include"
+            },
+            {
+              "gap_id": 7,
+              "answer": "disagree"
+            },
+            {
+              "gap_id": 8,
+              "answer": "seems"
+            },
+            {
+              "gap_id": 9,
+              "answer": "do"
+            }
+          ]
+        },
+        {
+          "id": "unit_01_ex_g",
+          "exercise_code": "G",
+          "title": "Match to make sentences",
+          "instruction": "Match sentence halves 1–8 with endings A–H.",
+          "exercise_type": "matching",
+          "items": [
+            {
+              "id": 1,
+              "left": "1. I think",
+              "right_options": "A-H",
+              "answer": "B",
+              "full_sentence": "I think I'm going to buy the new Racetrack CD."
+            },
+            {
+              "id": 2,
+              "left": "2. I'm thinking",
+              "right_options": "A-H",
+              "answer": "F",
+              "full_sentence": "I'm thinking of getting Dad a CD for his birthday."
+            },
+            {
+              "id": 3,
+              "left": "3. Phil's looking",
+              "right_options": "A-H",
+              "answer": "D",
+              "full_sentence": "Phil's looking for his glasses. Have you seen them?"
+            },
+            {
+              "id": 4,
+              "left": "4. Phil looks",
+              "right_options": "A-H",
+              "answer": "H",
+              "full_sentence": "Phil looks like he needs a holiday!"
+            },
+            {
+              "id": 5,
+              "left": "5. Claire has",
+              "right_options": "A-H",
+              "answer": "A",
+              "full_sentence": "Claire has darker hair than her sister."
+            },
+            {
+              "id": 6,
+              "left": "6. Claire is having",
+              "right_options": "A-H",
+              "answer": "C",
+              "full_sentence": "Claire is having a haircut at the moment."
+            },
+            {
+              "id": 7,
+              "left": "7. Andy is",
+              "right_options": "A-H",
+              "answer": "E",
+              "full_sentence": "Andy is not old enough to drive a car."
+            },
+            {
+              "id": 8,
+              "left": "8. Andy is being",
+              "right_options": "A-H",
+              "answer": "G",
+              "full_sentence": "Andy is being very annoying at the moment!"
+            }
+          ],
+          "options_pool": {
+            "A": "darker hair than her sister.",
+            "B": "I'm going to buy the new Racetrack CD.",
+            "C": "a haircut at the moment.",
+            "D": "for his glasses. Have you seen them?",
+            "E": "not old enough to drive a car.",
+            "F": "of getting Dad a CD for his birthday.",
+            "G": "very annoying at the moment!",
+            "H": "like he needs a holiday!"
+          }
+        },
+        {
+          "id": "unit_01_ex_h",
+          "exercise_code": "H",
+          "title": "Find the extra word in each line",
+          "instruction": "In the text 'International friends', each line 1–10 has one unnecessary word. Identify that word.",
+          "exercise_type": "extra_word",
+          "items": [
+            {
+              "line": 1,
+              "text": "I've been to travelling round Europe all summer. It's the first time I've",
+              "answer": "to"
+            },
+            {
+              "line": 2,
+              "text": "ever been going abroad, and I've had a fantastic time! I've seen",
+              "answer": "going"
+            },
+            {
+              "line": 3,
+              "text": "loads of interesting places and I have to also made loads of new friends.",
+              "answer": "to"
+            },
+            {
+              "line": 4,
+              "text": "I've been decided to stay in touch with them now I'm back. One of",
+              "answer": "been"
+            },
+            {
+              "line": 5,
+              "text": "them, Giselle, is French. She was making on holiday too. We now send",
+              "answer": "making"
+            },
+            {
+              "line": 6,
+              "text": "text messages are to each other all the time. They're usually in English",
+              "answer": "are"
+            },
+            {
+              "line": 7,
+              "text": "because my French isn't very good! I'm planning to have visit her in",
+              "answer": "have"
+            },
+            {
+              "line": 8,
+              "text": "France next year sometime. I hope I can. I am love meeting people from",
+              "answer": "am"
+            },
+            {
+              "line": 9,
+              "text": "other countries! I want to have had lots of friends from all over the world!",
+              "answer": "had"
+            },
+            {
+              "line": 10,
+              "text": "Travelling certainly broadens the mind but it also is broadens your circle of friends!",
+              "answer": "is"
+            }
+          ]
+        },
+        {
+          "id": "unit_01_ex_i",
+          "exercise_code": "I",
+          "title": "Write one word in each gap",
+          "instruction": "Complete the dialogue 'Holiday Blues' by writing one word in each gap.",
+          "exercise_type": "open_cloze",
+          "items": [
+            {
+              "gap_id": 1,
+              "context": "'You've (1) _____ looking at that timetable for the last ten minutes...'",
+              "answer": "been"
+            },
+            {
+              "gap_id": 2,
+              "context": "'I (2) _____ wish you'd be quiet!...",
+              "answer": "do"
+            },
+            {
+              "gap_id": 3,
+              "context": "...I've (3) _____ a splitting headache thanks to you!'",
+              "answer": "got"
+            },
+            {
+              "gap_id": 4,
+              "context": "'Mum! Dad! Please!' said Alison. 'You're both (4) _____ very silly...",
+              "answer": "being"
+            },
+            {
+              "gap_id": 5,
+              "context": "...(5) _____ is no point at all in blaming each other...'",
+              "answer": "There"
+            },
+            {
+              "gap_id": 6,
+              "context": "'You (6) _____ quite right, darling...",
+              "answer": "are"
+            },
+            {
+              "gap_id": 7,
+              "context": "...I (7) _____ sorry,' said Sheila.",
+              "answer": "am"
+            },
+            {
+              "gap_id": 8,
+              "context": "'Now, let's have another look at this timetable. Well, it (8) _____ like we...'",
+              "answer": "looks"
+            },
+            {
+              "gap_id": 9,
+              "context": "...we (9) _____ definitely missed the last train today...'",
+              "answer": "have"
+            },
+            {
+              "gap_id": 10,
+              "context": "'I (10) _____ so,' said Sheila...",
+              "answer": "think"
+            },
+            {
+              "gap_id": 11,
+              "context": "'Well, one thing is (11) _____ in doubt,' said Matt.",
+              "answer": "not"
+            },
+            {
+              "gap_id": 12,
+              "context": "'This is the worst holiday we've (12) _____ been on,' said Matt.",
+              "answer": "ever"
+            }
+          ]
+        },
+        {
+          "id": "unit_01_ex_j",
+          "exercise_code": "J",
+          "title": "Complete each second sentence using the word given",
+          "instruction": "Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words.",
+          "exercise_type": "key_word_transformation",
+          "items": [
+            {
+              "id": 1,
+              "sentence1": "What's the price of the tickets, Jimmy?",
+              "key_word": "much",
+              "sentence2_pre": "How",
+              "sentence2_post": "Jimmy?",
+              "answer": "much do the tickets cost"
+            },
+            {
+              "id": 2,
+              "sentence1": "Are these your trainers?",
+              "key_word": "to",
+              "sentence2_pre": "Do",
+              "sentence2_post": "you?",
+              "answer": "these trainers belong to"
+            },
+            {
+              "id": 3,
+              "sentence1": "Sasha's not keen on team sports at all.",
+              "key_word": "like",
+              "sentence2_pre": "Sasha",
+              "sentence2_post": "team sports at all.",
+              "answer": "does not like"
+            },
+            {
+              "id": 4,
+              "sentence1": "It's only her second time in a recording studio.",
+              "key_word": "been",
+              "sentence2_pre": "She",
+              "sentence2_post": "in a recording studio once before.",
+              "answer": "has only been"
+            },
+            {
+              "id": 5,
+              "sentence1": "We got here three hours ago.",
+              "key_word": "have",
+              "sentence2_pre": "We",
+              "sentence2_post": "three hours.",
+              "answer": "have been here for"
+            },
+            {
+              "id": 6,
+              "sentence1": "I started writing this hours ago and it's still not right.",
+              "key_word": "writing",
+              "sentence2_pre": "I",
+              "sentence2_post": "hours and it's still not right.",
+              "answer": "have been writing this for"
+            },
+            {
+              "id": 7,
+              "sentence1": "This is my first experience of flying alone.",
+              "key_word": "time",
+              "sentence2_pre": "It is the first",
+              "sentence2_post": "alone.",
+              "answer": "time I have flown"
+            },
+            {
+              "id": 8,
+              "sentence1": "Sharon's in the bath at the moment.",
+              "key_word": "a",
+              "sentence2_pre": "Sharon",
+              "sentence2_post": "at the moment.",
+              "answer": "is having a bath"
+            },
+            {
+              "id": 9,
+              "sentence1": "Paul enjoys surprises apart from on his birthday.",
+              "key_word": "does",
+              "sentence2_pre": "Paul",
+              "sentence2_post": "surprises, just not on his birthday!",
+              "answer": "does enjoy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit_02",
+      "unit_number": 2,
+      "title": "Travel and transport",
+      "unit_type": "vocabulary",
+      "cefr_level": "B2",
+      "summary": "Key vocabulary for Travel and Transport: confusing pairs, phrasal verbs, collocations, word patterns, and derivations.",
+      "theory": {
+        "sections": [
+          {
+            "id": "topic_vocab_in_contrast",
+            "title": "Topic vocabulary in contrast",
+            "items": [
+              {
+                "words": [
+                  "voyage",
+                  "journey",
+                  "trip",
+                  "travel",
+                  "excursion"
+                ],
+                "definitions": "voyage: long journey by sea/space; journey: travelling from A to B; trip: go somewhere and return; travel: activity of travelling; excursion: short tour for pleasure."
+              },
+              {
+                "words": [
+                  "fare",
+                  "ticket",
+                  "fee"
+                ],
+                "definitions": "fare: money paid for public transport; ticket: paper confirming travel; fee: payment for professional service/entrance."
+              },
+              {
+                "words": [
+                  "live",
+                  "stay"
+                ],
+                "definitions": "live: permanent residence; stay: temporary lodging."
+              },
+              {
+                "words": [
+                  "view",
+                  "sight"
+                ],
+                "definitions": "view: what you see from a place; sight: notable object or place that people visit."
+              },
+              {
+                "words": [
+                  "miss",
+                  "lose"
+                ],
+                "definitions": "miss: arrive too late for transport; lose: misplace and cannot find."
+              },
+              {
+                "words": [
+                  "border",
+                  "edge",
+                  "line"
+                ],
+                "definitions": "border: official divide between countries; edge: outermost part; line: long narrow mark."
+              },
+              {
+                "words": [
+                  "world",
+                  "earth"
+                ],
+                "definitions": "world: planet with human society; earth: the physical globe/soil."
+              },
+              {
+                "words": [
+                  "take",
+                  "bring",
+                  "go"
+                ],
+                "definitions": "take: carry away from here; bring: carry toward here; go: move from one place to another."
+              },
+              {
+                "words": [
+                  "length",
+                  "distance"
+                ],
+                "definitions": "length: measurement of size; distance: amount of space between two points."
+              },
+              {
+                "words": [
+                  "area",
+                  "territory"
+                ],
+                "definitions": "area: part of a place/city; territory: land controlled by a state or animal."
+              },
+              {
+                "words": [
+                  "book",
+                  "keep"
+                ],
+                "definitions": "book: reserve in advance; keep: retain in possession."
+              },
+              {
+                "words": [
+                  "guide",
+                  "lead"
+                ],
+                "definitions": "guide: show the way and explain; lead: direct movement in front of others."
+              },
+              {
+                "words": [
+                  "season",
+                  "period"
+                ],
+                "definitions": "season: specific time of year; period: defined stretch of time."
+              },
+              {
+                "words": [
+                  "arrive",
+                  "reach"
+                ],
+                "definitions": "arrive: come to a place (arrive in/at); reach: arrive at after effort (no preposition)."
+              },
+              {
+                "words": [
+                  "native",
+                  "home"
+                ],
+                "definitions": "native: place of birth/origin; home: place where one lives."
+              }
+            ]
+          },
+          {
+            "id": "phrasal_verbs",
+            "title": "Phrasal verbs",
+            "items": [
+              {
+                "verb": "catch up with",
+                "definition": "reach the same point/level as"
+              },
+              {
+                "verb": "check in",
+                "definition": "register at a hotel or an airport"
+              },
+              {
+                "verb": "check out",
+                "definition": "leave a hotel; investigate"
+              },
+              {
+                "verb": "drop off",
+                "definition": "let someone get out of a vehicle; fall asleep"
+              },
+              {
+                "verb": "get back",
+                "definition": "return from a place"
+              },
+              {
+                "verb": "go away",
+                "definition": "go on holiday"
+              },
+              {
+                "verb": "keep up with",
+                "definition": "stay at the same point/level as"
+              },
+              {
+                "verb": "make for",
+                "definition": "go in the direction of"
+              },
+              {
+                "verb": "pick up",
+                "definition": "stop in a vehicle to give someone a lift"
+              },
+              {
+                "verb": "pull in",
+                "definition": "stop by the side of the road in a car"
+              },
+              {
+                "verb": "run over",
+                "definition": "hit with a car"
+              },
+              {
+                "verb": "see off",
+                "definition": "go to a train station/airport to see someone leave"
+              },
+              {
+                "verb": "set out/off",
+                "definition": "start a journey"
+              },
+              {
+                "verb": "take off",
+                "definition": "leave the ground (plane)"
+              },
+              {
+                "verb": "turn round",
+                "definition": "go back in the opposite direction"
+              }
+            ]
+          },
+          {
+            "id": "phrases_and_collocations",
+            "title": "Phrases and collocations",
+            "items": [
+              {
+                "headword": "accident",
+                "phrases": "have an accident; be (involved) in an accident; do sth by accident"
+              },
+              {
+                "headword": "advance",
+                "phrases": "in advance; advance to/towards a place"
+              },
+              {
+                "headword": "ahead",
+                "phrases": "go straight ahead; go ahead; be ahead of sth/sb"
+              },
+              {
+                "headword": "direction",
+                "phrases": "a change of direction; in the direction of sth; in this/that direction"
+              },
+              {
+                "headword": "head",
+                "phrases": "off the top of your head; head for/towards a place; head over heels (in love)"
+              },
+              {
+                "headword": "holiday",
+                "phrases": "go/be on holiday; have/take a holiday; bank holiday"
+              },
+              {
+                "headword": "left",
+                "phrases": "go/turn/etc left; on the left; on the left-hand side; in the left-hand corner; left-handed"
+              },
+              {
+                "headword": "route",
+                "phrases": "plan your/a route; take a route"
+              },
+              {
+                "headword": "sights",
+                "phrases": "see the sights"
+              },
+              {
+                "headword": "sightseeing",
+                "phrases": "go sightseeing"
+              },
+              {
+                "headword": "speed",
+                "phrases": "at (high/full/etc) speed; a burst of speed; speed limit"
+              },
+              {
+                "headword": "tour",
+                "phrases": "go on/take a tour of/(a)round somewhere; tour a place; tour guide"
+              },
+              {
+                "headword": "trip",
+                "phrases": "business trip; school trip; go on a trip; take a trip (to a place)"
+              },
+              {
+                "headword": "way",
+                "phrases": "lose/make/find your way; in a way; on the way; go all the way (to sth/swh)"
+              }
+            ]
+          },
+          {
+            "id": "word_patterns",
+            "title": "Word patterns",
+            "items": [
+              {
+                "pattern": "afraid of sth/sb/doing; afraid to do"
+              },
+              {
+                "pattern": "appear to be"
+              },
+              {
+                "pattern": "arrange sth (with sb); arrange for sb to do"
+              },
+              {
+                "pattern": "arrive in/at a place; arrive here/there"
+              },
+              {
+                "pattern": "continue sth/doing; continue to do; continue with sth"
+              },
+              {
+                "pattern": "differ from sth/sb"
+              },
+              {
+                "pattern": "dream about/of sth/sb/doing"
+              },
+              {
+                "pattern": "invite sb to do"
+              },
+              {
+                "pattern": "keen to do; keen on sth/sb/doing"
+              },
+              {
+                "pattern": "live in/at a place; live on/for sth; live here/there"
+              },
+              {
+                "pattern": "regret (not) doing; regret sth; regret to tell/inform you"
+              },
+              {
+                "pattern": "think of/about sth/sb/doing"
+              },
+              {
+                "pattern": "write about sth/sb/doing; write (sth) (to sb); write sb sth; write sth down"
+              }
+            ]
+          },
+          {
+            "id": "word_formation",
+            "title": "Word formation",
+            "items": [
+              {
+                "base": "arrange",
+                "derivatives": "rearrange, arrangement"
+              },
+              {
+                "base": "arrive",
+                "derivatives": "arrival"
+              },
+              {
+                "base": "broad",
+                "derivatives": "breadth, broaden"
+              },
+              {
+                "base": "culture",
+                "derivatives": "cultural(ly), (un)cultured"
+              },
+              {
+                "base": "differ",
+                "derivatives": "different(ly), difference"
+              },
+              {
+                "base": "direct",
+                "derivatives": "indirect, direction, director, (in)directly"
+              },
+              {
+                "base": "distant",
+                "derivatives": "distantly, distance"
+              },
+              {
+                "base": "enter",
+                "derivatives": "entrance"
+              },
+              {
+                "base": "inhabit",
+                "derivatives": "inhabitant"
+              },
+              {
+                "base": "photograph",
+                "derivatives": "photography, photographer, photographic"
+              },
+              {
+                "base": "recognise",
+                "derivatives": "(un)recognisable, recognition"
+              },
+              {
+                "base": "time",
+                "derivatives": "timetable"
+              },
+              {
+                "base": "tour",
+                "derivatives": "tourism, tourist"
+              },
+              {
+                "base": "world",
+                "derivatives": "worldwide"
+              }
+            ]
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "id": "unit_02_ex_a",
+          "exercise_code": "A",
+          "title": "Topic vocabulary in contrast",
+          "instruction": "Choose the correct answer A, B, C, or D.",
+          "exercise_type": "multiple_choice",
+          "items": [
+            {
+              "id": 1,
+              "question": "You need a passport to cross the _____ between Mexico and the United States.",
+              "options": [
+                "A. edge",
+                "B. line",
+                "C. border",
+                "D. rim"
+              ],
+              "answer": "C"
+            },
+            {
+              "id": 2,
+              "question": "The hotel where we are _____ is quite luxurious.",
+              "options": [
+                "A. living",
+                "B. remaining",
+                "C. existing",
+                "D. staying"
+              ],
+              "answer": "D"
+            },
+            {
+              "id": 3,
+              "question": "When you _____ your destination, your tour guide will meet you at the airport.",
+              "options": [
+                "A. arrive",
+                "B. get",
+                "C. reach",
+                "D. achieve"
+              ],
+              "answer": "C"
+            },
+            {
+              "id": 4,
+              "question": "It can be quite busy here during the tourist _____.",
+              "options": [
+                "A. season",
+                "B. period",
+                "C. phase",
+                "D. stage"
+              ],
+              "answer": "A"
+            },
+            {
+              "id": 5,
+              "question": "David _____ me to the train station every morning.",
+              "options": [
+                "A. goes",
+                "B. takes",
+                "C. has",
+                "D. makes"
+              ],
+              "answer": "B"
+            },
+            {
+              "id": 6,
+              "question": "I always enjoy our school _____ to France.",
+              "options": [
+                "A. excursion",
+                "B. journey",
+                "C. trip",
+                "D. travel"
+              ],
+              "answer": "C"
+            },
+            {
+              "id": 7,
+              "question": "Hurry up, or we'll _____ the bus!",
+              "options": [
+                "A. avoid",
+                "B. miss",
+                "C. drop",
+                "D. lose"
+              ],
+              "answer": "B"
+            },
+            {
+              "id": 8,
+              "question": "The brochure says that the hotel has a great _____ of the sea.",
+              "options": [
+                "A. appearance",
+                "B. look",
+                "C. sight",
+                "D. view"
+              ],
+              "answer": "D"
+            },
+            {
+              "id": 9,
+              "question": "I must remember to _____ a souvenir back from Spain for my grandmother.",
+              "options": [
+                "A. go",
+                "B. take",
+                "C. bring",
+                "D. keep"
+              ],
+              "answer": "C"
+            },
+            {
+              "id": 10,
+              "question": "The _____ from London to Berlin is about 919 kilometres.",
+              "options": [
+                "A. measure",
+                "B. length",
+                "C. gap",
+                "D. distance"
+              ],
+              "answer": "D"
+            },
+            {
+              "id": 11,
+              "question": "Make sure you _____ a hotel before you come to our island, especially in the summer.",
+              "options": [
+                "A. book",
+                "B. keep",
+                "C. put",
+                "D. take"
+              ],
+              "answer": "A"
+            },
+            {
+              "id": 12,
+              "question": "I live in Barcelona, but my _____ town is Madrid.",
+              "options": [
+                "A. birth",
+                "B. home",
+                "C. native",
+                "D. origin"
+              ],
+              "answer": "B"
+            }
+          ]
+        },
+        {
+          "id": "unit_02_ex_b",
+          "exercise_code": "B",
+          "title": "Circle the correct word",
+          "instruction": "Choose the correct word between the two choices.",
+          "exercise_type": "binary_choice",
+          "items": [
+            {
+              "id": 1,
+              "text": "I hope to go on a trip round the [world / earth] one day.",
+              "options": [
+                "world",
+                "earth"
+              ],
+              "answer": "world"
+            },
+            {
+              "id": 2,
+              "text": "You learn a lot about the local [territory / area] by speaking to local people.",
+              "options": [
+                "territory",
+                "area"
+              ],
+              "answer": "area"
+            },
+            {
+              "id": 3,
+              "text": "It's good to have someone to [lead / guide] you when you are on holiday.",
+              "options": [
+                "lead",
+                "guide"
+              ],
+              "answer": "guide"
+            },
+            {
+              "id": 4,
+              "text": "I get the train to work every day and the [fare / fee] is quite expensive.",
+              "options": [
+                "fare",
+                "fee"
+              ],
+              "answer": "fare"
+            },
+            {
+              "id": 5,
+              "text": "Captain Cook discovered Australia on a [voyage / travel] to the Pacific.",
+              "options": [
+                "voyage",
+                "travel"
+              ],
+              "answer": "voyage"
+            },
+            {
+              "id": 6,
+              "text": "Most tourist attractions in London charge an admission [fee / ticket].",
+              "options": [
+                "fee",
+                "ticket"
+              ],
+              "answer": "fee"
+            },
+            {
+              "id": 7,
+              "text": "The sunset over Niagara Falls really is a magnificent [look / sight].",
+              "options": [
+                "look",
+                "sight"
+              ],
+              "answer": "sight"
+            }
+          ]
+        },
+        {
+          "id": "unit_02_ex_c",
+          "exercise_code": "C",
+          "title": "Phrasal verbs: Complete using words in the box",
+          "instruction": "Complete using the correct form of the words in the box.",
+          "exercise_type": "word_bank",
+          "word_bank": [
+            "catch",
+            "check",
+            "get",
+            "go",
+            "make",
+            "pick",
+            "pull",
+            "see"
+          ],
+          "items": [
+            {
+              "id": 1,
+              "sentence": "Let's go to the airport to _____ Grandpa off when he flies back home.",
+              "answer": "see"
+            },
+            {
+              "id": 2,
+              "sentence": "If it starts to rain, _____ for a nearby cave to wait for it to pass.",
+              "answer": "make"
+            },
+            {
+              "id": 3,
+              "sentence": "We would like to remind all guests that they must _____ out before midday.",
+              "answer": "check"
+            },
+            {
+              "id": 4,
+              "sentence": "Please _____ in and stop so that I can buy something to drink.",
+              "answer": "pull"
+            },
+            {
+              "id": 5,
+              "sentence": "Every Saturday night my dad _____ us up outside the cinema.",
+              "answer": "picks"
+            },
+            {
+              "id": 6,
+              "sentence": "I think the neighbours have _____ away for the weekend.",
+              "answer": "gone"
+            },
+            {
+              "id": 7,
+              "sentence": "John's up ahead so Greg is pedalling fast to _____ up with him.",
+              "answer": "catch"
+            },
+            {
+              "id": 8,
+              "sentence": "We're going on holiday tomorrow, but we'll call you when we _____ back.",
+              "answer": "get"
+            }
+          ]
+        },
+        {
+          "id": "unit_02_ex_d",
+          "exercise_code": "D",
+          "title": "Write a phrasal verb in the correct form",
+          "instruction": "Replace the words in italics with the correct form of a phrasal verb.",
+          "exercise_type": "phrasal_replacement",
+          "items": [
+            {
+              "id": 1,
+              "sentence": "We can start our journey (start our journey) towards the mountains at dawn.",
+              "target": "start our journey",
+              "answer": "set out"
+            },
+            {
+              "id": 2,
+              "sentence": "Dad fetched the luggage while Mum registered (registered) at the hotel.",
+              "target": "registered",
+              "answer": "checked in"
+            },
+            {
+              "id": 3,
+              "sentence": "I asked the taxi driver to let me get out (let me get out) outside the train station.",
+              "target": "let me get out",
+              "answer": "drop me off"
+            },
+            {
+              "id": 4,
+              "sentence": "Oh, no! I've forgotten my passport! We'll have to go back (go back) and get it!",
+              "target": "go back",
+              "answer": "turn round"
+            },
+            {
+              "id": 5,
+              "sentence": "The most exciting moment is when the plane leaves the ground (leaves the ground).",
+              "target": "leaves the ground",
+              "answer": "takes off"
+            },
+            {
+              "id": 6,
+              "sentence": "Stop the car! I think we've hit (hit) a dog.",
+              "target": "hit",
+              "answer": "run over"
+            },
+            {
+              "id": 7,
+              "sentence": "I don't think a horse can ever stay at the same speed as (stay at the same speed as) a car.",
+              "target": "stay at the same speed as",
+              "answer": "keep up with"
+            }
+          ]
+        },
+        {
+          "id": "unit_02_ex_e",
+          "exercise_code": "E",
+          "title": "Phrases and collocations: Write one word in each gap",
+          "instruction": "Write one word in each gap to complete the phrase or collocation.",
+          "exercise_type": "gap_fill",
+          "items": [
+            {
+              "id": 1,
+              "sentence": "The speed _____ in towns is 50 km/h and you shouldn't go faster than that.",
+              "answer": "limit"
+            },
+            {
+              "id": 2,
+              "sentence": "Why don't we _____ the scenic route along the coast?",
+              "answer": "take"
+            },
+            {
+              "id": 3,
+              "sentence": "If you buy your plane ticket _____ advance, it's often cheaper than if you wait.",
+              "answer": "in"
+            },
+            {
+              "id": 4,
+              "sentence": "I can't remember the name of the hotel we stayed at off the _____ of my head.",
+              "answer": "top"
+            },
+            {
+              "id": 5,
+              "sentence": "I'm sorry I'm late! I _____ my way and had to ask for directions.",
+              "answer": "lost"
+            },
+            {
+              "id": 6,
+              "sentence": "My mum's away in Germany on a business _____ at the moment.",
+              "answer": "trip"
+            },
+            {
+              "id": 7,
+              "sentence": "The bank? Well, turn left here, then go _____ ahead for a kilometre and it's on the left.",
+              "answer": "straight"
+            },
+            {
+              "id": 8,
+              "sentence": "If you look on your left-hand _____ as we turn this corner, you'll see Big Ben.",
+              "answer": "side"
+            },
+            {
+              "id": 9,
+              "sentence": "I'll look round the shops in the morning and then _____ sightseeing in the afternoon.",
+              "answer": "go"
+            },
+            {
+              "id": 10,
+              "sentence": "My grandma hasn't driven since she _____ an accident last year.",
+              "answer": "had"
+            },
+            {
+              "id": 11,
+              "sentence": "I love visiting foreign places, _____ the sights and learning about other cultures.",
+              "answer": "seeing"
+            },
+            {
+              "id": 12,
+              "sentence": "During the 70s, many British people started to go _____ holiday to Spain.",
+              "answer": "on"
+            },
+            {
+              "id": 13,
+              "sentence": "While you're in London, you should take a tour _____ the Houses of Parliament.",
+              "answer": "round"
+            }
+          ]
+        },
+        {
+          "id": "unit_02_ex_f",
+          "exercise_code": "F",
+          "title": "Word patterns: Choose the correct answer",
+          "instruction": "Select the correct option A, B, C, or D for each sentence.",
+          "exercise_type": "multiple_choice",
+          "items": [
+            {
+              "id": 1,
+              "question": "I've always dreamt _____ China.",
+              "options": [
+                "A. to visit",
+                "B. of visiting",
+                "C. I visit",
+                "D. visit"
+              ],
+              "answer": "B"
+            },
+            {
+              "id": 2,
+              "question": "The travel agency is arranging for us _____ at a really nice hotel.",
+              "options": [
+                "A. stay",
+                "B. of staying",
+                "C. to stay",
+                "D. staying"
+              ],
+              "answer": "C"
+            },
+            {
+              "id": 3,
+              "question": "My dad says he always regrets _____ more.",
+              "options": [
+                "A. to not travel",
+                "B. not travelling",
+                "C. he not travel",
+                "D. of not travelling"
+              ],
+              "answer": "B"
+            },
+            {
+              "id": 4,
+              "question": "John seems keen _____ how to drive as soon as he can.",
+              "options": [
+                "A. of learning",
+                "B. he learn",
+                "C. for learn",
+                "D. to learn"
+              ],
+              "answer": "D"
+            },
+            {
+              "id": 5,
+              "question": "Now, class, I'd like you all to write _____ a description of your last holiday.",
+              "options": [
+                "A. me",
+                "B. to me",
+                "C. it me",
+                "D. about me"
+              ],
+              "answer": "A"
+            },
+            {
+              "id": 6,
+              "question": "When you arrive _____ have your passport ready.",
+              "options": [
+                "A. to the airport",
+                "B. in the airport",
+                "C. on the airport",
+                "D. at the airport"
+              ],
+              "answer": "D"
+            },
+            {
+              "id": 7,
+              "question": "The Joneses have invited us _____ to Australia with them this summer.",
+              "options": [
+                "A. going",
+                "B. for going",
+                "C. about going",
+                "D. to go"
+              ],
+              "answer": "D"
+            },
+            {
+              "id": 8,
+              "question": "The in-flight entertainment may differ _____ that advertised.",
+              "options": [
+                "A. to",
+                "B. from",
+                "C. in",
+                "D. at"
+              ],
+              "answer": "B"
+            }
+          ]
+        },
+        {
+          "id": "unit_02_ex_g",
+          "exercise_code": "G",
+          "title": "Find the extra word in each line",
+          "instruction": "In the text 'The cancelled trip', each line 1–10 has one unnecessary word. Identify that word.",
+          "exercise_type": "extra_word",
+          "items": [
+            {
+              "line": 1,
+              "text": "...Oh, let me tell you about our trip. Did you know that Sara is afraid of be",
+              "answer": "be"
+            },
+            {
+              "line": 2,
+              "text": "...flying? We had arranged it with her family to go to France for a few days.",
+              "answer": "it"
+            },
+            {
+              "line": 3,
+              "text": "...I have always wanted to see Paris and would love to live in there one day.",
+              "answer": "in"
+            },
+            {
+              "line": 4,
+              "text": "...Well, we got to the airport and Sara appeared being nervous. I asked her if",
+              "answer": "being"
+            },
+            {
+              "line": 5,
+              "text": "...she was okay and she said she was fine, so we continued on to our way.",
+              "answer": "to"
+            },
+            {
+              "line": 6,
+              "text": "...We went through passport control and I could see so that Sara wasn't",
+              "answer": "so"
+            },
+            {
+              "line": 7,
+              "text": "...keen on going any further. Just then, a voice announced: 'We regret it to",
+              "answer": "it"
+            },
+            {
+              "line": 8,
+              "text": "...inform passengers that Flight 114 to France is been cancelled.' That was",
+              "answer": "been"
+            },
+            {
+              "line": 9,
+              "text": "...our flight! Sarah said she was glad because of she was too frightened to",
+              "answer": "of"
+            },
+            {
+              "line": 10,
+              "text": "...fly anyway! So, we all went to home. That was the end of that trip!",
+              "answer": "to"
+            }
+          ]
+        },
+        {
+          "id": "unit_02_ex_h",
+          "exercise_code": "H",
+          "title": "Word formation: Complete the passage",
+          "instruction": "Use the capital word at the end of each line to form a word that fits in the gap.",
+          "exercise_type": "word_formation_passage",
+          "items": [
+            {
+              "gap_id": 1,
+              "root": "TOUR",
+              "sentence": "It's not always easy being a (1) [gap]...",
+              "answer": "tourist"
+            },
+            {
+              "gap_id": 2,
+              "root": "ARRANGE",
+              "sentence": "You spend half your time making (2) [gap] for your holiday...",
+              "answer": "arrangements"
+            },
+            {
+              "gap_id": 3,
+              "root": "TIME",
+              "sentence": "...and the other half worrying about sticking to the (3) [gap]...",
+              "answer": "timetable"
+            },
+            {
+              "gap_id": 4,
+              "root": "CULTURE",
+              "sentence": "There are no (4) [gap] problems...",
+              "answer": "cultural"
+            },
+            {
+              "gap_id": 5,
+              "root": "PHOTOGRAPH",
+              "sentence": "...you don't need someone to be the (5) [gap]...",
+              "answer": "photographer"
+            },
+            {
+              "gap_id": 6,
+              "root": "INHABIT",
+              "sentence": "...and you know that the local (6) [gap] are always friendly!",
+              "answer": "inhabitants"
+            }
+          ]
+        },
+        {
+          "id": "unit_02_ex_i",
+          "exercise_code": "I",
+          "title": "Word formation: Sentences",
+          "instruction": "Complete the sentences by changing the form of the word in capitals.",
+          "exercise_type": "word_formation_sentence",
+          "items": [
+            {
+              "id": 1,
+              "root": "RECOGNISE",
+              "sentence": "Beijing has changed so much in the last few years that it's almost _____.",
+              "answer": "unrecognisable"
+            },
+            {
+              "id": 2,
+              "root": "WORLD",
+              "sentence": "The number of cars _____ is about a billion and is increasing all the time.",
+              "answer": "worldwide"
+            },
+            {
+              "id": 3,
+              "root": "DIFFER",
+              "sentence": "The new maglev trains run on a completely _____ system from ordinary trains.",
+              "answer": "different"
+            },
+            {
+              "id": 4,
+              "root": "BROAD",
+              "sentence": "Living in a foreign country really does _____ your horizons.",
+              "answer": "broaden"
+            },
+            {
+              "id": 5,
+              "root": "DIRECT",
+              "sentence": "I can't find a _____ flight from London to Delhi so I've booked one that changes in Frankfurt.",
+              "answer": "direct"
+            },
+            {
+              "id": 6,
+              "root": "ARRIVE",
+              "sentence": "All passengers must complete a visa form upon _____ at Singapore airport.",
+              "answer": "arrival"
+            },
+            {
+              "id": 7,
+              "root": "DISTANT",
+              "sentence": "You can still see old milestones by the side of the road in England, showing the _____ to the nearest town.",
+              "answer": "distance"
+            },
+            {
+              "id": 8,
+              "root": "ENTER",
+              "sentence": "The Museum of Transport has a full-sized jet plane next to the _____.",
+              "answer": "entrance"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

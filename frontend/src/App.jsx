@@ -21,6 +21,7 @@ import { TranscriptPage } from "./pages/TranscriptPage";
 import { AudioStudioPage } from "./pages/AudioStudioPage";
 import { SmartReaderPage } from "./pages/SmartReaderPage";
 import { WritingPage } from "./pages/WritingPage";
+import { DestinationB2Page } from "./components/DestinationB2/DestinationB2Page";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -57,6 +58,7 @@ export default function App() {
     if (path === "/transcript" || path.startsWith("/transcript/")) return "tab-transcript";
     if (path === "/reader" || path.startsWith("/reader/")) return "tab-reader";
     if (path === "/writing" || path.startsWith("/writing/")) return "tab-writing";
+    if (path === "/destination-b2" || path.startsWith("/destination-b2/")) return "tab-destination-b2";
     if (path === "/history" || path.startsWith("/history/")) return "tab-history";
     if (path === "/audio-studio" || path.startsWith("/audio-studio/")) return "tab-audio-studio";
     return "tab-dictation";
@@ -68,6 +70,7 @@ export default function App() {
       case "tab-vocab": return "/vocab";
       case "tab-reader": return "/reader";
       case "tab-writing": return "/writing";
+      case "tab-destination-b2": return "/destination-b2";
       case "tab-transcript": return "/transcript";
       case "tab-history": return "/history";
       case "tab-audio-studio": return "/audio-studio";
@@ -855,6 +858,20 @@ export default function App() {
             </button>
 
             <button
+              className={`tab-btn ${activeTab === "tab-destination-b2" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-destination-b2")}
+              style={activeTab === "tab-destination-b2" ? { borderColor: "#6366f1" } : {}}
+              title="Destination B2: Grammar & Vocabulary (Unit 1 & 2)"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                <path d="M12 6v10" />
+              </svg>
+              <span>Destination B2</span>
+            </button>
+
+            <button
               className={`tab-btn ${activeTab === "tab-history" ? "active" : ""}`}
               onClick={() => setActiveTab("tab-history")}
               title="Lịch sử học tập & tiến độ"
@@ -1084,6 +1101,11 @@ export default function App() {
         {/* TAB 7: AI Writing Studio */}
         <div style={{ display: activeTab === "tab-writing" ? "block" : "none" }}>
           <WritingPage isActive={activeTab === "tab-writing"} />
+        </div>
+
+        {/* TAB 8: Destination B2 (Unit 1 & 2) */}
+        <div style={{ display: activeTab === "tab-destination-b2" ? "block" : "none" }}>
+          <DestinationB2Page isActive={activeTab === "tab-destination-b2"} token={token} />
         </div>
       </main>
 

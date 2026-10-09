@@ -438,5 +438,9 @@ class SystemVocabBank(Base):
         }
 
 
-
-
+# Modular re-export for Destination B2
+from app.infrastructure.database.destination_b2_models import (
+    DestinationB2Unit,
+    DestinationB2Exercise,
+    DestinationB2Progress,
+)

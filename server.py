@@ -24,6 +24,7 @@ from app.presentation.admin_api import router as admin_router
 from app.presentation.audio_studio_api import router as audio_studio_router
 from app.presentation.writing_api import router as writing_router
 from app.presentation.system_vocab_api import router as system_vocab_router
+from app.presentation.destination_b2_api import router as destination_b2_router
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +102,7 @@ app.include_router(admin_router)
 app.include_router(audio_studio_router)
 app.include_router(writing_router)
 app.include_router(system_vocab_router)
+app.include_router(destination_b2_router)
 
 # 5. Mount React frontend build
 base_dir = os.path.dirname(__file__)
