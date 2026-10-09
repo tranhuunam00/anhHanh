@@ -46,21 +46,81 @@ export const detectVoiceGender = (voiceName = "") => {
   return "Tự nhiên";
 };
 
+export const EDGE_AI_VOICES = [
+  {
+    voiceURI: "edge:en-US-JennyNeural",
+    name: "Jenny • Mỹ (Nữ • AI Tự Nhiên ✨)",
+    lang: "en-US",
+    isEdgeAI: true,
+  },
+  {
+    voiceURI: "edge:en-US-GuyNeural",
+    name: "Guy • Mỹ (Nam • AI Tự Nhiên ✨)",
+    lang: "en-US",
+    isEdgeAI: true,
+  },
+  {
+    voiceURI: "edge:en-US-AriaNeural",
+    name: "Aria • Mỹ (Nữ • AI Diễn Cảm ✨)",
+    lang: "en-US",
+    isEdgeAI: true,
+  },
+  {
+    voiceURI: "edge:en-GB-SoniaNeural",
+    name: "Sonia • Anh (Nữ • AI Chuẩn London ✨)",
+    lang: "en-GB",
+    isEdgeAI: true,
+  },
+  {
+    voiceURI: "edge:en-GB-RyanNeural",
+    name: "Ryan • Anh (Nam • AI Chuẩn London ✨)",
+    lang: "en-GB",
+    isEdgeAI: true,
+  },
+  {
+    voiceURI: "edge:en-AU-NatashaNeural",
+    name: "Natasha • Úc (Nữ • AI Tự Nhiên ✨)",
+    lang: "en-AU",
+    isEdgeAI: true,
+  },
+  {
+    voiceURI: "edge:en-IN-NeerjaNeural",
+    name: "Neerja • Ấn Độ (Nữ • AI Tự Nhiên ✨)",
+    lang: "en-IN",
+    isEdgeAI: true,
+  },
+];
+
 /**
  * Filter list of voices by selected accent code
  * If Indian accent is chosen but OS has no local voice, provides virtual presets.
+ * If options.includeEdgeAI is true, prepends matching Neural Edge-TTS voices at the top.
  */
-export const filterVoicesByAccent = (voices = [], accentCode = "ALL") => {
-  if (!Array.isArray(voices)) return [];
+export const filterVoicesByAccent = (voices = [], accentCode = "ALL", options = {}) => {
+  const includeEdgeAI = Boolean(options && options.includeEdgeAI);
+  let edgeMatches = [];
+  if (includeEdgeAI) {
+    if (!accentCode || accentCode === "ALL") {
+      edgeMatches = [...EDGE_AI_VOICES];
+    } else {
+      const targetLang = accentCode.toLowerCase();
+      edgeMatches = EDGE_AI_VOICES.filter((v) =>
+        (v.lang || "").toLowerCase().startsWith(targetLang)
+      );
+    }
+  }
+
+  if (!Array.isArray(voices)) return edgeMatches;
   if (!accentCode || accentCode === "ALL") {
     // Return all English voices first, then others
-    return [...voices].sort((a, b) => {
+    const sortedBrowser = [...voices].sort((a, b) => {
       const aIsEn = (a.lang || "").toLowerCase().startsWith("en");
       const bIsEn = (b.lang || "").toLowerCase().startsWith("en");
       if (aIsEn && !bIsEn) return -1;
       if (!aIsEn && bIsEn) return 1;
       return (a.name || "").localeCompare(b.name || "");
     });
+    return [...edgeMatches, ...sortedBrowser];
   }
 
   const target = accentCode.toLowerCase();
@@ -88,6 +148,7 @@ export const filterVoicesByAccent = (voices = [], accentCode = "ALL") => {
     if (indianMatches.length === 0) {
       // Virtual fallback entries when OS has no local Indian voice package installed
       return [
+        ...edgeMatches,
         {
           voiceURI: "virtual_indian_male",
           name: "Ravi • Ấn Độ (Nam • Indian English)",
@@ -102,10 +163,11 @@ export const filterVoicesByAccent = (voices = [], accentCode = "ALL") => {
         },
       ];
     }
-    return indianMatches;
+    return [...edgeMatches, ...indianMatches];
   }
 
-  return voices.filter((v) => v && (v.lang || "").toLowerCase().startsWith(target));
+  const filtered = voices.filter((v) => v && (v.lang || "").toLowerCase().startsWith(target));
+  return [...edgeMatches, ...filtered];
 };
 
 /**
@@ -113,7 +175,7 @@ export const filterVoicesByAccent = (voices = [], accentCode = "ALL") => {
  */
 export const formatVoiceLabel = (voice) => {
   if (!voice) return "Giọng mặc định";
-  if (voice.isVirtual) return voice.name;
+  if (voice.isVirtual || voice.isEdgeAI) return voice.name;
 
   const name = voice.name || "Default Voice";
   const lang = (voice.lang || "").toLowerCase();

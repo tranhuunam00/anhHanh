@@ -17,9 +17,9 @@ export const ReaderVoiceSelector = ({
   onSelectPitchPreset,
   onTestVoice,
 }) => {
-  // Filter available voices based on selected accent
+  // Filter available voices based on selected accent (including high-fidelity Edge Neural AI voices)
   const filteredVoices = useMemo(() => {
-    return filterVoicesByAccent(voices, selectedAccent);
+    return filterVoicesByAccent(voices, selectedAccent, { includeEdgeAI: true });
   }, [voices, selectedAccent]);
 
   return (

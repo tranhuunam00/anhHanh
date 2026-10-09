@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   ACCENT_OPTIONS,
   PITCH_PRESETS,
+  EDGE_AI_VOICES,
   detectVoiceGender,
   filterVoicesByAccent,
   formatVoiceLabel,
@@ -77,6 +78,20 @@ describe("readerVoices - filterVoicesByAccent", () => {
     assert.equal(all[0].lang.startsWith("en"), true);
   });
 
+  test("prepends Edge AI voices when includeEdgeAI option is true", () => {
+    const list = filterVoicesByAccent(dummyVoices, "ALL", { includeEdgeAI: true });
+    assert.equal(list.length, dummyVoices.length + EDGE_AI_VOICES.length);
+    assert.equal(list[0].isEdgeAI, true);
+    assert.equal(list[0].name.includes("Jenny"), true);
+  });
+
+  test("filters Edge AI voices matching selected accent when includeEdgeAI is true", () => {
+    const ukList = filterVoicesByAccent(dummyVoices, "en-GB", { includeEdgeAI: true });
+    const edgeUk = ukList.filter((v) => v.isEdgeAI);
+    assert.ok(edgeUk.length > 0);
+    assert.ok(edgeUk.every((v) => v.lang === "en-GB"));
+  });
+
   test("handles empty or invalid inputs safely without throwing", () => {
     assert.deepEqual(filterVoicesByAccent(null, "en-US"), []);
     assert.deepEqual(filterVoicesByAccent([], "ALL"), []);
@@ -85,6 +100,12 @@ describe("readerVoices - filterVoicesByAccent", () => {
 });
 
 describe("readerVoices - formatVoiceLabel", () => {
+  test("formats Edge AI voice label directly with sparkle indicator", () => {
+    const edgeVoice = EDGE_AI_VOICES[0];
+    assert.equal(formatVoiceLabel(edgeVoice), edgeVoice.name);
+    assert.ok(formatVoiceLabel(edgeVoice).includes("✨"));
+  });
+
   test("formats Microsoft Online voice nicely", () => {
     const v = { name: "Microsoft Jenny Online (Natural) - English (United States)", lang: "en-US" };
     const label = formatVoiceLabel(v);

@@ -1,5 +1,10 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { PITCH_PRESETS } from "../utils/readerVoices";
+import {
+  playEdgeTtsAudio,
+  stopEdgeAudio,
+  isEdgeVoice,
+} from "../services/edgeTtsService";
 
 export function useReaderSpeech({
   sentencesList,
@@ -21,7 +26,7 @@ export function useReaderSpeech({
   // Available Web Speech voices and Accent / Persona customization
   const [voices, setVoices] = useState([]);
   const [selectedVoiceUri, setSelectedVoiceUri] = useState(
-    () => localStorage.getItem("shotlang_reader_voice_uri") || ""
+    () => localStorage.getItem("shotlang_reader_voice_uri") || "edge:en-US-JennyNeural"
   );
   const [selectedAccent, setSelectedAccent] = useState(
     () => localStorage.getItem("shotlang_reader_accent") || "ALL"
@@ -147,15 +152,14 @@ export function useReaderSpeech({
   // Text-To-Speech: Speak sentence at index
   const speakSentence = useCallback(
     (index, autoPlay = true) => {
-      if (!window.speechSynthesis) {
-        alert("Trình duyệt không hỗ trợ Web Speech Synthesis.");
-        return;
-      }
-
       if (!sentencesList || sentencesList.length === 0) return;
 
-      if (index < 0 || index >= sentencesList.length) {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
         window.speechSynthesis.cancel();
+      }
+      stopEdgeAudio();
+
+      if (index < 0 || index >= sentencesList.length) {
         setIsSpeaking(false);
         setCurrentSentenceIdx(0);
         setElapsedSeconds(0);
@@ -163,7 +167,6 @@ export function useReaderSpeech({
         return;
       }
 
-      window.speechSynthesis.cancel();
       setCurrentSentenceIdx(index);
 
       const sentence = sentencesList[index];
@@ -174,6 +177,62 @@ export function useReaderSpeech({
 
       if (!autoPlay) {
         setIsSpeaking(false);
+        return;
+      }
+
+      sentenceStartRef.current = {
+        index,
+        startTime: Date.now(),
+        baseElapsed: sentenceStartSec,
+        duration: sentence.duration / speechRate,
+      };
+
+      const handleSpeechComplete = () => {
+        if (!onlyCurrentSentenceRef.current && index + 1 < sentencesList.length) {
+          speakSentence(index + 1, true);
+        } else {
+          setIsSpeaking(false);
+          sentenceStartRef.current = null;
+          if (!onlyCurrentSentenceRef.current) {
+            setCurrentSentenceIdx(0);
+            setElapsedSeconds(0);
+            clearSentenceHighlights();
+            if (showToast) {
+              showToast("Đã nghe xong bài viết!", "success");
+            }
+          }
+        }
+      };
+
+      // 1. High-fidelity Neural Edge-TTS playback
+      if (isEdgeVoice(selectedVoiceUri)) {
+        setIsSpeaking(true);
+        playEdgeTtsAudio({
+          text: sentence.text,
+          voice: selectedVoiceUri,
+          rate: speechRate,
+          pitch: pitchPreset,
+          onStart: () => setIsSpeaking(true),
+          onEnd: handleSpeechComplete,
+          onError: (err) => {
+            console.warn("Edge-TTS error, falling back to Web Speech:", err);
+            // Fallback to Web Speech if network fails
+            if (window.speechSynthesis) {
+              const fallbackUtter = new SpeechSynthesisUtterance(sentence.text);
+              if (selectedVoice) fallbackUtter.voice = selectedVoice;
+              fallbackUtter.rate = Number.isFinite(speechRate) ? speechRate : 1.0;
+              fallbackUtter.onend = handleSpeechComplete;
+              fallbackUtter.onerror = () => setIsSpeaking(false);
+              window.speechSynthesis.speak(fallbackUtter);
+            }
+          },
+        });
+        return;
+      }
+
+      // 2. Standard Web Speech Synthesis fallback
+      if (!window.speechSynthesis) {
+        alert("Trình duyệt không hỗ trợ Web Speech Synthesis.");
         return;
       }
 
@@ -201,29 +260,7 @@ export function useReaderSpeech({
       utterance.rate = Number.isFinite(finalRate) ? finalRate : 1.0;
       utterance.pitch = Number.isFinite(finalPitch) ? finalPitch : 1.0;
 
-      sentenceStartRef.current = {
-        index,
-        startTime: Date.now(),
-        baseElapsed: sentenceStartSec,
-        duration: sentence.duration / speechRate,
-      };
-
-      utterance.onend = () => {
-        if (!onlyCurrentSentenceRef.current && index + 1 < sentencesList.length) {
-          speakSentence(index + 1, true);
-        } else {
-          setIsSpeaking(false);
-          sentenceStartRef.current = null;
-          if (!onlyCurrentSentenceRef.current) {
-            setCurrentSentenceIdx(0);
-            setElapsedSeconds(0);
-            clearSentenceHighlights();
-            if (showToast) {
-              showToast("Đã nghe xong bài viết!", "success");
-            }
-          }
-        }
-      };
+      utterance.onend = handleSpeechComplete;
 
       utterance.onerror = (e) => {
         if (e.error !== "interrupted" && e.error !== "canceled") {
@@ -251,8 +288,33 @@ export function useReaderSpeech({
 
   // Quick test voice sample
   const handleTestVoice = useCallback(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    stopEdgeAudio();
+
+    if (isEdgeVoice(selectedVoiceUri)) {
+      const isIndian = selectedVoiceUri.includes("IN");
+      const sampleText = isIndian
+        ? "Namaste! Welcome to Smart Reader. Let's practice English with natural voice!"
+        : "Hello! This is a natural AI speech sample with authentic intonation. Welcome to Smart Reader!";
+
+      playEdgeTtsAudio({
+        text: sampleText,
+        voice: selectedVoiceUri,
+        rate: speechRate,
+        pitch: pitchPreset,
+        onStart: () => {
+          if (showToast) showToast("Đang phát thử giọng AI tự nhiên...", "info");
+        },
+        onError: (err) => {
+          console.warn("Test voice error:", err);
+        },
+      });
+      return;
+    }
+
     if (typeof window === "undefined" || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
 
     const isIndianMode =
       selectedVoiceUri.startsWith("virtual_indian") ||
@@ -296,7 +358,10 @@ export function useReaderSpeech({
 
   const handleToggleSpeech = () => {
     if (isSpeaking) {
-      window.speechSynthesis?.cancel();
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      stopEdgeAudio();
       setIsSpeaking(false);
     } else {
       speakSentence(currentSentenceIdx, true);
@@ -373,12 +438,14 @@ export function useReaderSpeech({
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
+      stopEdgeAudio();
     };
   }, []);
 
   useEffect(() => {
     if (!isActive && isSpeaking) {
       window.speechSynthesis?.cancel();
+      stopEdgeAudio();
       setIsSpeaking(false);
       clearSentenceHighlights();
     }

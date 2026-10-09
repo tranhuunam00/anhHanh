@@ -6,6 +6,7 @@ import { ReaderPasteSection } from "../components/Reader/ReaderPasteSection";
 import { SAMPLE_ARTICLE, sanitizePastedHtml } from "../utils/readerUtils";
 import { processReaderArticle } from "../utils/readerHtmlProcessor";
 import { useReaderSpeech } from "../hooks/useReaderSpeech";
+import { stopEdgeAudio } from "../services/edgeTtsService";
 import { Lightbulb } from "../components/Icons";
 import "../styles/smart-reader.css";
 
@@ -175,6 +176,7 @@ export function SmartReaderPage({ isActive = true }) {
     window.scrollTo({ top: 0, behavior: "instant" });
     if (isSpeaking) {
       window.speechSynthesis?.cancel();
+      stopEdgeAudio();
       setIsSpeaking(false);
     }
     clearSentenceHighlights();
@@ -392,6 +394,7 @@ export function SmartReaderPage({ isActive = true }) {
                 window.scrollTo({ top: 0, behavior: "instant" });
                 if (isSpeaking) {
                   window.speechSynthesis?.cancel();
+                  stopEdgeAudio();
                   setIsSpeaking(false);
                 }
               }
