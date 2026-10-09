@@ -20,6 +20,7 @@ import {
   Mic,
   CheckCircle2,
   Pencil,
+  ExternalLink,
 } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -750,17 +751,35 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                     >
                       <Volume2 size={14} strokeWidth={2} />
                     </button>
-                    <button
-                      className={`vocab-audio-btn ${listeningWordId === v.id ? "listening" : ""}`}
-                      onClick={() => handleStartPronouncePractice(v)}
-                      title="Luyện phát âm qua Micro (AI nhận diện giọng nói)"
-                      style={{
-                        color: listeningWordId === v.id ? "#dc2626" : "#6366f1",
-                        background: listeningWordId === v.id ? "rgba(239, 68, 68, 0.15)" : undefined,
-                      }}
-                    >
-                      <Mic size={14} strokeWidth={2.2} />
-                    </button>
+                    {(v.source_lang || "en").toLowerCase() === "en" ? (
+                      <a
+                        className="vocab-audio-btn"
+                        href={`https://dictionary.cambridge.org/vi/dictionary/english/${encodeURIComponent(
+                          v.word.trim().toLowerCase().replace(/\s+/g, "-")
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={`Tra "${v.word}" trên Cambridge Dictionary`}
+                        style={{
+                          color: "var(--primary, #6366f1)",
+                          textDecoration: "none",
+                        }}
+                      >
+                        <ExternalLink size={14} strokeWidth={2.2} />
+                      </a>
+                    ) : (
+                      <button
+                        className={`vocab-audio-btn ${listeningWordId === v.id ? "listening" : ""}`}
+                        onClick={() => handleStartPronouncePractice(v)}
+                        title="Luyện phát âm qua Micro (AI nhận diện giọng nói)"
+                        style={{
+                          color: listeningWordId === v.id ? "#dc2626" : "#6366f1",
+                          background: listeningWordId === v.id ? "rgba(239, 68, 68, 0.15)" : undefined,
+                        }}
+                      >
+                        <Mic size={14} strokeWidth={2.2} />
+                      </button>
+                    )}
                     <button
                       className="vocab-audio-btn"
                       style={{ color: "#2563eb" }}
