@@ -291,7 +291,11 @@ export function SmartReaderPage({ isActive = true }) {
   const handleArticleClick = (e) => {
     // 1. Ctrl + Click (or Cmd + Click on Mac) -> Speak clicked sentence
     if (e.ctrlKey || e.metaKey) {
-      const sentenceEl = e.target.closest(".reader-sentence");
+      let sentenceEl = e.target.closest(".reader-sentence");
+      if (!sentenceEl) {
+        const block = e.target.closest("p, h1, h2, h3, h4, h5, h6, li, blockquote");
+        sentenceEl = block?.querySelector(".reader-sentence");
+      }
       if (sentenceEl) {
         e.preventDefault();
         e.stopPropagation();
