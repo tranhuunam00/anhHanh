@@ -38,5 +38,26 @@
 - **Quy chuẩn Database Khởi Tạo Mới (Zero-to-One DB Integrity)**:
   - Bất kỳ schema hoặc model nào phải đảm bảo khi chạy trên database trống hoàn toàn (fresh run), toàn bộ migration (`001` đến phiên bản mới nhất) phải thực thi tuần tự không lỗi và tái lập chính xác 100% cấu trúc bảng, cột, khóa ngoại, chỉ mục tương ứng với ORM `models.py`.
 
+## 7. Quy Tắc Số Hóa Bài Tập Destination B2 (100% Fidelity & Visual Integrity)
+Destination B2 là giáo trình chuẩn quốc tế. Toàn bộ bài tập số hóa phải đạt độ chuẩn xác 1:1 cả về cấu trúc thị giác (Visual UI) lẫn nội dung học liệu (Text Content) so với sách gốc `Destination-B2.pdf`.
+
+- **Quy trình 2 bước BẮT BUỘC khi số hóa bất kỳ Unit nào**:
+  1. **Bước 1: Capture toàn bộ màn hình/trang Unit từ PDF & Phân tích Kiến trúc Component**:
+     - Mở trực tiếp file PDF gốc `Destination-B2.pdf` và đối chiếu toàn bộ các trang bài tập của Unit đó.
+     - Phân tích kỹ lưỡng bản chất dạng bài tập (Exercise Type) và Layout thị giác đặc thù.
+     - **TUYỆT ĐỐI KHÔNG mapping dựa vào mã chữ cái A, B, C, D, G, H...**: Mỗi Unit có hệ thống bài tập hoàn toàn khác nhau.
+       - *Ví dụ thực tế*: 
+         - Unit 1 bài G là Ghép 2 vế câu (Matching 2 cột), nhưng Unit 2 bài G là Tìm từ thừa (Extra Word dòng kẻ).
+         - Unit 1 bài H là Tìm từ thừa (Extra Word), nhưng Unit 2 bài H là Cấu tạo từ theo đoạn văn (Word Formation Passage với từ in hoa ở lề phải).
+     - **Nguyên tắc "Dạng mới thì thêm mới component"**: Nếu bài tập có layout mới chưa được hỗ trợ chuẩn xác (như: Word Formation đoạn văn có từ gốc in hoa ở lề phải, Extra Word trên trang giấy kẻ ngang, Matching nối 2 cột, Phrasal Verb thay thế cụm in nghiêng...), **BẮT BUỘC PHẢI TẠO COMPONENT MỚI ĐỘC LẬP**, tuyệt đối không được gộp ép bừa bãi vào component không đúng định dạng.
+  2. **Bước 2: Bảo toàn 100% Text từ PDF (Zero Text Omission - Không Thiếu Dù Chỉ 1 Từ)**:
+     - Dữ liệu bài tập BẮT BUỘC phải chứa đầy đủ 100% câu chữ từ trang PDF gốc, kiểm tra từng dòng, từng chữ.
+     - **TUYỆT ĐỐI KHÔNG ĐƯỢC**:
+       - Cắt vụn dòng, ngắt ngang câu làm mất ngữ cảnh bài học.
+       - Bỏ sót TỪ GỐC IN HOA (CAPITAL ROOT WORDS: `TOUR`, `ARRANGE`, `TIME`, `CULTURE`, `PHOTOGRAPH`, `INHABIT`...) ở lề phải hoặc cuối mỗi dòng trong bài Word Formation.
+       - Tóm tắt hoặc lược bớt nội dung đoạn văn bài đọc (Passage text).
+       - Bỏ sót từ gợi ý trong hộp từ (Word Bank) hoặc các cụm từ in nghiêng/in đậm cần thay thế.
+     - Đảm bảo đồng bộ 100% giữa file dữ liệu frontend (`frontend/src/data/destinationB2/`) và backend seed data (`app/infrastructure/database/data/destination_b2_seed_data.json`).
+
 
 

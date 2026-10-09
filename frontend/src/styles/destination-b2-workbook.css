@@ -18,7 +18,6 @@
   gap: 12px 18px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
-
 .b2-wb-word-pill {
   font-family: inherit;
   font-weight: 700;
@@ -26,7 +25,6 @@
   color: var(--text-primary, #0f172a);
   letter-spacing: 0.2px;
 }
-
 .b2-wb-bullet {
   color: var(--text-muted, #94a3b8);
   font-weight: 800;
@@ -40,7 +38,6 @@
   position: relative;
   margin: 0 4px;
 }
-
 .b2-dotted-input {
   border: none;
   border-bottom: 2px dotted var(--primary, #6366f1);
@@ -54,18 +51,15 @@
   min-width: 160px;
   transition: all 0.2s ease;
 }
-
 .b2-dotted-input:focus {
   border-bottom: 2px solid var(--primary, #6366f1);
   background: rgba(99, 102, 241, 0.05);
   border-radius: 4px 4px 0 0;
 }
-
 .b2-dotted-input.correct {
   border-bottom: 2px solid #10b981;
   color: #059669;
 }
-
 .b2-dotted-input.incorrect {
   border-bottom: 2px solid #ef4444;
   color: #dc2626;
@@ -79,7 +73,6 @@
   margin: 0 4px;
   vertical-align: middle;
 }
-
 .b2-inline-choice-btn {
   border: 1px solid transparent;
   background: rgba(99, 102, 241, 0.08);
@@ -92,28 +85,18 @@
   cursor: pointer;
   transition: all 0.15s ease;
 }
-
 .b2-inline-choice-btn:hover:not(:disabled) {
   background: rgba(99, 102, 241, 0.2);
   transform: translateY(-1px);
 }
-
 .b2-inline-choice-btn.selected {
   background: var(--primary, #6366f1);
   color: #ffffff;
   border-color: var(--primary, #6366f1);
   box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
 }
-
-.b2-inline-choice-btn.correct {
-  background: #10b981;
-  color: #ffffff;
-}
-
-.b2-inline-choice-btn.incorrect {
-  background: #ef4444;
-  color: #ffffff;
-}
+.b2-inline-choice-btn.correct { background: #10b981; color: #ffffff; }
+.b2-inline-choice-btn.incorrect { background: #ef4444; color: #ffffff; }
 
 /* Exercise B: Rewrite Card */
 .b2-rewrite-item {
@@ -125,7 +108,6 @@
   background: var(--bg-card, #ffffff);
   border: 1px solid var(--border-color, #e2e8f0);
 }
-
 .b2-bold-target {
   font-weight: 800;
   color: var(--text-primary, #0f172a);
@@ -140,12 +122,8 @@
   grid-template-columns: 1fr;
   gap: 16px;
 }
-
 @media (min-width: 860px) {
-  .b2-mcq-twocol {
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
+  .b2-mcq-twocol { grid-template-columns: 1fr 1fr; gap: 24px; }
 }
 
 .b2-mcq-card {
@@ -157,14 +135,12 @@
   flex-direction: column;
   gap: 10px;
 }
-
 .b2-mcq-options-stack {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-top: 4px;
 }
-
 .b2-mcq-option-pill {
   display: flex;
   align-items: center;
@@ -180,18 +156,15 @@
   text-align: left;
   transition: all 0.15s ease;
 }
-
 .b2-mcq-option-pill:hover:not(:disabled) {
   border-color: var(--primary, #6366f1);
   background: rgba(99, 102, 241, 0.05);
 }
-
 .b2-mcq-option-pill.selected {
   border-color: var(--primary, #6366f1);
   background: rgba(99, 102, 241, 0.12);
   font-weight: 700;
 }
-
 .b2-mcq-option-letter {
   display: inline-flex;
   align-items: center;
@@ -204,7 +177,6 @@
   background: rgba(0, 0, 0, 0.06);
   color: var(--text-primary, #0f172a);
 }
-
 .b2-mcq-option-pill.selected .b2-mcq-option-letter {
   background: var(--primary, #6366f1);
   color: #ffffff;
@@ -309,6 +281,44 @@
   color: var(--text-primary, #0f172a);
 }
 
+/* Exercise H: Word Formation Passage Layout (Cambridge B2) */
+.b2-wf-passage-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.b2-wf-passage-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border-color, #e2e8f0);
+  font-size: 0.98rem;
+  line-height: 1.8;
+}
+
+.b2-wf-passage-text {
+  flex: 1;
+  color: var(--text-primary, #0f172a);
+}
+
+.b2-wf-passage-cap {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.92rem;
+  letter-spacing: 1px;
+  color: var(--text-primary, #0f172a);
+  min-width: 120px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
 /* Key Word Transformation (Ex J) */
 .b2-key-badge-container {
   display: inline-block;
@@ -331,45 +341,26 @@
     padding: 8px 10px 32px;
     gap: 12px;
   }
-
   .b2-header-card {
     padding: 14px 16px;
     border-radius: 12px;
     gap: 12px;
   }
-
-  .b2-title {
-    font-size: 1.2rem;
-  }
-
-  .b2-subtitle {
-    font-size: 0.85rem;
-    line-height: 1.4;
-  }
-
-  .b2-unit-switcher {
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-  }
-
+  .b2-title { font-size: 1.2rem; }
+  .b2-subtitle { font-size: 0.85rem; line-height: 1.4; }
+  .b2-unit-switcher { width: 100%; display: flex; }
   .b2-unit-tab-btn {
     flex: 1;
     justify-content: center;
     padding: 7px 10px;
     font-size: 0.82rem;
   }
-
-  /* Compact Horizontal Exercise Quick-Nav on Mobile */
   .b2-sidebar {
     padding: 10px 12px;
     border-radius: 12px;
     gap: 8px;
   }
-  .b2-nav-mode-btn {
-    padding: 8px 12px;
-    font-size: 0.88rem;
-  }
+  .b2-nav-mode-btn { padding: 8px 12px; font-size: 0.88rem; }
   .b2-exercise-pill-list {
     display: flex;
     flex-direction: row;
@@ -387,65 +378,41 @@
     font-size: 0.82rem;
     white-space: nowrap;
   }
-
-  /* Exercise Runner Card */
   .b2-exercise-card {
     padding: 14px 12px;
     border-radius: 12px;
     gap: 12px;
   }
-  .b2-instruction-box {
-    padding: 10px 12px;
-    font-size: 0.85rem;
-  }
+  .b2-instruction-box { padding: 10px 12px; font-size: 0.85rem; }
   .b2-wb-box-header {
     padding: 8px 12px;
     gap: 6px 10px;
     margin-bottom: 12px;
   }
-  .b2-wb-word-pill {
-    font-size: 0.88rem;
-  }
+  .b2-wb-word-pill { font-size: 0.88rem; }
   .b2-passage-blue-box {
     padding: 12px 14px;
     font-size: 0.92rem;
     line-height: 1.7;
     border-radius: 10px;
   }
-
-  /* Touch-friendly buttons (Ex A, E, J) */
   .b2-inline-choice-wrapper {
     display: inline-flex;
     flex-wrap: wrap;
     gap: 4px;
     margin: 4px 0;
   }
-  .b2-inline-choice-btn {
-    padding: 5px 12px;
-    font-size: 0.88rem;
-  }
-  .b2-mcq-card {
-    padding: 12px;
-    gap: 8px;
-  }
-  .b2-mcq-option-pill {
-    padding: 8px 12px;
-    font-size: 0.88rem;
-  }
-  .b2-key-badge-container {
-    font-size: 0.82rem;
-    padding: 3px 8px;
-  }
+  .b2-inline-choice-btn { padding: 5px 12px; font-size: 0.88rem; }
+  .b2-mcq-card { padding: 12px; gap: 8px; }
+  .b2-mcq-option-pill { padding: 8px 12px; font-size: 0.88rem; }
+  .b2-key-badge-container { font-size: 0.82rem; padding: 3px 8px; }
 
-  /* Mobile Notebook Paper (Ex H) */
+  /* Mobile Notebook Paper (Ex H / Extra Word) */
   .b2-notebook-paper {
     padding: 14px 12px;
     border-radius: 10px;
   }
-  .b2-notebook-title {
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-  }
+  .b2-notebook-title { font-size: 1.1rem; margin-bottom: 10px; }
   .b2-notebook-row {
     flex-direction: column;
     align-items: flex-start;
@@ -462,6 +429,24 @@
     width: auto;
   }
 
+  /* Mobile Word Formation Passage */
+  .b2-wf-passage-card {
+    padding: 14px 12px;
+    border-radius: 10px;
+  }
+  .b2-wf-passage-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 0;
+  }
+  .b2-wf-passage-cap {
+    align-self: flex-end;
+    background: rgba(99, 102, 241, 0.08);
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
   /* Mobile Matching (Ex G) */
   .b2-match-left-item {
     flex-direction: column;
@@ -476,14 +461,10 @@
     width: 100%;
     padding: 8px 10px;
   }
-
-  /* Dotted inputs on small screens */
   .b2-dotted-input {
     font-size: 0.92rem;
     padding: 4px 2px;
   }
-
-  /* Action Buttons on Mobile */
   .b2-actions-bar {
     flex-direction: column;
     align-items: stretch;

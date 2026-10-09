@@ -1,10 +1,9 @@
 import React from "react";
-import { CheckCircle } from "../../Icons";
 
 /**
  * Exercise Component: Word Formation Passage (Cambridge B2 Format)
  * Dùng cho các bài đọc cấu tạo từ như Unit 2 Ex H (Holiday at home)...
- * Hiển thị đoạn văn chuẩn với chỗ trống (1)-(N) và TỪ GỐC IN HOA ở bên phải mỗi dòng.
+ * Hiển thị đoạn văn chuẩn với chỗ trống (1)-(N) inline và TỪ GỐC IN HOA ở bên phải mỗi dòng.
  * Rule 1: Internal icons only.
  * Rule 4: Max 500 lines.
  */
@@ -23,108 +22,105 @@ export const WordFormationPassageExercise = ({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      {/* Passage Header / Title */}
-      {exercise.passage_title && (
-        <div
-          style={{
-            textAlign: "center",
-            fontWeight: 800,
-            fontSize: "1.2rem",
-            color: "var(--text-primary)",
-            padding: "8px 0",
-            borderBottom: "1px dashed var(--border-color)",
-          }}
-        >
-          {exercise.passage_title}
-        </div>
-      )}
+      {/* Passage Card Container */}
+      <div className="b2-wf-passage-card">
+        {exercise.passage_title && (
+          <div
+            style={{
+              textAlign: "center",
+              fontWeight: 800,
+              fontSize: "1.2rem",
+              color: "var(--text-primary)",
+              paddingBottom: "14px",
+              marginBottom: "8px",
+              borderBottom: "1px dashed var(--border-color)",
+            }}
+          >
+            {exercise.passage_title}
+          </div>
+        )}
 
-      {/* Form Items List */}
-      <div className="b2-question-list">
-        {items.map((item, idx) => {
-          const itemKey = String(item.gap_number || item.id || idx + 1);
-          const currentAns = userAnswers[itemKey] || "";
-          const itemRes = getItemResult(itemKey, idx);
-          const rootWord = (item.prompt || "").replace(/[()]/g, "").trim();
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {items.map((item, idx) => {
+            const itemKey = String(item.gap_number || item.gap_id || item.id || idx + 1);
+            const currentAns = userAnswers[itemKey] || "";
+            const itemRes = getItemResult(itemKey, idx);
+            const rootWord = (item.capital_word || item.prompt || item.root || "")
+              .replace(/[()]/g, "")
+              .trim();
 
-          return (
-            <div
-              key={itemKey}
-              className={`b2-question-item ${itemRes ? (itemRes.is_correct ? "correct" : "incorrect") : ""}`}
-              style={{ padding: "14px 18px" }}
-            >
-              {/* Row with Sentence Context + Prominent Root Word Badge */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div style={{ flex: 1, fontSize: "0.98rem", lineHeight: "1.7", color: "var(--text-primary)" }}>
-                  <strong style={{ color: "var(--primary)", marginRight: "8px" }}>
-                    ({item.gap_number || item.id || idx + 1})
-                  </strong>
-                  <span>{item.text || item.sentence}</span>
+            const hasSegments = item.prefix !== undefined;
+
+            return (
+              <div key={itemKey} className="b2-wf-passage-row">
+                {/* Passage Line with Inline Blank */}
+                <div className="b2-wf-passage-text">
+                  {hasSegments ? (
+                    <>
+                      {item.prefix && <span>{item.prefix} </span>}
+                      <strong style={{ color: "var(--primary)", marginRight: "4px" }}>
+                        ({item.gap_number || idx + 1})
+                      </strong>
+                      <input
+                        type="text"
+                        disabled={!!result}
+                        className={`b2-dotted-input ${
+                          itemRes ? (itemRes.is_correct ? "correct" : "incorrect") : ""
+                        }`}
+                        style={{ minWidth: "140px", maxWidth: "200px", textAlign: "center" }}
+                        placeholder="..................................."
+                        value={currentAns}
+                        onChange={(e) => onAnswerChange(itemKey, e.target.value)}
+                      />
+                      {item.suffix && <span> {item.suffix}</span>}
+                    </>
+                  ) : (
+                    <>
+                      <strong style={{ color: "var(--primary)", marginRight: "6px" }}>
+                        ({item.gap_number || idx + 1})
+                      </strong>
+                      <input
+                        type="text"
+                        disabled={!!result}
+                        className={`b2-dotted-input ${
+                          itemRes ? (itemRes.is_correct ? "correct" : "incorrect") : ""
+                        }`}
+                        style={{ minWidth: "140px", maxWidth: "200px", textAlign: "center" }}
+                        placeholder="..................................."
+                        value={currentAns}
+                        onChange={(e) => onAnswerChange(itemKey, e.target.value)}
+                      />
+                      <span style={{ marginLeft: "8px" }}>{item.text || item.sentence}</span>
+                    </>
+                  )}
+
+                  {/* Immediate Feedback Tag */}
+                  {itemRes && (
+                    <span
+                      style={{
+                        marginLeft: "10px",
+                        fontSize: "0.88rem",
+                        fontWeight: 700,
+                        color: itemRes.is_correct ? "#10b981" : "#ef4444",
+                      }}
+                    >
+                      {itemRes.is_correct ? "✓" : `(${itemRes.correct_answer})`}
+                    </span>
+                  )}
                 </div>
 
+                {/* Right-aligned CAPITAL ROOT WORD */}
                 {rootWord && (
-                  <div
-                    style={{
-                      background: "rgba(99, 102, 241, 0.12)",
-                      border: "1.5px solid var(--primary)",
-                      color: "var(--primary)",
-                      fontWeight: 800,
-                      fontSize: "0.88rem",
-                      letterSpacing: "1px",
-                      padding: "4px 12px",
-                      borderRadius: "6px",
-                      alignSelf: "flex-start",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <div className="b2-wf-passage-cap">
                     {rootWord}
                   </div>
                 )}
               </div>
-
-              {/* Dotted Underline Input */}
-              <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginTop: "8px" }}>
-                <input
-                  type="text"
-                  disabled={!!result}
-                  className={`b2-dotted-input ${itemRes ? (itemRes.is_correct ? "correct" : "incorrect") : ""}`}
-                  style={{ width: "100%", maxWidth: "340px" }}
-                  placeholder={`Biến đổi từ "${rootWord}"...`}
-                  value={currentAns}
-                  onChange={(e) => onAnswerChange(itemKey, e.target.value)}
-                />
-              </div>
-
-              {/* Feedback Banner */}
-              {itemRes && (
-                <div className={`b2-answer-feedback ${itemRes.is_correct ? "correct" : "incorrect"}`}>
-                  {itemRes.is_correct ? (
-                    <>
-                      <CheckCircle size={16} />
-                      <span>Chính xác: <strong>{itemRes.correct_answer}</strong></span>
-                    </>
-                  ) : (
-                    <span>Chưa đúng. Đáp án: <strong>{itemRes.correct_answer}</strong></span>
-                  )}
-                  {itemRes.explanation && (
-                    <span style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginLeft: "8px" }}>
-                      — {itemRes.explanation}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 };
+

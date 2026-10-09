@@ -2201,45 +2201,96 @@
         {
           "id": "unit_02_ex_h",
           "exercise_code": "H",
-          "title": "Word formation: Complete the passage",
-          "instruction": "Use the capital word at the end of each line to form a word that fits in the gap.",
+          "title": "Use the word given in capitals at the end of each line to form a word that fits in the gap.",
+          "instruction": "Use the word given in capitals at the end of each line to form a word that fits in the gap in the same line.",
           "exercise_type": "word_formation_passage",
+          "passage_title": "Holiday at home",
+          "passage_text": "It's not always easy being a (1) [TOUR] ........................ You spend half your time making (2) [ARRANGE] ...................... for your holiday and the other half worrying about sticking to the (3) [TIME] ........................ I think it's relaxing sometimes to spend a holiday at home. There are no (4) [CULTURE] ...................... problems, you don't need someone to be the (5) [PHOTOGRAPH] ...................... and you know that the local (6) [INHABIT] ...................... are always friendly!",
+          "order_num": 8,
           "items": [
             {
+              "id": 1,
+              "gap_number": 1,
               "gap_id": 1,
+              "prefix": "It's not always easy being a",
+              "suffix": ". You spend half your",
+              "capital_word": "TOUR",
+              "prompt": "(TOUR)",
               "root": "TOUR",
-              "sentence": "It's not always easy being a (1) [gap]...",
-              "answer": "tourist"
+              "text": "It's not always easy being a (1) ............................... . You spend half your",
+              "answer": "tourist",
+              "answers": ["tourist"],
+              "explanation": "tour -> tourist (khách du lịch)."
             },
             {
+              "id": 2,
+              "gap_number": 2,
               "gap_id": 2,
+              "prefix": "time making",
+              "suffix": "for your holiday and the other half",
+              "capital_word": "ARRANGE",
+              "prompt": "(ARRANGE)",
               "root": "ARRANGE",
-              "sentence": "You spend half your time making (2) [gap] for your holiday...",
-              "answer": "arrangements"
+              "text": "time making (2) ............................... for your holiday and the other half",
+              "answer": "arrangements",
+              "answers": ["arrangements"],
+              "explanation": "arrange -> arrangements (lên kế hoạch/sắp xếp)."
             },
             {
+              "id": 3,
+              "gap_number": 3,
               "gap_id": 3,
+              "prefix": "worrying about sticking to the",
+              "suffix": ". I think it's relaxing",
+              "capital_word": "TIME",
+              "prompt": "(TIME)",
               "root": "TIME",
-              "sentence": "...and the other half worrying about sticking to the (3) [gap]...",
-              "answer": "timetable"
+              "text": "worrying about sticking to the (3) ............................... . I think it's relaxing",
+              "answer": "timetable",
+              "answers": ["timetable"],
+              "explanation": "time -> timetable (lịch trình thời gian biểu)."
             },
             {
+              "id": 4,
+              "gap_number": 4,
               "gap_id": 4,
+              "prefix": "sometimes to spend a holiday at home. There are no",
+              "suffix": "",
+              "capital_word": "CULTURE",
+              "prompt": "(CULTURE)",
               "root": "CULTURE",
-              "sentence": "There are no (4) [gap] problems...",
-              "answer": "cultural"
+              "text": "sometimes to spend a holiday at home. There are no (4) ...............................",
+              "answer": "cultural",
+              "answers": ["cultural"],
+              "explanation": "culture -> cultural (thuộc về văn hóa)."
             },
             {
+              "id": 5,
+              "gap_number": 5,
               "gap_id": 5,
+              "prefix": "problems, you don't need someone to be the",
+              "suffix": "and",
+              "capital_word": "PHOTOGRAPH",
+              "prompt": "(PHOTOGRAPH)",
               "root": "PHOTOGRAPH",
-              "sentence": "...you don't need someone to be the (5) [gap]...",
-              "answer": "photographer"
+              "text": "problems, you don't need someone to be the (5) ............................... and",
+              "answer": "photographer",
+              "answers": ["photographer"],
+              "explanation": "photograph -> photographer (nhiếp ảnh gia/người chụp ảnh)."
             },
             {
+              "id": 6,
+              "gap_number": 6,
               "gap_id": 6,
+              "prefix": "you know that the local",
+              "suffix": "are always friendly!",
+              "capital_word": "INHABIT",
+              "prompt": "(INHABIT)",
               "root": "INHABIT",
-              "sentence": "...and you know that the local (6) [gap] are always friendly!",
-              "answer": "inhabitants"
+              "text": "you know that the local (6) ............................... are always friendly!",
+              "answer": "inhabitants",
+              "answers": ["inhabitants"],
+              "explanation": "inhabit -> inhabitants (cư dân địa phương, số nhiều)."
             }
           ]
         },
