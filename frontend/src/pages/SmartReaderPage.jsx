@@ -83,7 +83,7 @@ export function SmartReaderPage({ isActive = true }) {
     if (!clean.includes("<p>") && !clean.includes("<div>") && !clean.includes("<h")) {
       clean = clean
         .split(/\n\s*\n/)
-        .map((p) => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`)
+        .map((p) => `<p>${p.trim().replace(/\n/g, "<br> ")}</p>`)
         .join("");
     } else {
       clean = sanitizePastedHtml(clean);

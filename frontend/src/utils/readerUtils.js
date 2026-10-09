@@ -112,7 +112,7 @@ export function getWordVariants(word) {
 }
 
 /**
- * Split text into readable sentence segments protecting abbreviations and decimals
+ * Split text into readable sentence segments protecting abbreviations, decimals, and ellipses
  * @param {string} text
  * @returns {string[]}
  */
@@ -121,20 +121,45 @@ export function splitTextIntoSentences(text) {
   const trimmed = text.trim();
   if (!trimmed) return [];
 
-  // Protect common abbreviations and titles from premature splitting
-  const protectedText = trimmed
-    .replace(
-      /\b(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|Inc|Ltd|Co|Corp|U\.S|U\.K|e\.g|i\.e|vs|etc|No|St|Dept|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\./gi,
-      (m) => m.replace(/\./g, "\uE000")
-    )
-    .replace(/(\d+)\.(\d+)/g, "$1\uE000$2");
+  // 1. Normalize whitespace, non-breaking spaces, and newlines
+  let normalized = trimmed
+    .replace(/\u00A0/g, " ")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n");
 
-  // Split on sentence boundaries: punctuation (. ! ?) followed by whitespace and a start char
-  const rawParts = protectedText.split(/(?<=[.?!])\s+(?=[A-Z0-9"“'‘(])/);
+  // 2. Protect ellipses (3+ dots, unicode …, or spaced dots . . .)
+  const ELLIPSIS_TOKEN = "\uE001";
+  normalized = normalized.replace(/(\.{3,}|…|\.\s*\.\s*\.)/g, ELLIPSIS_TOKEN);
+
+  // 3. Protect abbreviations, honorifics, corporate names, dates, Latin terms
+  const ABBR_TOKEN = "\uE000";
+  normalized = normalized
+    .replace(
+      /\b(Mr|Mrs|Ms|Miss|Dr|Prof|Sr|Jr|Inc|Ltd|Co|Corp|Dept|Univ|Gov|Pres|Gen|Col|Capt|Lt|Sgt|Rep|Sen|St|Ave|Rd|Blvd|No|Nos|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|vs|vol|approx|est|min|max|sec|hr|fig|eq|ed|al|cf)\./gi,
+      (m) => m.replace(/\./g, ABBR_TOKEN)
+    )
+    .replace(/\b(U\.S|U\.K|U\.N|E\.U|e\.g|i\.e|a\.m|p\.m)\./gi, (m) =>
+      m.replace(/\./g, ABBR_TOKEN)
+    )
+    .replace(/\b([A-Z])\.\s+(?=[A-Z])/g, `$1${ABBR_TOKEN} `)
+    .replace(/(\d+)\.(\d+)/g, `$1${ABBR_TOKEN}$2`);
+
+  // 4. Split on sentence boundaries:
+  // First match boundaries followed by whitespace/newlines
+  // Then match boundaries without whitespace (glued text e.g. walk.We'll)
+  const SPLIT_TOKEN = "\uE002";
+  const markedText = normalized
+    .replace(/(?<=[.?!]['"”’\)\]]*)\s+(?=[A-Za-z0-9"“'‘(\[])/g, SPLIT_TOKEN)
+    .replace(/(?<=[.?!]['"”’\)\]]*)(?=[A-Z])/g, SPLIT_TOKEN);
+
+  const rawParts = markedText.split(SPLIT_TOKEN);
 
   const sentences = [];
   for (const part of rawParts) {
-    const restored = part.replace(/\uE000/g, ".").trim();
+    const restored = part
+      .replace(new RegExp(ABBR_TOKEN, "g"), ".")
+      .replace(new RegExp(ELLIPSIS_TOKEN, "g"), "...")
+      .trim();
     if (restored.length > 0) {
       sentences.push(restored);
     }
@@ -176,63 +201,169 @@ export function groupBlockIntoSentences(block, getNextIndex, addSentence, doc) {
     const span = doc.createElement("span");
     span.className = "reader-sentence";
     span.setAttribute("data-s-idx", String(sIdx));
-    while (block.firstChild) {
-      span.appendChild(block.firstChild);
-    }
+    const children = Array.from(block.childNodes);
+    block.innerHTML = "";
+    children.forEach((child) => span.appendChild(child));
     block.appendChild(span);
     addSentence(sIdx, sentenceStrings[0]);
     return;
   }
 
-  // Multiple sentences: split child nodes into sentence spans
+  // Calculate non-whitespace character counts for each sentence
+  const targetNonWsCounts = sentenceStrings.map(
+    (s) => s.replace(/\s+/g, "").length
+  );
+
   const originalChildren = Array.from(block.childNodes);
   block.innerHTML = "";
 
+  let currentSentenceIdx = 0;
+  let accumulatedNonWsInSentence = 0;
   let sIdx = getNextIndex();
+
   let currentSpan = doc.createElement("span");
   currentSpan.className = "reader-sentence";
   currentSpan.setAttribute("data-s-idx", String(sIdx));
 
-  let currentSentenceIdx = 0;
+  const finalizeCurrentSpan = () => {
+    if (currentSpan.childNodes.length > 0) {
+      block.appendChild(currentSpan);
+      addSentence(sIdx, sentenceStrings[currentSentenceIdx]);
+    }
+    currentSentenceIdx++;
+    if (currentSentenceIdx < sentenceStrings.length) {
+      sIdx = getNextIndex();
+      currentSpan = doc.createElement("span");
+      currentSpan.className = "reader-sentence";
+      currentSpan.setAttribute("data-s-idx", String(sIdx));
+      accumulatedNonWsInSentence = 0;
+    }
+  };
 
-  originalChildren.forEach((child) => {
-    if (child.nodeType !== Node.TEXT_NODE) {
-      currentSpan.appendChild(child);
+  const processNode = (node) => {
+    if (currentSentenceIdx >= sentenceStrings.length - 1) {
+      currentSpan.appendChild(node);
       return;
     }
 
-    let remainingText = child.nodeValue;
-    while (remainingText.length > 0 && currentSentenceIdx < sentenceStrings.length - 1) {
-      const match = remainingText.match(/([.?!]+(?:\s+|$))/);
-      if (match && match.index !== undefined) {
-        const cutIdx = match.index + match[0].length;
-        const partBefore = remainingText.slice(0, cutIdx);
-        remainingText = remainingText.slice(cutIdx);
+    if (node.nodeType === Node.TEXT_NODE) {
+      let text = node.nodeValue;
+      while (text.length > 0 && currentSentenceIdx < sentenceStrings.length - 1) {
+        const neededNonWs =
+          targetNonWsCounts[currentSentenceIdx] - accumulatedNonWsInSentence;
 
-        if (partBefore) {
-          currentSpan.appendChild(doc.createTextNode(partBefore));
+        let nonWsCount = 0;
+        let cutPos = text.length;
+
+        for (let i = 0; i < text.length; i++) {
+          if (!/\s/.test(text[i])) {
+            nonWsCount++;
+            if (nonWsCount === neededNonWs) {
+              let endPos = i + 1;
+              while (
+                endPos < text.length &&
+                /['"”’\)\]\s]/.test(text[endPos]) &&
+                !/\n/.test(text[endPos])
+              ) {
+                endPos++;
+                if (text[endPos - 1] === " ") break;
+              }
+              cutPos = endPos;
+              break;
+            }
+          }
         }
 
-        block.appendChild(currentSpan);
-        addSentence(sIdx, sentenceStrings[currentSentenceIdx]);
+        if (nonWsCount >= neededNonWs) {
+          const partForCurrent = text.slice(0, cutPos);
+          text = text.slice(cutPos);
+          if (partForCurrent.length > 0) {
+            currentSpan.appendChild(doc.createTextNode(partForCurrent));
+          }
+          accumulatedNonWsInSentence += neededNonWs;
+          finalizeCurrentSpan();
+        } else {
+          accumulatedNonWsInSentence += nonWsCount;
+          currentSpan.appendChild(doc.createTextNode(text));
+          text = "";
+        }
+      }
 
-        currentSentenceIdx++;
-        sIdx = getNextIndex();
-        currentSpan = doc.createElement("span");
-        currentSpan.className = "reader-sentence";
-        currentSpan.setAttribute("data-s-idx", String(sIdx));
+      if (text.length > 0) {
+        currentSpan.appendChild(doc.createTextNode(text));
+      }
+    } else {
+      const elText = node.textContent || "";
+      const elNonWs = elText.replace(/\s+/g, "").length;
+      const neededNonWs =
+        targetNonWsCounts[currentSentenceIdx] - accumulatedNonWsInSentence;
+
+      if (elNonWs < neededNonWs || currentSentenceIdx >= sentenceStrings.length - 1) {
+        accumulatedNonWsInSentence += elNonWs;
+        currentSpan.appendChild(node);
+      } else if (elNonWs === neededNonWs) {
+        accumulatedNonWsInSentence += elNonWs;
+        currentSpan.appendChild(node);
+        finalizeCurrentSpan();
       } else {
-        break;
+        if (node.childNodes && node.childNodes.length > 0) {
+          const children = Array.from(node.childNodes);
+          node.innerHTML = "";
+          currentSpan.appendChild(node);
+
+          children.forEach((c) => {
+            if (c.nodeType === Node.TEXT_NODE) {
+              let text = c.nodeValue;
+              while (text.length > 0 && currentSentenceIdx < sentenceStrings.length - 1) {
+                const needed =
+                  targetNonWsCounts[currentSentenceIdx] - accumulatedNonWsInSentence;
+                let nWs = 0;
+                let cutPos = text.length;
+                for (let i = 0; i < text.length; i++) {
+                  if (!/\s/.test(text[i])) {
+                    nWs++;
+                    if (nWs === needed) {
+                      cutPos = i + 1;
+                      break;
+                    }
+                  }
+                }
+                if (nWs >= needed) {
+                  const before = text.slice(0, cutPos);
+                  text = text.slice(cutPos);
+                  node.appendChild(doc.createTextNode(before));
+                  accumulatedNonWsInSentence += needed;
+                  finalizeCurrentSpan();
+                  if (text.length > 0 || children.length > 0) {
+                    const newEl = doc.createElement(node.nodeName);
+                    currentSpan.appendChild(newEl);
+                  }
+                } else {
+                  accumulatedNonWsInSentence += nWs;
+                  node.appendChild(doc.createTextNode(text));
+                  text = "";
+                }
+              }
+              if (text.length > 0) {
+                node.appendChild(doc.createTextNode(text));
+              }
+            } else {
+              node.appendChild(c);
+            }
+          });
+        } else {
+          currentSpan.appendChild(node);
+        }
       }
     }
+  };
 
-    if (remainingText.length > 0) {
-      currentSpan.appendChild(doc.createTextNode(remainingText));
-    }
-  });
+  originalChildren.forEach(processNode);
 
   if (currentSpan.childNodes.length > 0) {
     block.appendChild(currentSpan);
-    addSentence(sIdx, sentenceStrings[currentSentenceIdx] || currentSpan.textContent.trim());
+    if (currentSentenceIdx < sentenceStrings.length) {
+      addSentence(sIdx, sentenceStrings[currentSentenceIdx]);
+    }
   }
 }

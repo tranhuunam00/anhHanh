@@ -1,4 +1,4 @@
-import { getWordVariants, groupBlockIntoSentences } from "./readerUtils.js";
+import { getWordVariants, groupBlockIntoSentences, splitTextIntoSentences } from "./readerUtils.js";
 
 /**
  * Parses article HTML, marks saved vocabulary words, and segments into sentences with timing metadata.
@@ -13,11 +13,22 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
 
   if (typeof window === "undefined" || !window.DOMParser) {
     const words = articleHtml.match(/\b[a-zA-Z0-9'’-]+\b/g) || [];
+    const sentenceStrings = splitTextIntoSentences(articleHtml.replace(/<[^>]*>/g, " "));
+    let cumulative = 0;
+    const sentencesList = (sentenceStrings.length > 0 ? sentenceStrings : [articleHtml]).map((s, idx) => {
+      const sWords = s.match(/\b[a-zA-Z0-9'’-]+\b/g) || [];
+      const wordCount = sWords.length;
+      const duration = Math.max(1.2, Number((wordCount / 2.33 + 0.35).toFixed(1)));
+      const startTime = cumulative;
+      const endTime = Number((cumulative + duration).toFixed(1));
+      cumulative = endTime;
+      return { index: idx, text: s, wordCount, duration, startTime, endTime };
+    });
     return {
       processedHtml: articleHtml,
       matchedWords: [],
       totalWordsCount: words.length,
-      sentencesList: [{ index: 0, text: articleHtml, wordCount: words.length, duration: 2, startTime: 0, endTime: 2 }],
+      sentencesList,
     };
   }
 
@@ -149,6 +160,14 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
         const p = doc.createElement("p");
         p.textContent = node.nodeValue;
         doc.body.replaceChild(p, node);
+      }
+    });
+
+    // Ensure <br> tags have whitespace separation so textContent does not glue sentences together
+    doc.body.querySelectorAll("br").forEach((br) => {
+      const next = br.nextSibling;
+      if (!next || next.nodeType !== Node.TEXT_NODE || !/^\s/.test(next.nodeValue)) {
+        br.after(doc.createTextNode(" "));
       }
     });
 
