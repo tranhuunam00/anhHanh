@@ -5,6 +5,7 @@ Follows AGENTS.md:
 - Dedicated endpoints for Destination B2 Grammar & Vocabulary.
 - Full 4-aspect coverage test suite.
 """
+import json
 import logging
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
@@ -135,8 +136,15 @@ async def submit_exercise(
         raise HTTPException(status_code=404, detail="Exercise not found")
 
     # Grade submission
+    exercise_items = exercise.items or []
+    if isinstance(exercise_items, str):
+        try:
+            exercise_items = json.loads(exercise_items)
+        except Exception:
+            exercise_items = []
+
     grading_result = grade_exercise_submission(
-        exercise_items=exercise.items or [],
+        exercise_items=exercise_items,
         user_answers=payload.answers
     )
 

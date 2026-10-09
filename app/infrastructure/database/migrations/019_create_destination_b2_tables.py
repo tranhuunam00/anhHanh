@@ -92,7 +92,7 @@ async def upgrade(conn) -> None:
 
     units = data.get("units", [])
     for unit in units:
-        theory_val = json.dumps(unit.get("theory", {}), ensure_ascii=False) if is_sqlite else unit.get("theory", {})
+        theory_val = json.dumps(unit.get("theory", {}), ensure_ascii=False)
         unit_params = {
             "id": unit["id"],
             "unit_number": unit["unit_number"],
@@ -120,7 +120,7 @@ async def upgrade(conn) -> None:
         await conn.execute(unit_insert_sql, unit_params)
 
         for ex in unit.get("exercises", []):
-            items_val = json.dumps(ex.get("items", []), ensure_ascii=False) if is_sqlite else ex.get("items", [])
+            items_val = json.dumps(ex.get("items", []), ensure_ascii=False)
             ex_params = {
                 "id": ex["id"],
                 "unit_id": unit["id"],

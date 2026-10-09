@@ -62,7 +62,13 @@ class DestinationB2Unit(Base):
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
         if include_theory:
-            data["theory"] = self.theory or {}
+            th = self.theory or {}
+            if isinstance(th, str):
+                try:
+                    th = json.loads(th)
+                except Exception:
+                    pass
+            data["theory"] = th
         if include_exercises and self.exercises:
             data["exercises"] = [ex.to_dict(include_answers=False) for ex in self.exercises]
         return data
@@ -89,6 +95,12 @@ class DestinationB2Exercise(Base):
     def to_dict(self, include_answers: bool = True):
         """Serialize exercise to dictionary. Strip answers if include_answers is False."""
         exercise_items = self.items or []
+        if isinstance(exercise_items, str):
+            try:
+                exercise_items = json.loads(exercise_items)
+            except Exception:
+                exercise_items = []
+
         if not include_answers:
             sanitized_items = []
             for item in exercise_items:
