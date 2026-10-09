@@ -322,3 +322,179 @@
   font-size: 0.88rem;
   margin: 6px 0;
 }
+
+/* ==========================================================================
+   Mobile Responsive Optimizations (< 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .b2-container {
+    padding: 8px 10px 32px;
+    gap: 12px;
+  }
+
+  .b2-header-card {
+    padding: 14px 16px;
+    border-radius: 12px;
+    gap: 12px;
+  }
+
+  .b2-title {
+    font-size: 1.2rem;
+  }
+
+  .b2-subtitle {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .b2-unit-switcher {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+  }
+
+  .b2-unit-tab-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 7px 10px;
+    font-size: 0.82rem;
+  }
+
+  /* Compact Horizontal Exercise Quick-Nav on Mobile */
+  .b2-sidebar {
+    padding: 10px 12px;
+    border-radius: 12px;
+    gap: 8px;
+  }
+  .b2-nav-mode-btn {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+  }
+  .b2-exercise-pill-list {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+    padding: 2px 2px 8px;
+    scrollbar-width: thin;
+  }
+  .b2-exercise-nav-item {
+    flex-shrink: 0;
+    width: auto;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  /* Exercise Runner Card */
+  .b2-exercise-card {
+    padding: 14px 12px;
+    border-radius: 12px;
+    gap: 12px;
+  }
+  .b2-instruction-box {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+  .b2-wb-box-header {
+    padding: 8px 12px;
+    gap: 6px 10px;
+    margin-bottom: 12px;
+  }
+  .b2-wb-word-pill {
+    font-size: 0.88rem;
+  }
+  .b2-passage-blue-box {
+    padding: 12px 14px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    border-radius: 10px;
+  }
+
+  /* Touch-friendly buttons (Ex A, E, J) */
+  .b2-inline-choice-wrapper {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 4px 0;
+  }
+  .b2-inline-choice-btn {
+    padding: 5px 12px;
+    font-size: 0.88rem;
+  }
+  .b2-mcq-card {
+    padding: 12px;
+    gap: 8px;
+  }
+  .b2-mcq-option-pill {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+  }
+  .b2-key-badge-container {
+    font-size: 0.82rem;
+    padding: 3px 8px;
+  }
+
+  /* Mobile Notebook Paper (Ex H) */
+  .b2-notebook-paper {
+    padding: 14px 12px;
+    border-radius: 10px;
+  }
+  .b2-notebook-title {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+  .b2-notebook-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 0;
+  }
+  .b2-notebook-row-left {
+    width: 100%;
+    gap: 10px;
+  }
+  .b2-notebook-row-left .b2-dotted-input {
+    flex: 1;
+    min-width: unset;
+    width: auto;
+  }
+
+  /* Mobile Matching (Ex G) */
+  .b2-match-left-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .b2-match-left-item > div:last-child {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .b2-match-left-item select {
+    width: 100%;
+    padding: 8px 10px;
+  }
+
+  /* Dotted inputs on small screens */
+  .b2-dotted-input {
+    font-size: 0.92rem;
+    padding: 4px 2px;
+  }
+
+  /* Action Buttons on Mobile */
+  .b2-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding-top: 14px;
+  }
+  .b2-actions-bar button,
+  .b2-score-banner {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+  }
+}
+
