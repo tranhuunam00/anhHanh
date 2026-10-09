@@ -17,6 +17,8 @@ from app.infrastructure.ai_writing_evaluator import (
 from app.infrastructure.ai_writing_generator import (
     generate_prompt_impl,
     suggest_structures_impl,
+    normalize_suggestion_item,
+    normalize_suggestions,
 )
 
 
@@ -169,6 +171,144 @@ async def test_suggest_structures_success_mock():
         assert res["topic"] == "Urbanization"
         assert len(res["suggestions"]) == 1
         assert res["suggestions"][0]["phrase"] == "exponential urbanization"
+
+
+def test_normalize_suggestion_item_various_inputs():
+    """Verify normalize_suggestion_item input coverage, alternative keys, and heuristics."""
+    # 1. Happy path standard item
+    item1 = {
+        "kind": "collocation",
+        "category": "intro",
+        "band": "band8",
+        "phrase": "rapid economic growth",
+        "meaning": "tăng trưởng kinh tế nhanh chóng",
+        "template": "rapid economic growth",
+        "usage": "Mở đầu bối cảnh"
+    }
+    norm1 = normalize_suggestion_item(item1)
+    assert norm1["kind"] == "collocation"
+    assert norm1["category"] == "intro"
+    assert norm1["band"] == "band8"
+    assert norm1["phrase"] == "rapid economic growth"
+    assert norm1["meaning"] == "tăng trưởng kinh tế nhanh chóng"
+
+    # 2. Alternative keys (sentence_frame, translation, type)
+    item2 = {
+        "type": "structure",
+        "category": "counter_argument",
+        "sentence_frame": "While it is argued that [X], others believe [Y].",
+        "translation": "Trong khi một số lập luận rằng [X], người khác tin rằng [Y].",
+        "target_band": "Band 8.0+",
+    }
+    norm2 = normalize_suggestion_item(item2)
+    assert norm2["kind"] == "structure"
+    assert norm2["category"] == "counter"
+    assert norm2["band"] == "band8"
+    assert norm2["phrase"] == "While it is argued that [X], others believe [Y]."
+    assert norm2["meaning"] == "Trong khi một số lập luận rằng [X], người khác tin rằng [Y]."
+    assert norm2["template"] == "While it is argued that [X], others believe [Y]."
+
+    # 3. Heuristic kind detection: brackets in phrase -> structure
+    item3 = {
+        "phrase": "It is widely acknowledged that [fact]",
+        "vietnamese_meaning": "Điều được công nhận rộng rãi là...",
+        "level": "7.5"
+    }
+    norm3 = normalize_suggestion_item(item3)
+    assert norm3["kind"] == "structure"
+    assert norm3["band"] == "band7"
+
+    # 4. Heuristic kind detection: short phrase without brackets -> collocation
+    item4 = {
+        "phrase": "foster creativity",
+        "meaning": "thúc đẩy sáng tạo",
+        "band": "6.5"
+    }
+    norm4 = normalize_suggestion_item(item4)
+    assert norm4["kind"] == "collocation"
+    assert norm4["band"] == "band6"
+
+    # 5. Bad cases / Boundary inputs
+    assert normalize_suggestion_item(None) is None
+    assert normalize_suggestion_item({}) is None
+    assert normalize_suggestion_item("invalid string") is None
+    assert normalize_suggestion_item({"phrase": "", "meaning": ""}) is None
+
+
+def test_normalize_suggestions_container_formats():
+    """Verify normalize_suggestions handles lists, dicts, grouped categories, and band defaults."""
+    # Dict with 'suggestions' list
+    data1 = {
+        "suggestions": [
+            {"phrase": "curb emissions", "meaning": "cắt giảm khí thải"},
+            {"sentence_frame": "One major factor is [reason].", "translation": "Một yếu tố chính là..."}
+        ]
+    }
+    res1 = normalize_suggestions(data1, target_band=8.0)
+    assert len(res1) == 2
+    assert res1[0]["kind"] == "collocation"
+    assert res1[0]["band"] == "band8"
+    assert res1[1]["kind"] == "structure"
+    assert res1[1]["band"] == "band8"
+
+    # Dict with category grouped lists
+    data2 = {
+        "intro": [{"phrase": "pave the way for", "meaning": "mở đường cho"}],
+        "conclusion": [{"sentence_frame": "In conclusion, [summary]", "meaning": "Tóm lại..."}]
+    }
+    res2 = normalize_suggestions(data2, target_band=6.5)
+    assert len(res2) == 2
+    assert res2[0]["category"] == "intro"
+    assert res2[0]["band"] == "band6"
+    assert res2[1]["category"] == "conclusion"
+
+    # Empty and invalid containers
+    assert normalize_suggestions([]) == []
+    assert normalize_suggestions({}) == []
+    assert normalize_suggestions(None) == []
+
+
+@pytest.mark.asyncio
+async def test_suggest_structures_legacy_gemini_format_normalized():
+    """Verify suggest_structures_impl normalizes non-standard keys from Gemini."""
+    legacy_mock = {
+        "topic": "Renewable energy",
+        "suggestions": [
+            {
+                "type": "collocation",
+                "expression": "fossil fuel depletion",
+                "vietnamese": "sự cạn kiệt nhiên liệu hóa thạch",
+                "level": "8.0",
+                "category": "body"
+            },
+            {
+                "sentence_frame": "There is every reason to believe that [view].",
+                "meaning_vi": "Có mọi lý do để tin rằng...",
+                "band": "7.5",
+                "category": "intro"
+            }
+        ]
+    }
+    with patch("httpx.AsyncClient.post") as mock_post:
+        mock_post.return_value = AsyncMock(
+            status_code=200,
+            json=lambda: {
+                "candidates": [{
+                    "content": {
+                        "parts": [{"text": json.dumps(legacy_mock)}]
+                    }
+                }]
+            }
+        )
+        res = await suggest_structures_impl(topic="Renewable energy", api_key="dummy_key")
+        assert len(res["suggestions"]) == 2
+        assert res["suggestions"][0]["phrase"] == "fossil fuel depletion"
+        assert res["suggestions"][0]["meaning"] == "sự cạn kiệt nhiên liệu hóa thạch"
+        assert res["suggestions"][0]["kind"] == "collocation"
+        assert res["suggestions"][0]["band"] == "band8"
+        assert res["suggestions"][1]["phrase"] == "There is every reason to believe that [view]."
+        assert res["suggestions"][1]["kind"] == "structure"
+        assert res["suggestions"][1]["band"] == "band7"
 
 
 @pytest.mark.asyncio

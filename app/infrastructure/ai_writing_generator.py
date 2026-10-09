@@ -3,7 +3,7 @@ import re
 import json
 import logging
 import random
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import httpx
 from app.infrastructure.writing_prompts_catalog import CURATED_PROMPTS_BY_LANG, LANGUAGES_CONFIG
 
@@ -158,6 +158,136 @@ Trả về kết quả DUY NHẤT định dạng JSON:
     return random.choice(prompts)
 
 
+def normalize_suggestion_item(item: Dict[str, Any], default_band: str = "band7") -> Optional[Dict[str, Any]]:
+    """Normalize a single suggestion object from Gemini into a standard format."""
+    if not isinstance(item, dict):
+        return None
+
+    phrase = (
+        item.get("phrase")
+        or item.get("sentence_frame")
+        or item.get("frame")
+        or item.get("collocation")
+        or item.get("expression")
+        or item.get("text")
+        or item.get("content")
+        or item.get("pattern")
+        or item.get("structure")
+        or item.get("template")
+        or item.get("sample")
+        or ""
+    )
+    if isinstance(phrase, list):
+        phrase = " ".join(str(x) for x in phrase)
+    phrase = str(phrase).strip()
+
+    meaning = (
+        item.get("meaning")
+        or item.get("translation")
+        or item.get("vietnamese")
+        or item.get("vietnamese_meaning")
+        or item.get("meaning_vi")
+        or item.get("definition")
+        or item.get("explanation")
+        or item.get("desc")
+        or ""
+    )
+    meaning = str(meaning).strip()
+
+    if not phrase and not meaning:
+        return None
+    if not phrase:
+        phrase = meaning
+
+    raw_kind = str(item.get("kind") or item.get("type") or "").lower()
+    if "colloc" in raw_kind or raw_kind == "cụm từ":
+        kind = "collocation"
+    elif "struct" in raw_kind or "frame" in raw_kind or "khung" in raw_kind:
+        kind = "structure"
+    else:
+        # Heuristic: if contains bracket placeholders [...] or has more than 5 words, it is structure
+        if ("[" in phrase and "]" in phrase) or len(phrase.split()) > 5:
+            kind = "structure"
+        else:
+            kind = "collocation"
+
+    raw_band = str(item.get("band") or item.get("target_band") or item.get("level") or "").lower()
+    if any(k in raw_band for k in ["band8", "band 8", "8.", "8,"]) or raw_band == "8":
+        band = "band8"
+    elif any(k in raw_band for k in ["band7", "band 7", "7.", "7,"]) or raw_band == "7":
+        band = "band7"
+    elif any(k in raw_band for k in ["band6", "band 6", "6.", "6,"]) or raw_band == "6":
+        band = "band6"
+    else:
+        band = default_band
+
+    raw_cat = str(item.get("category") or "").lower()
+    if "intro" in raw_cat:
+        category = "intro"
+    elif "counter" in raw_cat or "rebuttal" in raw_cat:
+        category = "counter"
+    elif "conclu" in raw_cat:
+        category = "conclusion"
+    else:
+        category = "body"
+
+    template = str(item.get("template") or phrase).strip()
+    usage = str(item.get("usage") or item.get("usage_note") or item.get("context") or item.get("note") or "").strip()
+
+    return {
+        "kind": kind,
+        "category": category,
+        "band": band,
+        "phrase": phrase,
+        "meaning": meaning,
+        "template": template,
+        "usage": usage,
+    }
+
+
+def normalize_suggestions(data: Any, target_band: float = 7.0) -> List[Dict[str, Any]]:
+    """Normalize raw suggestions list or dictionary into uniform array of suggestion objects."""
+    default_band = "band8" if target_band >= 8.0 else ("band7" if target_band >= 7.0 else "band6")
+    raw_items = []
+
+    if isinstance(data, list):
+        raw_items = data
+    elif isinstance(data, dict):
+        if "suggestions" in data:
+            sug = data["suggestions"]
+            if isinstance(sug, list):
+                raw_items = sug
+            elif isinstance(sug, dict):
+                for k, v in sug.items():
+                    if isinstance(v, list):
+                        for it in v:
+                            if isinstance(it, dict) and "category" not in it:
+                                it["category"] = k
+                            raw_items.append(it)
+        elif "structures" in data and isinstance(data["structures"], list):
+            raw_items = data["structures"]
+        else:
+            for k, v in data.items():
+                if isinstance(v, list):
+                    for it in v:
+                        if isinstance(it, dict):
+                            if k in ["collocations", "collocation"] and "kind" not in it:
+                                it["kind"] = "collocation"
+                            elif k in ["structures", "structure"] and "kind" not in it:
+                                it["kind"] = "structure"
+                            elif "category" not in it:
+                                it["category"] = k
+                            raw_items.append(it)
+
+    normalized = []
+    for item in raw_items:
+        norm = normalize_suggestion_item(item, default_band=default_band)
+        if norm:
+            normalized.append(norm)
+
+    return normalized
+
+
 async def suggest_structures_impl(
     topic: str,
     language: str = "en",
@@ -187,15 +317,34 @@ QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
 1. TUYỆT ĐỐI KHÔNG ĐƯỢC VIẾT CẢ CÂU HOÀN CHỈNH ĐÃ VIẾT SẴN HẾT NỘI DUNG / NGUYÊN CÂU DÀI 25-40 TỪ.
 2. CHỈ CUNG CẤP ĐÚNG 2 LOẠI GỢI Ý:
    - Loại A: "collocation" (Cụm từ đắt giá theo chủ đề): 2 - 5 từ kết hợp tự nhiên.
-   - Loại B: "structure" (Khung cấu trúc câu): BẮT BUỘC DÙNG DẤU NGOẶC VUÔNG `[...]` làm chỗ trống.
+   - Loại B: "structure" (Khung cấu trúc câu): BẮT BUỘC DÙNG DẤU NGOẶC VUÔNG `[...]` làm chỗ trống để người học tự điền ý của họ.
 
-Hãy đề xuất khoảng 10 đến 14 gợi ý theo "intro", "body", "counter", "conclusion".
+Hãy đề xuất khoảng 10 đến 14 gợi ý theo 4 phần: "intro", "body", "counter", "conclusion".
 
-TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
+BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON HỢP LỆ THEO CẤU TRÚC CHÍNH XÁC SAU ĐÂY:
 {{
   "topic": "{topic[:150]}",
   "language": "{language}",
-  "suggestions": []
+  "suggestions": [
+    {{
+      "kind": "collocation",
+      "category": "intro",
+      "band": "band8",
+      "phrase": "exponential urban growth",
+      "meaning": "sự phát triển đô thị với tốc độ phi mã",
+      "usage": "Dùng mở đầu phần dẫn dắt bối cảnh xã hội",
+      "template": "exponential urban growth"
+    }},
+    {{
+      "kind": "structure",
+      "category": "body",
+      "band": "band8",
+      "phrase": "A compelling case can be made that [luận điểm]",
+      "meaning": "Có một lý lẽ thuyết phục rằng...",
+      "usage": "Dùng mở đầu câu phát triển luận điểm chính",
+      "template": "A compelling case can be made that [luận điểm]"
+    }}
+  ]
 }}
 """
     models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
@@ -219,7 +368,14 @@ TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON:
                     raw_text = re.sub(r"^```json\s*", "", raw_text)
                     raw_text = re.sub(r"\s*```$", "", raw_text)
                     parsed = json.loads(raw_text)
-                    return parsed
+                    normalized_list = normalize_suggestions(parsed, target_band=target_band)
+                    topic_text = parsed.get("topic", topic) if isinstance(parsed, dict) else topic
+                    lang_text = parsed.get("language", language) if isinstance(parsed, dict) else language
+                    return {
+                        "topic": topic_text,
+                        "language": lang_text,
+                        "suggestions": normalized_list
+                    }
                 else:
                     last_error = f"HTTP {resp.status_code}: {resp.text[:200]}"
             except Exception as e:
