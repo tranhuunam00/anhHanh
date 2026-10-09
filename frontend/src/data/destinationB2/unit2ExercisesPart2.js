@@ -10,7 +10,7 @@ export const UNIT_2_EXERCISES_PART2 = [
     exercise_code: "E",
     title: "Write one word in each gap.",
     instruction: "Write one word in each gap.",
-    exercise_type: "bracket_verb",
+    exercise_type: "collocation_gap_fill",
     order_num: 5,
     items: [
       {
@@ -265,7 +265,7 @@ export const UNIT_2_EXERCISES_PART2 = [
     exercise_code: "H",
     title: "Use the word given in capitals at the end of each line to form a word that fits in the gap.",
     instruction: "Use the word given in capitals at the end of each line to form a word that fits in the gap in the same line.",
-    exercise_type: "passage_gap_fill",
+    exercise_type: "word_formation_passage",
     passage_title: "Holiday at home",
     passage_text: "It's not always easy being a (1) [TOUR] ........................ You spend half your time making (2) [ARRANGE] ...................... for your holiday and the other half worrying about sticking to the (3) [TIME] ........................ I think it's relaxing sometimes to spend a holiday at home. There are no (4) [CULTURE] ...................... problems, you don't need someone to be the (5) [PHOTOGRAPH] ...................... and you know that the local (6) [INHABIT] ...................... are always friendly!",
     order_num: 8,
@@ -331,7 +331,7 @@ export const UNIT_2_EXERCISES_PART2 = [
     exercise_code: "I",
     title: "Complete the sentences by changing the form of the word in capitals.",
     instruction: "Complete the sentences by changing the form of the word in capitals when this is necessary.",
-    exercise_type: "bracket_verb",
+    exercise_type: "word_formation_sentences",
     order_num: 9,
     items: [
       {

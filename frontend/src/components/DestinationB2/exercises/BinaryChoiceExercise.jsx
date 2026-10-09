@@ -26,6 +26,19 @@ export const BinaryChoiceExercise = ({
         const currentAns = userAnswers[itemKey] || "";
         const itemRes = getItemResult(itemKey, idx);
 
+        let prefix = item.prefix || "";
+        let suffix = item.suffix || "";
+        let options = item.options || [];
+
+        if (!item.prefix && !item.suffix && item.text && item.text.includes("[")) {
+          const match = item.text.match(/^(.*?)\[(.*?)\](.*?)$/);
+          if (match) {
+            prefix = match[1];
+            options = match[2].split("/").map((s) => s.trim());
+            suffix = match[3];
+          }
+        }
+
         return (
           <div
             key={itemKey}
@@ -35,9 +48,9 @@ export const BinaryChoiceExercise = ({
               <strong style={{ color: "var(--primary)", marginRight: "10px", minWidth: "24px", display: "inline-block" }}>
                 {item.id || idx + 1}
               </strong>
-              <span>{item.prefix}</span>
+              <span>{prefix}</span>
               <span className="b2-inline-choice-wrapper">
-                {(item.options || []).map((opt, oIdx) => {
+                {options.map((opt, oIdx) => {
                   const isSelected = currentAns.toLowerCase() === opt.toLowerCase();
                   return (
                     <React.Fragment key={oIdx}>

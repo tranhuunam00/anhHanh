@@ -130,8 +130,10 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
         </div>
       )}
 
-      {/* Authentic Blue Reading Passage Box (Ex F, Ex I) */}
-      {exercise.passage_text && exercise.exercise_code !== "H" && (
+      {/* Authentic Blue Reading Passage Box (Ex F, Ex I in Unit 1) */}
+      {exercise.passage_text &&
+        exercise.exercise_type !== "word_formation_passage" &&
+        exercise.exercise_type !== "extra_word" && (
         <div className="b2-passage-blue-box">
           {exercise.passage_title && (
             <div className="b2-passage-heading">

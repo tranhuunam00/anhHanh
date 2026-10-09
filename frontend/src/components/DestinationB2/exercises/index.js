@@ -7,3 +7,6 @@ export { PassageClozeExercise } from "./PassageClozeExercise";
 export { MatchingExercise } from "./MatchingExercise";
 export { ExtraWordExercise } from "./ExtraWordExercise";
 export { KeyWordTransformationExercise } from "./KeyWordTransformationExercise";
+export { WordFormationPassageExercise } from "./WordFormationPassageExercise";
+export { WordFormationSentencesExercise } from "./WordFormationSentencesExercise";
+export { CollocationGapFillExercise } from "./CollocationGapFillExercise";
