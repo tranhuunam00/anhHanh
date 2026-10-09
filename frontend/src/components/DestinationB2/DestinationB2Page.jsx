@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { BookOpen, CheckCircle, IconSparkles } from "../Icons";
-import { fetchB2Units, fetchB2UnitDetail } from "../../services/destinationB2Service";
 import { UNIT_1_THEORY } from "../../data/destinationB2/unit1Theory";
 import { UNIT_1_EXERCISES } from "../../data/destinationB2/unit1Exercises";
+import { UNIT_2_THEORY } from "../../data/destinationB2/unit2Theory";
+import { UNIT_2_EXERCISES } from "../../data/destinationB2/unit2Exercises";
 import { getB2StoredProgress } from "../../utils/destinationB2Grading";
 import { B2TheoryViewer } from "./B2TheoryViewer";
 import { B2ExerciseRunner } from "./B2ExerciseRunner";
@@ -19,24 +20,36 @@ export const DestinationB2Page = ({ isActive, token }) => {
   const [activeMode, setActiveMode] = useState("theory"); // 'theory' | 'exercise'
   const [activeExerciseId, setActiveExerciseId] = useState("u01_ex_a");
   const [completedExerciseIds, setCompletedExerciseIds] = useState(new Set());
-  const [remoteUnit2Detail, setRemoteUnit2Detail] = useState(null);
 
-  // Unit 1 is 100% offline client-side native from textbook data
+  // Unit 1: 100% offline native textbook data (Grammar)
   const staticUnit1Detail = useMemo(
     () => ({
       unit_number: 1,
       unit_type: "grammar",
-      title: "Present time: Present Simple, Present Continuous, Present Perfect Simple, Present Perfect Continuous, Stative verbs",
+      title: "Present time: Present Simple, Continuous, Perfect Simple & Continuous, Stative verbs",
       theory: UNIT_1_THEORY,
       exercises: UNIT_1_EXERCISES,
     }),
     []
   );
 
-  // Initialize completed exercise status from localStorage
+  // Unit 2: 100% offline native textbook data (Vocabulary)
+  const staticUnit2Detail = useMemo(
+    () => ({
+      unit_number: 2,
+      unit_type: "vocabulary",
+      title: "Travel and transport",
+      theory: UNIT_2_THEORY,
+      exercises: UNIT_2_EXERCISES,
+    }),
+    []
+  );
+
+  // Initialize completed exercise status from localStorage for all units
   useEffect(() => {
     const completed = new Set();
-    UNIT_1_EXERCISES.forEach((ex) => {
+    const allExercises = [...UNIT_1_EXERCISES, ...UNIT_2_EXERCISES];
+    allExercises.forEach((ex) => {
       const saved = getB2StoredProgress(ex.id);
       if (saved && saved.results && saved.results.length > 0) {
         completed.add(ex.id);
@@ -45,29 +58,9 @@ export const DestinationB2Page = ({ isActive, token }) => {
     setCompletedExerciseIds(completed);
   }, []);
 
-  // Fetch optional remote data for Unit 2 if user navigates there
-  useEffect(() => {
-    if (selectedUnitNumber === 2 && !remoteUnit2Detail) {
-      fetchB2UnitDetail(2)
-        .then((detail) => {
-          if (detail) setRemoteUnit2Detail(detail);
-        })
-        .catch(() => {
-          // Gracefully handle offline
-        });
-    }
-  }, [selectedUnitNumber, remoteUnit2Detail]);
-
   if (!isActive) return null;
 
-  const currentUnitDetail = selectedUnitNumber === 1 ? staticUnit1Detail : (remoteUnit2Detail || {
-    unit_number: 2,
-    unit_type: "vocabulary",
-    title: "Travel and transport",
-    theory: { sections: [] },
-    exercises: [],
-  });
-
+  const currentUnitDetail = selectedUnitNumber === 1 ? staticUnit1Detail : staticUnit2Detail;
   const exercises = currentUnitDetail.exercises || [];
   const activeExercise = exercises.find((ex) => ex.id === activeExerciseId) || exercises[0];
 
@@ -99,7 +92,9 @@ export const DestinationB2Page = ({ isActive, token }) => {
             Unit {selectedUnitNumber}: {currentUnitDetail.title}
           </h1>
           <p className="b2-subtitle">
-            Học lý thuyết ngữ pháp chuẩn sách giáo trình và làm đầy đủ 10 bài tập từ A đến J (trang 8 - 13).
+            {selectedUnitNumber === 1
+              ? "Học lý thuyết ngữ pháp chuẩn sách giáo trình và làm đầy đủ 10 bài tập từ A đến J (trang 8 - 13)."
+              : "Học lý thuyết từ vựng & cụm từ chuẩn sách giáo trình và làm đầy đủ 9 bài tập từ A đến I (trang 14 - 17)."}
           </p>
         </div>
 
@@ -123,6 +118,7 @@ export const DestinationB2Page = ({ isActive, token }) => {
             onClick={() => {
               setSelectedUnitNumber(2);
               setActiveMode("theory");
+              setActiveExerciseId("u02_ex_a");
             }}
           >
             <IconSparkles size={16} />
