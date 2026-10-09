@@ -1,7 +1,7 @@
 /**
  * AI Vocabulary Extraction and Batch Import API Service
  */
-import { safeParseResponse } from "./authService";
+import { safeParseResponse } from "./authService.js";
 
 export const aiExtractVocabFromText = async (
   text,

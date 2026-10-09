@@ -165,7 +165,8 @@ export const WordLookupPopover = ({
   // Audio speech
   const handlePlayAudio = (accent) => {
     setActiveAudio(accent);
-    playPronunciationAudio(cleanWord, accent).finally(() => {
+    const audioUrl = accent === "uk" ? lookupData?.audio_uk : lookupData?.audio_us;
+    playPronunciationAudio(cleanWord, accent, audioUrl).finally(() => {
       setTimeout(() => setActiveAudio(null), 800);
     });
   };
@@ -309,12 +310,21 @@ export const WordLookupPopover = ({
               <div className="lookup-skeleton-line" style={{ width: "65%" }} />
             ) : (
               <div className="lookup-ipa-row">
-                <span className="ipa-accent">UK</span>
-                <span className="ipa-text">{lookupData?.ipa_uk || lookupData?.ipa || "/.../"}</span>
-                <span className="ipa-accent" style={{ marginLeft: "10px" }}>
-                  US
-                </span>
-                <span className="ipa-text">{lookupData?.ipa_us || lookupData?.ipa || "/.../"}</span>
+                {lookupData?.ipa_uk && lookupData?.ipa_us && lookupData.ipa_uk !== lookupData.ipa_us ? (
+                  <>
+                    <span className="ipa-accent">UK</span>
+                    <span className="ipa-text">{lookupData.ipa_uk}</span>
+                    <span className="ipa-accent" style={{ marginLeft: "10px" }}>
+                      US
+                    </span>
+                    <span className="ipa-text">{lookupData.ipa_us}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="ipa-accent">UK • US</span>
+                    <span className="ipa-text">{lookupData?.ipa_uk || lookupData?.ipa_us || lookupData?.ipa || "/.../"}</span>
+                  </>
+                )}
               </div>
             )}
           </div>

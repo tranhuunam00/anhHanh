@@ -251,23 +251,35 @@ export const quickLookupWord = async (word, context = null, token = null, target
 
 let currentAudio = null;
 
-export const playPronunciationAudio = (word, ttsLang = "en") => {
-  if (!word) return Promise.resolve();
+export const playPronunciationAudio = (word, ttsLang = "us", customAudioUrl = null) => {
+  if (!word || typeof word !== "string") return Promise.resolve();
 
   return new Promise((resolve) => {
     if (currentAudio) {
       try {
+        currentAudio.onended = null;
+        currentAudio.onerror = null;
+        currentAudio.onplay = null;
         currentAudio.pause();
         currentAudio.currentTime = 0;
+        currentAudio.removeAttribute("src");
+        currentAudio.src = "";
       } catch (e) {
         console.debug("Audio pause err:", e);
       }
       currentAudio = null;
     }
 
-    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
-      word.trim()
-    )}&tl=${ttsLang}&client=tw-ob`;
+    const clean = word.trim();
+    if (!clean) {
+      resolve();
+      return;
+    }
+
+    const langStr = String(ttsLang || "us").toLowerCase();
+    const isUk = langStr === "uk" || langStr === "en-gb" || langStr.includes("gb");
+    const edgeVoice = isUk ? "en-GB-SoniaNeural" : "en-US-JennyNeural";
+    const primaryUrl = customAudioUrl || `/api/tts/stream?text=${encodeURIComponent(clean)}&voice=${edgeVoice}`;
 
     let resolved = false;
     const finish = () => {
@@ -278,13 +290,34 @@ export const playPronunciationAudio = (word, ttsLang = "en") => {
       }
     };
 
-    const fallbackTTS = () => {
+    const fallbackWebSpeech = () => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         try {
           window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(word.trim());
-          utterance.lang = ttsLang === "en" ? "en-US" : ttsLang;
+          const utterance = new SpeechSynthesisUtterance(clean);
+          const targetLang = isUk ? "en-GB" : "en-US";
+          utterance.lang = targetLang;
           utterance.rate = 0.9;
+
+          if (typeof window.speechSynthesis.getVoices === "function") {
+            const allVoices = window.speechSynthesis.getVoices() || [];
+            if (isUk) {
+              const ukVoice = allVoices.find(
+                (v) =>
+                  (v.lang && (v.lang === "en-GB" || v.lang.startsWith("en-GB") || v.lang.includes("GB"))) ||
+                  /UK|British|George|Susan|Hazel|Sonia|London/i.test(v.name)
+              );
+              if (ukVoice) utterance.voice = ukVoice;
+            } else {
+              const usVoice = allVoices.find(
+                (v) =>
+                  (v.lang && (v.lang === "en-US" || v.lang.startsWith("en-US") || v.lang.includes("US"))) &&
+                  !/UK|GB|British|Australia|India/i.test(v.name)
+              );
+              if (usVoice) utterance.voice = usVoice;
+            }
+          }
+
           utterance.onend = finish;
           utterance.onerror = finish;
           window.speechSynthesis.speak(utterance);
@@ -296,18 +329,44 @@ export const playPronunciationAudio = (word, ttsLang = "en") => {
       }
     };
 
+    let hasFailed = false;
+    const handleError = () => {
+      if (hasFailed) return;
+      hasFailed = true;
+      if (customAudioUrl && primaryUrl === customAudioUrl) {
+        const edgeUrl = `/api/tts/stream?text=${encodeURIComponent(clean)}&voice=${edgeVoice}`;
+        const edgeAudio = new Audio(edgeUrl);
+        currentAudio = edgeAudio;
+        edgeAudio.onended = finish;
+        edgeAudio.onerror = fallbackWebSpeech;
+        const playEdge = edgeAudio.play();
+        if (playEdge !== undefined) {
+          playEdge.catch(fallbackWebSpeech);
+        }
+      } else {
+        fallbackWebSpeech();
+      }
+    };
+
     try {
-      const audio = new Audio(ttsUrl);
+      const audio = new Audio(primaryUrl);
       currentAudio = audio;
       audio.onended = finish;
-      audio.onerror = fallbackTTS;
+      audio.onerror = handleError;
 
       const playPromise = audio.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => fallbackTTS());
+        playPromise.catch((err) => {
+          if (err && err.name !== "AbortError") {
+            handleError();
+          } else {
+            finish();
+          }
+        });
       }
     } catch {
-      fallbackTTS();
+      handleError();
     }
   });
 };
+
