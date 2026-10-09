@@ -325,7 +325,7 @@ class SentenceGrouperService:
                 return
 
             duration = wds[-1]["end"] - wds[0]["start"]
-            if duration > self.max_duration_seconds and len(wds) > 1:
+            if round(duration, 4) > self.max_duration_seconds and len(wds) > 1:
                 half_time = wds[0]["start"] + duration / 2
                 split_idx = self.find_best_split_index(wds, profile, half_time)
 

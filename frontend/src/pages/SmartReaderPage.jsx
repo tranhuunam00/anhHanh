@@ -267,8 +267,14 @@ export function SmartReaderPage({ isActive = true }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [mode, isActive, handleToggleSpeech, handleRestartSpeech]);
 
-  // Click on highlighted mark inside article OR click on sentence to speak
+  // Single click inside article: Open vocab popover if clicking a saved mark;
+  // If user is selecting text (bôi đen), ignore so selection isn't interrupted.
   const handleArticleClick = (e) => {
+    const selection = window.getSelection();
+    if (selection && selection.toString().trim().length > 0) {
+      return;
+    }
+
     const markEl = e.target.closest(".smart-vocab-mark");
     if (markEl) {
       e.preventDefault();
@@ -282,6 +288,13 @@ export function SmartReaderPage({ isActive = true }) {
         element: markEl,
         contextSentence: parentSentence,
       });
+      return;
+    }
+  };
+
+  // Double click inside article: Speak the double-clicked sentence
+  const handleArticleDoubleClick = (e) => {
+    if (e.target.closest(".smart-vocab-mark")) {
       return;
     }
 
@@ -410,6 +423,7 @@ export function SmartReaderPage({ isActive = true }) {
                 className="reader-article-body"
                 dangerouslySetInnerHTML={{ __html: processedHtml }}
                 onClick={handleArticleClick}
+                onDoubleClick={handleArticleDoubleClick}
               />
             </div>
           </main>

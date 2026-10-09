@@ -817,7 +817,7 @@
   padding: 1px 2px;
   margin: 0 1px;
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
+  cursor: text;
 }
 
 .reader-sentence:hover {

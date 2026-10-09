@@ -201,7 +201,7 @@ export function ReaderSidebar({
 
         {/* Row 4: Scrubber helper hint */}
         <div className="reader-scrubber-hint">
-          <span>Kéo thanh tua hoặc <strong>bấm vào câu bất kỳ</strong> bên phải để nghe</span>
+          <span>Kéo thanh tua hoặc <strong>nhấp đúp vào câu bất kỳ</strong> bên phải để nghe</span>
         </div>
       </div>
 
