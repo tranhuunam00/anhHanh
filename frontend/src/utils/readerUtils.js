@@ -367,3 +367,35 @@ export function groupBlockIntoSentences(block, getNextIndex, addSentence, doc) {
     }
   }
 }
+
+/**
+ * Detect if text is purely decorative divider or blank symbols (e.g. ____________________, ----, ***)
+ * @param {string} text
+ * @returns {boolean}
+ */
+export function isSilentOrDivider(text) {
+  if (!text || typeof text !== "string") return true;
+  const stripped = text.replace(/[\s_\-–—*#=~.·•[\]()]+/g, "");
+  return stripped.length === 0;
+}
+
+/**
+ * Sanitize text before speech synthesis so TTS doesn't awkwardly read "underscore underscore" or bracket codes
+ * @param {string} text
+ * @returns {string}
+ */
+export function cleanSpeechText(text) {
+  if (!text || typeof text !== "string") return "";
+  let clean = text;
+  // Replace repeated underscores (e.g. ____________________ or ___)
+  clean = clean.replace(/_{2,}/g, " ");
+  // Replace repeated dashes or hyphens
+  clean = clean.replace(/[-–—]{2,}/g, " - ");
+  // Replace repeated symbols (***, ===, ~~~)
+  clean = clean.replace(/[*#=~]{2,}/g, " ");
+  // Strip question labels like [Q1], [Q2], (Q1) to natural Q1 for TTS
+  clean = clean.replace(/\[([Qq]\d+)\]/gi, "$1");
+  clean = clean.replace(/\(([Qq]\d+)\)/gi, "$1");
+  return clean.replace(/\s+/g, " ").trim();
+}
+

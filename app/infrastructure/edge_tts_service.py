@@ -1,5 +1,6 @@
 """Edge-TTS High-Fidelity Neural Speech Synthesis Service."""
 import logging
+import re
 from typing import Optional, AsyncGenerator, Dict, Any
 import edge_tts
 
@@ -153,6 +154,22 @@ def resolve_edge_voice(voice: Optional[str], accent: Optional[str] = None) -> st
     return DEFAULT_EDGE_VOICE
 
 
+def clean_tts_text(text: str) -> str:
+    """Sanitize text for TTS synthesis, eliminating repeated symbols like underscores, dashes, brackets."""
+    if not text or not isinstance(text, str):
+        return ""
+    # Strip repeated underscores (e.g. ____________________ or ___)
+    cleaned = re.sub(r"_{2,}", " ", text)
+    # Strip repeated dashes / hyphens
+    cleaned = re.sub(r"[-–—]{2,}", " - ", cleaned)
+    # Strip repeated symbols (***, ===, ~~~)
+    cleaned = re.sub(r"[*#=~]{2,}", " ", cleaned)
+    # Normalize question tokens [Q1] -> Q1
+    cleaned = re.sub(r"\[([Qq]\d+)\]", r"\1", cleaned)
+    cleaned = re.sub(r"\(([Qq]\d+)\)", r"\1", cleaned)
+    return re.sub(r"\s+", " ", cleaned).strip()
+
+
 async def generate_edge_tts_stream(
     text: str,
     voice: str = DEFAULT_EDGE_VOICE,
@@ -160,8 +177,12 @@ async def generate_edge_tts_stream(
     pitch: str = "+0Hz",
 ) -> AsyncGenerator[bytes, None]:
     """Generate audio chunks stream from Microsoft Edge Neural TTS."""
-    cleaned_text = (text or "").strip()
+    cleaned_text = clean_tts_text(text)
     if not cleaned_text:
+        return
+
+    # Skip streaming if there are no spoken letters or digits (e.g. pure symbols)
+    if not re.search(r"[a-zA-Z0-9]", cleaned_text):
         return
 
     cleaned_text = cleaned_text[:3000]
