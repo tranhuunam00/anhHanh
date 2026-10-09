@@ -40,7 +40,7 @@
               }
             ],
             "watch_out": [
-              "We can also use do/does in present simple statements for emphasis: 'You don't like going by bus, do you?' 'Actually, I do like going by bus for short distances.'"
+              "We can also use do/does in present simple statements for emphasis:\n• 'You don't like going by bus, do you?' 'Actually, I do like going by bus for short distances.'\n• The bus isn't quicker than the train but it does stop right outside the factory."
             ]
           },
           {
@@ -48,7 +48,7 @@
             "title": "Present Continuous",
             "forms": {
               "statement": "I am driving... | You/we/they are driving... | He/she/it is driving...",
-              "negative": "I'm not driving... | You/we/they aren't driving... | He/she/it isn't driving...",
+              "negative": "I'm not driving... | You/we/they aren't driving... (or You're/we're/they're not driving...) | He/she/it isn't driving... (or He's/she's/it's not driving...)",
               "question": "Am I driving...? | Are you/we/they driving...? | Is he/she/it driving...?"
             },
             "rules": [
@@ -79,9 +79,9 @@
             "id": "present_perfect_simple",
             "title": "Present Perfect Simple",
             "forms": {
-              "statement": "have/has + past participle (I have flown... | He has flown...)",
-              "negative": "haven't/hasn't + past participle (I haven't flown... | He hasn't flown...)",
-              "question": "Have/Has + subject + past participle (Have you flown...? | Has he flown...?)"
+              "statement": "I/you/we/they have flown... | He/she/it has flown...",
+              "negative": "I/you/we/they haven't flown... | He/she/it hasn't flown...",
+              "question": "Have I/you/we/they flown...? | Has he/she/it flown...?"
             },
             "rules": [
               {
@@ -102,9 +102,9 @@
               }
             ],
             "watch_out": [
-              "Phrases such as 'It's the first/second/etc time...' are followed by the present perfect simple: It's the second time I've been on a plane.",
-              "Speakers of American English often use past simple where British English uses present perfect simple: US: We already saw the Sphinx. UK: We've already seen the Sphinx.",
-              "Speakers of American English use 'gotten' as past participle of 'get' (except when get means have/possess). British English only uses 'got'."
+              "Phrases such as It's the first/second/etc time... are followed by the present perfect simple:\n• It's the second time I've been on a plane.",
+              "Speakers of American English often use the past simple in situations where speakers of British English would use the present perfect simple:\n• US: We already saw the Sphinx.\n• UK: We've already seen the Sphinx.",
+              "Speakers of American English use gotten as the past participle of the verb 'get', except when 'get' means 'have' or 'possess'. Speakers of British English only ever use got:\n• US: We've already gotten Dan a new backpack for his summer vacation.\n• UK: We've already got Dan a new rucksack for his summer holiday."
             ]
           },
           {
@@ -126,16 +126,16 @@
               }
             ],
             "watch_out": [
-              "Often used with words and phrases like all day/week/year, for, since, just: We've been walking for hours and I need a rest.",
-              "Not normally used with 'ever' and 'never': Have you ever flown in a helicopter before? (NOT Have you ever been flying...)",
-              "Difference in meaning: 'I have read that book' (finished) vs 'I have been reading that book' (not finished)."
+              "The present perfect continuous is often used with words and phrases like all day/week/year/etc, for, since, just, etc.:\n• We've been walking for hours and I need a rest.",
+              "The present perfect continuous is not normally used with the words ever and never:\n• Have you ever flown in a helicopter before? (NOT: Have you ever been flying in a helicopter before?)",
+              "Comparison: Sometimes there is very little difference in meaning:\n• I have worked at the airport for four years. = I have been working at the airport for four years.\nComparison: Sometimes there is a clear difference in meaning:\n• I have read that book about cruise ships. (I have finished it.)\n• I have been reading that book about cruise ships. (I have not finished it.)"
             ]
           },
           {
             "id": "stative_verbs",
             "title": "Stative Verbs",
             "forms": {
-              "statement": "Not normally used in continuous tenses because they describe states, not actions."
+              "statement": "Stative verbs are not normally used in continuous tenses because they describe states, not actions:\n• I see what you mean. (NOT: I am seeing what you mean.)"
             },
             "rules": [
               {
@@ -159,23 +159,24 @@
                 "example": "appear, look, resemble, seem"
               },
               {
-                "use": "Possession & relationships",
+                "use": "Possession and relationships between things",
                 "example": "belong to, consist of, have, include, involve, own"
               }
             ],
             "watch_out": [
-              "Some verbs can be stative with one meaning and non-stative with another: Do you have your plane ticket? (state: possession) vs Are you having lunch? (action: eating)."
+              "Some verbs (such as be, have, imagine, look, see, smell, taste, think) are stative with one meaning and non-stative with another meaning:\n• Do you have your plane ticket with you? (state: possession)\n• Are you having lunch at the moment? (action: eating)"
             ]
           }
         ]
       },
       "exercises": [
         {
-          "id": "unit_01_ex_a",
+          "id": "u01_ex_a",
           "exercise_code": "A",
           "title": "Circle the correct word or phrase",
-          "instruction": "Choose the correct present tense form for each sentence.",
+          "instruction": "Circle the correct word or phrase in each sentence.",
           "exercise_type": "binary_choice",
+          "order_num": 1,
           "items": [
             {
               "id": 1,
@@ -184,7 +185,8 @@
                 "goes",
                 "is usually going"
               ],
-              "answer": "goes"
+              "answer": "goes",
+              "explanation": "Habitual regular action takes Present Simple."
             },
             {
               "id": 2,
@@ -193,7 +195,8 @@
                 "talks",
                 "is talking"
               ],
-              "answer": "is talking"
+              "answer": "is talking",
+              "explanation": "Action happening right now takes Present Continuous."
             },
             {
               "id": 3,
@@ -202,7 +205,8 @@
                 "don't eat",
                 "aren't eating"
               ],
-              "answer": "aren't eating"
+              "answer": "aren't eating",
+              "explanation": "Temporary situation taking place at the moment takes Present Continuous."
             },
             {
               "id": 4,
@@ -211,7 +215,8 @@
                 "Does air travel get",
                 "Is air travel getting"
               ],
-              "answer": "Is air travel getting"
+              "answer": "Is air travel getting",
+              "explanation": "Changing and developing situation takes Present Continuous."
             },
             {
               "id": 5,
@@ -220,7 +225,8 @@
                 "calls",
                 "is calling"
               ],
-              "answer": "calls"
+              "answer": "calls",
+              "explanation": "Regular habit (every weekend without fail) takes Present Simple."
             },
             {
               "id": 6,
@@ -229,7 +235,8 @@
                 "do babysitters generally earn",
                 "are babysitters generally earning"
               ],
-              "answer": "do babysitters generally earn"
+              "answer": "do babysitters generally earn",
+              "explanation": "General fact/habit (generally) takes Present Simple."
             },
             {
               "id": 7,
@@ -238,16 +245,25 @@
                 "You always come",
                 "You're always coming"
               ],
-              "answer": "You're always coming"
+              "answer": "You're always coming",
+              "explanation": "Annoying habit with 'always' takes Present Continuous."
             },
             {
               "id": 8,
-              "text": "[I don't go / I'm not going] out much during the week but I [always try / I'm always trying] to go out somewhere on Saturday night.",
+              "text": "[I don't go / I'm not going] out much during the week but [I always try / I'm always trying] to go out somewhere on Saturday night.",
               "options": [
                 "I don't go / I always try",
-                "I'm not going / I'm always trying"
+                "I'm not going / I'm always trying",
+                "I don't go / I'm always trying",
+                "I'm not going / I always try"
               ],
-              "answer": "I don't go / I always try"
+              "answers": [
+                "I don't go / I always try",
+                "don't go / always try",
+                "don't go / I always try"
+              ],
+              "answer": "I don't go / I always try",
+              "explanation": "Habits during the week and on Saturday nights take Present Simple."
             },
             {
               "id": 9,
@@ -256,7 +272,8 @@
                 "does stop",
                 "is stopping"
               ],
-              "answer": "does stop"
+              "answer": "does stop",
+              "explanation": "Present simple emphatic 'does stop' for timetabled truth."
             },
             {
               "id": 10,
@@ -265,131 +282,235 @@
                 "takes",
                 "is taking"
               ],
-              "answer": "takes"
+              "answer": "takes",
+              "explanation": "Habitual regular activity (almost every weekend) takes Present Simple."
             }
           ]
         },
         {
-          "id": "unit_01_ex_b",
+          "id": "u01_ex_b",
           "exercise_code": "B",
           "title": "Rewrite correctly",
-          "instruction": "Change the words or phrases in bold to correct each sentence.",
+          "instruction": "Rewrite correctly. Change the words or phrases in bold.",
           "exercise_type": "correction",
+          "order_num": 2,
           "items": [
             {
               "id": 1,
-              "prompt": "My dad is often getting up late on Saturday mornings.",
-              "target": "is often getting up",
-              "answer": "often gets up"
+              "text": "My dad is often getting up late on Saturday mornings.",
+              "bold_phrase": "is often getting up",
+              "answers": [
+                "often gets up",
+                "My dad often gets up late on Saturday mornings."
+              ],
+              "answer": "often gets up",
+              "explanation": "Habitual action takes Present Simple: 'often gets up'."
             },
             {
               "id": 2,
-              "prompt": "Are you speaking any other languages apart from English?",
-              "target": "Are you speaking",
-              "answer": "Do you speak"
+              "text": "Are you speaking any other languages apart from English?",
+              "bold_phrase": "Are you speaking",
+              "answers": [
+                "Do you speak",
+                "Do you speak any other languages apart from English?"
+              ],
+              "answer": "Do you speak",
+              "explanation": "Ability / state takes Present Simple: 'Do you speak'."
             },
             {
               "id": 3,
-              "prompt": "I already buy all my Christmas presents and it's only October!",
-              "target": "already buy",
-              "answer": "I've already bought"
+              "text": "I already buy all my Christmas presents and it's only October!",
+              "bold_phrase": "already buy",
+              "answers": [
+                "have already bought",
+                "I've already bought",
+                "already bought"
+              ],
+              "answer": "I've already bought",
+              "explanation": "Present result of completed action with 'already' takes Present Perfect Simple."
             },
             {
               "id": 4,
-              "prompt": "It's the first time I'm ever having a party at home.",
-              "target": "I'm ever having",
-              "answer": "I've ever had"
+              "text": "It's the first time I'm ever having a party at home.",
+              "bold_phrase": "I'm ever having",
+              "answers": [
+                "I've ever had",
+                "I have ever had"
+              ],
+              "answer": "I've ever had",
+              "explanation": "'It's the first time...' is followed by Present Perfect Simple."
             },
             {
               "id": 5,
-              "prompt": "Actually, I think Darren does works quite hard sometimes.",
-              "target": "does works",
-              "answer": "works"
+              "text": "Actually, I think Darren does works quite hard sometimes.",
+              "bold_phrase": "does works",
+              "answers": [
+                "works",
+                "does work"
+              ],
+              "answer": "works",
+              "explanation": "After auxiliary 'does', use bare infinitive 'work', or simply 'works'."
             },
             {
               "id": 6,
-              "prompt": "Carlo is never eating Chinese food before.",
-              "target": "is never eating",
-              "answer": "has never eaten"
+              "text": "Carlo is never eating Chinese food before.",
+              "bold_phrase": "is never eating",
+              "answers": [
+                "has never eaten"
+              ],
+              "answer": "has never eaten",
+              "explanation": "Life experience before now with 'never' takes Present Perfect Simple."
             },
             {
               "id": 7,
-              "prompt": "Sean already books a table for tonight.",
-              "target": "already books",
-              "answer": "Sean has already booked"
+              "text": "Sean already books a table for tonight.",
+              "bold_phrase": "already books",
+              "answers": [
+                "Sean has already booked",
+                "Sean's already booked",
+                "has already booked",
+                "'s already booked"
+              ],
+              "answer": "Sean has already booked",
+              "explanation": "Completed action with present relevance takes Present Perfect Simple."
             },
             {
               "id": 8,
-              "prompt": "Needs Melanie any help painting her new flat?",
-              "target": "Needs Melanie",
-              "answer": "Does Melanie need"
+              "text": "Needs Melanie any help painting her new flat?",
+              "bold_phrase": "Needs Melanie",
+              "answers": [
+                "Does Melanie need"
+              ],
+              "answer": "Does Melanie need",
+              "explanation": "Question in Present Simple takes auxiliary 'Does Melanie need'."
             }
           ]
         },
         {
-          "id": "unit_01_ex_c",
+          "id": "u01_ex_c",
           "exercise_code": "C",
           "title": "Complete using the correct form of the verb in brackets",
-          "instruction": "Fill in the blank with the correct present tense form of the verb in brackets.",
+          "instruction": "Complete using the correct form of the verb in brackets (Present Simple, Continuous, Perfect Simple, or Perfect Continuous).",
           "exercise_type": "bracket_fill",
+          "order_num": 3,
           "items": [
             {
               "id": 1,
-              "sentence": "It's the first time _____ (I / ever / eat) octopus!",
-              "answer": "I've ever eaten"
+              "text": "It's the first time ____________________ (I / ever / eat) octopus!",
+              "prompt": "(I / ever / eat)",
+              "answers": [
+                "I've ever eaten",
+                "I have ever eaten"
+              ],
+              "answer": "I've ever eaten",
+              "explanation": "'It's the first time...' takes Present Perfect Simple."
             },
             {
               "id": 2,
-              "sentence": "Sandy _____ (not / see) his sister since she went to university.",
-              "answer": "hasn't seen"
+              "text": "Sandy ____________________ (not / see) his sister since she went to university.",
+              "prompt": "(not / see)",
+              "answers": [
+                "hasn't seen",
+                "has not seen"
+              ],
+              "answer": "hasn't seen",
+              "explanation": "Action continuing from a point in time ('since') takes Present Perfect Simple."
             },
             {
               "id": 3,
-              "sentence": "They _____ (go) on holiday to Spain and won't be back until the end of the month.",
-              "answer": "have gone"
+              "text": "They ____________________ (go) on holiday to Spain and won't be back until the end of the month.",
+              "prompt": "(go)",
+              "answers": [
+                "have gone",
+                "'ve gone"
+              ],
+              "answer": "have gone",
+              "explanation": "They have gone to Spain (and are still there)."
             },
             {
               "id": 4,
-              "sentence": "Poor Tracy! She _____ (write) that essay for hours now and she still hasn't finished!",
-              "answer": "has been writing"
+              "text": "Poor Tracy! She ____________________ (write) that essay for hours now and she still hasn't finished!",
+              "prompt": "(write)",
+              "answers": [
+                "has been writing",
+                "'s been writing"
+              ],
+              "answer": "has been writing",
+              "explanation": "Action ongoing for hours up to now takes Present Perfect Continuous."
             },
             {
               "id": 5,
-              "sentence": "_____ (you / ever / meet) anyone famous?",
-              "answer": "Have you ever met"
+              "text": "____________________ (you / ever / meet) anyone famous?",
+              "prompt": "(you / ever / meet)",
+              "answers": [
+                "Have you ever met"
+              ],
+              "answer": "Have you ever met",
+              "explanation": "Question about life experience with 'ever' takes Present Perfect Simple."
             },
             {
               "id": 6,
-              "sentence": "_____ (I / try) to get in touch with Jenny all morning but I can't find her anywhere.",
-              "answer": "I've been trying"
+              "text": "____________________ (I / try) to get in touch with Jenny all morning but I can't find her anywhere.",
+              "prompt": "(I / try)",
+              "answers": [
+                "I've been trying",
+                "I have been trying"
+              ],
+              "answer": "I've been trying",
+              "explanation": "Repeated attempts ongoing throughout the morning take Present Perfect Continuous."
             },
             {
               "id": 7,
-              "sentence": "_____ (I / not finish) the book yet so I can't tell you what happens.",
-              "answer": "I haven't finished"
+              "text": "____________________ (I / not finish) the book yet so I can't tell you what happens.",
+              "prompt": "(I / not finish)",
+              "answers": [
+                "I haven't finished",
+                "I have not finished"
+              ],
+              "answer": "I haven't finished",
+              "explanation": "Action incomplete at present with 'yet' takes Present Perfect Simple."
             },
             {
               "id": 8,
-              "sentence": "_____ (you / already / decide) where you're going this summer?",
-              "answer": "Have you already decided"
+              "text": "____________________ (you / already / decide) where you're going this summer?",
+              "prompt": "(you / already / decide)",
+              "answers": [
+                "Have you already decided"
+              ],
+              "answer": "Have you already decided",
+              "explanation": "Question about completed decision with 'already' takes Present Perfect Simple."
             },
             {
               "id": 9,
-              "sentence": "_____ (We / live) here for the last six years.",
-              "answer": "We've lived"
+              "text": "____________________ (We / live) here for the last six years.",
+              "prompt": "(We / live)",
+              "answers": [
+                "We've lived",
+                "We have lived",
+                "We've been living",
+                "We have been living"
+              ],
+              "answer": "We've lived",
+              "explanation": "Both Present Perfect Simple and Continuous are acceptable with 'live for six years'."
             },
             {
               "id": 10,
-              "sentence": "_____ (I / never / hear) such nonsense!",
-              "answer": "I've never heard"
+              "text": "____________________ (I / never / hear) such nonsense!",
+              "prompt": "(I / never / hear)",
+              "answers": [
+                "I've never heard",
+                "I have never heard"
+              ],
+              "answer": "I've never heard",
+              "explanation": "Experience up to now with 'never' takes Present Perfect Simple."
             }
           ]
         },
         {
-          "id": "unit_01_ex_d",
+          "id": "u01_ex_d",
           "exercise_code": "D",
           "title": "Complete using the words in the box",
-          "instruction": "Fill in each gap using the correct time word from the box.",
+          "instruction": "Complete using the words in the box. Use each word once.",
           "exercise_type": "word_bank",
           "word_bank": [
             "already",
@@ -403,184 +524,257 @@
             "still",
             "yet"
           ],
+          "order_num": 4,
           "items": [
             {
               "id": 1,
-              "sentence": "Have you _____ dreamt of winning the lottery?",
-              "answer": "ever"
+              "text": "Have you ________________ dreamt of winning the lottery?",
+              "answer": "ever",
+              "explanation": "'ever' is used in questions to mean 'at any time in your life'."
             },
             {
               "id": 2,
-              "sentence": "I haven't worked out how to set the timer on the video _____.",
-              "answer": "yet"
+              "text": "I haven't worked out how to set the timer on the video ________________.",
+              "answer": "yet",
+              "explanation": "'yet' is used at the end of negative sentences."
             },
             {
               "id": 3,
-              "sentence": "My dad's lived in the same house _____ he was born.",
-              "answer": "since"
+              "text": "My dad's lived in the same house ________________ he was born.",
+              "answer": "since",
+              "explanation": "'since' marks the starting point in time in the past."
             },
             {
               "id": 4,
-              "sentence": "The film's only been on _____ a couple of minutes.",
-              "answer": "for"
+              "text": "The film's only been on ________________ a couple of minutes.",
+              "answer": "for",
+              "explanation": "'for' marks the duration of time."
             },
             {
               "id": 5,
-              "sentence": "Bruce has knocked three men out of the competition _____ far.",
-              "answer": "so"
+              "text": "Bruce has knocked three men out of the competition ________________ far.",
+              "answer": "so",
+              "explanation": "The idiom 'so far' means 'up to the present moment'."
             },
             {
               "id": 6,
-              "sentence": "I _____ get the chance to get any exercise - I'm just too busy.",
-              "answer": "rarely"
+              "text": "I ________________ get the chance to get any exercise - I'm just too busy.",
+              "answer": "rarely",
+              "explanation": "'rarely' is an adverb of frequency meaning 'seldom / hardly ever'."
             },
             {
               "id": 7,
-              "sentence": "He's only _____ got home.",
-              "answer": "just"
+              "text": "He's only ________________ got home.",
+              "answer": "just",
+              "explanation": "'just' means 'a very short time ago'."
             },
             {
               "id": 8,
-              "sentence": "It's eleven o'clock and Todd _____ hasn't come home. Where could he be?",
-              "answer": "still"
+              "text": "It's eleven o'clock and Todd ________________ hasn't come home. Where could he be?",
+              "answer": "still",
+              "explanation": "'still' expresses surprise that a situation continues."
             },
             {
               "id": 9,
-              "sentence": "I've never met Ruth _____. What's she like?",
-              "answer": "before"
+              "text": "I've never met Ruth ________________. What's she like?",
+              "answer": "before",
+              "explanation": "'before' at the end of a clause means 'at an earlier time'."
             },
             {
               "id": 10,
-              "sentence": "Have you finished _____? That was quick!",
-              "answer": "already"
+              "text": "Have you finished ________________? That was quick!",
+              "answer": "already",
+              "explanation": "'already' in questions expresses surprise that something was completed sooner than expected."
             }
           ]
         },
         {
-          "id": "unit_01_ex_e",
+          "id": "u01_ex_e",
           "exercise_code": "E",
           "title": "Choose the correct answer",
-          "instruction": "Select the correct option A, B, C, or D for each sentence.",
+          "instruction": "Choose the correct answer (A, B, C, or D).",
           "exercise_type": "multiple_choice",
+          "order_num": 5,
           "items": [
             {
               "id": 1,
-              "question": "Ian _____ a shower at the moment, so could you call back in about half an hour?",
+              "text": "Ian ________ a shower at the moment, so could you call back in about half an hour?",
               "options": [
                 "A. takes",
                 "B. is taking",
                 "C. has taken",
                 "D. has been taking"
               ],
-              "answer": "B"
+              "answer": "B. is taking",
+              "answers": [
+                "B",
+                "B. is taking",
+                "is taking"
+              ],
+              "explanation": "Action happening at the moment of speaking takes Present Continuous."
             },
             {
               "id": 2,
-              "question": "_____ to Ipswich before?",
+              "text": "________ to Ipswich before?",
               "options": [
                 "A. Do you ever go",
                 "B. Are you ever going",
                 "C. Have you ever been",
                 "D. Have you ever been going"
               ],
-              "answer": "C"
+              "answer": "C. Have you ever been",
+              "answers": [
+                "C",
+                "C. Have you ever been",
+                "Have you ever been"
+              ],
+              "explanation": "Asking about life experience before now takes Present Perfect Simple."
             },
             {
               "id": 3,
-              "question": "I _____ to all the local newspapers and TV stations to complain.",
+              "text": "I ________ to all the local newspapers and TV stations to complain.",
               "options": [
                 "A. already write",
                 "B. already writing",
                 "C. have already written",
                 "D. have already been writing"
               ],
-              "answer": "C"
+              "answer": "C. have already written",
+              "answers": [
+                "C",
+                "C. have already written",
+                "have already written"
+              ],
+              "explanation": "Completed action with present relevance takes Present Perfect Simple."
             },
             {
               "id": 4,
-              "question": "_____ TV for the last four hours? Turn it off and get some exercise!",
+              "text": "________ TV for the last four hours? Turn it off and get some exercise!",
               "options": [
                 "A. Do you watch",
                 "B. Are you watching",
                 "C. Watched you",
                 "D. Have you been watching"
               ],
-              "answer": "D"
+              "answer": "D. Have you been watching",
+              "answers": [
+                "D",
+                "D. Have you been watching",
+                "Have you been watching"
+              ],
+              "explanation": "Duration of an ongoing activity (for the last four hours) takes Present Perfect Continuous."
             },
             {
               "id": 5,
-              "question": "Eric, _____ hockey competitively or just for fun?",
+              "text": "Eric, ________ hockey competitively or just for fun?",
               "options": [
                 "A. do you usually play",
                 "B. are you usually playing",
                 "C. have you usually played",
                 "D. have you usually been playing"
               ],
-              "answer": "A"
+              "answer": "A. do you usually play",
+              "answers": [
+                "A",
+                "A. do you usually play",
+                "do you usually play"
+              ],
+              "explanation": "Asking about general habit with 'usually' takes Present Simple."
             },
             {
               "id": 6,
-              "question": "That's the first time _____ an answer right today!",
+              "text": "That's the first time ________ an answer right today!",
               "options": [
                 "A. I get",
                 "B. I am getting",
                 "C. I have got",
                 "D. I have been getting"
               ],
-              "answer": "C"
+              "answer": "C. I have got",
+              "answers": [
+                "C",
+                "C. I have got",
+                "I have got"
+              ],
+              "explanation": "'That's the first time...' is followed by Present Perfect Simple."
             },
             {
               "id": 7,
-              "question": "Jessica has _____ left, I'm afraid.",
+              "text": "Jessica has ________ left, I'm afraid.",
               "options": [
                 "A. already",
                 "B. yet",
                 "C. still",
                 "D. so far"
               ],
-              "answer": "A"
+              "answer": "A. already",
+              "answers": [
+                "A",
+                "A. already",
+                "already"
+              ],
+              "explanation": "'already' is placed between auxiliary 'has' and past participle 'left'."
             },
             {
               "id": 8,
-              "question": "Dan _____ in the living room while we redecorate his bedroom.",
+              "text": "Dan ________ in the living room while we redecorate his bedroom.",
               "options": [
                 "A. sleeps",
                 "B. is sleeping",
                 "C. has slept",
                 "D. does sleep"
               ],
-              "answer": "B"
+              "answer": "B. is sleeping",
+              "answers": [
+                "B",
+                "B. is sleeping",
+                "is sleeping"
+              ],
+              "explanation": "Temporary situation during redecoration takes Present Continuous."
             },
             {
               "id": 9,
-              "question": "Unfortunately, Simone _____ a day off very often.",
+              "text": "Unfortunately, Simone ________ a day off very often.",
               "options": [
                 "A. doesn't get",
                 "B. isn't getting",
                 "C. hasn't got",
                 "D. hasn't been getting"
               ],
-              "answer": "A"
+              "answer": "A. doesn't get",
+              "answers": [
+                "A",
+                "A. doesn't get",
+                "doesn't get"
+              ],
+              "explanation": "Fact / habit with 'very often' takes Present Simple negative."
             },
             {
               "id": 10,
-              "question": "Actually, I _____ a cup of tea first thing every morning but then I switch to coffee.",
+              "text": "Actually, I ________ a cup of tea first thing every morning but then I switch to coffee.",
               "options": [
                 "A. do drink",
                 "B. am drinking",
                 "C. have drunk",
                 "D. have been drinking"
               ],
-              "answer": "A"
+              "answer": "A. do drink",
+              "answers": [
+                "A",
+                "A. do drink",
+                "do drink"
+              ],
+              "explanation": "Present Simple emphatic 'do drink' emphasizes a habitual truth."
             }
           ]
         },
         {
-          "id": "unit_01_ex_f",
+          "id": "u01_ex_f",
           "exercise_code": "F",
           "title": "Complete using the correct form of the words in the box",
-          "instruction": "Read the passage 'Ancient aviators?' and fill each gap with the correct present form of the words in the box.",
+          "instruction": "Complete the passage 'Ancient aviators?' using the correct form of the words in the box.",
           "exercise_type": "passage_gap_fill",
+          "passage_title": "Ancient aviators?",
           "word_bank": [
             "be",
             "disagree",
@@ -592,111 +786,86 @@
             "seem",
             "understand"
           ],
-          "passage": "Everyone (1) [gap] that humans have been flying for only a few hundred years. But (2) [gap] it possible that ancient civilizations also had the ability and technology to fly? In the Nazcan Desert in southern Peru, there are hundreds of lines which an ancient culture drew in the dust. On the ground, they just (3) [gap] like straight lines. But when you (4) [gap] them from the air, you (5) [gap] exactly what they are. They are incredible and enormous pictures. The pictures (6) [gap] animals, birds and symbols. One bizarre theory, which most mainstream scientists (7) [gap] with, is that the people who made the lines thousands and thousands of years ago flew above the lines in balloons. It (8) [gap] incredible, but a few people (9) [gap] believe it's possible.",
+          "passage_text": "Everyone (1) ________ that humans have been flying for only a few hundred years. But (2) ________ it possible that ancient civilizations also had the ability and technology to fly?\n\nIn the Nazcan Desert in southern Peru, there are hundreds of lines which an ancient culture drew in the dust. On the ground, they just (3) ________ like straight lines. But when you (4) ________ them from the air, you (5) ________ exactly what they are. They are incredible and enormous pictures. The pictures (6) ________ animals, birds and symbols.\n\nOne bizarre theory, which most mainstream scientists (7) ________ with, is that the people who made the lines thousands and thousands of years ago flew above the lines in balloons. It (8) ________ incredible, but a few people (9) ________ believe it's possible.",
+          "order_num": 6,
           "items": [
             {
-              "gap_id": 1,
-              "answer": "knows"
+              "id": 1,
+              "gap_number": 1,
+              "text": "Everyone (1) ________________ that humans have been flying for only a few hundred years.",
+              "answer": "knows",
+              "explanation": "Everyone takes singular present simple: 'knows'."
             },
             {
-              "gap_id": 2,
-              "answer": "is"
+              "id": 2,
+              "gap_number": 2,
+              "text": "But (2) ________________ it possible that ancient civilizations also had the ability and technology to fly?",
+              "answer": "is",
+              "explanation": "State question: 'is it possible'."
             },
             {
-              "gap_id": 3,
-              "answer": "look"
+              "id": 3,
+              "gap_number": 3,
+              "text": "On the ground, they just (3) ________________ like straight lines.",
+              "answer": "look",
+              "explanation": "Stative verb of appearance: 'look like straight lines'."
             },
             {
-              "gap_id": 4,
-              "answer": "see"
+              "id": 4,
+              "gap_number": 4,
+              "text": "But when you (4) ________________ them from the air...",
+              "answer": "see",
+              "explanation": "Verb of sense/perception: 'see them from the air'."
             },
             {
-              "gap_id": 5,
-              "answer": "understand"
+              "id": 5,
+              "gap_number": 5,
+              "text": "...you (5) ________________ exactly what they are.",
+              "answers": [
+                "understand",
+                "know",
+                "see"
+              ],
+              "answer": "understand",
+              "explanation": "Stative verb of thinking: 'understand / know / see exactly what they are'."
             },
             {
-              "gap_id": 6,
-              "answer": "include"
+              "id": 6,
+              "gap_number": 6,
+              "text": "The pictures (6) ________________ animals, birds and symbols.",
+              "answer": "include",
+              "explanation": "Stative verb of composition: 'include animals, birds and symbols'."
             },
             {
-              "gap_id": 7,
-              "answer": "disagree"
+              "id": 7,
+              "gap_number": 7,
+              "text": "One bizarre theory, which most mainstream scientists (7) ________________ with...",
+              "answer": "disagree",
+              "explanation": "Opinion/belief: 'disagree with'."
             },
             {
-              "gap_id": 8,
-              "answer": "seems"
+              "id": 8,
+              "gap_number": 8,
+              "text": "It (8) ________________ incredible...",
+              "answer": "seems",
+              "explanation": "Stative verb of appearance: 'seems incredible'."
             },
             {
-              "gap_id": 9,
-              "answer": "do"
+              "id": 9,
+              "gap_number": 9,
+              "text": "...but a few people (9) ________________ believe it's possible.",
+              "answer": "do",
+              "explanation": "Emphatic auxiliary: 'do believe it's possible'."
             }
           ]
         },
         {
-          "id": "unit_01_ex_g",
+          "id": "u01_ex_g",
           "exercise_code": "G",
           "title": "Match to make sentences",
-          "instruction": "Match sentence halves 1–8 with endings A–H.",
+          "instruction": "Match the sentence halves (1-8) with the correct endings (A-H).",
           "exercise_type": "matching",
-          "items": [
-            {
-              "id": 1,
-              "left": "1. I think",
-              "right_options": "A-H",
-              "answer": "B",
-              "full_sentence": "I think I'm going to buy the new Racetrack CD."
-            },
-            {
-              "id": 2,
-              "left": "2. I'm thinking",
-              "right_options": "A-H",
-              "answer": "F",
-              "full_sentence": "I'm thinking of getting Dad a CD for his birthday."
-            },
-            {
-              "id": 3,
-              "left": "3. Phil's looking",
-              "right_options": "A-H",
-              "answer": "D",
-              "full_sentence": "Phil's looking for his glasses. Have you seen them?"
-            },
-            {
-              "id": 4,
-              "left": "4. Phil looks",
-              "right_options": "A-H",
-              "answer": "H",
-              "full_sentence": "Phil looks like he needs a holiday!"
-            },
-            {
-              "id": 5,
-              "left": "5. Claire has",
-              "right_options": "A-H",
-              "answer": "A",
-              "full_sentence": "Claire has darker hair than her sister."
-            },
-            {
-              "id": 6,
-              "left": "6. Claire is having",
-              "right_options": "A-H",
-              "answer": "C",
-              "full_sentence": "Claire is having a haircut at the moment."
-            },
-            {
-              "id": 7,
-              "left": "7. Andy is",
-              "right_options": "A-H",
-              "answer": "E",
-              "full_sentence": "Andy is not old enough to drive a car."
-            },
-            {
-              "id": 8,
-              "left": "8. Andy is being",
-              "right_options": "A-H",
-              "answer": "G",
-              "full_sentence": "Andy is being very annoying at the moment!"
-            }
-          ],
-          "options_pool": {
+          "matching_options": {
             "A": "darker hair than her sister.",
             "B": "I'm going to buy the new Racetrack CD.",
             "C": "a haircut at the moment.",
@@ -705,214 +874,408 @@
             "F": "of getting Dad a CD for his birthday.",
             "G": "very annoying at the moment!",
             "H": "like he needs a holiday!"
-          }
-        },
-        {
-          "id": "unit_01_ex_h",
-          "exercise_code": "H",
-          "title": "Find the extra word in each line",
-          "instruction": "In the text 'International friends', each line 1–10 has one unnecessary word. Identify that word.",
-          "exercise_type": "extra_word",
-          "items": [
-            {
-              "line": 1,
-              "text": "I've been to travelling round Europe all summer. It's the first time I've",
-              "answer": "to"
-            },
-            {
-              "line": 2,
-              "text": "ever been going abroad, and I've had a fantastic time! I've seen",
-              "answer": "going"
-            },
-            {
-              "line": 3,
-              "text": "loads of interesting places and I have to also made loads of new friends.",
-              "answer": "to"
-            },
-            {
-              "line": 4,
-              "text": "I've been decided to stay in touch with them now I'm back. One of",
-              "answer": "been"
-            },
-            {
-              "line": 5,
-              "text": "them, Giselle, is French. She was making on holiday too. We now send",
-              "answer": "making"
-            },
-            {
-              "line": 6,
-              "text": "text messages are to each other all the time. They're usually in English",
-              "answer": "are"
-            },
-            {
-              "line": 7,
-              "text": "because my French isn't very good! I'm planning to have visit her in",
-              "answer": "have"
-            },
-            {
-              "line": 8,
-              "text": "France next year sometime. I hope I can. I am love meeting people from",
-              "answer": "am"
-            },
-            {
-              "line": 9,
-              "text": "other countries! I want to have had lots of friends from all over the world!",
-              "answer": "had"
-            },
-            {
-              "line": 10,
-              "text": "Travelling certainly broadens the mind but it also is broadens your circle of friends!",
-              "answer": "is"
-            }
-          ]
-        },
-        {
-          "id": "unit_01_ex_i",
-          "exercise_code": "I",
-          "title": "Write one word in each gap",
-          "instruction": "Complete the dialogue 'Holiday Blues' by writing one word in each gap.",
-          "exercise_type": "open_cloze",
-          "items": [
-            {
-              "gap_id": 1,
-              "context": "'You've (1) _____ looking at that timetable for the last ten minutes...'",
-              "answer": "been"
-            },
-            {
-              "gap_id": 2,
-              "context": "'I (2) _____ wish you'd be quiet!...",
-              "answer": "do"
-            },
-            {
-              "gap_id": 3,
-              "context": "...I've (3) _____ a splitting headache thanks to you!'",
-              "answer": "got"
-            },
-            {
-              "gap_id": 4,
-              "context": "'Mum! Dad! Please!' said Alison. 'You're both (4) _____ very silly...",
-              "answer": "being"
-            },
-            {
-              "gap_id": 5,
-              "context": "...(5) _____ is no point at all in blaming each other...'",
-              "answer": "There"
-            },
-            {
-              "gap_id": 6,
-              "context": "'You (6) _____ quite right, darling...",
-              "answer": "are"
-            },
-            {
-              "gap_id": 7,
-              "context": "...I (7) _____ sorry,' said Sheila.",
-              "answer": "am"
-            },
-            {
-              "gap_id": 8,
-              "context": "'Now, let's have another look at this timetable. Well, it (8) _____ like we...'",
-              "answer": "looks"
-            },
-            {
-              "gap_id": 9,
-              "context": "...we (9) _____ definitely missed the last train today...'",
-              "answer": "have"
-            },
-            {
-              "gap_id": 10,
-              "context": "'I (10) _____ so,' said Sheila...",
-              "answer": "think"
-            },
-            {
-              "gap_id": 11,
-              "context": "'Well, one thing is (11) _____ in doubt,' said Matt.",
-              "answer": "not"
-            },
-            {
-              "gap_id": 12,
-              "context": "'This is the worst holiday we've (12) _____ been on,' said Matt.",
-              "answer": "ever"
-            }
-          ]
-        },
-        {
-          "id": "unit_01_ex_j",
-          "exercise_code": "J",
-          "title": "Complete each second sentence using the word given",
-          "instruction": "Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words.",
-          "exercise_type": "key_word_transformation",
+          },
+          "order_num": 7,
           "items": [
             {
               "id": 1,
-              "sentence1": "What's the price of the tickets, Jimmy?",
-              "key_word": "much",
-              "sentence2_pre": "How",
-              "sentence2_post": "Jimmy?",
-              "answer": "much do the tickets cost"
+              "text": "1. I think ________________",
+              "answer": "B",
+              "answers": [
+                "B",
+                "I'm going to buy the new Racetrack CD."
+              ],
+              "explanation": "think (state: opinion/belief) -> I'm going to buy the new Racetrack CD."
             },
             {
               "id": 2,
-              "sentence1": "Are these your trainers?",
-              "key_word": "to",
-              "sentence2_pre": "Do",
-              "sentence2_post": "you?",
-              "answer": "these trainers belong to"
+              "text": "2. I'm thinking ________________",
+              "answer": "F",
+              "answers": [
+                "F",
+                "of getting Dad a CD for his birthday."
+              ],
+              "explanation": "be thinking of (action: mental consideration) -> of getting Dad a CD for his birthday."
             },
             {
               "id": 3,
-              "sentence1": "Sasha's not keen on team sports at all.",
-              "key_word": "like",
-              "sentence2_pre": "Sasha",
-              "sentence2_post": "team sports at all.",
-              "answer": "does not like"
+              "text": "3. Phil's looking ________________",
+              "answer": "D",
+              "answers": [
+                "D",
+                "for his glasses. Have you seen them?"
+              ],
+              "explanation": "be looking for (action: searching) -> for his glasses. Have you seen them?"
             },
             {
               "id": 4,
-              "sentence1": "It's only her second time in a recording studio.",
-              "key_word": "been",
-              "sentence2_pre": "She",
-              "sentence2_post": "in a recording studio once before.",
-              "answer": "has only been"
+              "text": "4. Phil looks ________________",
+              "answer": "H",
+              "answers": [
+                "H",
+                "like he needs a holiday!"
+              ],
+              "explanation": "look like (state: appearance) -> like he needs a holiday!"
             },
             {
               "id": 5,
-              "sentence1": "We got here three hours ago.",
-              "key_word": "have",
-              "sentence2_pre": "We",
-              "sentence2_post": "three hours.",
-              "answer": "have been here for"
+              "text": "5. Claire has ________________",
+              "answer": "A",
+              "answers": [
+                "A",
+                "darker hair than her sister."
+              ],
+              "explanation": "have (state: possession/feature) -> darker hair than her sister."
             },
             {
               "id": 6,
-              "sentence1": "I started writing this hours ago and it's still not right.",
-              "key_word": "writing",
-              "sentence2_pre": "I",
-              "sentence2_post": "hours and it's still not right.",
-              "answer": "have been writing this for"
+              "text": "6. Claire is having ________________",
+              "answer": "C",
+              "answers": [
+                "C",
+                "a haircut at the moment."
+              ],
+              "explanation": "be having (action: experiencing/receiving) -> a haircut at the moment."
             },
             {
               "id": 7,
-              "sentence1": "This is my first experience of flying alone.",
-              "key_word": "time",
-              "sentence2_pre": "It is the first",
-              "sentence2_post": "alone.",
-              "answer": "time I have flown"
+              "text": "7. Andy is ________________",
+              "answer": "E",
+              "answers": [
+                "E",
+                "not old enough to drive a car."
+              ],
+              "explanation": "be (state: age/quality) -> not old enough to drive a car."
             },
             {
               "id": 8,
-              "sentence1": "Sharon's in the bath at the moment.",
-              "key_word": "a",
-              "sentence2_pre": "Sharon",
-              "sentence2_post": "at the moment.",
-              "answer": "is having a bath"
+              "text": "8. Andy is being ________________",
+              "answer": "G",
+              "answers": [
+                "G",
+                "very annoying at the moment!"
+              ],
+              "explanation": "be being (temporary behavior at the moment) -> very annoying at the moment!"
+            }
+          ]
+        },
+        {
+          "id": "u01_ex_h",
+          "exercise_code": "H",
+          "title": "Find the extra word in each line",
+          "instruction": "Read the passage 'International friends'. Find the unnecessary extra word in each line.",
+          "exercise_type": "extra_word",
+          "passage_title": "International friends",
+          "order_num": 8,
+          "items": [
+            {
+              "id": 1,
+              "line": 1,
+              "text": "I've been to travelling round Europe all summer. It's the first time I've",
+              "answer": "to",
+              "explanation": "Remove 'to' ('I've been travelling round Europe...')."
+            },
+            {
+              "id": 2,
+              "line": 2,
+              "text": "ever been going abroad, and I've had a fantastic time! I've seen",
+              "answer": "going",
+              "explanation": "Remove 'going' ('It's the first time I've ever been abroad...')."
+            },
+            {
+              "id": 3,
+              "line": 3,
+              "text": "loads of interesting places and I have to also made loads of new friends.",
+              "answer": "to",
+              "explanation": "Remove 'to' ('...and I have also made loads of new friends.')."
+            },
+            {
+              "id": 4,
+              "line": 4,
+              "text": "I've been decided to stay in touch with them now I'm back. One of",
+              "answer": "been",
+              "explanation": "Remove 'been' ('I've decided to stay in touch...')."
+            },
+            {
+              "id": 5,
+              "line": 5,
+              "text": "them, Giselle, is French. She was making on holiday too. We now send",
+              "answer": "making",
+              "explanation": "Remove 'making' ('She was on holiday too.')."
+            },
+            {
+              "id": 6,
+              "line": 6,
+              "text": "text messages are to each other all the time. They're usually in English",
+              "answer": "are",
+              "explanation": "Remove 'are' ('We now send text messages to each other...')."
+            },
+            {
+              "id": 7,
+              "line": 7,
+              "text": "because my French isn't very good! I'm planning to have visit her in",
+              "answer": "have",
+              "explanation": "Remove 'have' ('I'm planning to visit her in France...')."
+            },
+            {
+              "id": 8,
+              "line": 8,
+              "text": "France next year sometime. I hope I can. I am love meeting people from",
+              "answer": "am",
+              "explanation": "Remove 'am' ('I love meeting people from other countries!')."
             },
             {
               "id": 9,
-              "sentence1": "Paul enjoys surprises apart from on his birthday.",
+              "line": 9,
+              "text": "other countries! I want to have had lots of friends from all over the world!",
+              "answer": "had",
+              "explanation": "Remove 'had' ('I want to have lots of friends...')."
+            },
+            {
+              "id": 10,
+              "line": 10,
+              "text": "Travelling certainly broadens the mind but it also is broadens your circle of friends!",
+              "answer": "is",
+              "explanation": "Remove 'is' ('...but it also broadens your circle of friends!')."
+            }
+          ]
+        },
+        {
+          "id": "u01_ex_i",
+          "exercise_code": "I",
+          "title": "Write one word in each gap",
+          "instruction": "Complete the dialogue 'Holiday Blues' by writing ONE word in each gap.",
+          "exercise_type": "open_cloze",
+          "passage_title": "Holiday Blues",
+          "passage_text": "'You've (1) ________ looking at that timetable for the last ten minutes. It can't be that confusing!' said Sheila angrily.\n'I (2) ________ wish you'd be quiet! I've (3) ________ a splitting headache thanks to you!' replied Matt.\n'Mum! Dad! Please!' said Alison. 'You're both (4) ________ very silly. (5) ________ is no point at all in blaming each other. That's not going to help us find out what time the next train to Budapest is due to leave.'\n'You (6) ________ quite right, darling. I (7) ________ sorry,' said Sheila.\n'Me too,' mumbled Matt. 'Now, let's have another look at this timetable. Well, it (8) ________ like we (9) ________ definitely missed the last train today. That was the 18.20 we just missed, wasn't it?'\n'I (10) ________ so,' said Sheila. 'I mean, it did leave at 18.20. Whether it's actually going to Budapest or not is another question.'\n'Well, one thing is (11) ________ in doubt,' said Matt.\n'What's that?' asked Sheila and Alison together.\n'This is the worst holiday we've (12) ________ been on,' said Matt. 'Next year, we're going to try something far less adventurous.'\n'Agreed!' said Sheila and Alison.",
+          "order_num": 9,
+          "items": [
+            {
+              "id": 1,
+              "gap_number": 1,
+              "text": "'You've (1) ________________ looking at that timetable for the last ten minutes. It can't be that confusing!' said Sheila angrily.",
+              "answer": "been",
+              "explanation": "Present perfect continuous: 'You've been looking'."
+            },
+            {
+              "id": 2,
+              "gap_number": 2,
+              "text": "'I (2) ________________ wish you'd be quiet!'",
+              "answers": [
+                "do",
+                "really"
+              ],
+              "answer": "do",
+              "explanation": "Emphatic auxiliary: 'I do wish you'd be quiet!' (or 'really')."
+            },
+            {
+              "id": 3,
+              "gap_number": 3,
+              "text": "'I've (3) ________________ a splitting headache thanks to you!' replied Matt.",
+              "answer": "got",
+              "explanation": "Have got a headache: 'I've got a splitting headache'."
+            },
+            {
+              "id": 4,
+              "gap_number": 4,
+              "text": "'You're both (4) ________________ very silly.'",
+              "answer": "being",
+              "explanation": "Temporary behavior at the moment: 'You're both being very silly'."
+            },
+            {
+              "id": 5,
+              "gap_number": 5,
+              "text": "'(5) ________________ is no point at all in blaming each other.'",
+              "answers": [
+                "There",
+                "there"
+              ],
+              "answer": "There",
+              "explanation": "Existential 'There is no point at all in blaming each other.'"
+            },
+            {
+              "id": 6,
+              "gap_number": 6,
+              "text": "'You (6) ________________ quite right, darling.'",
+              "answer": "are",
+              "explanation": "Present simple of be: 'You are quite right'."
+            },
+            {
+              "id": 7,
+              "gap_number": 7,
+              "text": "'I (7) ________________ sorry,' said Sheila.",
+              "answer": "am",
+              "explanation": "Present simple of be: 'I am sorry'."
+            },
+            {
+              "id": 8,
+              "gap_number": 8,
+              "text": "'Well, it (8) ________________ like we have definitely missed the last train today.'",
+              "answers": [
+                "looks",
+                "seems"
+              ],
+              "answer": "looks",
+              "explanation": "Stative appearance: 'it looks like' / 'it seems like'."
+            },
+            {
+              "id": 9,
+              "gap_number": 9,
+              "text": "'...like we (9) ________________ definitely missed the last train today.'",
+              "answers": [
+                "have",
+                "'ve"
+              ],
+              "answer": "have",
+              "explanation": "Present perfect auxiliary: 'we have definitely missed'."
+            },
+            {
+              "id": 10,
+              "gap_number": 10,
+              "text": "'I (10) ________________ so,' said Sheila.",
+              "answer": "think",
+              "explanation": "Stative verb of opinion: 'I think so'."
+            },
+            {
+              "id": 11,
+              "gap_number": 11,
+              "text": "'Well, one thing is (11) ________________ in doubt,' said Matt.",
+              "answer": "not",
+              "explanation": "Negative expression: 'is not in doubt'."
+            },
+            {
+              "id": 12,
+              "gap_number": 12,
+              "text": "'This is the worst holiday we've (12) ________________ been on,' said Matt.",
+              "answer": "ever",
+              "explanation": "Superlative followed by present perfect with 'ever'."
+            }
+          ]
+        },
+        {
+          "id": "u01_ex_j",
+          "exercise_code": "J",
+          "title": "Complete each second sentence using the word given",
+          "instruction": "Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.",
+          "exercise_type": "key_word_transformation",
+          "order_num": 10,
+          "items": [
+            {
+              "id": 1,
+              "first_sentence": "What's the price of the tickets, Jimmy?",
+              "key_word": "much",
+              "second_sentence_prefix": "How",
+              "second_sentence_suffix": "Jimmy?",
+              "answers": [
+                "much are the tickets",
+                "much do the tickets cost"
+              ],
+              "answer": "much are the tickets",
+              "explanation": "'What's the price of the tickets?' = 'How much are the tickets?' / 'How much do the tickets cost?'"
+            },
+            {
+              "id": 2,
+              "first_sentence": "Are these your trainers?",
+              "key_word": "to",
+              "second_sentence_prefix": "Do",
+              "second_sentence_suffix": "you?",
+              "answers": [
+                "these trainers belong to"
+              ],
+              "answer": "these trainers belong to",
+              "explanation": "'Are these your trainers?' = 'Do these trainers belong to you?'"
+            },
+            {
+              "id": 3,
+              "first_sentence": "Sasha's not keen on team sports at all.",
+              "key_word": "like",
+              "second_sentence_prefix": "Sasha",
+              "second_sentence_suffix": "team sports at all.",
+              "answers": [
+                "does not like",
+                "doesn't like"
+              ],
+              "answer": "doesn't like",
+              "explanation": "'is not keen on' = 'does not like' / 'doesn't like'."
+            },
+            {
+              "id": 4,
+              "first_sentence": "It's only her second time in a recording studio.",
+              "key_word": "been",
+              "second_sentence_prefix": "She",
+              "second_sentence_suffix": "in a recording studio once before.",
+              "answers": [
+                "has only been",
+                "'s only been"
+              ],
+              "answer": "has only been",
+              "explanation": "'It's only her second time...' = 'She has only been in a recording studio once before.'"
+            },
+            {
+              "id": 5,
+              "first_sentence": "We got here three hours ago.",
+              "key_word": "have",
+              "second_sentence_prefix": "We",
+              "second_sentence_suffix": "three hours.",
+              "answers": [
+                "have been here for",
+                "have been here",
+                "'ve been here for",
+                "'ve been here"
+              ],
+              "answer": "have been here for",
+              "explanation": "'got here three hours ago' = 'have been here for three hours'."
+            },
+            {
+              "id": 6,
+              "first_sentence": "I started writing this hours ago and it's still not right.",
+              "key_word": "writing",
+              "second_sentence_prefix": "I",
+              "second_sentence_suffix": "hours and it's still not right.",
+              "answers": [
+                "have been writing this for",
+                "'ve been writing this for"
+              ],
+              "answer": "have been writing this for",
+              "explanation": "Past start + still ongoing with duration = 'have been writing this for'."
+            },
+            {
+              "id": 7,
+              "first_sentence": "This is my first experience of flying alone.",
+              "key_word": "time",
+              "second_sentence_prefix": "It is the first",
+              "second_sentence_suffix": "alone.",
+              "answers": [
+                "time I have flown",
+                "time I've flown"
+              ],
+              "answer": "time I have flown",
+              "explanation": "'This is my first experience of flying...' = 'It is the first time I have flown alone.'"
+            },
+            {
+              "id": 8,
+              "first_sentence": "Sharon's in the bath at the moment.",
+              "key_word": "a",
+              "second_sentence_prefix": "Sharon",
+              "second_sentence_suffix": "at the moment.",
+              "answers": [
+                "is having a bath",
+                "'s having a bath"
+              ],
+              "answer": "is having a bath",
+              "explanation": "'is in the bath' = 'is having a bath'."
+            },
+            {
+              "id": 9,
+              "first_sentence": "Paul enjoys surprises apart from on his birthday.",
               "key_word": "does",
-              "sentence2_pre": "Paul",
-              "sentence2_post": "surprises, just not on his birthday!",
-              "answer": "does enjoy"
+              "second_sentence_prefix": "Paul",
+              "second_sentence_suffix": "surprises, just not on his birthday!",
+              "answers": [
+                "does enjoy"
+              ],
+              "answer": "does enjoy",
+              "explanation": "Emphatic Present Simple: 'Paul does enjoy surprises'."
             }
           ]
         }

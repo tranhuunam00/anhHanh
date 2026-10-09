@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Check, CheckCircle, RotateCcw, Trophy } from "../Icons";
+import { Check, CheckCircle, RotateCcw, Trophy, IconAlert } from "../Icons";
 import { submitB2Exercise } from "../../services/destinationB2Service";
 
 export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
@@ -24,9 +24,10 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
   }
 
   const items = exercise.items || [];
+  const bankWords = exercise.word_bank || [];
 
   const handleInputChange = (key, value) => {
-    if (result) return; // Prevent changing after submission
+    if (result) return; // Prevent editing after submission
     setUserAnswers((prev) => ({
       ...prev,
       [key]: value,
@@ -55,18 +56,15 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
     setErrorMessage("");
   };
 
-  // Find bank options if word bank exercise
-  const bankWords = exercise.word_bank || [];
-
   return (
     <div className="b2-exercise-card">
       {/* Exercise Header */}
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-          <span className="b2-ex-badge" style={{ width: "32px", height: "32px", fontSize: "1rem" }}>
+          <span className="b2-ex-badge" style={{ width: "36px", height: "36px", fontSize: "1.1rem" }}>
             {exercise.exercise_code}
           </span>
-          <h2 style={{ margin: 0, fontSize: "1.25rem", color: "var(--text-primary)" }}>
+          <h2 style={{ margin: 0, fontSize: "1.3rem", color: "var(--text-primary)" }}>
             {exercise.title}
           </h2>
         </div>
@@ -75,11 +73,11 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
         </div>
       </div>
 
-      {/* Word bank cloud if applicable */}
+      {/* Word Bank cloud (Ex D, Ex F) */}
       {bankWords.length > 0 && (
         <div className="b2-word-bank-cloud">
           <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-muted)", alignSelf: "center", marginRight: "4px" }}>
-            Từ gợi ý:
+            Hộp từ gợi ý (Word Box):
           </span>
           {bankWords.map((word, idx) => (
             <span key={idx} className="b2-word-bank-pill">
@@ -89,10 +87,67 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
         </div>
       )}
 
+      {/* Passage Card for Reading / Cloze Exercises (Ex F, Ex I) */}
+      {exercise.passage_text && (
+        <div
+          style={{
+            background: "var(--bg-secondary)",
+            border: "1px solid var(--border-color)",
+            borderRadius: "12px",
+            padding: "18px 22px",
+            lineHeight: "1.8",
+            fontSize: "0.96rem",
+            color: "var(--text-primary)",
+          }}
+        >
+          {exercise.passage_title && (
+            <div
+              style={{
+                fontSize: "1.1rem",
+                fontWeight: 800,
+                color: "var(--primary)",
+                marginBottom: "12px",
+                borderBottom: "1px dashed var(--border-color)",
+                paddingBottom: "8px",
+              }}
+            >
+              📖 {exercise.passage_title}
+            </div>
+          )}
+          <div style={{ whiteSpace: "pre-line", fontStyle: "normal" }}>
+            {exercise.passage_text}
+          </div>
+        </div>
+      )}
+
+      {/* Matching Options Legend (Ex G) */}
+      {exercise.matching_options && (
+        <div
+          style={{
+            background: "var(--bg-secondary)",
+            border: "1px solid var(--border-color)",
+            borderRadius: "12px",
+            padding: "16px 20px",
+          }}
+        >
+          <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "8px" }}>
+            Vế câu ghép (A - H):
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "8px" }}>
+            {Object.entries(exercise.matching_options).map(([letter, text]) => (
+              <div key={letter} style={{ fontSize: "0.88rem", color: "var(--text-primary)" }}>
+                <strong style={{ color: "var(--primary)", marginRight: "6px" }}>{letter}.</strong>
+                {text}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Questions List */}
       <div className="b2-question-list">
         {items.map((item, index) => {
-          const itemKey = String(item.id || item.gap_id || item.line || index + 1);
+          const itemKey = String(item.id || item.gap_number || item.line || index + 1);
           const currentAns = userAnswers[itemKey] || "";
           const itemResult = result?.results?.find((r) => String(r.item_key) === itemKey || r.item_number === index + 1);
 
@@ -103,21 +158,52 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
 
           return (
             <div key={itemKey} className={`b2-question-item ${statusClass}`}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px" }}>
-                <div className="b2-q-text">
-                  <strong style={{ color: "var(--primary)", marginRight: "8px" }}>
-                    {index + 1}.
-                  </strong>
-                  {item.text || item.sentence || item.line_text || `Câu hỏi số ${index + 1}`}
-                  {item.key_word && (
-                    <span style={{ marginLeft: "8px", fontWeight: 700, color: "var(--primary)" }}>
-                      [{item.key_word}]
-                    </span>
-                  )}
-                </div>
+              {/* Question Text / Prompt */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                {/* For Key Word Transformation (Ex J) */}
+                {item.key_word && (
+                  <div style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>
+                    <div style={{ marginBottom: "6px" }}>
+                      <strong style={{ color: "var(--primary)", marginRight: "8px" }}>{index + 1}.</strong>
+                      {item.first_sentence}
+                    </div>
+                    <div style={{ display: "inline-block", background: "rgba(99, 102, 241, 0.12)", color: "var(--primary)", fontWeight: 700, padding: "2px 8px", borderRadius: "6px", fontSize: "0.85rem", marginBottom: "6px" }}>
+                      Từ khóa: {item.key_word.toUpperCase()}
+                    </div>
+                    <div style={{ fontWeight: 500, color: "var(--text-secondary)" }}>
+                      {item.second_sentence_prefix} <strong>[ . . . ]</strong> {item.second_sentence_suffix}
+                    </div>
+                  </div>
+                )}
+
+                {/* For Rewrite with Bold Words (Ex B) */}
+                {item.bold_phrase && (
+                  <div style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>
+                    <strong style={{ color: "var(--primary)", marginRight: "8px" }}>{index + 1}.</strong>
+                    {item.text}
+                    <div style={{ marginTop: "4px", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                      Cụm từ in đậm cần sửa: <strong style={{ color: "#f59e0b" }}>{item.bold_phrase}</strong>
+                    </div>
+                  </div>
+                )}
+
+                {/* For Standard Text items (Ex A, C, D, E, F, G, H, I) */}
+                {!item.key_word && !item.bold_phrase && (
+                  <div className="b2-q-text">
+                    <strong style={{ color: "var(--primary)", marginRight: "8px" }}>
+                      {item.line ? `Dòng ${item.line}.` : item.gap_number ? `Chỗ trống (${item.gap_number}).` : `${index + 1}.`}
+                    </strong>
+                    {item.text || item.sentence || `Câu hỏi số ${index + 1}`}
+                    {item.prompt && (
+                      <span style={{ marginLeft: "8px", fontWeight: 700, color: "var(--primary)" }}>
+                        {item.prompt}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Render input depending on item type */}
+              {/* Input Area based on Question Type */}
               {item.options && Array.isArray(item.options) ? (
                 <div className="b2-choice-options">
                   {item.options.map((opt, optIdx) => {
@@ -135,20 +221,46 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
                     );
                   })}
                 </div>
+              ) : exercise.matching_options ? (
+                /* Matching selection (A-H) */
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                  {Object.keys(exercise.matching_options).map((letter) => {
+                    const isSelected = currentAns.toUpperCase() === letter.toUpperCase();
+                    return (
+                      <button
+                        key={letter}
+                        type="button"
+                        disabled={!!result}
+                        className={`b2-option-btn ${isSelected ? "selected" : ""}`}
+                        style={{ minWidth: "40px", fontWeight: 700 }}
+                        onClick={() => handleInputChange(itemKey, letter)}
+                      >
+                        {letter}
+                      </button>
+                    );
+                  })}
+                </div>
               ) : (
+                /* Fill in the blank input */
                 <div>
                   <input
                     type="text"
                     disabled={!!result}
                     className="b2-input-fill"
-                    placeholder="Nhập câu trả lời của bạn..."
+                    placeholder={
+                      exercise.exercise_type === "extra_word"
+                        ? "Nhập từ thừa trong dòng này (hoặc 'correct' nếu đúng)..."
+                        : item.key_word
+                        ? "Nhập từ biến đổi (từ 2 đến 5 từ)..."
+                        : "Nhập câu trả lời của bạn..."
+                    }
                     value={currentAns}
                     onChange={(e) => handleInputChange(itemKey, e.target.value)}
                   />
                 </div>
               )}
 
-              {/* Evaluation result banner */}
+              {/* Evaluation Feedback Banner */}
               {itemResult && (
                 <div className={`b2-answer-feedback ${itemResult.is_correct ? "correct" : "incorrect"}`}>
                   {itemResult.is_correct ? (
@@ -163,7 +275,7 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
                   )}
                   {itemResult.explanation && (
                     <span style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginLeft: "8px" }}>
-                      ({itemResult.explanation})
+                      — {itemResult.explanation}
                     </span>
                   )}
                 </div>
@@ -173,21 +285,21 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
         })}
       </div>
 
-      {/* Error message if any */}
+      {/* Error message */}
       {errorMessage && (
         <div style={{ color: "#ef4444", fontSize: "0.9rem", padding: "10px", background: "rgba(239, 68, 68, 0.1)", borderRadius: "8px" }}>
           {errorMessage}
         </div>
       )}
 
-      {/* Footer / Actions Bar */}
+      {/* Actions Bar */}
       <div className="b2-actions-bar">
         {result ? (
           <>
             <div className="b2-score-banner">
               <Trophy size={20} color="#f59e0b" />
               <span>
-                Điểm số: <strong style={{ color: result.score >= 80 ? "#10b981" : "#f59e0b" }}>{result.score}%</strong> ({result.correct_items}/{result.total_items} câu đúng)
+                Kết quả: <strong style={{ color: result.score >= 80 ? "#10b981" : "#f59e0b" }}>{result.score}%</strong> ({result.correct_items}/{result.total_items} câu đúng)
               </span>
             </div>
             <button type="button" className="btn btn-secondary btn-with-icon" onClick={handleRetry}>
@@ -198,7 +310,7 @@ export const B2ExerciseRunner = ({ exercise, token, onExerciseCompleted }) => {
         ) : (
           <>
             <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-              Đã làm {Object.values(userAnswers).filter(Boolean).length}/{items.length} câu
+              Đã điền {Object.values(userAnswers).filter(Boolean).length}/{items.length} câu
             </span>
             <button
               type="button"

@@ -104,23 +104,36 @@ async def upgrade(conn) -> None:
         }
 
         unit_insert_sql = text("""
-            INSERT OR IGNORE INTO destination_b2_units (
-                id, unit_number, title, unit_type, cefr_level, summary, theory, created_at, updated_at
-            ) VALUES (
-                :id, :unit_number, :title, :unit_type, :cefr_level, :summary, :theory, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-            );
-        """ if is_sqlite else """
             INSERT INTO destination_b2_units (
                 id, unit_number, title, unit_type, cefr_level, summary, theory, created_at, updated_at
             ) VALUES (
                 :id, :unit_number, :title, :unit_type, :cefr_level, :summary, :theory, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             )
-            ON CONFLICT (id) DO NOTHING;
+            ON CONFLICT (id) DO UPDATE SET
+                title = excluded.title,
+                unit_type = excluded.unit_type,
+                cefr_level = excluded.cefr_level,
+                summary = excluded.summary,
+                theory = excluded.theory,
+                updated_at = CURRENT_TIMESTAMP;
         """)
         await conn.execute(unit_insert_sql, unit_params)
 
+        # Clean any existing exercises for this unit before seeding to avoid duplicates
+        await conn.execute(
+            text("DELETE FROM destination_b2_exercises WHERE unit_id = :unit_id;"),
+            {"unit_id": unit["id"]}
+        )
+
         for ex in unit.get("exercises", []):
-            items_val = json.dumps(ex.get("items", []), ensure_ascii=False)
+            items_payload = {
+                "items": ex.get("items", []),
+                "passage_title": ex.get("passage_title"),
+                "passage_text": ex.get("passage_text"),
+                "word_bank": ex.get("word_bank", []),
+                "matching_options": ex.get("matching_options"),
+            }
+            items_val = json.dumps(items_payload, ensure_ascii=False)
             ex_params = {
                 "id": ex["id"],
                 "unit_id": unit["id"],
@@ -133,18 +146,18 @@ async def upgrade(conn) -> None:
             }
 
             ex_insert_sql = text("""
-                INSERT OR IGNORE INTO destination_b2_exercises (
-                    id, unit_id, exercise_code, title, instruction, exercise_type, order_num, items, created_at, updated_at
-                ) VALUES (
-                    :id, :unit_id, :exercise_code, :title, :instruction, :exercise_type, :order_num, :items, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-                );
-            """ if is_sqlite else """
                 INSERT INTO destination_b2_exercises (
                     id, unit_id, exercise_code, title, instruction, exercise_type, order_num, items, created_at, updated_at
                 ) VALUES (
                     :id, :unit_id, :exercise_code, :title, :instruction, :exercise_type, :order_num, :items, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
                 )
-                ON CONFLICT (id) DO NOTHING;
+                ON CONFLICT (id) DO UPDATE SET
+                    title = excluded.title,
+                    instruction = excluded.instruction,
+                    exercise_type = excluded.exercise_type,
+                    order_num = excluded.order_num,
+                    items = excluded.items,
+                    updated_at = CURRENT_TIMESTAMP;
             """)
             await conn.execute(ex_insert_sql, ex_params)
 

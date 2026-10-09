@@ -94,12 +94,26 @@ class DestinationB2Exercise(Base):
 
     def to_dict(self, include_answers: bool = True):
         """Serialize exercise to dictionary. Strip answers if include_answers is False."""
-        exercise_items = self.items or []
-        if isinstance(exercise_items, str):
+        raw_items = self.items or []
+        if isinstance(raw_items, str):
             try:
-                exercise_items = json.loads(exercise_items)
+                raw_items = json.loads(raw_items)
             except Exception:
-                exercise_items = []
+                raw_items = []
+
+        passage_title = None
+        passage_text = None
+        word_bank = []
+        matching_options = None
+
+        if isinstance(raw_items, dict):
+            passage_title = raw_items.get("passage_title")
+            passage_text = raw_items.get("passage_text")
+            word_bank = raw_items.get("word_bank") or []
+            matching_options = raw_items.get("matching_options")
+            exercise_items = raw_items.get("items", [])
+        else:
+            exercise_items = raw_items
 
         if not include_answers:
             sanitized_items = []
@@ -119,8 +133,12 @@ class DestinationB2Exercise(Base):
             "instruction": self.instruction,
             "exercise_type": self.exercise_type,
             "order_num": self.order_num,
+            "passage_title": passage_title,
+            "passage_text": passage_text,
+            "word_bank": word_bank,
+            "matching_options": matching_options,
             "items": exercise_items,
-            "total_items": len(self.items or []),
+            "total_items": len(exercise_items),
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

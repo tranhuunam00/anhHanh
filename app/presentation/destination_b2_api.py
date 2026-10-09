@@ -143,6 +143,9 @@ async def submit_exercise(
         except Exception:
             exercise_items = []
 
+    if isinstance(exercise_items, dict):
+        exercise_items = exercise_items.get("items", [])
+
     grading_result = grade_exercise_submission(
         exercise_items=exercise_items,
         user_answers=payload.answers
