@@ -25,8 +25,12 @@ export const buildEdgeTtsUrl = ({ text, voice, rate = 1.0, pitch = "standard" })
 export const stopEdgeAudio = () => {
   if (activeAudio) {
     try {
+      activeAudio.onended = null;
+      activeAudio.onerror = null;
+      activeAudio.onplay = null;
       activeAudio.pause();
       activeAudio.currentTime = 0;
+      activeAudio.removeAttribute("src");
       activeAudio.src = "";
     } catch {
       // Ignore cleanup error
@@ -55,11 +59,14 @@ export const playEdgeTtsAudio = ({
   const audio = new Audio(url);
   activeAudio = audio;
 
+  let hasEnded = false;
   audio.onplay = () => {
     if (onStart) onStart();
   };
 
   audio.onended = () => {
+    if (hasEnded) return;
+    hasEnded = true;
     if (activeAudio === audio) {
       activeAudio = null;
     }
@@ -67,6 +74,8 @@ export const playEdgeTtsAudio = ({
   };
 
   audio.onerror = (err) => {
+    if (hasEnded) return;
+    hasEnded = true;
     if (activeAudio === audio) {
       activeAudio = null;
     }
@@ -76,7 +85,8 @@ export const playEdgeTtsAudio = ({
   const playPromise = audio.play();
   if (playPromise !== undefined) {
     playPromise.catch((err) => {
-      if (err.name !== "AbortError") {
+      if (err.name !== "AbortError" && !hasEnded) {
+        hasEnded = true;
         console.warn("Edge-TTS Audio play error:", err);
         if (onError) onError(err);
       }

@@ -7,6 +7,7 @@ import {
   detectVoiceGender,
   filterVoicesByAccent,
   formatVoiceLabel,
+  resolveSpeechVoice,
 } from "../src/utils/readerVoices.js";
 
 describe("readerVoices - detectVoiceGender", () => {
@@ -153,3 +154,44 @@ describe("readerVoices - PITCH_PRESETS & ACCENT_OPTIONS integrity", () => {
     }
   });
 });
+
+describe("readerVoices - resolveSpeechVoice", () => {
+  const mockVoices = [
+    { voiceURI: "voice-1", name: "Microsoft Jenny Online", lang: "en-US" },
+    { voiceURI: "voice-2", name: "Microsoft Guy Online", lang: "en-US" },
+    { voiceURI: "voice-3", name: "Microsoft George", lang: "en-GB" },
+    { voiceURI: "voice-4", name: "Microsoft Ravi", lang: "en-IN" },
+    { voiceURI: "voice-5", name: "Microsoft Neerja", lang: "en-IN" },
+  ];
+
+  test("resolves exact voice by voiceURI or name", () => {
+    const res = resolveSpeechVoice(mockVoices, "voice-2", "ALL");
+    assert.equal(res.voiceURI, "voice-2");
+    assert.equal(res.name, "Microsoft Guy Online");
+  });
+
+  test("resolves virtual Indian voices to real Indian voices when available", () => {
+    const maleRes = resolveSpeechVoice(mockVoices, "virtual_indian_male", "en-IN");
+    assert.equal(maleRes.voiceURI, "voice-4");
+
+    const femaleRes = resolveSpeechVoice(mockVoices, "virtual_indian_female", "en-IN");
+    assert.equal(femaleRes.voiceURI, "voice-5");
+  });
+
+  test("falls back to accent match when selected voice is not found", () => {
+    const res = resolveSpeechVoice(mockVoices, "non-existent-voice", "en-GB");
+    assert.equal(res.voiceURI, "voice-3");
+  });
+
+  test("falls back to general English or first voice when accent not matched", () => {
+    const res = resolveSpeechVoice(mockVoices, "non-existent-voice", "en-AU");
+    assert.ok(res.lang.startsWith("en"));
+  });
+
+  test("handles empty or null voices array safely", () => {
+    assert.equal(resolveSpeechVoice([], "voice-1", "ALL"), null);
+    assert.equal(resolveSpeechVoice(null, "voice-1", "ALL"), null);
+    assert.equal(resolveSpeechVoice(undefined, "voice-1", "ALL"), null);
+  });
+});
+

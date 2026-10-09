@@ -204,3 +204,68 @@ export const formatVoiceLabel = (voice) => {
   const isNatural = /natural/i.test(name) ? " • AI" : "";
   return `${cleanName} (${region} • ${gender}${isNatural})`;
 };
+
+/**
+ * Resolves active SpeechSynthesisVoice object matching selected voice URI or accent fallback.
+ * @param {SpeechSynthesisVoice[]} voices
+ * @param {string} selectedVoiceUri
+ * @param {string} selectedAccent
+ * @returns {SpeechSynthesisVoice|null}
+ */
+export const resolveSpeechVoice = (voices = [], selectedVoiceUri = "", selectedAccent = "ALL") => {
+  if (!voices || voices.length === 0) return null;
+
+  // Handle virtual Indian voice options when no native voice is installed
+  if (selectedVoiceUri === "virtual_indian_male") {
+    const realIndianMale = voices.find((v) => {
+      const n = (v.name || "").toLowerCase();
+      const l = (v.lang || "").toLowerCase();
+      return (l.includes("in") || n.includes("india")) && (n.includes("ravi") || n.includes("male") || n.includes("prabhat"));
+    });
+    if (realIndianMale) return realIndianMale;
+    const maleEn = voices.find((v) => {
+      const n = (v.name || "").toLowerCase();
+      return (v.lang || "").toLowerCase().startsWith("en") && (n.includes("male") || n.includes("david") || n.includes("guy") || n.includes("george"));
+    });
+    return maleEn || voices[0] || null;
+  }
+
+  if (selectedVoiceUri === "virtual_indian_female") {
+    const realIndianFemale = voices.find((v) => {
+      const n = (v.name || "").toLowerCase();
+      const l = (v.lang || "").toLowerCase();
+      return (l.includes("in") || n.includes("india")) && (n.includes("neerja") || n.includes("female") || n.includes("heera") || n.includes("veena"));
+    });
+    if (realIndianFemale) return realIndianFemale;
+    const femaleEn = voices.find((v) => {
+      const n = (v.name || "").toLowerCase();
+      return (v.lang || "").toLowerCase().startsWith("en") && (n.includes("female") || n.includes("zira") || n.includes("jenny") || n.includes("samantha"));
+    });
+    return femaleEn || voices[0] || null;
+  }
+
+  if (selectedVoiceUri) {
+    const match = voices.find((v) => (v.voiceURI || v.name) === selectedVoiceUri);
+    if (match) return match;
+  }
+
+  // Fallback: accent match or general English voice
+  if (selectedAccent && selectedAccent !== "ALL") {
+    if (selectedAccent === "en-IN") {
+      const inMatch = voices.find((v) => {
+        const l = (v.lang || "").toLowerCase();
+        const n = (v.name || "").toLowerCase();
+        return l.includes("in") || n.includes("india") || n.includes("ravi") || n.includes("neerja");
+      });
+      if (inMatch) return inMatch;
+    } else {
+      const accentMatch = voices.find((v) =>
+        (v.lang || "").toLowerCase().startsWith(selectedAccent.toLowerCase())
+      );
+      if (accentMatch) return accentMatch;
+    }
+  }
+
+  const enMatch = voices.find((v) => (v.lang || "").toLowerCase().startsWith("en"));
+  return enMatch || voices[0] || null;
+};

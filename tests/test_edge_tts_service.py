@@ -8,6 +8,7 @@ from app.infrastructure.edge_tts_service import (
     format_edge_pitch,
     resolve_edge_voice,
     generate_edge_tts_stream,
+    clean_tts_text,
     SUPPORTED_EDGE_VOICES,
     DEFAULT_EDGE_VOICE,
 )
@@ -98,6 +99,18 @@ def test_resolve_edge_voice_default_fallback():
     """Verify fallback to DEFAULT_EDGE_VOICE (Jenny) on completely unknown input."""
     assert resolve_edge_voice(None, None) == DEFAULT_EDGE_VOICE
     assert resolve_edge_voice("non_existent_voice", "non_existent_accent") == DEFAULT_EDGE_VOICE
+
+
+def test_clean_tts_text_strips_underscores_and_symbols():
+    """Verify clean_tts_text completely strips ASCII and Unicode underscores and line symbols."""
+    assert clean_tts_text("____________________") == ""
+    assert clean_tts_text("＿＿＿＿＿＿＿＿＿＿") == ""
+    assert clean_tts_text("Hello ___ world") == "Hello world"
+    assert clean_tts_text("Hello _ world") == "Hello world"
+    assert clean_tts_text("Fill in [Q1] ________ with the word.") == "Fill in Q1 with the word."
+    assert clean_tts_text("*** Title ***") == "Title"
+    assert clean_tts_text(None) == ""
+    assert clean_tts_text("") == ""
 
 
 # =========================================================================

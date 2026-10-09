@@ -158,10 +158,10 @@ def clean_tts_text(text: str) -> str:
     """Sanitize text for TTS synthesis, eliminating repeated symbols like underscores, dashes, brackets."""
     if not text or not isinstance(text, str):
         return ""
-    # Strip repeated underscores (e.g. ____________________ or ___)
-    cleaned = re.sub(r"_{2,}", " ", text)
+    # Strip ALL underscores and line characters (single, multiple, ASCII, and Unicode variants)
+    cleaned = re.sub(r"[_＿\uFF3F\u2013\u2014\u2015\u2500\u2501¯‾]+", " ", text)
     # Strip repeated dashes / hyphens
-    cleaned = re.sub(r"[-–—]{2,}", " - ", cleaned)
+    cleaned = re.sub(r"[-–—]{2,}", " ", cleaned)
     # Strip repeated symbols (***, ===, ~~~)
     cleaned = re.sub(r"[*#=~]{2,}", " ", cleaned)
     # Normalize question tokens [Q1] -> Q1

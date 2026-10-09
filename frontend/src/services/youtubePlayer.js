@@ -407,8 +407,10 @@ export class YouTubePlayerController {
 
   speakText(text, lang) {
     if (!window.speechSynthesis) return;
+    const clean = (text || "").replace(/[_＿\uFF3F\u2013\u2014\u2015\u2500\u2501¯‾]+/g, " ").trim();
+    if (!clean) return;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(clean);
     const code = (lang || this.sourceLang || "en").toLowerCase();
     const langMap = {
       en: "en-US", fr: "fr-FR", ja: "ja-JP", ko: "ko-KR", zh: "zh-CN",

@@ -131,26 +131,48 @@ export function splitTextIntoSentences(text) {
   const ELLIPSIS_TOKEN = "\uE001";
   normalized = normalized.replace(/(\.{3,}|…|\.\s*\.\s*\.)/g, ELLIPSIS_TOKEN);
 
-  // 3. Protect abbreviations, honorifics, corporate names, dates, Latin terms
+  // 3. Protect titles, abbreviations, corporate names, dates, Latin terms
   const ABBR_TOKEN = "\uE000";
-  normalized = normalized
-    .replace(
-      /\b(Mr|Mrs|Ms|Miss|Dr|Prof|Sr|Jr|Inc|Ltd|Co|Corp|Dept|Univ|Gov|Pres|Gen|Col|Capt|Lt|Sgt|Rep|Sen|St|Ave|Rd|Blvd|No|Nos|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|vs|vol|approx|est|min|max|sec|hr|fig|eq|ed|al|cf)\./gi,
-      (m) => m.replace(/\./g, ABBR_TOKEN)
-    )
-    .replace(/\b(U\.S|U\.K|U\.N|E\.U|e\.g|i\.e|a\.m|p\.m)\./gi, (m) =>
-      m.replace(/\./g, ABBR_TOKEN)
-    )
-    .replace(/\b([A-Z])\.\s+(?=[A-Z])/g, `$1${ABBR_TOKEN} `)
-    .replace(/(\d+)\.(\d+)/g, `$1${ABBR_TOKEN}$2`);
+
+  // Titles always followed by name: protect dot
+  normalized = normalized.replace(
+    /\b(Mr|Mrs|Ms|Miss|Dr|Prof|Sr|Jr|Pres|Gen|Col|Capt|Lt|Sgt|Rep|Sen|St|Ave|Rd|Blvd|No|Nos)\./gi,
+    (m) => m.replace(/\./g, ABBR_TOKEN)
+  );
+
+  // Abbreviations like U.S., U.K., a.m., p.m., e.g., i.e.
+  // Protect internal dots always (e.g. U. in U.S., a. in a.m.)
+  normalized = normalized.replace(/\b([A-Za-z])\.([A-Za-z])\./g, (m, c1, c2) => {
+    return c1 + ABBR_TOKEN + c2 + ".";
+  });
+
+  // If abbreviation's trailing dot is followed by lowercase, protect it
+  normalized = normalized.replace(
+    new RegExp(ABBR_TOKEN + "([A-Za-z])\\.\\s+(?=[a-z])", "g"),
+    ABBR_TOKEN + "$1" + ABBR_TOKEN + " "
+  );
+
+  // Protect other abbreviations like vs., etc., approx., when followed by lowercase
+  normalized = normalized.replace(
+    /\b(Inc|Ltd|Co|Corp|Dept|Univ|Gov|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|vs|vol|approx|est|min|max|sec|hr|fig|eq|ed|al|cf|etc)\.\s+(?=[a-z])/gi,
+    (m) => m.replace(/\./g, ABBR_TOKEN)
+  );
+
+  // Protect single middle initials (e.g. George W. Bush, J. K. Rowling) preceded by space/start
+  normalized = normalized.replace(/(?<=\s|^)([A-Z])\.\s+(?=[A-Z])/g, `$1${ABBR_TOKEN} `);
+
+  // Protect numbers with decimals (e.g. 18.5, 3.14, 4.30)
+  normalized = normalized.replace(/(\d+)\.(\d+)/g, `$1${ABBR_TOKEN}$2`);
 
   // 4. Split on sentence boundaries:
-  // First match boundaries followed by whitespace/newlines
-  // Then match boundaries without whitespace (glued text e.g. walk.We'll)
+  // 1. Punctuation (. ? !) followed by newlines
+  // 2. Punctuation followed by whitespace and an uppercase letter, digit, bracket, or quote
+  // 3. Glued text: punctuation directly followed by an uppercase letter
   const SPLIT_TOKEN = "\uE002";
   const markedText = normalized
-    .replace(/(?<=[.?!]['"”’\)\]]*)\s+(?=[A-Za-z0-9"“'‘(\[])/g, SPLIT_TOKEN)
-    .replace(/(?<=[.?!]['"”’\)\]]*)(?=[A-Z])/g, SPLIT_TOKEN);
+    .replace(/(?<=[.?!]['"”’)\]]*)\s*\n+\s*/g, SPLIT_TOKEN)
+    .replace(/(?<=[.?!]['"”’)\]]*)\s+(?=[A-Z0-9"“'‘(\[])/g, SPLIT_TOKEN)
+    .replace(/(?<=[.?!]['"”’)\]]*)(?=[A-Z])/g, SPLIT_TOKEN);
 
   const rawParts = markedText.split(SPLIT_TOKEN);
 
@@ -262,7 +284,7 @@ export function groupBlockIntoSentences(block, getNextIndex, addSentence, doc) {
               let endPos = i + 1;
               while (
                 endPos < text.length &&
-                /['"”’\)\]\s]/.test(text[endPos]) &&
+                /['"”’)\]\s]/.test(text[endPos]) &&
                 !/\n/.test(text[endPos])
               ) {
                 endPos++;
@@ -361,9 +383,15 @@ export function groupBlockIntoSentences(block, getNextIndex, addSentence, doc) {
   originalChildren.forEach(processNode);
 
   if (currentSpan.childNodes.length > 0) {
-    block.appendChild(currentSpan);
-    if (currentSentenceIdx < sentenceStrings.length) {
-      addSentence(sIdx, sentenceStrings[currentSentenceIdx]);
+    if (currentSpan.textContent.trim().length > 0) {
+      block.appendChild(currentSpan);
+      if (currentSentenceIdx < sentenceStrings.length) {
+        addSentence(sIdx, sentenceStrings[currentSentenceIdx]);
+      }
+    } else {
+      while (currentSpan.firstChild) {
+        block.appendChild(currentSpan.firstChild);
+      }
     }
   }
 }
@@ -375,7 +403,10 @@ export function groupBlockIntoSentences(block, getNextIndex, addSentence, doc) {
  */
 export function isSilentOrDivider(text) {
   if (!text || typeof text !== "string") return true;
-  const stripped = text.replace(/[\s_\-–—*#=~.·•[\]()]+/g, "");
+  const stripped = text.replace(
+    /[\s_\-–—*#=~.·•[\]()＿\uFF3F\u2013\u2014\u2015\u2500\u2501¯‾]+/g,
+    ""
+  );
   return stripped.length === 0;
 }
 
@@ -387,15 +418,21 @@ export function isSilentOrDivider(text) {
 export function cleanSpeechText(text) {
   if (!text || typeof text !== "string") return "";
   let clean = text;
-  // Replace repeated underscores (e.g. ____________________ or ___)
-  clean = clean.replace(/_{2,}/g, " ");
+  // Replace all underscores (ASCII and Unicode fullwidth low line, horizontal bars)
+  clean = clean.replace(/[_＿\uFF3F\u2013\u2014\u2015\u2500\u2501¯‾]+/g, " ");
   // Replace repeated dashes or hyphens
-  clean = clean.replace(/[-–—]{2,}/g, " - ");
+  clean = clean.replace(/[-–—]{2,}/g, " ");
   // Replace repeated symbols (***, ===, ~~~)
   clean = clean.replace(/[*#=~]{2,}/g, " ");
   // Strip question labels like [Q1], [Q2], (Q1) to natural Q1 for TTS
   clean = clean.replace(/\[([Qq]\d+)\]/gi, "$1");
   clean = clean.replace(/\(([Qq]\d+)\)/gi, "$1");
-  return clean.replace(/\s+/g, " ").trim();
+  clean = clean.replace(/\s+/g, " ").trim();
+  // If no spoken alphanumeric characters remain, return empty string so TTS stays completely silent
+  if (!/[a-zA-Z0-9\u00C0-\u024F\u1EA0-\u1EF9]/.test(clean)) {
+    return "";
+  }
+  return clean;
 }
+
 

@@ -6,6 +6,8 @@ import {
   splitTextIntoSentences,
   formatTime,
   groupBlockIntoSentences,
+  isSilentOrDivider,
+  cleanSpeechText,
 } from "../src/utils/readerUtils.js";
 
 describe("readerUtils Unit Tests", () => {
@@ -129,6 +131,80 @@ describe("readerUtils Unit Tests", () => {
       assert.equal(res[2], "We followed.");
     });
 
+    it("splits on various punctuation marks (?, !, ?!, !!, ??)", () => {
+      const text = "Where are we going? To the park! Are you ready? Yes! Really?! Absolutely!!";
+      const res = splitTextIntoSentences(text);
+      assert.deepEqual(res, [
+        "Where are we going?",
+        "To the park!",
+        "Are you ready?",
+        "Yes!",
+        "Really?!",
+        "Absolutely!!"
+      ]);
+    });
+
+    it("protects times and decimals while splitting terminal abbreviations", () => {
+      const text = "The train departs at 7.30 a.m. and arrives at 9.45 p.m. Don't be late.";
+      const res = splitTextIntoSentences(text);
+      assert.equal(res.length, 2);
+      assert.equal(res[0], "The train departs at 7.30 a.m. and arrives at 9.45 p.m.");
+      assert.equal(res[1], "Don't be late.");
+
+      const usText = "He lives in the U.S. He works hard.";
+      const usRes = splitTextIntoSentences(usText);
+      assert.equal(usRes.length, 2);
+      assert.equal(usRes[0], "He lives in the U.S.");
+      assert.equal(usRes[1], "He works hard.");
+    });
+
+    it("keeps direct speech dialogue attributions together with quotes", () => {
+      const text = 'He asked, "Are you sure?" "Yes!" she replied. Then they left.';
+      const res = splitTextIntoSentences(text);
+      assert.equal(res.length, 3);
+      assert.equal(res[0], 'He asked, "Are you sure?"');
+      assert.equal(res[1], '"Yes!" she replied.');
+      assert.equal(res[2], "Then they left.");
+    });
+
+    it("splits sentences across newlines and multiple whitespace runs", () => {
+      const text = "First line.\nSecond line?\r\nThird line!\n\nFourth line.";
+      const res = splitTextIntoSentences(text);
+      assert.deepEqual(res, [
+        "First line.",
+        "Second line?",
+        "Third line!",
+        "Fourth line."
+      ]);
+
+      const spaces = "Sentence one.    Sentence two?   Sentence three!  Sentence four.";
+      const resSpaces = splitTextIntoSentences(spaces);
+      assert.deepEqual(resSpaces, [
+        "Sentence one.",
+        "Sentence two?",
+        "Sentence three!",
+        "Sentence four."
+      ]);
+    });
+
+    it("protects names with middle initials and titles", () => {
+      const text = "George W. Bush and J. K. Rowling visited Washington D.C. yesterday.";
+      const res = splitTextIntoSentences(text);
+      assert.equal(res.length, 1);
+      assert.equal(res[0], "George W. Bush and J. K. Rowling visited Washington D.C. yesterday.");
+    });
+
+    it("splits Vietnamese text with standard punctuation correctly", () => {
+      const vn = "Xin chào các bạn. Hôm nay chúng ta học tiếng Anh! Bạn đã sẵn sàng chưa? Bắt đầu thôi.";
+      const res = splitTextIntoSentences(vn);
+      assert.deepEqual(res, [
+        "Xin chào các bạn.",
+        "Hôm nay chúng ta học tiếng Anh!",
+        "Bạn đã sẵn sàng chưa?",
+        "Bắt đầu thôi."
+      ]);
+    });
+
     it("handles empty, whitespace, and single-sentence inputs", () => {
       assert.deepEqual(splitTextIntoSentences(""), []);
       assert.deepEqual(splitTextIntoSentences("   "), []);
@@ -239,6 +315,31 @@ describe("readerUtils Unit Tests", () => {
       assert.ok(sentences[1].t.includes("[Q1]"));
     });
 
+    it("does not create empty reader-sentence ghost spans for trailing whitespace", () => {
+      const p = new MockNode(1, "P");
+      p.appendChild(new MockNode(3, "#text", "Sentence one. Sentence two. "));
+
+      const sentences = [];
+      let idx = 0;
+      groupBlockIntoSentences(
+        p,
+        () => idx++,
+        (i, t) => sentences.push({ i, t }),
+        mockDoc
+      );
+
+      assert.equal(sentences.length, 2);
+      assert.equal(sentences[0].t, "Sentence one.");
+      assert.equal(sentences[1].t, "Sentence two.");
+      const spanNodes = p.childNodes.filter(
+        (c) => c.className === "reader-sentence"
+      );
+      assert.equal(spanNodes.length, 2);
+      for (const span of spanNodes) {
+        assert.ok(span.textContent.trim().length > 0);
+      }
+    });
+
     it("handles null or empty blocks safely without throwing", () => {
       assert.doesNotThrow(() => groupBlockIntoSentences(null, () => 0, () => {}, mockDoc));
       const emptyP = new MockNode(1, "P");
@@ -256,6 +357,66 @@ describe("readerUtils Unit Tests", () => {
       const clean = sanitizePastedHtml(dirty);
       assert.ok(!clean.includes("<script>"));
       assert.ok(clean.includes("<p>Hello world</p>"));
+    });
+  });
+
+  describe("isSilentOrDivider", () => {
+    it("identifies decorative underline dividers and symbols correctly", () => {
+      assert.equal(isSilentOrDivider("____________________"), true);
+      assert.equal(isSilentOrDivider("＿＿＿＿＿＿＿＿＿＿"), true);
+      assert.equal(isSilentOrDivider("--------------------"), true);
+      assert.equal(isSilentOrDivider("––––––––––––––––––––"), true);
+      assert.equal(isSilentOrDivider("──────────"), true);
+      assert.equal(isSilentOrDivider("***"), true);
+      assert.equal(isSilentOrDivider("   "), true);
+      assert.equal(isSilentOrDivider(""), true);
+      assert.equal(isSilentOrDivider(null), true);
+      assert.equal(isSilentOrDivider(undefined), true);
+    });
+
+    it("returns false for genuine sentences and words", () => {
+      assert.equal(isSilentOrDivider("Hi everyone."), false);
+      assert.equal(isSilentOrDivider("[Q1] All bushwalkers"), false);
+      assert.equal(isSilentOrDivider("Hello world"), false);
+      assert.equal(isSilentOrDivider("Fill in [Q1] ________ with the word."), false);
+    });
+  });
+
+  describe("cleanSpeechText", () => {
+    it("strips underscores and cleans repeated divider symbols", () => {
+      assert.equal(cleanSpeechText("____________________"), "");
+      assert.equal(cleanSpeechText("＿＿＿＿＿＿＿＿＿＿"), "");
+      assert.equal(cleanSpeechText("--------------------"), "");
+      assert.equal(cleanSpeechText("––––––––––––––––––––"), "");
+      assert.equal(cleanSpeechText("Hello ___ world"), "Hello world");
+      assert.equal(cleanSpeechText("Hello _ world"), "Hello world");
+      assert.equal(cleanSpeechText("*** Welcome ***"), "Welcome");
+      assert.equal(
+        cleanSpeechText("all bushwalkers who are over 12. ____________________"),
+        "all bushwalkers who are over 12."
+      );
+    });
+
+    it("normalizes question markers and blanks for natural TTS pronunciation", () => {
+      assert.equal(
+        cleanSpeechText("recommend it for [Q1] all bushwalkers"),
+        "recommend it for Q1 all bushwalkers"
+      );
+      assert.equal(
+        cleanSpeechText("Fill in [Q1] ________ with the correct word."),
+        "Fill in Q1 with the correct word."
+      );
+      assert.equal(
+        cleanSpeechText("wear (Q2) rubber boots"),
+        "wear Q2 rubber boots"
+      );
+    });
+
+    it("handles empty or non-string inputs safely", () => {
+      assert.equal(cleanSpeechText(""), "");
+      assert.equal(cleanSpeechText(null), "");
+      assert.equal(cleanSpeechText(undefined), "");
+      assert.equal(cleanSpeechText(12345), "");
     });
   });
 });

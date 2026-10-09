@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { PITCH_PRESETS } from "../utils/readerVoices";
+import { PITCH_PRESETS, resolveSpeechVoice } from "../utils/readerVoices";
+import { isSilentOrDivider, cleanSpeechText } from "../utils/readerUtils";
 import {
   playEdgeTtsAudio,
   stopEdgeAudio,
@@ -22,6 +23,8 @@ export function useReaderSpeech({
   );
   const onlyCurrentSentenceRef = useRef(onlyCurrentSentence);
   const sentenceStartRef = useRef(null);
+  const activeUtteranceRef = useRef(null);
+  const dividerTimerRef = useRef(null);
 
   // Available Web Speech voices and Accent / Persona customization
   const [voices, setVoices] = useState([]);
@@ -68,63 +71,9 @@ export function useReaderSpeech({
     return Number.isFinite(p) ? p : 1.0;
   }, [pitchPreset]);
 
-  // Compute active SpeechSynthesisVoice object
+  // Compute active SpeechSynthesisVoice object via modular resolver
   const selectedVoice = useMemo(() => {
-    if (!voices || voices.length === 0) return null;
-
-    // Handle virtual Indian voice options when no native voice is installed
-    if (selectedVoiceUri === "virtual_indian_male") {
-      const realIndianMale = voices.find((v) => {
-        const n = (v.name || "").toLowerCase();
-        const l = (v.lang || "").toLowerCase();
-        return (l.includes("in") || n.includes("india")) && (n.includes("ravi") || n.includes("male") || n.includes("prabhat"));
-      });
-      if (realIndianMale) return realIndianMale;
-      const maleEn = voices.find((v) => {
-        const n = (v.name || "").toLowerCase();
-        return (v.lang || "").toLowerCase().startsWith("en") && (n.includes("male") || n.includes("david") || n.includes("guy") || n.includes("george"));
-      });
-      return maleEn || voices[0] || null;
-    }
-
-    if (selectedVoiceUri === "virtual_indian_female") {
-      const realIndianFemale = voices.find((v) => {
-        const n = (v.name || "").toLowerCase();
-        const l = (v.lang || "").toLowerCase();
-        return (l.includes("in") || n.includes("india")) && (n.includes("neerja") || n.includes("female") || n.includes("heera") || n.includes("veena"));
-      });
-      if (realIndianFemale) return realIndianFemale;
-      const femaleEn = voices.find((v) => {
-        const n = (v.name || "").toLowerCase();
-        return (v.lang || "").toLowerCase().startsWith("en") && (n.includes("female") || n.includes("zira") || n.includes("jenny") || n.includes("samantha"));
-      });
-      return femaleEn || voices[0] || null;
-    }
-
-    if (selectedVoiceUri) {
-      const match = voices.find((v) => (v.voiceURI || v.name) === selectedVoiceUri);
-      if (match) return match;
-    }
-
-    // Fallback: accent match or general English voice
-    if (selectedAccent && selectedAccent !== "ALL") {
-      if (selectedAccent === "en-IN") {
-        const inMatch = voices.find((v) => {
-          const l = (v.lang || "").toLowerCase();
-          const n = (v.name || "").toLowerCase();
-          return l.includes("in") || n.includes("india") || n.includes("ravi") || n.includes("neerja");
-        });
-        if (inMatch) return inMatch;
-      } else {
-        const accentMatch = voices.find((v) =>
-          (v.lang || "").toLowerCase().startsWith(selectedAccent.toLowerCase())
-        );
-        if (accentMatch) return accentMatch;
-      }
-    }
-
-    const enMatch = voices.find((v) => (v.lang || "").toLowerCase().startsWith("en"));
-    return enMatch || voices[0] || null;
+    return resolveSpeechVoice(voices, selectedVoiceUri, selectedAccent);
   }, [voices, selectedVoiceUri, selectedAccent]);
 
   const handleSelectVoiceUri = useCallback((uri) => {
@@ -154,8 +103,15 @@ export function useReaderSpeech({
     (index, autoPlay = true) => {
       if (!sentencesList || sentencesList.length === 0) return;
 
+      if (dividerTimerRef.current) {
+        clearTimeout(dividerTimerRef.current);
+        dividerTimerRef.current = null;
+      }
+
       if (typeof window !== "undefined" && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+        }
       }
       stopEdgeAudio();
 
@@ -204,11 +160,26 @@ export function useReaderSpeech({
         }
       };
 
+      // Check if sentence is purely a divider or decorative (e.g. ____________________, ----, ***)
+      if (isSilentOrDivider(sentence.text)) {
+        setIsSpeaking(true);
+        dividerTimerRef.current = setTimeout(() => {
+          handleSpeechComplete();
+        }, 400);
+        return;
+      }
+
+      const speechText = cleanSpeechText(sentence.text);
+      if (!speechText) {
+        handleSpeechComplete();
+        return;
+      }
+
       // 1. High-fidelity Neural Edge-TTS playback
       if (isEdgeVoice(selectedVoiceUri)) {
         setIsSpeaking(true);
         playEdgeTtsAudio({
-          text: sentence.text,
+          text: speechText,
           voice: selectedVoiceUri,
           rate: speechRate,
           pitch: pitchPreset,
@@ -218,11 +189,22 @@ export function useReaderSpeech({
             console.warn("Edge-TTS error, falling back to Web Speech:", err);
             // Fallback to Web Speech if network fails
             if (window.speechSynthesis) {
-              const fallbackUtter = new SpeechSynthesisUtterance(sentence.text);
+              const fallbackUtter = new SpeechSynthesisUtterance(speechText);
+              activeUtteranceRef.current = fallbackUtter;
               if (selectedVoice) fallbackUtter.voice = selectedVoice;
               fallbackUtter.rate = Number.isFinite(speechRate) ? speechRate : 1.0;
-              fallbackUtter.onend = handleSpeechComplete;
-              fallbackUtter.onerror = () => setIsSpeaking(false);
+              fallbackUtter.onend = () => {
+                if (activeUtteranceRef.current === fallbackUtter) {
+                  activeUtteranceRef.current = null;
+                }
+                handleSpeechComplete();
+              };
+              fallbackUtter.onerror = () => {
+                if (activeUtteranceRef.current === fallbackUtter) {
+                  activeUtteranceRef.current = null;
+                }
+                setIsSpeaking(false);
+              };
               window.speechSynthesis.speak(fallbackUtter);
             }
           },
@@ -236,7 +218,8 @@ export function useReaderSpeech({
         return;
       }
 
-      const utterance = new SpeechSynthesisUtterance(sentence.text);
+      const utterance = new SpeechSynthesisUtterance(speechText);
+      activeUtteranceRef.current = utterance;
       const isIndianMode =
         selectedVoiceUri.startsWith("virtual_indian") ||
         selectedAccent === "en-IN" ||
@@ -260,9 +243,17 @@ export function useReaderSpeech({
       utterance.rate = Number.isFinite(finalRate) ? finalRate : 1.0;
       utterance.pitch = Number.isFinite(finalPitch) ? finalPitch : 1.0;
 
-      utterance.onend = handleSpeechComplete;
+      utterance.onend = () => {
+        if (activeUtteranceRef.current === utterance) {
+          activeUtteranceRef.current = null;
+        }
+        handleSpeechComplete();
+      };
 
       utterance.onerror = (e) => {
+        if (activeUtteranceRef.current === utterance) {
+          activeUtteranceRef.current = null;
+        }
         if (e.error !== "interrupted" && e.error !== "canceled") {
           console.warn("Speech synthesis error:", e);
           setIsSpeaking(false);

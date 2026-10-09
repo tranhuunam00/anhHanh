@@ -77,8 +77,10 @@ export function AudioStudioPage({ isActive = true }) {
 
   const speakSentence = useCallback((text) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window) || !text) return;
+    const clean = text.replace(/[_＿\uFF3F\u2013\u2014\u2015\u2500\u2501¯‾]+/g, " ").trim();
+    if (!clean) return;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(clean);
     utterance.lang = "en-US";
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);

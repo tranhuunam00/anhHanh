@@ -1,4 +1,4 @@
-import { getWordVariants, groupBlockIntoSentences, splitTextIntoSentences } from "./readerUtils.js";
+import { getWordVariants, groupBlockIntoSentences, splitTextIntoSentences, isSilentOrDivider } from "./readerUtils.js";
 
 /**
  * Parses article HTML, marks saved vocabulary words, and segments into sentences with timing metadata.
@@ -13,9 +13,18 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
 
   if (typeof window === "undefined" || !window.DOMParser) {
     const words = articleHtml.match(/\b[a-zA-Z0-9'’-]+\b/g) || [];
-    const sentenceStrings = splitTextIntoSentences(articleHtml.replace(/<[^>]*>/g, " "));
+    const blockSeparated = articleHtml
+      .replace(/<\/(p|div|li|h[1-6]|blockquote|section|article|header|footer)>/gi, "\n\n")
+      .replace(/<(br|hr)\s*\/?>/gi, "\n\n");
+    const rawBlocks = blockSeparated
+      .split(/\n+/)
+      .map((b) => b.replace(/<[^>]*>/g, " ").trim())
+      .filter((b) => b.length > 0 && !isSilentOrDivider(b));
+    const sentenceStrings = rawBlocks
+      .flatMap((b) => splitTextIntoSentences(b))
+      .filter((s) => !isSilentOrDivider(s));
     let cumulative = 0;
-    const sentencesList = (sentenceStrings.length > 0 ? sentenceStrings : [articleHtml]).map((s, idx) => {
+    const sentencesList = sentenceStrings.map((s, idx) => {
       const sWords = s.match(/\b[a-zA-Z0-9'’-]+\b/g) || [];
       const wordCount = sWords.length;
       const duration = Math.max(1.2, Number((wordCount / 2.33 + 0.35).toFixed(1)));
@@ -48,7 +57,8 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
     });
 
     // 1. Highlight saved vocabulary tokens on all text nodes first
-    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, null, false);
+    const showTextFilter = typeof NodeFilter !== "undefined" ? NodeFilter.SHOW_TEXT : 4;
+    const walker = doc.createTreeWalker(doc.body, showTextFilter, null, false);
     const textNodes = [];
     let currentNode;
     while ((currentNode = walker.nextNode())) {
@@ -156,7 +166,7 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
 
     // 2. Wrap direct text nodes in <p> if needed
     Array.from(doc.body.childNodes).forEach((node) => {
-      if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim().length > 0) {
+      if (node.nodeType === 3 && node.nodeValue.trim().length > 0) {
         const p = doc.createElement("p");
         p.textContent = node.nodeValue;
         doc.body.replaceChild(p, node);
@@ -166,7 +176,7 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
     // Ensure <br> tags have whitespace separation so textContent does not glue sentences together
     doc.body.querySelectorAll("br").forEach((br) => {
       const next = br.nextSibling;
-      if (!next || next.nodeType !== Node.TEXT_NODE || !/^\s/.test(next.nodeValue)) {
+      if (!next || next.nodeType !== 3 || !/^\s/.test(next.nodeValue)) {
         br.after(doc.createTextNode(" "));
       }
     });
@@ -198,6 +208,10 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
     };
 
     leafBlocks.forEach((block) => {
+      if (isSilentOrDivider(block.textContent)) {
+        block.classList.add("reader-divider-block");
+        return;
+      }
       groupBlockIntoSentences(block, getNextIndex, addSentence, doc);
     });
 
