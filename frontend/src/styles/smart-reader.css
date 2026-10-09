@@ -810,6 +810,34 @@
   color: var(--text-primary);
 }
 
+.reader-shortcut-tip-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  margin-bottom: 20px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  background: var(--bg-card-hover, rgba(59, 130, 246, 0.05));
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  line-height: 1.45;
+}
+
+.reader-ctrl-kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 0.72rem;
+  font-family: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+
 /* Sentence Spans in Reader View */
 .reader-sentence {
   display: inline;
@@ -822,6 +850,17 @@
 
 .reader-sentence:hover {
   background-color: rgba(59, 130, 246, 0.08);
+}
+
+/* When Ctrl / Cmd is held, cursor turns into pointer and sentences highlight for playback */
+.reader-article-body.ctrl-mode .reader-sentence {
+  cursor: pointer !important;
+}
+
+.reader-article-body.ctrl-mode .reader-sentence:hover {
+  background-color: rgba(59, 130, 246, 0.18) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+  border-radius: 4px;
 }
 
 /* Karaoke / Active Speaking Sentence */

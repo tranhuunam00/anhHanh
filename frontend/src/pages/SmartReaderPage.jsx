@@ -6,6 +6,7 @@ import { ReaderPasteSection } from "../components/Reader/ReaderPasteSection";
 import { SAMPLE_ARTICLE, sanitizePastedHtml } from "../utils/readerUtils";
 import { processReaderArticle } from "../utils/readerHtmlProcessor";
 import { useReaderSpeech } from "../hooks/useReaderSpeech";
+import { Lightbulb } from "../components/Icons";
 import "../styles/smart-reader.css";
 
 export function SmartReaderPage({ isActive = true }) {
@@ -26,6 +27,7 @@ export function SmartReaderPage({ isActive = true }) {
   const [readerTheme, setReaderTheme] = useState(() => localStorage.getItem("shotlang_reader_theme") || "default");
   const [autoScroll, setAutoScroll] = useState(() => localStorage.getItem("shotlang_reader_autoscroll") !== "false");
   const [activeWordPopover, setActiveWordPopover] = useState(null);
+  const [isCtrlPressed, setIsCtrlPressed] = useState(false);
 
   const editorBoxRef = useRef(null);
   const articleContainerRef = useRef(null);
@@ -250,6 +252,8 @@ export function SmartReaderPage({ isActive = true }) {
     if (mode !== "reading" || !isActive) return;
 
     const handleKeyDown = (e) => {
+      setIsCtrlPressed(Boolean(e.ctrlKey || e.metaKey));
+
       const tag = document.activeElement?.tagName?.toLowerCase();
       const isEditing = tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable;
       if (isEditing) return;
@@ -263,18 +267,52 @@ export function SmartReaderPage({ isActive = true }) {
       }
     };
 
+    const handleKeyUp = (e) => {
+      setIsCtrlPressed(Boolean(e.ctrlKey || e.metaKey));
+    };
+
+    const handleBlur = () => {
+      setIsCtrlPressed(false);
+    };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", handleBlur);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", handleBlur);
+    };
   }, [mode, isActive, handleToggleSpeech, handleRestartSpeech]);
 
-  // Single click inside article: Open vocab popover if clicking a saved mark;
-  // If user is selecting text (bôi đen), ignore so selection isn't interrupted.
+  // Click inside article:
+  // 1. Ctrl + Click: Speak that specific sentence
+  // 2. Click on saved mark: Open vocab popover
   const handleArticleClick = (e) => {
+    // 1. Ctrl + Click (or Cmd + Click on Mac) -> Speak clicked sentence
+    if (e.ctrlKey || e.metaKey) {
+      const sentenceEl = e.target.closest(".reader-sentence");
+      if (sentenceEl) {
+        e.preventDefault();
+        e.stopPropagation();
+        const sIdxAttr = sentenceEl.getAttribute("data-s-idx");
+        if (sIdxAttr !== null) {
+          const sIdx = Number(sIdxAttr);
+          if (!isNaN(sIdx) && sentencesList && sIdx >= 0 && sIdx < sentencesList.length) {
+            speakSentence(sIdx, true);
+          }
+        }
+        return;
+      }
+    }
+
+    // 2. If user is selecting text (bôi đen), ignore so selection isn't interrupted
     const selection = window.getSelection();
     if (selection && selection.toString().trim().length > 0) {
       return;
     }
 
+    // 3. Click on saved vocab mark -> Open popover
     const markEl = e.target.closest(".smart-vocab-mark");
     if (markEl) {
       e.preventDefault();
@@ -289,24 +327,6 @@ export function SmartReaderPage({ isActive = true }) {
         contextSentence: parentSentence,
       });
       return;
-    }
-  };
-
-  // Double click inside article: Speak the double-clicked sentence
-  const handleArticleDoubleClick = (e) => {
-    if (e.target.closest(".smart-vocab-mark")) {
-      return;
-    }
-
-    const sentenceEl = e.target.closest(".reader-sentence");
-    if (sentenceEl) {
-      const sIdxAttr = sentenceEl.getAttribute("data-s-idx");
-      if (sIdxAttr !== null) {
-        const sIdx = Number(sIdxAttr);
-        if (!isNaN(sIdx) && sentencesList && sIdx >= 0 && sIdx < sentencesList.length) {
-          speakSentence(sIdx, true);
-        }
-      }
     }
   };
 
@@ -418,12 +438,16 @@ export function SmartReaderPage({ isActive = true }) {
                 "--reader-font-size": `${fontSize}px`,
               }}
             >
+              <div className="reader-shortcut-tip-bar">
+                <Lightbulb size={15} color="#f59e0b" style={{ flexShrink: 0 }} />
+                <span><strong>Mẹo:</strong> Giữ <kbd className="reader-ctrl-kbd">Ctrl</kbd> + <strong>Click vào câu</strong> để nghe đọc • <strong>Nhấp đúp / Bôi đen</strong> từ để tra nghĩa</span>
+              </div>
+
               <div
                 ref={articleContainerRef}
-                className="reader-article-body"
+                className={`reader-article-body ${isCtrlPressed ? "ctrl-mode" : ""}`}
                 dangerouslySetInnerHTML={{ __html: processedHtml }}
                 onClick={handleArticleClick}
-                onDoubleClick={handleArticleDoubleClick}
               />
             </div>
           </main>
