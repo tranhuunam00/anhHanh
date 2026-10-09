@@ -37,7 +37,14 @@ export const WordLookupPopover = ({
     if (!targetElement) return;
 
     const updatePosition = () => {
-      const rect = targetElement.getBoundingClientRect();
+      let rect = null;
+      if (typeof targetElement.getBoundingClientRect === "function") {
+        rect = targetElement.getBoundingClientRect();
+      } else if (targetElement.left !== undefined && targetElement.top !== undefined) {
+        rect = targetElement;
+      }
+      if (!rect || (rect.width === 0 && rect.height === 0)) return;
+
       const popoverWidth = Math.min(320, window.innerWidth - 24);
       const popoverEstimatedHeight = 250;
 
@@ -138,8 +145,7 @@ export const WordLookupPopover = ({
       if (
         popoverRef.current &&
         !popoverRef.current.contains(e.target) &&
-        targetElement &&
-        !targetElement.contains(e.target)
+        (!targetElement || !(typeof targetElement.contains === "function" && targetElement.contains(e.target)))
       ) {
         onClose();
       }
@@ -257,10 +263,12 @@ export const WordLookupPopover = ({
       {/* Header: Word + UK / US Audio buttons + Close */}
       <div className="lookup-popover-header">
         <div className="lookup-word-title-group">
-          <span className="lookup-word-name">{cleanWord}</span>
-          {lookupData?.part_of_speech && (
+          <span className="lookup-word-name" title={cleanWord}>{cleanWord}</span>
+          {lookupData?.part_of_speech ? (
             <span className="lookup-pos-badge">{lookupData.part_of_speech}</span>
-          )}
+          ) : cleanWord.includes(" ") ? (
+            <span className="lookup-pos-badge">cụm từ</span>
+          ) : null}
         </div>
 
         <div className="lookup-audio-actions">
@@ -292,24 +300,27 @@ export const WordLookupPopover = ({
 
       <div className="lookup-divider" />
 
-      {/* IPA Section - Exactly as shown in Image 2 */}
-      <div className="lookup-section">
-        <div className="lookup-section-title">IPA for {cleanWord}</div>
-        {loading ? (
-          <div className="lookup-skeleton-line" style={{ width: "65%" }} />
-        ) : (
-          <div className="lookup-ipa-row">
-            <span className="ipa-accent">UK</span>
-            <span className="ipa-text">{lookupData?.ipa_uk || lookupData?.ipa || "/.../"}</span>
-            <span className="ipa-accent" style={{ marginLeft: "10px" }}>
-              US
-            </span>
-            <span className="ipa-text">{lookupData?.ipa_us || lookupData?.ipa || "/.../"}</span>
+      {/* IPA Section - Hiển thị nếu có IPA hoặc đang load */}
+      {(loading || Boolean(lookupData?.ipa_uk || lookupData?.ipa_us || lookupData?.ipa)) && (
+        <>
+          <div className="lookup-section">
+            <div className="lookup-section-title">IPA for {cleanWord}</div>
+            {loading ? (
+              <div className="lookup-skeleton-line" style={{ width: "65%" }} />
+            ) : (
+              <div className="lookup-ipa-row">
+                <span className="ipa-accent">UK</span>
+                <span className="ipa-text">{lookupData?.ipa_uk || lookupData?.ipa || "/.../"}</span>
+                <span className="ipa-accent" style={{ marginLeft: "10px" }}>
+                  US
+                </span>
+                <span className="ipa-text">{lookupData?.ipa_us || lookupData?.ipa || "/.../"}</span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-
-      <div className="lookup-divider" />
+          <div className="lookup-divider" />
+        </>
+      )}
 
       {/* Translation Section - Exactly as shown in Image 2 */}
       <div className="lookup-section">

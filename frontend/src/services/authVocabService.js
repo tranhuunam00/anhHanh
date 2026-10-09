@@ -230,13 +230,14 @@ export const submitVocabReviewResult = async (vocabId, isCorrect, token) => {
   return await safeParseResponse(res, "Không thể cập nhật kết quả ôn tập");
 };
 
-export const quickLookupWord = async (word, videoId = null, timestamp = null, token = null) => {
+export const quickLookupWord = async (word, context = null, token = null, targetLang = "vi") => {
   try {
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
-    const params = new URLSearchParams({ word: word.trim() });
-    if (videoId) params.append("video_id", videoId);
-    if (timestamp !== null && timestamp !== undefined) params.append("timestamp", String(timestamp));
+    const params = new URLSearchParams({ word: word.trim(), target_lang: targetLang });
+    if (context && typeof context === "string") {
+      params.append("context", context.trim());
+    }
 
     const res = await fetch(`/api/vocab/lookup?${params.toString()}`, { headers });
     if (res.ok) {

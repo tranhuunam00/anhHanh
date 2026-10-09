@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { IconSparkles } from "../Icons";
-import { useAuth } from "../../context/AuthContext";
-import { createVocabWord } from "../../services/authVocabService";
+import { WordLookupPopover } from "./WordLookupPopover";
 import { splitContextSentence } from "../../utils/textNormalizer";
 
 export const FloatingVocabSaver = ({
@@ -9,28 +7,38 @@ export const FloatingVocabSaver = ({
   currentVideoId = "",
   currentTimestamp = 0,
   sourceLang = "en",
-  targetLang = "vi"
+  targetLang = "vi",
 }) => {
-  const { token, refreshStreak, showToast, refreshSavedVocab } = useAuth();
-  const [position, setPosition] = useState(null);
   const [selectedWord, setSelectedWord] = useState("");
   const [selectedSentence, setSelectedSentence] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  const [targetRange, setTargetRange] = useState(null);
 
   useEffect(() => {
-    const handleMouseUp = () => {
+    const handleMouseUp = (e) => {
+      // Don't trigger if mouseup happened inside popover or input/textarea
+      if (e?.target?.closest(".word-lookup-popover, input, textarea")) {
+        return;
+      }
+
       const selection = window.getSelection();
       const text = selection?.toString().trim();
 
       if (!text || text.length > 120 || text.includes("\n")) {
-        setPosition(null);
-        setSelectedWord("");
-        setSelectedSentence("");
         return;
       }
 
-      // Check if range is inside exercise or transcript
-      const range = selection.getRangeAt(0);
+      // Ignore accidental 1-character clicks unless standard 1-letter words 'a' or 'i'
+      if (text.length === 1 && !["a", "i", "A", "I"].includes(text)) {
+        return;
+      }
+
+      let range;
+      try {
+        range = selection.getRangeAt(0);
+      } catch {
+        return;
+      }
+
       const rect = range.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
@@ -40,7 +48,7 @@ export const FloatingVocabSaver = ({
         const node = range.commonAncestorContainer;
         const element = node.nodeType === 3 ? node.parentElement : node;
         const sentenceEl = element.closest(
-          ".sentence-card, .sentence-item, .transcript-item, .transcript-sentence, .dictation-sentence-text, .transcript-line, p, li"
+          ".sentence-card, .sentence-item, .transcript-item, .transcript-sentence, .dictation-sentence-text, .transcript-line, .reader-sentence, p, li"
         );
         if (sentenceEl) {
           const origEl = sentenceEl.querySelector(".transcript-en, .transcript-orig, .orig-text, .sentence-en, [data-lang='en']");
@@ -65,18 +73,14 @@ export const FloatingVocabSaver = ({
       }
 
       setSelectedSentence(extractedSentence || currentSentence || "");
-      setPosition({
-        top: rect.top + window.scrollY - 8,
-        left: rect.left + window.scrollX + rect.width / 2,
-      });
       setSelectedWord(text);
+      setTargetRange(range.cloneRange());
     };
 
     const handleMouseDown = (e) => {
-      if (e.target.closest(".floating-vocab-btn")) return;
-      setPosition(null);
+      if (e.target.closest(".word-lookup-popover")) return;
       setSelectedWord("");
-      setSelectedSentence("");
+      setTargetRange(null);
     };
 
     document.addEventListener("mouseup", handleMouseUp);
@@ -88,59 +92,21 @@ export const FloatingVocabSaver = ({
     };
   }, [currentSentence]);
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!selectedWord || isSaving) return;
-
-    if (!token) {
-      showToast("Vui lòng đăng nhập để lưu từ vào Sổ tay từ vựng", "warning");
-      return;
-    }
-
-    setIsSaving(true);
-    showToast(`Đang tìm nghĩa & ảnh AI cho "${selectedWord}"...`, "info");
-
-    try {
-      await createVocabWord(
-        {
-          word: selectedWord,
-          context_sentence: selectedSentence || currentSentence || "",
-          video_id: currentVideoId || "",
-          timestamp: currentTimestamp || 0,
-          source_lang: sourceLang || "en",
-          target_lang: "vi",
-        },
-        token
-      );
-      showToast(`Đã lưu "${selectedWord}" vào Sổ tay từ vựng!`, "success");
-      refreshStreak();
-      if (refreshSavedVocab) refreshSavedVocab();
-      setPosition(null);
-      setSelectedWord("");
-      setSelectedSentence("");
-      window.getSelection()?.removeAllRanges();
-    } catch (err) {
-      showToast(err.message || "Không thể lưu từ này", "error");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  if (!position || !selectedWord) return null;
+  if (!selectedWord || !targetRange) return null;
 
   return (
-    <button
-      className="floating-vocab-btn"
-      style={{
-        top: `${position.top}px`,
-        left: `${position.left}px`,
+    <WordLookupPopover
+      word={selectedWord}
+      targetElement={targetRange}
+      contextSentence={selectedSentence || currentSentence || ""}
+      videoId={currentVideoId || ""}
+      timestamp={currentTimestamp || 0}
+      sourceLang={sourceLang || "en"}
+      targetLang={targetLang || "vi"}
+      onClose={() => {
+        setSelectedWord("");
+        setTargetRange(null);
       }}
-      onClick={handleSave}
-      disabled={isSaving}
-    >
-      <IconSparkles size={14} />
-      <span>{isSaving ? "Đang lưu..." : `Lưu "${selectedWord}"`}</span>
-    </button>
+    />
   );
 };
