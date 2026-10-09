@@ -1,0 +1,324 @@
+/* ==========================================================================
+   Destination B2: Workbook Authentic Layout & Exercise Styles
+   Rule 2: System CSS variables for light/dark mode compatibility.
+   Rule 4: File strictly under 500 lines.
+   ========================================================================== */
+
+/* Word Bank Box (Ex D, Ex F) */
+.b2-wb-box-header {
+  border: 1.5px solid var(--border-color, #cbd5e1);
+  background: var(--bg-card, #ffffff);
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.b2-wb-word-pill {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary, #0f172a);
+  letter-spacing: 0.2px;
+}
+
+.b2-wb-bullet {
+  color: var(--text-muted, #94a3b8);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+/* Dotted Line Input (Ex B, C, D) */
+.b2-dotted-line-container {
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
+  margin: 0 4px;
+}
+
+.b2-dotted-input {
+  border: none;
+  border-bottom: 2px dotted var(--primary, #6366f1);
+  background: transparent;
+  color: var(--text-primary, #0f172a);
+  font-family: inherit;
+  font-size: 0.96rem;
+  font-weight: 600;
+  padding: 4px 6px;
+  outline: none;
+  min-width: 160px;
+  transition: all 0.2s ease;
+}
+
+.b2-dotted-input:focus {
+  border-bottom: 2px solid var(--primary, #6366f1);
+  background: rgba(99, 102, 241, 0.05);
+  border-radius: 4px 4px 0 0;
+}
+
+.b2-dotted-input.correct {
+  border-bottom: 2px solid #10b981;
+  color: #059669;
+}
+
+.b2-dotted-input.incorrect {
+  border-bottom: 2px solid #ef4444;
+  color: #dc2626;
+}
+
+/* Inline Binary Choice Button (Ex A) */
+.b2-inline-choice-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 4px;
+  vertical-align: middle;
+}
+
+.b2-inline-choice-btn {
+  border: 1px solid transparent;
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--text-primary, #0f172a);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.b2-inline-choice-btn:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+}
+
+.b2-inline-choice-btn.selected {
+  background: var(--primary, #6366f1);
+  color: #ffffff;
+  border-color: var(--primary, #6366f1);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+}
+
+.b2-inline-choice-btn.correct {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.b2-inline-choice-btn.incorrect {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Exercise B: Rewrite Card */
+.b2-rewrite-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.b2-bold-target {
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  background: rgba(245, 158, 11, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Exercise E: Two Column Multiple Choice Layout */
+.b2-mcq-twocol {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 860px) {
+  .b2-mcq-twocol {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+}
+
+.b2-mcq-card {
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.b2-mcq-options-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.b2-mcq-option-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-primary, #0f172a);
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.b2-mcq-option-pill:hover:not(:disabled) {
+  border-color: var(--primary, #6366f1);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.b2-mcq-option-pill.selected {
+  border-color: var(--primary, #6366f1);
+  background: rgba(99, 102, 241, 0.12);
+  font-weight: 700;
+}
+
+.b2-mcq-option-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.8rem;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-primary, #0f172a);
+}
+
+.b2-mcq-option-pill.selected .b2-mcq-option-letter {
+  background: var(--primary, #6366f1);
+  color: #ffffff;
+}
+
+/* Exercise F & I: Ancient Aviators / Reading Passage Box */
+.b2-passage-blue-box {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  line-height: 1.85;
+  font-size: 0.98rem;
+  color: var(--text-primary, #0f172a);
+}
+
+.b2-passage-heading {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 14px;
+  color: var(--text-primary, #0f172a);
+}
+
+/* Exercise G: Matching Layout */
+.b2-matching-grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 860px) {
+  .b2-matching-grid-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+.b2-match-left-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+}
+
+.b2-match-right-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  font-size: 0.92rem;
+}
+
+/* Exercise H: International Friends (Notebook Paper Layout) */
+.b2-notebook-paper {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  font-family: inherit;
+}
+
+.b2-notebook-title {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 18px;
+  letter-spacing: 0.3px;
+  color: var(--text-primary, #0f172a);
+}
+
+.b2-notebook-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border-color, #e2e8f0);
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
+
+.b2-notebook-row-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.b2-notebook-row-text {
+  flex: 1;
+  color: var(--text-primary, #0f172a);
+}
+
+/* Key Word Transformation (Ex J) */
+.b2-key-badge-container {
+  display: inline-block;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  margin: 6px 0;
+}

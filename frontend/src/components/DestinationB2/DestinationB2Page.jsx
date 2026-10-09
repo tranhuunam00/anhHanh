@@ -1,85 +1,79 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { BookOpen, CheckCircle, IconSparkles } from "../Icons";
-import { fetchB2Units, fetchB2UnitDetail, fetchB2Exercise } from "../../services/destinationB2Service";
+import { fetchB2Units, fetchB2UnitDetail } from "../../services/destinationB2Service";
+import { UNIT_1_THEORY } from "../../data/destinationB2/unit1Theory";
+import { UNIT_1_EXERCISES } from "../../data/destinationB2/unit1Exercises";
+import { getB2StoredProgress } from "../../utils/destinationB2Grading";
 import { B2TheoryViewer } from "./B2TheoryViewer";
 import { B2ExerciseRunner } from "./B2ExerciseRunner";
 import "../../styles/destination-b2.css";
 
+/**
+ * Destination B2 Hub Component.
+ * Supports 100% offline pure client-side execution with zero backend dependency.
+ * Rule 1: Internal icons only.
+ * Rule 4: File strictly under 500 lines.
+ */
 export const DestinationB2Page = ({ isActive, token }) => {
-  const [units, setUnits] = useState([]);
   const [selectedUnitNumber, setSelectedUnitNumber] = useState(1);
-  const [unitDetail, setUnitDetail] = useState(null);
   const [activeMode, setActiveMode] = useState("theory"); // 'theory' | 'exercise'
-  const [activeExercise, setActiveExercise] = useState(null);
+  const [activeExerciseId, setActiveExerciseId] = useState("u01_ex_a");
   const [completedExerciseIds, setCompletedExerciseIds] = useState(new Set());
-  const [isLoading, setIsLoading] = useState(true);
+  const [remoteUnit2Detail, setRemoteUnit2Detail] = useState(null);
 
-  // Load units summary
+  // Unit 1 is 100% offline client-side native from textbook data
+  const staticUnit1Detail = useMemo(
+    () => ({
+      unit_number: 1,
+      unit_type: "grammar",
+      title: "Present time: Present Simple, Present Continuous, Present Perfect Simple, Present Perfect Continuous, Stative verbs",
+      theory: UNIT_1_THEORY,
+      exercises: UNIT_1_EXERCISES,
+    }),
+    []
+  );
+
+  // Initialize completed exercise status from localStorage
   useEffect(() => {
-    let isMounted = true;
-    const loadInitialData = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetchB2Units();
-        if (isMounted && res.units) {
-          setUnits(res.units);
-        }
-      } catch (err) {
-        console.error("Error loading Destination B2 units:", err);
-      } finally {
-        if (isMounted) setIsLoading(false);
+    const completed = new Set();
+    UNIT_1_EXERCISES.forEach((ex) => {
+      const saved = getB2StoredProgress(ex.id);
+      if (saved && saved.results && saved.results.length > 0) {
+        completed.add(ex.id);
       }
-    };
+    });
+    setCompletedExerciseIds(completed);
+  }, []);
 
-    if (isActive) {
-      loadInitialData();
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [isActive]);
-
-  // Load detail for selected unit
+  // Fetch optional remote data for Unit 2 if user navigates there
   useEffect(() => {
-    let isMounted = true;
-    const loadDetail = async () => {
-      try {
-        setIsLoading(true);
-        const detail = await fetchB2UnitDetail(selectedUnitNumber);
-        if (isMounted) {
-          setUnitDetail(detail);
-          // If in exercise mode, select first exercise by default
-          if (detail.exercises && detail.exercises.length > 0) {
-            loadExercise(detail.exercises[0].id);
-          }
-        }
-      } catch (err) {
-        console.error(`Error loading Unit ${selectedUnitNumber}:`, err);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    };
-
-    if (isActive && selectedUnitNumber) {
-      loadDetail();
+    if (selectedUnitNumber === 2 && !remoteUnit2Detail) {
+      fetchB2UnitDetail(2)
+        .then((detail) => {
+          if (detail) setRemoteUnit2Detail(detail);
+        })
+        .catch(() => {
+          // Gracefully handle offline
+        });
     }
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedUnitNumber, isActive]);
+  }, [selectedUnitNumber, remoteUnit2Detail]);
 
-  const loadExercise = async (exerciseId) => {
-    try {
-      const ex = await fetchB2Exercise(exerciseId);
-      setActiveExercise(ex);
-    } catch (err) {
-      console.error("Error fetching exercise detail:", err);
-    }
-  };
+  if (!isActive) return null;
+
+  const currentUnitDetail = selectedUnitNumber === 1 ? staticUnit1Detail : (remoteUnit2Detail || {
+    unit_number: 2,
+    unit_type: "vocabulary",
+    title: "Travel and transport",
+    theory: { sections: [] },
+    exercises: [],
+  });
+
+  const exercises = currentUnitDetail.exercises || [];
+  const activeExercise = exercises.find((ex) => ex.id === activeExerciseId) || exercises[0];
 
   const handleSelectExercise = (exId) => {
     setActiveMode("exercise");
-    loadExercise(exId);
+    setActiveExerciseId(exId);
   };
 
   const handleExerciseCompleted = (result) => {
@@ -88,32 +82,28 @@ export const DestinationB2Page = ({ isActive, token }) => {
     }
   };
 
-  if (!isActive) return null;
-
-  const currentUnitSummary = units.find((u) => u.unit_number === selectedUnitNumber) || unitDetail;
-
   return (
     <div className="b2-container">
       {/* Top Banner & Unit Selector */}
       <div className="b2-header-card">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-            <span className={`b2-badge-tag ${currentUnitSummary?.unit_type === "grammar" ? "b2-badge-grammar" : "b2-badge-vocab"}`}>
-              {currentUnitSummary?.unit_type === "grammar" ? "Ngữ pháp (Grammar)" : "Từ vựng (Vocabulary)"}
+            <span className={`b2-badge-tag ${currentUnitDetail.unit_type === "grammar" ? "b2-badge-grammar" : "b2-badge-vocab"}`}>
+              {currentUnitDetail.unit_type === "grammar" ? "Ngữ pháp (Grammar)" : "Từ vựng (Vocabulary)"}
             </span>
             <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-muted)" }}>
-              CEFR B2 • Destination B2 Master
+              CEFR B2 • Sách Destination B2 Chuẩn 100%
             </span>
           </div>
           <h1 className="b2-title">
-            Unit {selectedUnitNumber}: {currentUnitSummary?.title || "Destination B2"}
+            Unit {selectedUnitNumber}: {currentUnitDetail.title}
           </h1>
           <p className="b2-subtitle">
-            Học lý thuyết chuyên sâu và làm 19 dạng bài tập trắc nghiệm, điền từ, biến đổi câu từ trang 8 đến 17.
+            Học lý thuyết ngữ pháp chuẩn sách giáo trình và làm đầy đủ 10 bài tập từ A đến J (trang 8 - 13).
           </p>
         </div>
 
-        {/* Unit 1 & Unit 2 Switcher */}
+        {/* Unit Switcher */}
         <div className="b2-unit-switcher">
           <button
             type="button"
@@ -121,6 +111,7 @@ export const DestinationB2Page = ({ isActive, token }) => {
             onClick={() => {
               setSelectedUnitNumber(1);
               setActiveMode("theory");
+              setActiveExerciseId("u01_ex_a");
             }}
           >
             <BookOpen size={16} />
@@ -155,11 +146,11 @@ export const DestinationB2Page = ({ isActive, token }) => {
           </button>
 
           <div className="b2-sidebar-header" style={{ marginTop: "12px" }}>
-            Bài tập thực hành ({unitDetail?.exercises?.length || 0})
+            Bài tập thực hành ({exercises.length})
           </div>
 
           <div className="b2-exercise-pill-list">
-            {unitDetail?.exercises?.map((ex) => {
+            {exercises.map((ex) => {
               const isSelected = activeMode === "exercise" && activeExercise?.id === ex.id;
               const isCompleted = completedExerciseIds.has(ex.id);
 
@@ -186,7 +177,7 @@ export const DestinationB2Page = ({ isActive, token }) => {
         {/* Right Area: Theory or Exercise Runner */}
         <main>
           {activeMode === "theory" ? (
-            <B2TheoryViewer unit={unitDetail} />
+            <B2TheoryViewer unit={currentUnitDetail} />
           ) : (
             <B2ExerciseRunner
               exercise={activeExercise}

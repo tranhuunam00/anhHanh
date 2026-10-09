@@ -1,0 +1,9 @@
+export { BinaryChoiceExercise } from "./BinaryChoiceExercise";
+export { RewriteCorrectionExercise } from "./RewriteCorrectionExercise";
+export { BracketVerbExercise } from "./BracketVerbExercise";
+export { WordBankExercise } from "./WordBankExercise";
+export { MultipleChoiceExercise } from "./MultipleChoiceExercise";
+export { PassageClozeExercise } from "./PassageClozeExercise";
+export { MatchingExercise } from "./MatchingExercise";
+export { ExtraWordExercise } from "./ExtraWordExercise";
+export { KeyWordTransformationExercise } from "./KeyWordTransformationExercise";
