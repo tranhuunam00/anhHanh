@@ -63,7 +63,9 @@ class AIWritingService:
         topic: str,
         language: str = "en",
         target_band: float = 7.0,
-        genre: str = "ielts_task2"
+        genre: str = "ielts_task2",
+        request_kind: str = "all",
+        existing_phrases: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Generate tailored collocations, argument patterns and structures specifically for this topic."""
         api_key = get_gemini_api_key()
@@ -72,6 +74,8 @@ class AIWritingService:
             language=language,
             target_band=target_band,
             genre=genre,
+            request_kind=request_kind,
+            existing_phrases=existing_phrases,
             api_key=api_key,
         )
 

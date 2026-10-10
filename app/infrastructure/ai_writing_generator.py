@@ -293,6 +293,8 @@ async def suggest_structures_impl(
     language: str = "en",
     target_band: float = 7.0,
     genre: str = "ielts_task2",
+    request_kind: str = "all",
+    existing_phrases: Optional[List[str]] = None,
     api_key: Optional[str] = None
 ) -> Dict[str, Any]:
     """Generate tailored collocations, argument patterns and structures specifically for this topic."""
@@ -303,8 +305,32 @@ async def suggest_structures_impl(
     lang_name = cfg["name"]
     examiner = cfg["examiner"]
 
+    avoid_clause = ""
+    if existing_phrases and len(existing_phrases) > 0:
+        cleaned_existing = [p.strip() for p in existing_phrases if p and p.strip()][:25]
+        if cleaned_existing:
+            avoid_clause = f"\nTUYỆT ĐỐI KHÔNG LẶP LẠI các cụm từ / cấu trúc đã có sau đây: {', '.join(cleaned_existing)}.\n"
+
+    if request_kind == "collocation":
+        kind_task = f"""Nhiệm vụ của bạn là bổ sung thêm 6 - 10 CỤM TỪ (COLLOCATIONS) độc đáo, đắt giá nhất dành cho đề bài này bằng {lang_name}.
+CHỈ TẠO LOẠI A: "collocation" (Cụm từ 2 - 5 từ kết hợp tự nhiên, chuẩn văn phong học thuật Band {target_band}+).
+TUYỆT ĐỐI KHÔNG TẠO "structure" (không tạo khung câu).
+{avoid_clause}"""
+    elif request_kind == "structure":
+        kind_task = f"""Nhiệm vụ của bạn là bổ sung thêm 5 - 8 KHUNG CẤU TRÚC CÂU (SENTENCE FRAMES) học thuật cao cấp dành cho đề bài này bằng {lang_name}.
+CHỈ TẠO LOẠI B: "structure" (Khung cấu trúc câu: BẮT BUỘC DÙNG DẤU NGOẶC VUÔNG `[...]` làm chỗ trống để người học tự điền ý của họ).
+TUYỆT ĐỐI KHÔNG TẠO "collocation".
+{avoid_clause}"""
+    else:
+        kind_task = f"""Nhiệm vụ của bạn là phân tích đề bài luyện viết dưới đây và đề xuất bộ GỢI Ý CỤM TỪ (COLLOCATIONS) & KHUNG CẤU TRÚC CÂU (SENTENCE FRAMES) đắt giá nhất dành cho đề bài này bằng {lang_name}.
+Cung cấp cả 2 loại gợi ý:
+- Loại A: "collocation" (Cụm từ đắt giá theo chủ đề): 2 - 5 từ kết hợp tự nhiên.
+- Loại B: "structure" (Khung cấu trúc câu): BẮT BUỘC DÙNG DẤU NGOẶC VUÔNG `[...]` làm chỗ trống để người học tự điền ý của họ.
+Hãy đề xuất khoảng 10 đến 14 gợi ý theo 4 phần: "intro", "body", "counter", "conclusion".
+{avoid_clause}"""
+
     prompt_instruction = f"""Bạn là {examiner}.
-Nhiệm vụ của bạn là phân tích đề bài luyện viết dưới đây và đề xuất bộ GỢI Ý CỤM TỪ (COLLOCATIONS) & KHUNG CẤU TRÚC CÂU (SENTENCE FRAMES) đắt giá nhất dành cho đề bài này bằng {lang_name}.
+{kind_task}
 
 ĐỀ BÀI (TOPIC):
 \"\"\"{topic}\"\"\"
@@ -315,11 +341,7 @@ MỤC TIÊU BAND: {target_band}
 
 QUY TẮC CỐT LÕI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
 1. TUYỆT ĐỐI KHÔNG ĐƯỢC VIẾT CẢ CÂU HOÀN CHỈNH ĐÃ VIẾT SẴN HẾT NỘI DUNG / NGUYÊN CÂU DÀI 25-40 TỪ.
-2. CHỈ CUNG CẤP ĐÚNG 2 LOẠI GỢI Ý:
-   - Loại A: "collocation" (Cụm từ đắt giá theo chủ đề): 2 - 5 từ kết hợp tự nhiên.
-   - Loại B: "structure" (Khung cấu trúc câu): BẮT BUỘC DÙNG DẤU NGOẶC VUÔNG `[...]` làm chỗ trống để người học tự điền ý của họ.
-
-Hãy đề xuất khoảng 10 đến 14 gợi ý theo 4 phần: "intro", "body", "counter", "conclusion".
+2. Với "structure": BẮT BUỘC DÙNG DẤU NGOẶC VUÔNG `[...]` làm chỗ trống.
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON HỢP LỆ THEO CẤU TRÚC CHÍNH XÁC SAU ĐÂY:
 {{

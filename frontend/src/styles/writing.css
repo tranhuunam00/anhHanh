@@ -1981,6 +1981,182 @@
   color: #7c3aed;
 }
 
+/* --- Compact Toolbar & Addon Buttons --- */
+.structures-compact-toolbar {
+  padding: 8px 20px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.structures-topic-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex: 1;
+  minWidth: 220px;
+}
+
+.topic-chip-label {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.topic-chip-text {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+}
+
+.topic-chip-badge {
+  font-size: 0.7rem;
+  background: var(--bg-secondary);
+  padding: 1px 7px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  font-weight: 700;
+}
+
+.structures-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-structure-addon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.btn-structure-addon:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-addon-collocation {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.28);
+}
+
+.btn-addon-collocation:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #059669;
+}
+
+.btn-addon-structure {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+  border-color: rgba(139, 92, 246, 0.28);
+}
+
+.btn-addon-structure:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: #7c3aed;
+}
+
+.btn-addon-reload {
+  background: rgba(236, 72, 153, 0.1);
+  color: #db2777;
+  border-color: rgba(236, 72, 153, 0.25);
+}
+
+.btn-addon-reload:hover:not(:disabled) {
+  background: rgba(236, 72, 153, 0.18);
+  border-color: #db2777;
+}
+
+/* --- Compact Card Layout --- */
+.compact-body {
+  padding: 10px 20px !important;
+  gap: 8px !important;
+}
+
+.compact-card {
+  padding: 10px 14px !important;
+  gap: 6px !important;
+  border-radius: 10px !important;
+}
+
+.structure-tags-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.structure-category-pill {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+.structure-card-actions-compact {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-action-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-copy-compact {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn-copy-compact:hover {
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+.btn-insert-compact {
+  background: #7c3aed;
+  border: 1px solid #7c3aed;
+  color: #fff;
+}
+
+.btn-insert-compact:hover {
+  background: #6d28d9;
+}
+
+.compact-usage {
+  font-size: 0.74rem !important;
+  padding: 2px 7px !important;
+}
+
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

@@ -59,6 +59,8 @@ class SuggestStructuresRequest(BaseModel):
     language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu điểm")
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
+    request_kind: Optional[str] = Field(default="all", description="Loại yêu cầu: 'all', 'collocation', hoặc 'structure'")
+    existing_phrases: Optional[List[str]] = Field(default=[], description="Danh sách các cụm/câu đã có để tránh trùng")
 
 
 @router.get("/prompts")
@@ -174,7 +176,9 @@ async def suggest_writing_structures(
             topic=body.topic,
             language=body.language or "en",
             target_band=body.target_band or 7.0,
-            genre=body.genre or "ielts_task2"
+            genre=body.genre or "ielts_task2",
+            request_kind=body.request_kind or "all",
+            existing_phrases=body.existing_phrases or []
         )
         return {
             "success": True,

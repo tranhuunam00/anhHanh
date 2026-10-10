@@ -312,6 +312,48 @@ async def test_suggest_structures_legacy_gemini_format_normalized():
 
 
 @pytest.mark.asyncio
+async def test_suggest_structures_request_kind_collocation_and_structure():
+    """Verify request_kind='collocation' and 'structure' with existing_phrases deduplication."""
+    mock_colloc = {
+        "topic": "Education",
+        "suggestions": [
+            {
+                "kind": "collocation",
+                "phrase": "holistic development",
+                "meaning": "sự phát triển toàn diện",
+                "band": "band8",
+            }
+        ]
+    }
+    with patch("httpx.AsyncClient.post") as mock_post:
+        mock_post.return_value = AsyncMock(
+            status_code=200,
+            json=lambda: {
+                "candidates": [{
+                    "content": {
+                        "parts": [{"text": json.dumps(mock_colloc)}]
+                    }
+                }]
+            }
+        )
+        res = await suggest_structures_impl(
+            topic="Education",
+            request_kind="collocation",
+            existing_phrases=["rote learning"],
+            api_key="dummy_key"
+        )
+        assert len(res["suggestions"]) == 1
+        assert res["suggestions"][0]["phrase"] == "holistic development"
+        assert res["suggestions"][0]["kind"] == "collocation"
+
+        # Check prompt sent contains avoid_clause and collocation task
+        call_payload = mock_post.call_args[1]["json"]
+        sent_text = call_payload["contents"][0]["parts"][0]["text"]
+        assert "rote learning" in sent_text
+        assert "COLLOCATIONS" in sent_text
+
+
+@pytest.mark.asyncio
 async def test_evaluate_writing_impl_short_content_rejected():
     """Boundary test: essays under 15 words are rejected."""
     with pytest.raises(ValueError, match="quá ngắn"):

@@ -42,7 +42,15 @@ export const generateWritingPrompt = async ({ genre, topicArea, language = "en",
   return data.prompt;
 };
 
-export const suggestWritingStructures = async ({ topic, language = "en", targetBand = 7.0, genre = "ielts_task2", token }) => {
+export const suggestWritingStructures = async ({
+  topic,
+  language = "en",
+  targetBand = 7.0,
+  genre = "ielts_task2",
+  requestKind = "all",
+  existingPhrases = [],
+  token
+}) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -56,6 +64,8 @@ export const suggestWritingStructures = async ({ topic, language = "en", targetB
       language,
       target_band: targetBand,
       genre,
+      request_kind: requestKind,
+      existing_phrases: existingPhrases,
     }),
   });
 
