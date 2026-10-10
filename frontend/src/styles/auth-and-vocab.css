@@ -1170,6 +1170,92 @@
   line-height: 1.35;
 }
 
+.lookup-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lookup-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lookup-edit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  color: var(--primary, #6366f1);
+  background: rgba(99, 102, 241, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.lookup-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--primary, #6366f1);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.lookup-reset-btn:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary, #4f46e5);
+}
+
+.lookup-meaning-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.lookup-meaning-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  line-height: 1.38;
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 6px 10px;
+  resize: none;
+  min-height: 38px;
+  overflow-y: auto;
+  transition: all 0.15s ease;
+}
+
+.lookup-meaning-textarea:hover {
+  border-color: var(--border-color-hover, #cbd5e1);
+}
+
+.lookup-meaning-textarea:focus {
+  outline: none;
+  background: var(--bg-card, #ffffff);
+  border-color: var(--primary, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.lookup-meaning-textarea::placeholder {
+  color: var(--text-muted, #94a3b8);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
 .lookup-definition-text {
   font-size: 0.78rem;
   color: var(--text-secondary, #64748b);
@@ -1224,6 +1310,15 @@
 .lookup-save-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.lookup-save-btn.lookup-update-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.lookup-save-btn.lookup-update-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
 }
 
 .lookup-saved-bar {

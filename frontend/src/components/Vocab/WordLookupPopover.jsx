@@ -1,7 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IconVolume, IconSparkles, IconBookmark, IconClose, IconCheckCircle } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
-import { quickLookupWord, playPronunciationAudio, createVocabWord, updateVocabStatus } from "../../services/authVocabService";
+import {
+  quickLookupWord,
+  playPronunciationAudio,
+  createVocabWord,
+  updateVocabStatus,
+  updateVocabWord,
+} from "../../services/authVocabService";
+import {
+  resolveInitialMeaning,
+  isMeaningModified,
+  getMeaningSavePayload,
+  calculateAutoTextareaHeight,
+  computePopoverCoords,
+} from "../../utils/wordLookupUtils";
+import { PopoverTranslationSection } from "./PopoverTranslationSection";
 
 const STATUS_MAP = {
   NEW: { label: "Mới lưu", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.12)" },
@@ -22,53 +36,43 @@ export const WordLookupPopover = ({
 }) => {
   const { token, refreshStreak, refreshSavedVocab, showToast, savedVocabMap } = useAuth();
   const popoverRef = useRef(null);
+  const textareaRef = useRef(null);
 
   const [lookupData, setLookupData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeAudio, setActiveAudio] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, left: 0, placement: "bottom", arrowLeft: 140 });
+  const [coords, setCoords] = useState({ top: 0, left: 12, placement: "bottom", arrowLeft: 140 });
+  const [customMeaning, setCustomMeaning] = useState("");
+  const [initialMeaning, setInitialMeaning] = useState("");
 
   // Clean word token for display and lookup
   const cleanWord = (word || "").trim().replace(/^[’'".:,;!?-]+|[’'".:,;!?-]+$/g, "");
+
+  // Reset custom meanings when word token changes
+  useEffect(() => {
+    setCustomMeaning("");
+    setInitialMeaning("");
+  }, [cleanWord]);
+
+  // Auto adjust textarea height to fit content nicely
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      const h = calculateAutoTextareaHeight(textareaRef.current.scrollHeight, 38, 120);
+      textareaRef.current.style.height = `${h}px`;
+    }
+  }, [customMeaning, loading]);
 
   // Positioning relative to targetElement
   useEffect(() => {
     if (!targetElement) return;
 
     const updatePosition = () => {
-      let rect = null;
-      if (typeof targetElement.getBoundingClientRect === "function") {
-        rect = targetElement.getBoundingClientRect();
-      } else if (targetElement.left !== undefined && targetElement.top !== undefined) {
-        rect = targetElement;
-      }
-      if (!rect || (rect.width === 0 && rect.height === 0)) return;
-
-      const popoverWidth = Math.min(320, window.innerWidth - 24);
-      const popoverEstimatedHeight = 250;
-
-      const targetCenterX = rect.left + rect.width / 2;
-      let left = targetCenterX - popoverWidth / 2;
-
-      // Ensure stays within viewport horizontally
-      if (left < 12) left = 12;
-      if (left + popoverWidth > window.innerWidth - 12) {
-        left = window.innerWidth - 12 - popoverWidth;
-      }
-
-      // Check vertical space (default to bottom placement, like Image 2)
-      let placement = "bottom";
-      let top = rect.bottom + 8;
-
-      if (top + popoverEstimatedHeight > window.innerHeight && rect.top > popoverEstimatedHeight + 10) {
-        placement = "top";
-        top = rect.top - 8;
-      }
-
-      const arrowLeft = Math.max(16, Math.min(popoverWidth - 16, targetCenterX - left));
-
-      setCoords({ top, left, placement, arrowLeft });
+      const rect = typeof targetElement.getBoundingClientRect === "function"
+        ? targetElement.getBoundingClientRect()
+        : targetElement;
+      setCoords(computePopoverCoords(rect, window.innerWidth, window.innerHeight));
     };
 
     updatePosition();
@@ -88,7 +92,6 @@ export const WordLookupPopover = ({
 
     setLoading(true);
 
-    // Check if word is already in AuthContext savedVocabMap
     const cleanLower = cleanWord.toLowerCase().replace(/\s+/g, " ");
     const cleanNorm = cleanLower.replace(/[’']/g, "'");
     const savedItem = savedVocabMap
@@ -98,20 +101,31 @@ export const WordLookupPopover = ({
     quickLookupWord(cleanWord, contextSentence, token)
       .then((data) => {
         if (!isMounted) return;
+        const resolved = resolveInitialMeaning(cleanWord, data, savedItem);
+        setCustomMeaning(resolved);
+        setInitialMeaning(resolved);
+
         if (savedItem) {
           setLookupData({
             ...data,
             is_saved: true,
             saved_vocab: savedItem,
-            meaning: savedItem.meaning || data?.meaning,
+            meaning: resolved,
             ipa: savedItem.phonetic || data?.ipa,
           });
         } else {
-          setLookupData(data);
+          setLookupData({
+            ...data,
+            meaning: resolved,
+          });
         }
       })
       .catch(() => {
         if (!isMounted) return;
+        const fallback = resolveInitialMeaning(cleanWord, null, savedItem);
+        setCustomMeaning(fallback);
+        setInitialMeaning(fallback);
+
         setLookupData({
           word: cleanWord,
           ipa: null,
@@ -119,7 +133,7 @@ export const WordLookupPopover = ({
           ipa_us: null,
           part_of_speech: null,
           definition: null,
-          meaning: cleanWord,
+          meaning: fallback,
           is_saved: Boolean(savedItem),
           saved_vocab: savedItem,
         });
@@ -171,7 +185,7 @@ export const WordLookupPopover = ({
     });
   };
 
-  // One-click save to notebook
+  // One-click save to notebook with edited translation
   const handleSaveToNotebook = async () => {
     if (!token) {
       showToast("Vui lòng đăng nhập để lưu từ vào Sổ tay", "warning");
@@ -181,34 +195,75 @@ export const WordLookupPopover = ({
 
     setIsSaving(true);
     try {
-      const payload = {
-        word: cleanWord,
-        context_sentence: contextSentence || "",
-        meaning: lookupData.meaning || "",
-        phonetic: lookupData.ipa || "",
-        video_id: videoId || "",
-        timestamp: timestamp || 0,
-        source_lang: sourceLang || "en",
-        target_lang: targetLang || "vi",
-      };
+      const payload = getMeaningSavePayload({
+        cleanWord,
+        customMeaning,
+        lookupMeaning: lookupData?.meaning,
+        contextSentence,
+        phonetic: lookupData?.ipa,
+        videoId,
+        timestamp,
+        sourceLang,
+        targetLang,
+      });
 
       const res = await createVocabWord(payload, token);
       showToast(`Đã lưu "${cleanWord}" vào Sổ tay!`, "success");
       refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
 
+      const savedVocab = res?.vocab || {
+        word: cleanWord,
+        meaning: payload.meaning,
+        status: "NEW",
+        phonetic: lookupData?.ipa,
+      };
+
       setLookupData((prev) => ({
         ...prev,
         is_saved: true,
-        saved_vocab: res.vocab || {
-          word: cleanWord,
-          meaning: lookupData.meaning,
-          status: "NEW",
-          phonetic: lookupData.ipa,
-        },
+        saved_vocab: savedVocab,
+        meaning: payload.meaning,
       }));
+      setInitialMeaning(payload.meaning);
+      setCustomMeaning(payload.meaning);
     } catch (err) {
       showToast(err.message || "Không thể lưu từ này", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Update meaning for already saved word
+  const handleUpdateSavedMeaning = async () => {
+    if (!token || !lookupData?.saved_vocab?.id) return;
+    const finalMeaning = (customMeaning || "").trim();
+    if (!finalMeaning) {
+      showToast("Nghĩa từ vựng không được để trống", "warning");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const res = await updateVocabWord(lookupData.saved_vocab.id, { meaning: finalMeaning }, token);
+      showToast(`Đã cập nhật nghĩa của "${cleanWord}"!`, "success");
+      refreshStreak();
+      if (refreshSavedVocab) refreshSavedVocab();
+
+      const updatedVocab = res?.vocab || {
+        ...lookupData.saved_vocab,
+        meaning: finalMeaning,
+      };
+
+      setLookupData((prev) => ({
+        ...prev,
+        saved_vocab: updatedVocab,
+        meaning: finalMeaning,
+      }));
+      setInitialMeaning(finalMeaning);
+      setCustomMeaning(finalMeaning);
+    } catch (err) {
+      showToast(err.message || "Không thể cập nhật nghĩa từ này", "error");
     } finally {
       setIsSaving(false);
     }
@@ -239,7 +294,23 @@ export const WordLookupPopover = ({
     }
   };
 
+  // Handle Enter key inside textarea
+  const handleKeyDownTextarea = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (isSaved) {
+        if (isMeaningChanged) {
+          handleUpdateSavedMeaning();
+        }
+      } else {
+        handleSaveToNotebook();
+      }
+    }
+  };
+
   const isSaved = Boolean(lookupData?.is_saved);
+  const savedMeaning = lookupData?.saved_vocab?.meaning || lookupData?.meaning || "";
+  const isMeaningChanged = isMeaningModified(isSaved, customMeaning, savedMeaning);
   const savedStatus = lookupData?.saved_vocab?.status || (isSaved ? "NEW" : null);
   const statusConfig = savedStatus ? STATUS_MAP[savedStatus] || STATUS_MAP.NEW : null;
 
@@ -332,28 +403,21 @@ export const WordLookupPopover = ({
         </>
       )}
 
-      {/* Translation Section - Exactly as shown in Image 2 */}
-      <div className="lookup-section">
-        <div className="lookup-section-title">Translation</div>
-        {loading ? (
-          <div className="lookup-skeleton-line" style={{ width: "85%", height: "20px" }} />
-        ) : (
-          <div className="lookup-meaning-text">
-            {lookupData?.meaning || cleanWord}
-          </div>
-        )}
+      {/* Translation Section - User can edit directly before saving */}
+      <PopoverTranslationSection
+        loading={loading}
+        customMeaning={customMeaning}
+        initialMeaning={initialMeaning}
+        onMeaningChange={(e) => setCustomMeaning(e.target.value)}
+        onKeyDown={handleKeyDownTextarea}
+        onResetMeaning={() => setCustomMeaning(initialMeaning)}
+        definition={lookupData?.definition}
+        textareaRef={textareaRef}
+      />
 
-        {/* English definition (if available) for deeper learning */}
-        {lookupData?.definition && !loading && (
-          <div className="lookup-definition-text" title="English definition">
-            {lookupData.definition}
-          </div>
-        )}
-      </div>
-
-      {/* Smart Notebook Action (Super UX Upgrade) */}
+      {/* Smart Notebook Action */}
       <div className="lookup-action-footer">
-        {isSaved ? (
+        {isSaved && !isMeaningChanged ? (
           <div className="lookup-saved-bar">
             <div className="saved-indicator-group">
               <IconBookmark size={16} className="text-emerald-500" />
@@ -370,6 +434,17 @@ export const WordLookupPopover = ({
               )}
             </div>
           </div>
+        ) : isSaved && isMeaningChanged ? (
+          <button
+            type="button"
+            className="lookup-save-btn lookup-update-btn"
+            onClick={handleUpdateSavedMeaning}
+            disabled={isSaving || loading || !customMeaning.trim()}
+            title="Lưu nghĩa mới đã chỉnh sửa vào Sổ tay"
+          >
+            <IconCheckCircle size={14} />
+            <span>{isSaving ? "Đang lưu..." : "Cập nhật nghĩa trong Sổ tay"}</span>
+          </button>
         ) : (
           <button
             type="button"
