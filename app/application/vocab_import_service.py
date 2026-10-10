@@ -70,6 +70,9 @@ def plan_batch_import(
         raw_phonetic = getattr(item, 'phonetic', None) or (item.get('phonetic') if isinstance(item, dict) else None)
         phonetic = (raw_phonetic or "").strip() or None
 
+        raw_pos = getattr(item, 'part_of_speech', None) or (item.get('part_of_speech') if isinstance(item, dict) else None)
+        part_of_speech = (raw_pos or "").strip() or None
+
         raw_context = getattr(item, 'context_sentence', None) or (item.get('context_sentence') if isinstance(item, dict) else "")
         context = (raw_context or "").strip()
 
@@ -95,6 +98,7 @@ def plan_batch_import(
                 "clean_word": clean_word,
                 "meaning": clean_meaning,
                 "phonetic": phonetic,
+                "part_of_speech": part_of_speech,
                 "context_sentence": context,
                 "image_url": image_url,
                 "source_lang": item_lang,
@@ -104,6 +108,7 @@ def plan_batch_import(
             new_record_data = {
                 "word": clean_word,
                 "phonetic": phonetic,
+                "part_of_speech": part_of_speech,
                 "meaning": clean_meaning,
                 "context_sentence": context,
                 "image_url": image_url,

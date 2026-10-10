@@ -16,6 +16,7 @@ import {
 } from "../../services/authVocabService";
 import { getVoiceLang } from "../../utils/languageVoices";
 import { VocabImagePickerField } from "../Vocab/VocabImagePickerField";
+import { VocabPosPickerField } from "../Vocab/VocabPosPickerField";
 
 export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: initialSourceLang }) => {
   const { token, refreshStreak, refreshSavedVocab, showToast } = useAuth();
@@ -23,6 +24,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
   const [word, setWord] = useState("");
   const [phonetic, setPhonetic] = useState("");
   const [meaning, setMeaning] = useState("");
+  const [partOfSpeech, setPartOfSpeech] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [contextSentence, setContextSentence] = useState("");
   const [vocabStatus, setVocabStatus] = useState("LEARNING");
@@ -38,6 +40,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
     if (vocab) {
       setWord(vocab.word || "");
       setPhonetic(vocab.phonetic || "");
+      setPartOfSpeech(vocab.part_of_speech || "");
       setMeaning(vocab.meaning || "");
       setImageUrl(vocab.image_url || "");
       setContextSentence(vocab.context_sentence || "");
@@ -112,6 +115,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
       const updatePayload = {
         word: cleanWord,
         phonetic: phonetic.trim() || undefined,
+        part_of_speech: partOfSpeech.trim() || undefined,
         meaning: meaning.trim() || cleanWord,
         image_url: imageUrl.trim() || undefined,
         context_sentence: contextSentence.trim() || "",
@@ -323,6 +327,9 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
               />
             </div>
           </div>
+
+          {/* Row 2.5: Part of Speech Picker */}
+          <VocabPosPickerField value={partOfSpeech} onChange={setPartOfSpeech} />
 
           {/* Row 3: Image Picker */}
           <VocabImagePickerField

@@ -1055,15 +1055,188 @@
   text-overflow: ellipsis;
 }
 
+.lookup-pos-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lookup-pos-header-row {
+  display: flex;
+  align-items: center;
+}
+
+.lookup-pos-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
 .lookup-pos-badge {
   font-size: 0.72rem;
   font-weight: 600;
-  font-style: italic;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--bg-card-hover, rgba(99, 102, 241, 0.08));
+  color: var(--primary, #6366f1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.lookup-pos-badge:hover {
+  background: var(--primary, #6366f1);
+  color: #fff;
+}
+
+.lookup-pos-badge.empty {
+  color: var(--text-muted, #94a3b8);
+  border: 1px dashed var(--border-color, #cbd5e1);
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lookup-pos-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  padding: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 3px;
+  transition: color 0.15s ease;
+}
+
+.lookup-pos-toggle-btn:hover {
+  color: var(--primary, #6366f1);
+  background: var(--bg-card-hover, rgba(0, 0, 0, 0.05));
+}
+
+.lookup-pos-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 280px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  z-index: 100;
+  animation: fadeInPop 0.15s ease;
+}
+
+.lookup-pos-hint {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.lookup-pos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.lookup-pos-chip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-primary, #f8fafc);
+  color: var(--text-primary, #0f172a);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.lookup-pos-chip-btn:hover {
+  border-color: var(--primary, #6366f1);
+  background: var(--bg-card-hover, #f1f5f9);
+}
+
+.lookup-pos-chip-btn.selected {
+  background: var(--primary, #6366f1);
+  color: #ffffff;
+  border-color: var(--primary, #6366f1);
+  font-weight: 600;
+}
+
+.lookup-pos-abbr {
+  font-size: 0.68rem;
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
+.lookup-pos-custom-row {
+  display: flex;
+  gap: 5px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-color, #f1f5f9);
+}
+
+.lookup-pos-custom-input {
+  flex: 1;
+  font-size: 0.72rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  outline: none;
+}
+
+.lookup-pos-custom-input:focus {
+  border-color: var(--primary, #6366f1);
+}
+
+.lookup-pos-custom-submit-btn,
+.lookup-pos-done-btn {
+  font-size: 0.72rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+}
+
+.lookup-pos-custom-submit-btn {
+  background: var(--bg-card-hover, #e2e8f0);
+  color: var(--text-primary, #0f172a);
+}
+
+.lookup-pos-custom-submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lookup-pos-done-btn {
+  background: var(--primary, #6366f1);
+  color: #fff;
+}
+
+.vocab-pos-badge-card {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
   padding: 1px 6px;
   border-radius: 4px;
-  background: var(--bg-card-hover, #f1f5f9);
-  color: var(--text-secondary, #64748b);
-  flex-shrink: 0;
+  background: rgba(99, 102, 241, 0.09);
+  color: var(--primary, #6366f1);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  margin-left: 6px;
+  vertical-align: middle;
 }
 
 .lookup-audio-actions {

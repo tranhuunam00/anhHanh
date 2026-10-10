@@ -169,6 +169,7 @@ class UserVocabulary(Base):
     review_interval_days = Column(Integer, default=1, nullable=False)
     mastery_score = Column(Integer, default=0, nullable=False)
     source_lang = Column(String(10), default='en', nullable=True)
+    part_of_speech = Column(String(100), nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     user = relationship('User', back_populates='vocabulary')
@@ -179,6 +180,7 @@ class UserVocabulary(Base):
             'user_id': self.user_id,
             'word': self.word,
             'phonetic': self.phonetic,
+            'part_of_speech': self.part_of_speech,
             'meaning': self.meaning,
             'context_sentence': self.context_sentence,
             'image_url': self.image_url,

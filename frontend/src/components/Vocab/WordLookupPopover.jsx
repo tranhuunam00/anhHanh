@@ -16,6 +16,7 @@ import {
   computePopoverCoords,
 } from "../../utils/wordLookupUtils";
 import { PopoverTranslationSection } from "./PopoverTranslationSection";
+import { PopoverPosSelector } from "./PopoverPosSelector";
 
 const STATUS_MAP = {
   NEW: { label: "Mới lưu", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.12)" },
@@ -45,6 +46,8 @@ export const WordLookupPopover = ({
   const [coords, setCoords] = useState({ top: 0, left: 12, placement: "bottom", arrowLeft: 140 });
   const [customMeaning, setCustomMeaning] = useState("");
   const [initialMeaning, setInitialMeaning] = useState("");
+  const [customPos, setCustomPos] = useState("");
+  const [initialPos, setInitialPos] = useState("");
 
   // Clean word token for display and lookup
   const cleanWord = (word || "").trim().replace(/^[’'".:,;!?-]+|[’'".:,;!?-]+$/g, "");
@@ -53,6 +56,8 @@ export const WordLookupPopover = ({
   useEffect(() => {
     setCustomMeaning("");
     setInitialMeaning("");
+    setCustomPos("");
+    setInitialPos("");
   }, [cleanWord]);
 
   // Auto adjust textarea height to fit content nicely
@@ -105,18 +110,24 @@ export const WordLookupPopover = ({
         setCustomMeaning(resolved);
         setInitialMeaning(resolved);
 
+        const posResolved = savedItem?.part_of_speech || data?.part_of_speech || (cleanWord.includes(" ") ? "phrase" : "");
+        setCustomPos(posResolved);
+        setInitialPos(posResolved);
+
         if (savedItem) {
           setLookupData({
             ...data,
             is_saved: true,
             saved_vocab: savedItem,
             meaning: resolved,
+            part_of_speech: posResolved,
             ipa: savedItem.phonetic || data?.ipa,
           });
         } else {
           setLookupData({
             ...data,
             meaning: resolved,
+            part_of_speech: posResolved,
           });
         }
       })
@@ -126,12 +137,16 @@ export const WordLookupPopover = ({
         setCustomMeaning(fallback);
         setInitialMeaning(fallback);
 
+        const posResolved = savedItem?.part_of_speech || (cleanWord.includes(" ") ? "phrase" : "");
+        setCustomPos(posResolved);
+        setInitialPos(posResolved);
+
         setLookupData({
           word: cleanWord,
           ipa: null,
           ipa_uk: null,
           ipa_us: null,
-          part_of_speech: null,
+          part_of_speech: posResolved,
           definition: null,
           meaning: fallback,
           is_saved: Boolean(savedItem),
@@ -199,6 +214,7 @@ export const WordLookupPopover = ({
         cleanWord,
         customMeaning,
         lookupMeaning: lookupData?.meaning,
+        partOfSpeech: customPos,
         contextSentence,
         phonetic: lookupData?.ipa,
         videoId,
@@ -215,6 +231,7 @@ export const WordLookupPopover = ({
       const savedVocab = res?.vocab || {
         word: cleanWord,
         meaning: payload.meaning,
+        part_of_speech: payload.part_of_speech,
         status: "NEW",
         phonetic: lookupData?.ipa,
       };
@@ -224,9 +241,11 @@ export const WordLookupPopover = ({
         is_saved: true,
         saved_vocab: savedVocab,
         meaning: payload.meaning,
+        part_of_speech: payload.part_of_speech,
       }));
       setInitialMeaning(payload.meaning);
       setCustomMeaning(payload.meaning);
+      setInitialPos(payload.part_of_speech);
     } catch (err) {
       showToast(err.message || "Không thể lưu từ này", "error");
     } finally {
@@ -245,7 +264,11 @@ export const WordLookupPopover = ({
 
     setIsSaving(true);
     try {
-      const res = await updateVocabWord(lookupData.saved_vocab.id, { meaning: finalMeaning }, token);
+      const res = await updateVocabWord(
+        lookupData.saved_vocab.id,
+        { meaning: finalMeaning, part_of_speech: customPos },
+        token
+      );
       showToast(`Đã cập nhật nghĩa của "${cleanWord}"!`, "success");
       refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
@@ -253,15 +276,18 @@ export const WordLookupPopover = ({
       const updatedVocab = res?.vocab || {
         ...lookupData.saved_vocab,
         meaning: finalMeaning,
+        part_of_speech: customPos,
       };
 
       setLookupData((prev) => ({
         ...prev,
         saved_vocab: updatedVocab,
         meaning: finalMeaning,
+        part_of_speech: customPos,
       }));
       setInitialMeaning(finalMeaning);
       setCustomMeaning(finalMeaning);
+      setInitialPos(customPos);
     } catch (err) {
       showToast(err.message || "Không thể cập nhật nghĩa từ này", "error");
     } finally {
@@ -310,7 +336,8 @@ export const WordLookupPopover = ({
 
   const isSaved = Boolean(lookupData?.is_saved);
   const savedMeaning = lookupData?.saved_vocab?.meaning || lookupData?.meaning || "";
-  const isMeaningChanged = isMeaningModified(isSaved, customMeaning, savedMeaning);
+  const isPosChanged = (customPos || "").trim() !== (initialPos || "").trim();
+  const isMeaningChanged = isMeaningModified(isSaved, customMeaning, savedMeaning) || (isSaved && isPosChanged);
   const savedStatus = lookupData?.saved_vocab?.status || (isSaved ? "NEW" : null);
   const statusConfig = savedStatus ? STATUS_MAP[savedStatus] || STATUS_MAP.NEW : null;
 
@@ -332,15 +359,15 @@ export const WordLookupPopover = ({
         }}
       />
 
-      {/* Header: Word + UK / US Audio buttons + Close */}
+      {/* Header: Word + Multi-POS Selector + UK / US Audio buttons + Close */}
       <div className="lookup-popover-header">
         <div className="lookup-word-title-group">
           <span className="lookup-word-name" title={cleanWord}>{cleanWord}</span>
-          {lookupData?.part_of_speech ? (
-            <span className="lookup-pos-badge">{lookupData.part_of_speech}</span>
-          ) : cleanWord.includes(" ") ? (
-            <span className="lookup-pos-badge">cụm từ</span>
-          ) : null}
+          <PopoverPosSelector
+            partOfSpeech={customPos}
+            onChangePos={setCustomPos}
+            cleanWord={cleanWord}
+          />
         </div>
 
         <div className="lookup-audio-actions">

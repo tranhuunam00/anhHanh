@@ -8,6 +8,7 @@ class CreateVocabRequest(BaseModel):
     context_sentence: Optional[str] = ""
     meaning: Optional[str] = None
     phonetic: Optional[str] = None
+    part_of_speech: Optional[str] = None
     image_url: Optional[str] = None
     video_id: Optional[str] = None
     video_timestamp: Optional[float] = None
@@ -34,6 +35,7 @@ class UpdateVocabDetailsRequest(BaseModel):
     word: Optional[str] = None
     meaning: Optional[str] = None
     phonetic: Optional[str] = None
+    part_of_speech: Optional[str] = None
     image_url: Optional[str] = None
     context_sentence: Optional[str] = None
     status: Optional[str] = None
@@ -57,6 +59,7 @@ class BatchImportVocabItem(BaseModel):
     word: str = Field(..., min_length=1, max_length=150)
     meaning: str
     phonetic: Optional[str] = None
+    part_of_speech: Optional[str] = None
     context_sentence: Optional[str] = ""
     image_url: Optional[str] = None
     source_lang: Optional[str] = "en"

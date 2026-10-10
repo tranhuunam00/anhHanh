@@ -39,6 +39,7 @@ import { exportVocabToCSV, exportVocabToAnki } from "../../utils/vocabExporter";
 import { splitContextSentence } from "../../utils/textNormalizer";
 import { markVocabStudiedToday } from "../../utils/dailyReminderManager";
 import { getVoiceLang } from "../../utils/languageVoices";
+import { formatPosDisplay } from "../../utils/wordLookupUtils";
 
 export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const { token, isAuthenticated, refreshStreak, showToast, refreshSavedVocab } = useAuth();
@@ -637,6 +638,11 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
               <div className="vocab-card-body">
                 <div className="vocab-word-row">
                   <span className="vocab-word-text">{v.word}</span>
+                  {v.part_of_speech && (
+                    <span className="vocab-pos-badge-card" title={`Từ loại: ${v.part_of_speech}`}>
+                      {formatPosDisplay(v.part_of_speech, "vi")}
+                    </span>
+                  )}
                 </div>
 
                 {v.phonetic && (

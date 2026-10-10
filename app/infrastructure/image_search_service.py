@@ -282,16 +282,28 @@ class ImageSearchService:
                                     break
                             defs = item.get('defs', [])
                             if defs and isinstance(defs, list) and len(defs) > 0:
-                                first_def = defs[0]
-                                if '\t' in first_def:
-                                    raw_pos, raw_desc = first_def.split('\t', 1)
-                                    part_of_speech = pos_map.get(raw_pos.strip(), raw_pos.strip())
-                                    definition = raw_desc.strip()
-                                else:
-                                    definition = first_def.strip()
+                                collected_pos = []
+                                seen_pos = set()
+                                for d in defs:
+                                    if '\t' in d:
+                                        raw_pos, raw_desc = d.split('\t', 1)
+                                        norm_pos = pos_map.get(raw_pos.strip().lower(), raw_pos.strip())
+                                        if norm_pos and norm_pos.lower() not in seen_pos:
+                                            seen_pos.add(norm_pos.lower())
+                                            collected_pos.append(norm_pos)
+                                        if not definition and raw_desc.strip():
+                                            definition = raw_desc.strip()
+                                    elif not definition and d.strip():
+                                        definition = d.strip()
+
+                                if collected_pos:
+                                    part_of_speech = ", ".join(collected_pos)
                             break
         except Exception:
             pass
+
+        if not part_of_speech and ' ' in clean:
+            part_of_speech = "phrase"
 
         # Fallback to cls.get_word_phonetic if Datamuse direct call didn't yield IPA
         if not ipa:

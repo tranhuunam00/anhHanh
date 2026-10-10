@@ -6,6 +6,9 @@ import {
   getMeaningSavePayload,
   calculateAutoTextareaHeight,
   computePopoverCoords,
+  parsePosTokens,
+  formatPosDisplay,
+  togglePosInList,
 } from "../src/utils/wordLookupUtils.js";
 
 describe("wordLookupUtils - Unit Tests", () => {
@@ -65,11 +68,12 @@ describe("wordLookupUtils - Unit Tests", () => {
   });
 
   describe("getMeaningSavePayload", () => {
-    it("constructs full payload with custom meaning when provided", () => {
+    it("constructs full payload with custom meaning and part_of_speech when provided", () => {
       const payload = getMeaningSavePayload({
         cleanWord: "ahead of a possible election",
         customMeaning: "trước một cuộc bầu cử có thể xảy ra",
         lookupMeaning: "trước cuộc bầu cử",
+        partOfSpeech: "phrase",
         contextSentence: "This comes ahead of a possible election.",
         phonetic: "/ʌhˈɛd/",
         videoId: "vid_123",
@@ -83,6 +87,7 @@ describe("wordLookupUtils - Unit Tests", () => {
         context_sentence: "This comes ahead of a possible election.",
         meaning: "trước một cuộc bầu cử có thể xảy ra",
         phonetic: "/ʌhˈɛd/",
+        part_of_speech: "phrase",
         video_id: "vid_123",
         timestamp: 45.6,
         source_lang: "en",
@@ -95,8 +100,10 @@ describe("wordLookupUtils - Unit Tests", () => {
         cleanWord: "election",
         customMeaning: "   ",
         lookupMeaning: "cuộc bầu cử",
+        partOfSpeech: "noun",
       });
       assert.equal(payload.meaning, "cuộc bầu cử");
+      assert.equal(payload.part_of_speech, "noun");
     });
 
     it("falls back to cleanWord when both customMeaning and lookupMeaning are empty", () => {
@@ -106,6 +113,7 @@ describe("wordLookupUtils - Unit Tests", () => {
         lookupMeaning: "",
       });
       assert.equal(payload.meaning, "candidate");
+      assert.equal(payload.part_of_speech, "");
     });
 
     it("handles missing optional arguments with proper defaults", () => {
@@ -114,6 +122,7 @@ describe("wordLookupUtils - Unit Tests", () => {
       assert.equal(payload.context_sentence, "");
       assert.equal(payload.meaning, "");
       assert.equal(payload.phonetic, "");
+      assert.equal(payload.part_of_speech, "");
       assert.equal(payload.video_id, "");
       assert.equal(payload.timestamp, 0);
       assert.equal(payload.source_lang, "en");
@@ -123,6 +132,28 @@ describe("wordLookupUtils - Unit Tests", () => {
     it("coerces timestamp string to number correctly", () => {
       const payload = getMeaningSavePayload({ timestamp: "120.5" });
       assert.equal(payload.timestamp, 120.5);
+    });
+  });
+
+  describe("POS Utility Functions", () => {
+    it("parsePosTokens extracts and canonicalizes tokens correctly", () => {
+      assert.deepEqual(parsePosTokens("noun, verb"), ["noun", "verb"]);
+      assert.deepEqual(parsePosTokens("n; v / adj"), ["noun", "verb", "adjective"]);
+      assert.deepEqual(parsePosTokens("Danh từ, Động từ"), ["noun", "verb"]);
+      assert.deepEqual(parsePosTokens(""), []);
+      assert.deepEqual(parsePosTokens(null), []);
+    });
+
+    it("formatPosDisplay converts tokens to friendly display format", () => {
+      assert.equal(formatPosDisplay("noun, verb", "vi"), "Danh từ, Động từ");
+      assert.equal(formatPosDisplay("adjective", "vi"), "Tính từ");
+      assert.equal(formatPosDisplay("", "vi"), "");
+    });
+
+    it("togglePosInList adds and removes tokens cleanly for multi-POS", () => {
+      assert.equal(togglePosInList("noun", "verb"), "noun, verb");
+      assert.equal(togglePosInList("noun, verb", "noun"), "verb");
+      assert.equal(togglePosInList("", "noun"), "noun");
     });
   });
 

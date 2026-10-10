@@ -244,6 +244,8 @@ async def batch_import_vocabulary_words(
         target.meaning = upd["meaning"]
         if upd["phonetic"]:
             target.phonetic = upd["phonetic"]
+        if upd.get("part_of_speech"):
+            target.part_of_speech = upd["part_of_speech"]
         if upd["context_sentence"]:
             target.context_sentence = upd["context_sentence"]
         if upd["image_url"]:
@@ -256,6 +258,7 @@ async def batch_import_vocabulary_words(
             user_id=current_user.id,
             word=add_data["word"],
             phonetic=add_data["phonetic"],
+            part_of_speech=add_data.get("part_of_speech"),
             meaning=add_data["meaning"],
             context_sentence=add_data["context_sentence"],
             image_url=add_data["image_url"],

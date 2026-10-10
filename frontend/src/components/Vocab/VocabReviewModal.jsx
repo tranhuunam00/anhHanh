@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { submitVocabReviewResult } from "../../services/authVocabService";
 import { splitContextSentence } from "../../utils/textNormalizer";
 import { getVoiceLang } from "../../utils/languageVoices";
+import { formatPosDisplay } from "../../utils/wordLookupUtils";
 import "./VocabReviewModal.css";
 
 // Styled Modern Vector Icons
@@ -253,6 +254,11 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
               )}
               <div className="quiz-word-row">
                 <h2 className="quiz-word">{currentItem.word}</h2>
+                {currentItem.part_of_speech && (
+                  <span className="vocab-pos-badge-card">
+                    {formatPosDisplay(currentItem.part_of_speech, "vi")}
+                  </span>
+                )}
                 <button className="btn-audio" onClick={() => speakWord(currentItem.word)}>
                   <SvgVolume size={18} />
                 </button>
@@ -368,6 +374,11 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
                   <div className="card-front">
                     {currentItem.image_url && <img className="fc-img" src={currentItem.image_url} alt="" />}
                     <h2 className="fc-word">{currentItem.word}</h2>
+                    {currentItem.part_of_speech && (
+                      <span className="vocab-pos-badge-card" style={{ marginBottom: 6 }}>
+                        {formatPosDisplay(currentItem.part_of_speech, "vi")}
+                      </span>
+                    )}
                     {currentItem.phonetic && <div className="fc-ipa">{currentItem.phonetic}</div>}
                     <button className="btn-audio-fc" onClick={(e) => { e.stopPropagation(); speakWord(currentItem.word); }}>
                       <SvgVolume size={14} /> Nghe phát âm

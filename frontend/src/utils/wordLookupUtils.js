@@ -35,6 +35,103 @@ export function isMeaningModified(isSaved, customMeaning = "", savedMeaning = ""
 }
 
 /**
+ * Part of speech catalog with bilingual Vietnamese/English labels.
+ */
+export const POS_CATALOG = [
+  { key: "noun", vi: "Danh từ", en: "Noun", abbr: "n." },
+  { key: "verb", vi: "Động từ", en: "Verb", abbr: "v." },
+  { key: "adjective", vi: "Tính từ", en: "Adj", abbr: "adj." },
+  { key: "adverb", vi: "Trạng từ", en: "Adv", abbr: "adv." },
+  { key: "phrase", vi: "Cụm từ", en: "Phrase", abbr: "phr." },
+  { key: "preposition", vi: "Giới từ", en: "Prep", abbr: "prep." },
+  { key: "conjunction", vi: "Liên từ", en: "Conj", abbr: "conj." },
+  { key: "pronoun", vi: "Đại từ", en: "Pron", abbr: "pron." },
+  { key: "idiom", vi: "Thành ngữ", en: "Idiom", abbr: "idm." },
+];
+
+const POS_LOOKUP_MAP = {
+  n: "noun",
+  noun: "noun",
+  "danh từ": "noun",
+  v: "verb",
+  verb: "verb",
+  "động từ": "verb",
+  adj: "adjective",
+  adjective: "adjective",
+  "tính từ": "adjective",
+  adv: "adverb",
+  adverb: "adverb",
+  "trạng từ": "adverb",
+  prep: "preposition",
+  preposition: "preposition",
+  "giới từ": "preposition",
+  conj: "conjunction",
+  conjunction: "conjunction",
+  "liên từ": "conjunction",
+  pron: "pronoun",
+  pronoun: "pronoun",
+  "đại từ": "pronoun",
+  phrase: "phrase",
+  "cụm từ": "phrase",
+  idiom: "idiom",
+  "thành ngữ": "idiom",
+};
+
+/**
+ * Splits POS string into clean, unique array of tokens.
+ */
+export function parsePosTokens(posStr) {
+  if (!posStr || typeof posStr !== "string") return [];
+  const parts = posStr.split(/[,;/|•+\n]+/);
+  const result = [];
+  const seen = new Set();
+  for (const p of parts) {
+    const clean = p.trim();
+    if (!clean) continue;
+    const lower = clean.toLowerCase();
+    const canonical = POS_LOOKUP_MAP[lower] || clean;
+    if (!seen.has(canonical.toLowerCase())) {
+      seen.add(canonical.toLowerCase());
+      result.push(canonical);
+    }
+  }
+  return result;
+}
+
+/**
+ * Formats POS tokens for user display (e.g., "Danh từ, Động từ").
+ */
+export function formatPosDisplay(posStr, lang = "vi") {
+  const tokens = parsePosTokens(posStr);
+  if (!tokens.length) return "";
+  const viMap = {
+    noun: "Danh từ",
+    verb: "Động từ",
+    adjective: "Tính từ",
+    adverb: "Trạng từ",
+    preposition: "Giới từ",
+    conjunction: "Liên từ",
+    pronoun: "Đại từ",
+    phrase: "Cụm từ",
+    idiom: "Thành ngữ",
+  };
+  return tokens.map((t) => (lang === "vi" ? viMap[t.toLowerCase()] || t : t)).join(", ");
+}
+
+/**
+ * Toggles a POS key in a comma-separated POS string (supports multi-POS selection).
+ */
+export function togglePosInList(currentPosStr, posKey) {
+  const tokens = parsePosTokens(currentPosStr);
+  const targetLower = posKey.trim().toLowerCase();
+  const exists = tokens.some((t) => t.toLowerCase() === targetLower);
+  const updated = exists
+    ? tokens.filter((t) => t.toLowerCase() !== targetLower)
+    : [...tokens, posKey.trim()];
+  return updated.join(", ");
+}
+
+/**
  * Constructs the payload for saving or creating a notebook vocabulary word.
  * @param {object} params
  * @returns {object}
@@ -43,6 +140,7 @@ export function getMeaningSavePayload({
   cleanWord = "",
   customMeaning = "",
   lookupMeaning = "",
+  partOfSpeech = "",
   contextSentence = "",
   phonetic = "",
   videoId = "",
@@ -60,6 +158,7 @@ export function getMeaningSavePayload({
     context_sentence: (contextSentence || "").trim(),
     meaning,
     phonetic: (phonetic || "").trim(),
+    part_of_speech: (partOfSpeech || "").trim(),
     video_id: videoId || "",
     timestamp: typeof timestamp === "number" ? timestamp : Number(timestamp) || 0,
     source_lang: (sourceLang || "en").trim().toLowerCase(),

@@ -29,6 +29,15 @@ router.include_router(vocab_study_router)
 router.include_router(vocab_import_router)
 
 
+from app.infrastructure.pos_service import normalize_pos_string
+from app.presentation.vocab_api_helpers import (
+    resolve_word_meaning_helper,
+    resolve_word_pos_helper,
+    resolve_word_image_helper,
+    cache_dictionary_word_safely,
+)
+
+
 @router.post('')
 async def save_vocabulary_word(
     payload: CreateVocabRequest,
@@ -44,37 +53,9 @@ async def save_vocabulary_word(
     if not phonetic and src_lang in ('en', 'auto'):
         phonetic = ImageSearchService.get_word_phonetic(clean_word)
 
-    meaning = payload.meaning
-    if not meaning:
-        try:
-            translated = _translation_service.translate(clean_word, source_lang=src_lang, target_lang=tgt_lang)
-            if (not translated or translated.lower().strip() == clean_word.lower().strip()) and src_lang != 'auto':
-                auto_trans = _translation_service.translate(clean_word, source_lang='auto', target_lang=tgt_lang)
-                if auto_trans and auto_trans.lower().strip() != clean_word.lower().strip():
-                    translated = auto_trans
-            if translated and translated.strip():
-                meaning = translated.strip()
-        except Exception as e:
-            logger.warning(f"Translation failed for word '{clean_word}' ({src_lang}->{tgt_lang}): {e}")
-            meaning = None
-
-    if not meaning or not meaning.strip():
-        meaning = clean_word
-
-    image_url = payload.image_url
-    if not image_url:
-        try:
-            candidates = ImageSearchService.get_image_candidates(
-                word=clean_word,
-                context_sentence=payload.context_sentence or "",
-                meaning=meaning or "",
-                max_results=3
-            )
-            if candidates:
-                image_url = candidates[0]
-        except Exception as img_err:
-            logger.warning(f"Image search failed for '{clean_word}': {img_err}")
-            image_url = None
+    meaning = resolve_word_meaning_helper(clean_word, payload.meaning, src_lang, tgt_lang, _translation_service)
+    part_of_speech = resolve_word_pos_helper(clean_word, payload.part_of_speech)
+    image_url = resolve_word_image_helper(clean_word, payload.image_url, payload.context_sentence or "", meaning)
 
     query = select(UserVocabulary).where(
         UserVocabulary.user_id == current_user.id,
@@ -90,6 +71,8 @@ async def save_vocabulary_word(
         existing.meaning = meaning or existing.meaning
         if phonetic:
             existing.phonetic = phonetic
+        if part_of_speech:
+            existing.part_of_speech = part_of_speech
         if image_url:
             existing.image_url = image_url
         if payload.context_sentence:
@@ -102,6 +85,7 @@ async def save_vocabulary_word(
         user_id=current_user.id,
         word=clean_word,
         phonetic=phonetic,
+        part_of_speech=part_of_speech,
         meaning=meaning,
         context_sentence=payload.context_sentence or "",
         image_url=image_url,
@@ -117,19 +101,16 @@ async def save_vocabulary_word(
     await db.commit()
     await db.refresh(new_vocab)
 
-    try:
-        dict_check = await db.execute(select(DictionaryWord).where(DictionaryWord.word == clean_word.lower()))
-        if not dict_check.scalars().first():
-            db.add(DictionaryWord(
-                word=clean_word.lower(),
-                ipa=phonetic,
-                ipa_uk=phonetic,
-                ipa_us=phonetic,
-                meaning=meaning,
-            ))
-            await db.commit()
-    except Exception:
-        pass
+    await cache_dictionary_word_safely(
+        db=db,
+        clean_word=clean_word,
+        ipa=phonetic,
+        ipa_uk=phonetic,
+        ipa_us=phonetic,
+        part_of_speech=part_of_speech,
+        definition=None,
+        meaning=meaning
+    )
 
     return {'message': 'Đã lưu từ vựng vào Sổ tay', 'vocab': new_vocab.to_dict()}
 
@@ -230,12 +211,13 @@ async def quick_lookup_word(
     if cached_dict:
         ipa, ipa_uk, ipa_us = cached_dict.ipa, cached_dict.ipa_uk, cached_dict.ipa_us
         part_of_speech, definition, meaning = cached_dict.part_of_speech, cached_dict.definition, cached_dict.meaning
+        part_of_speech = normalize_pos_string(part_of_speech)
     else:
         details = ImageSearchService.get_word_details(clean_word)
         ipa = details.get('ipa')
         ipa_uk = details.get('ipa_uk') or ipa
         ipa_us = details.get('ipa_us') or ipa
-        part_of_speech = details.get('part_of_speech')
+        part_of_speech = normalize_pos_string(details.get('part_of_speech'))
         definition = details.get('definition')
 
         meaning = None
@@ -283,6 +265,8 @@ async def quick_lookup_word(
             saved_vocab = existing.to_dict()
             if existing.meaning:
                 meaning = existing.meaning
+            if existing.part_of_speech:
+                part_of_speech = existing.part_of_speech
 
     return {
         'word': clean_word,
@@ -463,6 +447,9 @@ async def update_vocabulary_details(
 
     if payload.status is not None and payload.status in ['NEW', 'LEARNING', 'MASTERED']:
         vocab.status = payload.status
+
+    if payload.part_of_speech is not None:
+        vocab.part_of_speech = normalize_pos_string(payload.part_of_speech)
 
     if payload.source_lang is not None and payload.source_lang.strip():
         vocab.source_lang = payload.source_lang.strip().lower()
