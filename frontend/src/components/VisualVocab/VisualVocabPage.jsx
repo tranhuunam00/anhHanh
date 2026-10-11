@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { VISUAL_VOCAB_TOPICS, getVisualVocabTopicById } from "../../data/visualVocab";
 import { filterItemsByQuery } from "../../utils/visualVocabUtils";
 import { VisualVocabHeader } from "./VisualVocabHeader";
@@ -62,17 +62,56 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
     }
   };
 
-  const handleSelectPrev = () => {
+  const handleSelectPrev = useCallback(() => {
     if (activeItemIndex > 0) {
       setActiveItemId(currentTopic.items[activeItemIndex - 1].id);
     }
-  };
+  }, [activeItemIndex, currentTopic]);
 
-  const handleSelectNext = () => {
+  const handleSelectNext = useCallback(() => {
     if (activeItemIndex < (currentTopic.items?.length || 0) - 1) {
       setActiveItemId(currentTopic.items[activeItemIndex + 1].id);
     }
-  };
+  }, [activeItemIndex, currentTopic]);
+
+  // Keyboard shortcut: ArrowLeft and ArrowRight to navigate words in Explore mode
+  useEffect(() => {
+    if (activeMode !== "EXPLORE") return;
+
+    const handleKeyDown = (e) => {
+      const targetTag = e.target?.tagName?.toUpperCase();
+      if (
+        targetTag === "INPUT" ||
+        targetTag === "TEXTAREA" ||
+        targetTag === "SELECT" ||
+        e.target?.isContentEditable
+      ) {
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleSelectPrev();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleSelectNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeMode, handleSelectPrev, handleSelectNext]);
+
+  // Auto scroll active item in quick word list into view
+  useEffect(() => {
+    if (!activeItemId) return;
+    const activeBtn = document.querySelector(`.vv-list-item-btn[data-id="${activeItemId}"]`);
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [activeItemId]);
 
   if (!isActive) return null;
 
@@ -128,6 +167,7 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
                 {currentTopic.items.map((item, idx) => (
                   <button
                     key={item.id}
+                    data-id={item.id}
                     type="button"
                     className={`vv-list-item-btn ${item.id === activeItemId ? "active" : ""}`}
                     onClick={() => setActiveItemId(item.id)}

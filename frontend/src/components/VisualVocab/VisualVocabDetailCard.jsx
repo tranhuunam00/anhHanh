@@ -123,16 +123,16 @@ export const VisualVocabDetailCard = ({
         )}
       </button>
 
-      {/* Nav Row: Previous & Next */}
+      {/* Nav Row: Previous & Next with ArrowLeft/ArrowRight Shortcut Hints */}
       <div className="vv-card-nav-row">
         <button
           type="button"
           className="vv-card-nav-btn"
           onClick={onSelectPrev}
           disabled={!hasPrev}
-          title="Từ trước đó"
+          title="Từ trước đó (Phím ←)"
         >
-          <ChevronLeft size={16} /> Trước
+          <ChevronLeft size={16} /> Trước <kbd className="vv-kbd-hint">←</kbd>
         </button>
 
         <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: 600 }}>
@@ -144,9 +144,9 @@ export const VisualVocabDetailCard = ({
           className="vv-card-nav-btn"
           onClick={onSelectNext}
           disabled={!hasNext}
-          title="Từ tiếp theo"
+          title="Từ tiếp theo (Phím →)"
         >
-          Tiếp <ChevronRight size={16} />
+          <kbd className="vv-kbd-hint">→</kbd> Tiếp <ChevronRight size={16} />
         </button>
       </div>
     </div>
