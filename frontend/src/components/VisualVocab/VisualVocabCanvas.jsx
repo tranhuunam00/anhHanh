@@ -1,0 +1,119 @@
+import React, { useState, useRef, useCallback } from "react";
+import { ZoomIn, ZoomOut, RotateCcw } from "../Icons";
+import { getZoomTransformStyle } from "../../utils/visualVocabUtils";
+
+export const VisualVocabCanvas = ({
+  topic,
+  items = [],
+  activeItemId = null,
+  onSelectHotspot,
+  showLabels = true,
+  // Quiz states
+  quizFeedback = null, // { hotspotId, isCorrect }
+  onCanvasClick = null,
+}) => {
+  const [scale, setScale] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const panStartRef = useRef({ x: 0, y: 0 });
+
+  const handleZoomIn = () => setScale((s) => Math.min(3, +(s + 0.25).toFixed(2)));
+  const handleZoomOut = () => setScale((s) => Math.max(0.75, +(s - 0.25).toFixed(2)));
+  const handleResetZoom = () => {
+    setScale(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  const handleMouseDown = useCallback((e) => {
+    // Only drag when mouse 0 (left click) and scale > 1
+    if (e.button !== 0 || scale <= 1) return;
+    setIsDragging(true);
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    panStartRef.current = { ...pan };
+  }, [scale, pan]);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+    setPan({
+      x: panStartRef.current.x + dx,
+      y: panStartRef.current.y + dy,
+    });
+  }, [isDragging]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const transformStyle = getZoomTransformStyle(scale, pan.x, pan.y);
+
+  return (
+    <div className="vv-canvas-wrapper">
+      <div
+        className={`vv-canvas-viewport ${isDragging ? "dragging" : ""}`}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <div className="vv-image-layer-container" style={transformStyle}>
+          {/* Main Diagram Illustration */}
+          <img
+            src={topic.image}
+            alt={topic.title}
+            className="vv-diagram-image"
+            draggable={false}
+          />
+
+          {/* Hotspot Pins Layer */}
+          {items.map((item, idx) => {
+            const isActive = item.id === activeItemId;
+            let feedbackClass = "";
+            if (quizFeedback && quizFeedback.hotspotId === item.id) {
+              feedbackClass = quizFeedback.isCorrect ? "correct" : "wrong";
+            }
+
+            return (
+              <div
+                key={item.id}
+                className={`vv-hotspot-pin ${isActive ? "active" : ""} ${feedbackClass}`}
+                style={{ left: `${item.x}%`, top: `${item.y}%` }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectHotspot(item);
+                }}
+                title={`${item.word} (${item.meaning})`}
+              >
+                <div className="vv-pin-dot">{idx + 1}</div>
+
+                {/* Floating Word Label */}
+                {showLabels && (
+                  <div className="vv-hotspot-label">
+                    <span>{item.word}</span>
+                    {item.ipa && <span className="vv-ipa">{item.ipa}</span>}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Floating Controls at bottom-right of canvas */}
+        <div className="vv-canvas-floating-controls">
+          <button type="button" onClick={handleZoomOut} title="Thu nhỏ">
+            <ZoomOut size={16} />
+          </button>
+          <span className="vv-zoom-indicator">{Math.round(scale * 100)}%</span>
+          <button type="button" onClick={handleZoomIn} title="Phóng to">
+            <ZoomIn size={16} />
+          </button>
+          <button type="button" onClick={handleResetZoom} title="Mặc định">
+            <RotateCcw size={15} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

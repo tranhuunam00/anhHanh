@@ -117,10 +117,10 @@ def test_user_permissions_logic():
     assert user_authorized_2.can_use_ai_import is True
     assert user_authorized_2.can_use_ai_writing is True
 
-    # Authorized user by name contain
+    # Unauthorized when matched only by name (security guard against display name bypass)
     user_authorized_3 = User(email="random@domain.com", name="tranhuunam23022000 user", role="USER")
-    assert user_authorized_3.can_use_ai_import is True
-    assert user_authorized_3.can_use_ai_writing is True
+    assert user_authorized_3.can_use_ai_import is False
+    assert user_authorized_3.can_use_ai_writing is False
 
     # Regular learner
     user_regular = User(email="regular.learner@school.edu", name="Student", role="USER")

@@ -1,0 +1,1 @@
+export { VisualVocabPage } from "./VisualVocabPage";

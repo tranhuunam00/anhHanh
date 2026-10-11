@@ -22,6 +22,7 @@ import { AudioStudioPage } from "./pages/AudioStudioPage";
 import { SmartReaderPage } from "./pages/SmartReaderPage";
 import { WritingPage } from "./pages/WritingPage";
 import { DestinationB2Page } from "./components/DestinationB2/DestinationB2Page";
+import { VisualVocabPage } from "./components/VisualVocab";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -59,6 +60,7 @@ export default function App() {
     if (path === "/reader" || path.startsWith("/reader/")) return "tab-reader";
     if (path === "/writing" || path.startsWith("/writing/")) return "tab-writing";
     if (path === "/destination-b2" || path.startsWith("/destination-b2/")) return "tab-destination-b2";
+    if (path === "/visual-vocab" || path.startsWith("/visual-vocab/")) return "tab-visual-vocab";
     if (path === "/history" || path.startsWith("/history/")) return "tab-history";
     if (path === "/audio-studio" || path.startsWith("/audio-studio/")) return "tab-audio-studio";
     return "tab-dictation";
@@ -68,6 +70,7 @@ export default function App() {
     switch (tab) {
       case "tab-admin": return "/admin";
       case "tab-vocab": return "/vocab";
+      case "tab-visual-vocab": return "/visual-vocab";
       case "tab-reader": return "/reader";
       case "tab-writing": return "/writing";
       case "tab-destination-b2": return "/destination-b2";
@@ -872,6 +875,19 @@ export default function App() {
             </button>
 
             <button
+              className={`tab-btn ${activeTab === "tab-visual-vocab" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-visual-vocab")}
+              style={activeTab === "tab-visual-vocab" ? { borderColor: "#6366f1" } : {}}
+              title="Học từ vựng qua sơ đồ tranh minh họa trực quan (Visual Diagram)"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+              </svg>
+              <span>Sơ đồ từ vựng</span>
+            </button>
+
+            <button
               className={`tab-btn ${activeTab === "tab-history" ? "active" : ""}`}
               onClick={() => setActiveTab("tab-history")}
               title="Lịch sử học tập & tiến độ"
@@ -1106,6 +1122,11 @@ export default function App() {
         {/* TAB 8: Destination B2 (Unit 1 & 2) */}
         <div style={{ display: activeTab === "tab-destination-b2" ? "block" : "none" }}>
           <DestinationB2Page isActive={activeTab === "tab-destination-b2"} token={token} />
+        </div>
+
+        {/* TAB 9: Visual Diagram Vocabulary (Mountain & University) */}
+        <div style={{ display: activeTab === "tab-visual-vocab" ? "block" : "none" }}>
+          <VisualVocabPage isActive={activeTab === "tab-visual-vocab"} token={token} />
         </div>
       </main>
 
