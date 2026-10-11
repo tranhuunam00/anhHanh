@@ -109,7 +109,7 @@ export const VisualVocabCanvas = ({
                 <div className="vv-pin-dot">{dotContent}</div>
 
                 {/* Floating Word Label */}
-                {showLabels && (
+                {(showLabels || isActive) && (
                   <div className="vv-hotspot-label">
                     <span>{item.word}</span>
                     {item.ipa && <span className="vv-ipa">{item.ipa}</span>}
