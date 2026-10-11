@@ -12,6 +12,9 @@ import {
   calculateCompletionRate,
   isSpellingMatch,
   getZoomTransformStyle,
+  getRemainingPool,
+  getNextMasteryQuestion,
+  updateMasteryProgress,
 } from "../src/utils/visualVocabUtils.js";
 
 test("clamp - limits values correctly and handles bad inputs", () => {
@@ -166,4 +169,45 @@ test("getZoomTransformStyle - outputs proper CSS transform strings", () => {
   // Handles bad inputs
   const styleBad = getZoomTransformStyle("invalid", null, undefined);
   assert.equal(styleBad.transform, "translate(0px, 0px) scale(1)");
+});
+
+test("getRemainingPool - filters out mastered items correctly", () => {
+  const items = [{ id: "1" }, { id: "2" }, { id: "3" }];
+  const remaining = getRemainingPool(items, new Set(["1"]));
+  assert.equal(remaining.length, 2);
+  assert.equal(remaining[0].id, "2");
+  assert.equal(remaining[1].id, "3");
+
+  // Handles arrays and empty sets
+  assert.equal(getRemainingPool(items, ["1", "2"]).length, 1);
+  assert.equal(getRemainingPool(items, []).length, 3);
+  assert.deepEqual(getRemainingPool(null, []), []);
+});
+
+test("getNextMasteryQuestion - picks random item from pool and avoids immediate repeat", () => {
+  const pool = [{ id: "a" }, { id: "b" }];
+  const nextItem = getNextMasteryQuestion(pool, "a");
+  assert.equal(nextItem.id, "b");
+
+  // Single item pool
+  const single = [{ id: "only" }];
+  assert.equal(getNextMasteryQuestion(single, "only").id, "only");
+
+  // Empty pool returns null
+  assert.equal(getNextMasteryQuestion([]), null);
+  assert.equal(getNextMasteryQuestion(null), null);
+});
+
+test("updateMasteryProgress - adds questionId on correct answer immutably", () => {
+  const initial = new Set(["a"]);
+  const updated = updateMasteryProgress(initial, "b", true);
+  assert.equal(updated.size, 2);
+  assert.ok(updated.has("b"));
+  // Initial set untouched
+  assert.equal(initial.size, 1);
+
+  // False answer does not add
+  const notAdded = updateMasteryProgress(initial, "c", false);
+  assert.equal(notAdded.size, 1);
+  assert.ok(!notAdded.has("c"));
 });

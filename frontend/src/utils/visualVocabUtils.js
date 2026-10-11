@@ -127,3 +127,42 @@ export const getZoomTransformStyle = (scale = 1, panX = 0, panY = 0) => {
     transition: "transform 0.15s ease-out",
   };
 };
+
+/**
+ * Filters items remaining to be mastered
+ */
+export const getRemainingPool = (allItems, masteredIds) => {
+  if (!Array.isArray(allItems)) return [];
+  const masteredSet = masteredIds instanceof Set ? masteredIds : new Set(Array.isArray(masteredIds) ? masteredIds : []);
+  return allItems.filter((it) => it && it.id && !masteredSet.has(it.id));
+};
+
+/**
+ * Selects a random next item from the unmastered pool without immediately repeating lastQuestionId (if possible)
+ */
+export const getNextMasteryQuestion = (remainingPool, lastQuestionId = null) => {
+  if (!Array.isArray(remainingPool) || remainingPool.length === 0) return null;
+  if (remainingPool.length === 1) return remainingPool[0];
+
+  const filtered = lastQuestionId
+    ? remainingPool.filter((it) => it && it.id !== lastQuestionId)
+    : remainingPool;
+
+  const candidatePool = filtered.length > 0 ? filtered : remainingPool;
+  const randomIndex = Math.floor(Math.random() * candidatePool.length);
+  return candidatePool[randomIndex] || null;
+};
+
+/**
+ * Updates mastered IDs collection based on correctness
+ */
+export const updateMasteryProgress = (masteredIds, questionId, isCorrect) => {
+  const currentSet = new Set(
+    masteredIds instanceof Set ? masteredIds : (Array.isArray(masteredIds) ? masteredIds : [])
+  );
+  if (isCorrect && questionId) {
+    currentSet.add(questionId);
+  }
+  return currentSet;
+};
+

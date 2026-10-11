@@ -9,8 +9,8 @@ export const VisualVocabCanvas = ({
   onSelectHotspot,
   showLabels = true,
   // Quiz states
-  quizFeedback = null, // { hotspotId, isCorrect }
-  onCanvasClick = null,
+  quizFeedback = null, // { clickedId, correctId, isCorrect }
+  masteredIds = null, // Set or Array of mastered word IDs
 }) => {
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -26,7 +26,6 @@ export const VisualVocabCanvas = ({
   };
 
   const handleMouseDown = useCallback((e) => {
-    // Only drag when mouse 0 (left click) and scale > 1
     if (e.button !== 0 || scale <= 1) return;
     setIsDragging(true);
     dragStartRef.current = { x: e.clientX, y: e.clientY };
@@ -70,15 +69,36 @@ export const VisualVocabCanvas = ({
           {/* Hotspot Pins Layer */}
           {items.map((item, idx) => {
             const isActive = item.id === activeItemId;
+            const isMastered = masteredIds
+              ? (masteredIds.has ? masteredIds.has(item.id) : masteredIds.includes(item.id))
+              : false;
+
             let feedbackClass = "";
-            if (quizFeedback && quizFeedback.hotspotId === item.id) {
-              feedbackClass = quizFeedback.isCorrect ? "correct" : "wrong";
+            let dotContent = idx + 1;
+
+            if (isMastered) {
+              feedbackClass += " mastered";
+              dotContent = "✓";
+            }
+
+            if (quizFeedback) {
+              if (quizFeedback.clickedId === item.id) {
+                if (quizFeedback.isCorrect) {
+                  feedbackClass += " correct";
+                  dotContent = "✓";
+                } else {
+                  feedbackClass += " wrong";
+                  dotContent = "✕";
+                }
+              } else if (!quizFeedback.isCorrect && quizFeedback.correctId === item.id) {
+                feedbackClass += " hint-pulse";
+              }
             }
 
             return (
               <div
                 key={item.id}
-                className={`vv-hotspot-pin ${isActive ? "active" : ""} ${feedbackClass}`}
+                className={`vv-hotspot-pin ${isActive ? "active" : ""} ${feedbackClass.trim()}`}
                 style={{ left: `${item.x}%`, top: `${item.y}%` }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -86,7 +106,7 @@ export const VisualVocabCanvas = ({
                 }}
                 title={`${item.word} (${item.meaning})`}
               >
-                <div className="vv-pin-dot">{idx + 1}</div>
+                <div className="vv-pin-dot">{dotContent}</div>
 
                 {/* Floating Word Label */}
                 {showLabels && (

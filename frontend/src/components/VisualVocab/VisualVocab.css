@@ -1,6 +1,6 @@
 /* ==========================================================================
    Visual Vocabulary Studio (Picture Dictionary & Interactive Diagram)
-   Uses strict CSS variables for Light & Dark mode compatibility
+   Uses strict CSS variables for Light & Dark mode compatibility (<500 lines)
    ========================================================================== */
 
 .visual-vocab-container {
@@ -189,30 +189,6 @@
   width: 100%;
 }
 
-.vv-search-box input::placeholder {
-  color: var(--text-muted);
-}
-
-.vv-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.vv-icon-btn:hover {
-  background: var(--bg-card);
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
 .vv-toggle-labels-btn {
   display: inline-flex;
   align-items: center;
@@ -301,8 +277,8 @@
 }
 
 .vv-pin-dot {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: #ffffff;
   color: #1e293b;
@@ -310,7 +286,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 800;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
@@ -318,20 +294,55 @@
 
 .vv-hotspot-pin:hover .vv-pin-dot,
 .vv-hotspot-pin.active .vv-pin-dot {
-  transform: scale(1.3);
+  transform: scale(1.35);
   background: var(--primary);
   color: #ffffff;
-  box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.5), 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.5), 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 
-.vv-hotspot-pin.pulse .vv-pin-dot {
-  animation: vv-pin-pulse 1.8s infinite;
+/* Correct / Error / Mastered / Hint States */
+.vv-hotspot-pin.correct .vv-pin-dot {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 7px rgba(16, 185, 129, 0.5) !important;
+  transform: scale(1.4) !important;
 }
 
-@keyframes vv-pin-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+.vv-hotspot-pin.wrong .vv-pin-dot {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #b91c1c !important;
+  box-shadow: 0 0 0 7px rgba(239, 68, 68, 0.5) !important;
+  animation: vv-shake 0.4s ease !important;
+  transform: scale(1.35) !important;
+}
+
+.vv-hotspot-pin.mastered .vv-pin-dot {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #047857;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+}
+
+.vv-hotspot-pin.hint-pulse .vv-pin-dot {
+  background: #f59e0b !important;
+  color: #ffffff !important;
+  border-color: #d97706 !important;
+  animation: vv-hint-glow 1.2s infinite !important;
+  transform: scale(1.4) !important;
+}
+
+@keyframes vv-hint-glow {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.8); }
+  70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+@keyframes vv-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 /* Floating Label on Hotspot */
@@ -348,11 +359,9 @@
   border-radius: 6px;
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.3px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
   pointer-events: none;
-  transition: opacity 0.15s ease, transform 0.15s ease;
   z-index: 12;
 }
 
@@ -360,32 +369,6 @@
   font-size: 0.65rem;
   opacity: 0.8;
   margin-left: 4px;
-  font-weight: 400;
-}
-
-.vv-hotspot-label.vn-mode {
-  background: rgba(99, 102, 241, 0.95);
-}
-
-/* Correct / Error Quiz Feedback state on Pins */
-.vv-hotspot-pin.correct .vv-pin-dot {
-  background: #10b981;
-  color: #ffffff;
-  border-color: #10b981;
-  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.4);
-}
-
-.vv-hotspot-pin.wrong .vv-pin-dot {
-  background: #ef4444;
-  color: #ffffff;
-  border-color: #ef4444;
-  animation: vv-shake 0.4s ease;
-}
-
-@keyframes vv-shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
 }
 
 /* Canvas Floating Overlay Controls */
@@ -430,7 +413,7 @@
   font-weight: 600;
 }
 
-/* ---------------- Sidebar / Word Detail Card ---------------- */
+/* ---------------- Sidebar & Detail Card ---------------- */
 .vv-sidebar {
   display: flex;
   flex-direction: column;
@@ -608,7 +591,7 @@
   cursor: not-allowed;
 }
 
-/* Word Quick List Drawer / Strip */
+/* Word Quick List Box */
 .vv-word-list-box {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -650,4 +633,36 @@
 .vv-list-item-btn .vv-list-vn {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+/* ---------------- Practice Progress Bar ---------------- */
+.vv-progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.vv-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.vv-progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.vv-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #10b981);
+  border-radius: 999px;
+  transition: width 0.3s ease;
 }

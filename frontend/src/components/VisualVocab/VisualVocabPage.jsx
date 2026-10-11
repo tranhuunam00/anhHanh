@@ -14,18 +14,20 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showLabels, setShowLabels] = useState(true);
   const [quizFeedback, setQuizFeedback] = useState(null);
-  const [lastClickedHotspotId, setLastClickedHotspotId] = useState(null);
+  const [lastClickedHotspot, setLastClickedHotspot] = useState(null);
+  const [masteredIds, setMasteredIds] = useState(new Set());
 
   const currentTopic = useMemo(() => {
     return getVisualVocabTopicById(currentTopicId);
   }, [currentTopicId]);
 
-  // When switching topic, select first word
+  // When switching topic, select first word and reset mastery
   useEffect(() => {
     if (currentTopic && currentTopic.items && currentTopic.items.length > 0) {
       setActiveItemId(currentTopic.items[0].id);
       setSearchQuery("");
       setQuizFeedback(null);
+      setMasteredIds(new Set());
     }
   }, [currentTopicId]);
 
@@ -55,8 +57,8 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
   const handleSelectHotspot = (item) => {
     setActiveItemId(item.id);
     if (activeMode === "SPOT_TAP") {
-      setLastClickedHotspotId(item.id);
-      setTimeout(() => setLastClickedHotspotId(null), 100);
+      setLastClickedHotspot(item);
+      setTimeout(() => setLastClickedHotspot(null), 100);
     }
   };
 
@@ -100,6 +102,7 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
           onSelectHotspot={handleSelectHotspot}
           showLabels={showLabels}
           quizFeedback={quizFeedback}
+          masteredIds={masteredIds}
         />
 
         {/* Right Sidebar: Active Word Inspector or Practice Mode */}
@@ -142,9 +145,10 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
               topic={currentTopic}
               items={currentTopic.items || []}
               mode={activeMode}
-              lastClickedHotspotId={lastClickedHotspotId}
+              lastClickedHotspot={lastClickedHotspot}
               onHighlightHotspot={(id) => setActiveItemId(id)}
               onQuizFeedback={setQuizFeedback}
+              onUpdateMasteredIds={setMasteredIds}
               onResetToExplore={() => handleChangeMode("EXPLORE")}
             />
           )}
