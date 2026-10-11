@@ -129,7 +129,8 @@ Trả về kết quả DUY NHẤT định dạng JSON:
     models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
     async with httpx.AsyncClient(timeout=60.0) as client:
         for model_name in models_to_try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+            headers = {"x-goog-api-key": api_key}
             payload = {
                 "contents": [{"parts": [{"text": prompt_instruction}]}],
                 "generationConfig": {
@@ -138,7 +139,7 @@ Trả về kết quả DUY NHẤT định dạng JSON:
                 }
             }
             try:
-                resp = await client.post(url, json=payload)
+                resp = await client.post(url, json=payload, headers=headers)
                 if resp.status_code == 200:
                     data = resp.json()
                     raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
@@ -374,7 +375,8 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON HỢP LỆ THEO CẤU TR�
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         for model_name in models_to_try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+            headers = {"x-goog-api-key": api_key}
             payload = {
                 "contents": [{"parts": [{"text": prompt_instruction}]}],
                 "generationConfig": {
@@ -383,7 +385,7 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON HỢP LỆ THEO CẤU TR�
                 }
             }
             try:
-                resp = await client.post(url, json=payload)
+                resp = await client.post(url, json=payload, headers=headers)
                 if resp.status_code == 200:
                     data = resp.json()
                     raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()

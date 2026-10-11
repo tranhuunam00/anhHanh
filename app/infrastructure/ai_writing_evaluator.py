@@ -154,7 +154,8 @@ LƯU Ý ĐẶC BIỆT VỀ HÌNH ẢNH ĐỀ BÀI ĐÍNH KÈM:
 
     async with httpx.AsyncClient(timeout=300.0) as client:
         for model_name in models_to_try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+            headers = {"x-goog-api-key": api_key}
             payload = {
                 "contents": [{"parts": content_parts}],
                 "generationConfig": {
@@ -164,7 +165,7 @@ LƯU Ý ĐẶC BIỆT VỀ HÌNH ẢNH ĐỀ BÀI ĐÍNH KÈM:
             }
             try:
                 logger.info(f"Submitting essay evaluation ({word_count} words) to {model_name}...")
-                response = await client.post(url, json=payload)
+                response = await client.post(url, json=payload, headers=headers)
                 if response.status_code == 200:
                     data = response.json()
                     raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()

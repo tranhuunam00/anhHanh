@@ -90,15 +90,14 @@ export const WritingPage = ({ isActive = false }) => {
     if (!user) return false;
     if (user.can_use_ai_writing || user.can_use_ai_import) return true;
     const em = (user.email || "").toLowerCase();
-    const nm = (user.name || "").toLowerCase();
+    const handle = em.split("@")[0];
     return (
-      em.includes("tranhuunam23022000") ||
-      em.includes("vuthiquynhtrang") ||
-      em.includes("vuthiquynhtrangbl6d") ||
-      nm.includes("tranhuunam23022000") ||
-      nm.includes("vuthiquynhtrang")
+      handle === "tranhuunam23022000" ||
+      handle === "vuthiquynhtrang" ||
+      handle === "vuthiquynhtrangbl6d"
     );
   }, [user]);
+
 
   // Prompt library and selection state
   const [promptsLibrary, setPromptsLibrary] = useState({});

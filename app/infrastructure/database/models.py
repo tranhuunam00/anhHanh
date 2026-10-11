@@ -48,14 +48,11 @@ class User(Base):
             return False
         em = self.email.strip().lower()
         handle = em.split('@')[0]
-        nm = (self.name or '').strip().lower()
-        if handle in {'tranhuunam23022000', 'vuthiquynhtrang', 'vuthiquynhtrangbl6d'}:
-            return True
-        if 'tranhuunam23022000' in em or 'vuthiquynhtrang' in em or 'vuthiquynhtrangbl6d' in em:
-            return True
-        if 'tranhuunam23022000' in nm or 'vuthiquynhtrang' in nm or 'vuthiquynhtrangbl6d' in nm:
-            return True
-        return False
+        # Strictly allow only 2 designated accounts (tranhuunam23022000 & vuthiquynhtrangbl6d/vuthiquynhtrang)
+        # Never match against self.name to prevent display name auth bypass
+        allowed_handles = {'tranhuunam23022000', 'vuthiquynhtrang', 'vuthiquynhtrangbl6d'}
+        return handle in allowed_handles
+
 
     @property
     def can_use_ai_writing(self) -> bool:

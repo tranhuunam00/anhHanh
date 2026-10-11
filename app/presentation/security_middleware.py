@@ -27,31 +27,46 @@ limiter = Limiter(
 )
 
 MAX_PAYLOAD_BYTES = 512 * 1024  # 512 KB
-MAX_DOC_PAYLOAD_BYTES = 505 * 1024 * 1024  # 5 MB for document/vocab uploads
+MAX_PAYLOAD_BYTES = 512 * 1024  # 512 KB
+MAX_DOC_PAYLOAD_BYTES = 5 * 1024 * 1024  # 5 MB for document/vocab uploads
 MAX_AUDIO_PAYLOAD_BYTES = 25 * 1024 * 1024  # 25 MB for custom audio uploads
 
 # ── Per-route-group hard limits (enforced at middleware, no decorator needed) ──
+# Note: Put specific subpaths BEFORE general prefixes because the loop matches first prefix.
 # Format: (path_prefix, max_requests, window_seconds)
 _ROUTE_LIMITS = [
-    ('/api/auth/login',      10,  900),   # 10 req / 15 min  (brute-force guard)
-    ('/api/auth/google',     10,  900),   # 10 req / 15 min
-    ('/api/auth/register',    5,  900),   # 5  req / 15 min
-    ('/api/auth',            60,   60),   # 60 req / min  (general auth routes: config, me)
-    ('/api/lesson/preview',  20,   60),   # 20 req / min
-    ('/api/lesson/start',    15,   60),   # 15 req / min
-    ('/api/lesson/progress', 60,   60),   # 60 req / min
-    ('/api/lesson',          20,   60),   # 20 req / min  (POST /api/lesson)
-    ('/api/translate',       30,   60),   # 30 req / min  (external translation guard)
-    ('/api/video-languages', 30,   60),   # 30 req / min
-    ('/api/evaluate',       120,   60),   # 120 req / min
-    ('/api/streak',          60,   60),   # 60 req / min
-    ('/api/feedback',         5,   60),   # 5  req / min  (POST only handled below)
-    ('/api/admin',           60,   60),   # 60 req / min
-    ('/api/vocab',          120,   60),   # 120 req / min
+    ('/api/auth/login',                10,  900),   # 10 req / 15 min  (brute-force guard)
+    ('/api/auth/google',               10,  900),   # 10 req / 15 min
+    ('/api/auth/register',              5,  900),   # 5  req / 15 min
+    ('/api/auth',                      60,   60),   # 60 req / min  (general auth routes: config, me)
+    ('/api/writing/evaluate',          10,   60),   # 10 req / min  (Gemini Essay Evaluation guard)
+    ('/api/writing/generate-prompt',   10,   60),   # 10 req / min  (Gemini Prompt Gen guard)
+    ('/api/writing/suggest-structures',15,   60),   # 15 req / min  (Gemini Suggestions guard)
+    ('/api/writing',                   30,   60),   # 30 req / min  (general writing routes)
+    ('/api/vocab/ai-extract-file',      5,   60),   # 5  req / min  (Gemini Vision/File OCR guard)
+    ('/api/vocab/ai-extract',          10,   60),   # 10 req / min  (Gemini Text AI extraction guard)
+    ('/api/vocab/extract-text',        15,   60),   # 15 req / min  (Doc parser/extraction guard)
+    ('/api/vocab',                    120,   60),   # 120 req / min
+    ('/api/lesson/preview',            20,   60),   # 20 req / min
+    ('/api/lesson/start',              15,   60),   # 15 req / min
+    ('/api/lesson/progress',           60,   60),   # 60 req / min
+    ('/api/lesson',                    20,   60),   # 20 req / min  (POST /api/lesson)
+    ('/api/translate',                 30,   60),   # 30 req / min  (external translation guard)
+    ('/api/video-languages',           30,   60),   # 30 req / min
+    ('/api/evaluate',                 120,   60),   # 120 req / min
+    ('/api/streak',                    60,   60),   # 60 req / min
+    ('/api/feedback',                   5,   60),   # 5  req / min  (POST only handled below)
+    ('/api/admin',                     60,   60),   # 60 req / min
 ]
 
 # In-memory sliding-window counters: { (ip, prefix): [timestamp, ...] }
 _counters: dict = defaultdict(list)
+
+
+def reset_rate_limit_counters():
+    """Clear in-memory rate limit counters (useful for unit test isolation)."""
+    _counters.clear()
+
 
 
 def _is_rate_limited(ip: str, path: str, method: str) -> tuple:
@@ -132,5 +147,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
         response.headers['Permissions-Policy'] = 'camera=(), microphone=(self), geolocation=()'
         response.headers['X-Permitted-Cross-Domain-Policies'] = 'none'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
 
         return response
+

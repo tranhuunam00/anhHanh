@@ -28,19 +28,20 @@ router = APIRouter(prefix="/api/writing", tags=["Writing"])
 
 class EvaluateWritingRequest(BaseModel):
     submission_id: Optional[str] = Field(default=None, description="ID bài viết nếu đã lưu trước đó")
-    topic: str = Field(..., min_length=2, description="Đề bài cần làm")
-    content: str = Field(..., min_length=15, description="Bài viết của học viên")
+
+    topic: str = Field(..., min_length=2, max_length=2000, description="Đề bài cần làm")
+    content: str = Field(..., min_length=15, max_length=35000, description="Bài viết của học viên")
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm (e.g. 6.5, 7.0, 7.5, 8.0)")
     language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết (en, ja, zh, ko, fr, de)")
     sub_type: Optional[str] = Field(default=None, description="Dạng bài chi tiết (line_graph, bar_chart, map, opinion, discussion...)")
-    images: Optional[List[str]] = Field(default=[], description="Danh sách ảnh đề bài đính kèm (base64 data URL hoặc URL)")
+    images: Optional[List[str]] = Field(default=[], max_length=5, description="Danh sách ảnh đề bài đính kèm (base64 data URL hoặc URL)")
 
 
 class SaveWritingRequest(BaseModel):
     submission_id: Optional[str] = Field(default=None, description="ID bài viết nếu cập nhật")
-    topic: str = Field(..., min_length=2, description="Đề bài cần làm")
-    content: str = Field(..., min_length=1, description="Nội dung bài viết")
+    topic: str = Field(..., min_length=2, max_length=2000, description="Đề bài cần làm")
+    content: str = Field(..., min_length=1, max_length=35000, description="Nội dung bài viết")
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu band điểm")
     language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết")
@@ -49,15 +50,16 @@ class SaveWritingRequest(BaseModel):
 
 class GeneratePromptRequest(BaseModel):
     genre: Optional[str] = Field(default="ielts_task2")
-    topic_area: Optional[str] = Field(default=None)
+    topic_area: Optional[str] = Field(default=None, max_length=500)
     language: Optional[str] = Field(default="en", description="Ngôn ngữ đề bài")
     sub_type: Optional[str] = Field(default=None, description="Dạng đề chi tiết (line_graph, bar_chart, process, map, opinion, discussion...)")
 
 
 class SuggestStructuresRequest(BaseModel):
-    topic: str = Field(..., min_length=2, description="Đề bài cần gợi ý cụm từ")
+    topic: str = Field(..., min_length=2, max_length=2000, description="Đề bài cần gợi ý cụm từ")
     language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết")
     target_band: Optional[float] = Field(default=7.0, description="Mục tiêu điểm")
+
     genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
     request_kind: Optional[str] = Field(default="all", description="Loại yêu cầu: 'all', 'collocation', hoặc 'structure'")
     existing_phrases: Optional[List[str]] = Field(default=[], description="Danh sách các cụm/câu đã có để tránh trùng")
@@ -210,6 +212,12 @@ async def evaluate_writing_submission(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Bài viết quá ngắn (tối thiểu 15 từ) để AI có thể đánh giá học thuật chuẩn xác."
         )
+    if word_count > 4000:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Bài viết vượt quá giới hạn tối đa cho phép (tối đa 4000 từ)."
+        )
+
 
     try:
         evaluation = await AIWritingService.evaluate_writing(

@@ -48,11 +48,12 @@ class ReviewResultRequest(BaseModel):
 
 
 class AIExtractTextRequest(BaseModel):
-    text: str = Field(..., min_length=2)
+    text: str = Field(..., min_length=2, max_length=50000, description="Nội dung trích xuất (tối đa 50,000 ký tự)")
     source_lang: Optional[str] = "en"
     target_lang: Optional[str] = "vi"
     mode: Optional[str] = "auto"
     vocab_level: Optional[str] = "intermediate"
+
 
 
 class BatchImportVocabItem(BaseModel):

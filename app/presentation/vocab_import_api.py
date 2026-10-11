@@ -166,14 +166,19 @@ async def ai_extract_vocabulary_from_file(
                 detail="Không thể đọc nội dung văn bản từ tệp này."
             )
 
+        # Security guard: limit extracted text length and images count to prevent token exhaustion / DoS
+        safe_text = (extracted_text or "")[:50000]
+        safe_images = images[:10] if images else None
+
         items = await AIVocabService.extract_vocabulary(
-            text=extracted_text or "",
+            text=safe_text,
             source_lang=source_lang or "en",
             target_lang=target_lang or "vi",
             mode="auto",
             vocab_level=vocab_level or "intermediate",
-            images=images
+            images=safe_images
         )
+
         return {
             'success': True,
             'filename': filename,

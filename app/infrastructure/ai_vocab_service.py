@@ -332,9 +332,10 @@ VĂN BẢN ĐẦU VÀO ({lang_name}):
 
         async with httpx.AsyncClient(timeout=300.0) as client:
             for model_name in models_to_try:
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+                headers = {"x-goog-api-key": api_key}
                 try:
-                    response = await client.post(url, json=payload)
+                    response = await client.post(url, json=payload, headers=headers)
                     if response.status_code == 200:
                         res_json = response.json()
                         candidates = res_json.get("candidates", [])

@@ -307,14 +307,11 @@ export const AIVocabImportModal = ({ isOpen, onClose, onSuccess }) => {
   const isAllowed = Boolean(
     user?.can_use_ai_import ||
       (user?.email &&
-        (user.email.toLowerCase().includes("tranhuunam23022000") ||
-          user.email.toLowerCase().includes("vuthiquynhtrang") ||
-          user.email.toLowerCase().includes("vuthiquynhtrangbl6d"))) ||
-      (user?.name &&
-        (user.name.toLowerCase().includes("tranhuunam23022000") ||
-          user.name.toLowerCase().includes("vuthiquynhtrang") ||
-          user.name.toLowerCase().includes("vuthiquynhtrangbl6d")))
+        ["tranhuunam23022000", "vuthiquynhtrang", "vuthiquynhtrangbl6d"].includes(
+          user.email.toLowerCase().split("@")[0]
+        ))
   );
+
 
   const handleSpeech = (text, itemLang = null) => {
     if (!text || !window.speechSynthesis) return;
