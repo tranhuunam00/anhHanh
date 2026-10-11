@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { submitVocabReviewResult, fetchPracticeSession } from "../../services/authVocabService";
 import { fetchSystemDistractors } from "../../services/systemVocabService";
 import { EXERCISE_FORMATS } from "../../utils/vocabExerciseGenerators";
@@ -16,12 +16,30 @@ export default function VocabExerciseHubModal({
   // Navigation View: "MENU" (Card selection) | "PRACTICE" (Interactive session) | "SUMMARY" (Results)
   const [viewMode, setViewMode] = useState("MENU");
 
-  // Selected format: D1 (Từ vựng -> Nghĩa VN) or D2 (Nghĩa VN -> Từ vựng)
+  // Selected format: D1 (Từ vựng -> Nghĩa VN), D2 (Nghĩa VN -> Từ vựng), D3 (Điền từ vào câu)
   const [selectedFormat, setSelectedFormat] = useState(EXERCISE_FORMATS.D1);
+
+  // Status Filter: "UNMASTERED" (Từ chưa thuộc - mặc định) | "MASTERED" (Từ đã thuộc) | "ALL" (Tất cả)
+  const [statusFilter, setStatusFilter] = useState("UNMASTERED");
 
   // Selected word quantity: 20, 40, 60, 80 or "ALL"
   const [selectedLimit, setSelectedLimit] = useState(20);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
+
+  // Filter word pools according to mastery status
+  const unmasteredPool = useMemo(() => {
+    return (vocabPool || []).filter((w) => w.status !== "MASTERED");
+  }, [vocabPool]);
+
+  const masteredPool = useMemo(() => {
+    return (vocabPool || []).filter((w) => w.status === "MASTERED");
+  }, [vocabPool]);
+
+  const activePool = useMemo(() => {
+    if (statusFilter === "UNMASTERED") return unmasteredPool;
+    if (statusFilter === "MASTERED") return masteredPool;
+    return vocabPool || [];
+  }, [statusFilter, unmasteredPool, masteredPool, vocabPool]);
 
   // Active practice session words, bank distractors and score tracking
   const [items, setItems] = useState([]);
@@ -34,24 +52,24 @@ export default function VocabExerciseHubModal({
 
   const currentItem = items[currentIndex];
 
-  // Start practice session with selected format & quantity
+  // Start practice session with selected format, status filter & quantity
   const handleStartPractice = async () => {
     setIsLoadingSession(true);
     try {
       let sessionWords = [];
 
-      // 1. If user is authenticated, request BE to randomly sample
+      // 1. If user is authenticated, request BE to randomly sample according to statusFilter
       if (token) {
         const limitParam = selectedLimit === "ALL" ? null : selectedLimit;
-        const res = await fetchPracticeSession(limitParam, "ALL", token);
+        const res = await fetchPracticeSession(limitParam, statusFilter, token);
         if (res && Array.isArray(res.items) && res.items.length > 0) {
           sessionWords = res.items;
         }
       }
 
       // 2. Fallback to client pool if not logged in or BE returned empty
-      if (sessionWords.length === 0 && vocabPool && vocabPool.length > 0) {
-        let poolCopy = [...vocabPool];
+      if (sessionWords.length === 0 && activePool && activePool.length > 0) {
+        let poolCopy = [...activePool];
         poolCopy.sort(() => Math.random() - 0.5);
 
         if (selectedLimit !== "ALL" && typeof selectedLimit === "number") {
@@ -62,7 +80,13 @@ export default function VocabExerciseHubModal({
       }
 
       if (sessionWords.length === 0) {
-        alert("Sổ tay của bạn chưa có từ vựng nào để luyện tập!");
+        if (statusFilter === "UNMASTERED") {
+          alert("🎉 Bạn không còn từ nào chưa thuộc trong sổ tay!");
+        } else if (statusFilter === "MASTERED") {
+          alert("Sổ tay của bạn chưa có từ nào được đánh dấu là 'Đã thuộc'!");
+        } else {
+          alert("Sổ tay của bạn chưa có từ vựng nào để luyện tập!");
+        }
         setIsLoadingSession(false);
         return;
       }
@@ -83,8 +107,8 @@ export default function VocabExerciseHubModal({
       setViewMode("PRACTICE");
     } catch (err) {
       console.error("Error starting practice session:", err);
-      if (vocabPool.length > 0) {
-        const shuffled = [...vocabPool].sort(() => Math.random() - 0.5);
+      if (activePool.length > 0) {
+        const shuffled = [...activePool].sort(() => Math.random() - 0.5);
         const limitCount =
           selectedLimit === "ALL"
             ? shuffled.length
@@ -173,6 +197,11 @@ export default function VocabExerciseHubModal({
     return (
       <VocabExerciseMenu
         totalWords={vocabPool.length}
+        unmasteredCount={unmasteredPool.length}
+        masteredCount={masteredPool.length}
+        availableWords={activePool.length}
+        statusFilter={statusFilter}
+        onSelectStatusFilter={setStatusFilter}
         selectedFormat={selectedFormat}
         onSelectFormat={setSelectedFormat}
         selectedLimit={selectedLimit}

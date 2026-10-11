@@ -6,6 +6,7 @@ import {
   Check,
   ArrowRight,
   Lightbulb,
+  CheckCircle,
 } from "../../Icons";
 import { EXERCISE_FORMATS } from "../../../utils/vocabExerciseGenerators";
 
@@ -13,6 +14,11 @@ const QUANTITY_OPTIONS = [20, 40, 60, 80, "ALL"];
 
 export const VocabExerciseMenu = ({
   totalWords = 0,
+  unmasteredCount = 0,
+  masteredCount = 0,
+  availableWords = 0,
+  statusFilter = "UNMASTERED",
+  onSelectStatusFilter,
   selectedFormat = EXERCISE_FORMATS.D1,
   onSelectFormat,
   selectedLimit = 20,
@@ -32,10 +38,17 @@ export const VocabExerciseMenu = ({
     }
   };
 
+  const poolCount = typeof availableWords === "number" ? availableWords : totalWords;
   const currentLimitDisplay =
     selectedLimit === "ALL"
-      ? totalWords
-      : Math.min(selectedLimit, totalWords || selectedLimit);
+      ? poolCount
+      : Math.min(selectedLimit, poolCount || selectedLimit);
+
+  const getStatusText = () => {
+    if (statusFilter === "UNMASTERED") return "từ chưa thuộc";
+    if (statusFilter === "MASTERED") return "từ đã thuộc";
+    return "từ";
+  };
 
   return (
     <div className="exercise-modal-backdrop" onClick={onClose}>
@@ -49,7 +62,7 @@ export const VocabExerciseMenu = ({
             <div>
               <h3 className="ex-header-title">Luyện Tập Từ Vựng</h3>
               <span className="ex-header-subtitle">
-                Sổ tay có <strong>{totalWords} từ vựng</strong> • Chọn dạng bài tập để bắt đầu
+                Sổ tay có <strong>{totalWords} từ vựng</strong> (Chưa thuộc: <strong>{unmasteredCount}</strong> • Đã thuộc: <strong>{masteredCount}</strong>)
               </span>
             </div>
           </div>
@@ -164,27 +177,94 @@ export const VocabExerciseMenu = ({
               </div>
             </div>
 
+            {/* Status Mastery Filter: Chưa thuộc vs Đã thuộc vs Tất cả */}
+            <div className="ex-status-filter-section">
+              <div className="ex-status-filter-header">
+                <span className="ex-status-filter-title">Nhóm từ muốn luyện tập:</span>
+                <span className="ex-status-filter-subtext">
+                  {statusFilter === "UNMASTERED" && (
+                    <span style={{ color: "var(--primary)" }}>
+                      <strong>{unmasteredCount}</strong> từ chưa thuộc
+                    </span>
+                  )}
+                  {statusFilter === "MASTERED" && (
+                    <span style={{ color: "#10b981" }}>
+                      <strong>{masteredCount}</strong> từ đã thuộc
+                    </span>
+                  )}
+                  {statusFilter === "ALL" && (
+                    <span style={{ color: "var(--text-secondary)" }}>
+                      <strong>{totalWords}</strong> từ tổng cộng
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              <div className="ex-status-filter-pills">
+                <button
+                  type="button"
+                  className={`ex-status-filter-btn unmastered ${statusFilter === "UNMASTERED" ? "selected" : ""}`}
+                  onClick={() => onSelectStatusFilter("UNMASTERED")}
+                >
+                  <Target size={15} />
+                  <span>Từ chưa thuộc</span>
+                  <span className="ex-status-badge">{unmasteredCount}</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`ex-status-filter-btn mastered ${statusFilter === "MASTERED" ? "selected" : ""}`}
+                  onClick={() => onSelectStatusFilter("MASTERED")}
+                >
+                  <CheckCircle size={15} />
+                  <span>Từ đã thuộc</span>
+                  <span className="ex-status-badge">{masteredCount}</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`ex-status-filter-btn all ${statusFilter === "ALL" ? "selected" : ""}`}
+                  onClick={() => onSelectStatusFilter("ALL")}
+                >
+                  <Sparkles size={15} />
+                  <span>Tất cả</span>
+                  <span className="ex-status-badge">{totalWords}</span>
+                </button>
+              </div>
+
+              {poolCount === 0 && (
+                <div className="ex-status-empty-alert">
+                  {statusFilter === "UNMASTERED"
+                    ? "🎉 Tuyệt vời! Bạn đã thuộc toàn bộ từ vựng trong sổ tay."
+                    : statusFilter === "MASTERED"
+                    ? "💡 Bạn chưa có từ nào được đánh dấu là 'Đã thuộc'. Hãy luyện tập các từ 'Chưa thuộc' trước nhé!"
+                    : "Sổ tay chưa có từ vựng nào."}
+                </div>
+              )}
+            </div>
+
             {/* Quantity Selector Section */}
             <div className="ex-quantity-section">
               <div className="ex-quantity-label">
                 <span>Số lượng câu hỏi:</span>
                 <span className="ex-quantity-subtext">
                   {selectedLimit === "ALL"
-                    ? `Tất cả (${totalWords} từ)`
-                    : `${Math.min(selectedLimit, totalWords || selectedLimit)} từ`}
+                    ? `Tất cả (${poolCount} từ)`
+                    : `${Math.min(selectedLimit, poolCount || selectedLimit)} từ`}
                 </span>
               </div>
 
               <div className="ex-quantity-pills">
                 {QUANTITY_OPTIONS.map((opt) => {
                   const isSelected = selectedLimit === opt;
-                  const label = opt === "ALL" ? `Tất cả (${totalWords})` : `${opt} từ`;
+                  const label = opt === "ALL" ? `Tất cả (${poolCount})` : `${opt} từ`;
                   return (
                     <button
                       key={opt}
                       type="button"
                       className={`ex-quantity-btn ${isSelected ? "selected" : ""}`}
                       onClick={() => onSelectLimit(opt)}
+                      disabled={poolCount === 0}
                     >
                       {label}
                     </button>
@@ -205,14 +285,14 @@ export const VocabExerciseMenu = ({
               type="button"
               className="ex-start-btn"
               onClick={onStart}
-              disabled={isLoading || totalWords === 0}
+              disabled={isLoading || poolCount === 0}
             >
               {isLoading ? (
                 <span>Đang chuẩn bị câu hỏi ngẫu nhiên...</span>
               ) : (
                 <>
                   <span>
-                    Bắt đầu Luyện tập {getFormatLabel()} ({currentLimitDisplay} từ)
+                    Bắt đầu {statusFilter === "MASTERED" ? "Ôn tập" : "Luyện tập"} {getFormatLabel()} ({currentLimitDisplay} {getStatusText()})
                   </span>
                   <ArrowRight size={18} />
                 </>

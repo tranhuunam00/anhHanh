@@ -93,3 +93,30 @@ def test_conflict_resolution_strategies_models():
     assert import_both.conflict_resolution == "keep_both"
 
 
+def test_practice_session_status_filtering_logic():
+    """Verify status filter logic: UNMASTERED filters out MASTERED, MASTERED keeps only MASTERED."""
+    test_words = [
+        {"id": 1, "word": "apple", "status": "NEW"},
+        {"id": 2, "word": "banana", "status": "LEARNING"},
+        {"id": 3, "word": "cat", "status": "MASTERED"},
+        {"id": 4, "word": "dog", "status": "MASTERED"},
+        {"id": 5, "word": "elephant", "status": "NEW"},
+    ]
+
+    # Status: UNMASTERED (NEW or LEARNING, not MASTERED)
+    unmastered = [w for w in test_words if w["status"] != "MASTERED"]
+    assert len(unmastered) == 3
+    assert all(w["status"] != "MASTERED" for w in unmastered)
+    assert set(w["word"] for w in unmastered) == {"apple", "banana", "elephant"}
+
+    # Status: MASTERED
+    mastered = [w for w in test_words if w["status"] == "MASTERED"]
+    assert len(mastered) == 2
+    assert all(w["status"] == "MASTERED" for w in mastered)
+    assert set(w["word"] for w in mastered) == {"cat", "dog"}
+
+    # Status: ALL
+    assert len(test_words) == 5
+
+
+

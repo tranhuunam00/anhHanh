@@ -103,7 +103,11 @@ async def get_practice_session(
     """Retrieve words for practice session with multiple-choice distractors."""
     stmt = select(UserVocabulary).where(UserVocabulary.user_id == current_user.id)
     if status_filter and status_filter.upper() != 'ALL':
-        stmt = stmt.where(UserVocabulary.status == status_filter.upper())
+        sf = status_filter.upper()
+        if sf in ('UNMASTERED', 'NOT_MASTERED'):
+            stmt = stmt.where(UserVocabulary.status != 'MASTERED')
+        else:
+            stmt = stmt.where(UserVocabulary.status == sf)
 
     res = await db.execute(stmt)
     all_words = list(res.scalars().all())

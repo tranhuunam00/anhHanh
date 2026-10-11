@@ -204,11 +204,15 @@ export const fetchDueVocabSession = async (limit = 20, token = null) => {
   return { items: [], total_due: 0 };
 };
 
-export const fetchPracticeSession = async (limit = 10, token = null) => {
+export const fetchPracticeSession = async (limit = 10, status = "UNMASTERED", token = null) => {
   try {
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
-    const res = await fetch(`/api/vocab/practice-session?limit=${limit}`, { headers });
+    const params = new URLSearchParams();
+    if (limit && limit !== "ALL") params.append("limit", limit);
+    if (status && status !== "ALL") params.append("status", status);
+    const query = params.toString() ? `?${params.toString()}` : "";
+    const res = await fetch(`/api/vocab/practice-session${query}`, { headers });
     if (res.ok) {
       return await res.json();
     }
