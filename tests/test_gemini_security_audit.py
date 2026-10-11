@@ -280,7 +280,7 @@ class TestSecureAPIKeyHeader:
             mock_client_cls.return_value.__aenter__.return_value = mock_client
             mock_resp = AsyncMock()
             mock_resp.status_code = 200
-            mock_resp.json.return_value = {
+            mock_resp.json = lambda: {
                 "candidates": [{
                     "content": {
                         "parts": [{"text": '[{"word": "ephemeral", "meaning": "ngắn ngủi"}]'}]
@@ -289,8 +289,8 @@ class TestSecureAPIKeyHeader:
             }
             mock_client.post.return_value = mock_resp
 
-            with patch("app.infrastructure.ai_vocab_service.settings") as mock_settings:
-                mock_settings.GEMINI_API_KEY = "test-secret-key-12345"
+
+            with patch("app.infrastructure.ai_vocab_service.get_gemini_api_key", return_value="test-secret-key-12345"):
                 await AIVocabService.extract_vocabulary("Ephemeral means lasting for a short time.")
 
             # Verify call args
@@ -305,3 +305,4 @@ class TestSecureAPIKeyHeader:
 
             # Key MUST be in headers
             assert called_headers.get("x-goog-api-key") == "test-secret-key-12345"
+
