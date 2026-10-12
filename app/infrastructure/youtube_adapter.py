@@ -259,8 +259,18 @@ class YouTubeTranscriptAdapter(ITranscriptService):
                     continue
                 break
 
+        err_msg = str(last_error) if last_error else ""
+        if "subtitles are disabled" in err_msg.lower():
+            friendly_detail = "Video này đã bị tắt tính năng phụ đề trên YouTube (Subtitles are disabled for this video)."
+        elif "no transcript found" in err_msg.lower():
+            friendly_detail = "Không tìm thấy phụ đề phù hợp cho video này trên YouTube."
+        elif "video unavailable" in err_msg.lower():
+            friendly_detail = "Video này không khả dụng hoặc đã bị đặt ở chế độ riêng tư trên YouTube."
+        else:
+            friendly_detail = err_msg.split("\n\n")[0] if "\n\n" in err_msg else err_msg
+
         raise TranscriptNotFoundException(
-            f"Không thể tải phụ đề cho video {video_id}: {str(last_error)}"
+            f"Không thể tải phụ đề cho video {video_id}: {friendly_detail}"
         )
 
 

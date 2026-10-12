@@ -11,6 +11,7 @@ import { PreviewModal } from "./components/Modals/PreviewModal";
 import { FeedbackModal } from "./components/Modals/FeedbackModal";
 import { LessonCompleteModal } from "./components/Modals/LessonCompleteModal";
 import { MicrophonePermissionModal } from "./components/Modals/MicrophonePermissionModal";
+import { VideoErrorModal } from "./components/Modals/VideoErrorModal";
 import { AdminPortal } from "./components/Admin/AdminPortal";
 import { VocabTab } from "./components/Vocab/VocabTab";
 import { HistoryTab } from "./components/History/HistoryTab";
@@ -135,6 +136,7 @@ export default function App() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isLessonCompleteModalOpen, setIsLessonCompleteModalOpen] = useState(false);
   const [isMicPermissionModalOpen, setIsMicPermissionModalOpen] = useState(false);
+  const [videoErrorData, setVideoErrorData] = useState(null);
   const [previewData, setPreviewData] = useState(null);
 
   // Lesson & Player State
@@ -444,7 +446,10 @@ export default function App() {
         playerController.pause();
       }
     } catch (e) {
-      alert("Lỗi tải video: " + e.message);
+      setVideoErrorData({
+        videoId: extractYouTubeId(cleanUrl) || cleanUrl,
+        message: e.message || "Không thể tải phụ đề cho video này.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -1226,6 +1231,23 @@ export default function App() {
         }}
       />
 
+      {/* Video Load Error Modal */}
+      <VideoErrorModal
+        isOpen={Boolean(videoErrorData)}
+        onClose={() => setVideoErrorData(null)}
+        errorData={videoErrorData}
+        onSwitchToAudioStudio={() => {
+          setVideoErrorData(null);
+          setActiveTab("tab-audio-studio");
+        }}
+        onOpenPresets={() => {
+          setVideoErrorData(null);
+          const presetsEl = document.querySelector(".presets-section");
+          if (presetsEl) {
+            presetsEl.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
+      />
     </div>
   );
 }
