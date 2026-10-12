@@ -7,6 +7,7 @@ import {
   ArrowRight,
   Lightbulb,
   CheckCircle,
+  Keyboard,
 } from "../../Icons";
 import { EXERCISE_FORMATS } from "../../../utils/vocabExerciseGenerators";
 
@@ -29,6 +30,8 @@ export const VocabExerciseMenu = ({
 }) => {
   const getFormatLabel = () => {
     switch (selectedFormat) {
+      case EXERCISE_FORMATS.D4:
+        return "Dạng 4 (Gõ từ chính tả)";
       case EXERCISE_FORMATS.D2:
         return "Dạng 2 (Nghĩa TV ➔ Từ vựng)";
       case EXERCISE_FORMATS.D3:
@@ -173,6 +176,38 @@ export const VocabExerciseMenu = ({
 
                 <div className="ex-card-footer">
                   <span className="ex-card-tag">Context Cloze</span>
+                </div>
+              </div>
+
+              {/* DẠNG 4: GÕ TỪ CHÍNH TẢ (ACTIVE TYPING / SPELLER) */}
+              <div
+                className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D4 ? "active" : ""}`}
+                onClick={() => onSelectFormat(EXERCISE_FORMATS.D4)}
+              >
+                <div className="ex-card-top">
+                  <div className="ex-card-icon-wrap d4">
+                    <Keyboard size={18} />
+                  </div>
+                  <div className="ex-card-status">
+                    {selectedFormat === EXERCISE_FORMATS.D4 ? (
+                      <span className="ex-selected-chip">
+                        <Check size={12} /> Đang chọn
+                      </span>
+                    ) : (
+                      <span className="ex-format-code">Dạng 4</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="ex-card-main">
+                  <h4 className="ex-card-title">Gõ từ chính tả</h4>
+                  <p className="ex-card-desc">
+                    Quan sát nghĩa tiếng Việt &amp; gợi ý ngữ cảnh, tự gõ chính xác mặt chữ.
+                  </p>
+                </div>
+
+                <div className="ex-card-footer">
+                  <span className="ex-card-tag">Active Typing</span>
                 </div>
               </div>
             </div>
