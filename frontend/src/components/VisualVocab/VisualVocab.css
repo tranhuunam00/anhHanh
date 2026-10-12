@@ -3,6 +3,7 @@
    Uses strict CSS variables for Light & Dark mode compatibility (<500 lines)
    ========================================================================== */
 @import "./VisualVocabSidebar.css";
+@import "./VisualVocabResponsive.css";
 
 .visual-vocab-container {
   display: flex;

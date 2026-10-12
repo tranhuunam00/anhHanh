@@ -324,7 +324,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   return (
     <div className="vocab-tab-wrapper">
       <div className="vocab-header-bar">
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div className="vocab-title-wrap">
           <BookOpen size={22} color="#6366f1" />
           <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800, color: "var(--text, #0f172a)" }}>
             Sổ Tay Từ Vựng Thông Minh
@@ -334,26 +334,19 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
           </span>
         </div>
 
-        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+        <div className="vocab-toolbar-container">
           {/* Search Box */}
-          <div style={{ position: "relative" }}>
+          <div className="vocab-search-wrap">
             <input
               type="text"
               placeholder="Tìm kiếm từ hoặc nghĩa..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                padding: "6px 12px 6px 32px",
-                borderRadius: "20px",
-                border: "1px solid var(--border, #cbd5e1)",
-                fontSize: "0.85rem",
-                background: "var(--card-bg, #fff)",
-                color: "var(--text, #1e293b)",
-              }}
+              className="vocab-search-input"
             />
             <Search
               size={14}
-              style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }}
+              className="vocab-search-icon"
             />
           </div>
 
@@ -385,13 +378,15 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 {f.label}
               </button>
             ))}
+          </div>
 
+          {/* Action Buttons Group */}
+          <div className="vocab-actions-group">
             {onOpenGuide && (
               <button
-                className="btn btn-secondary btn-with-icon"
+                className="btn btn-secondary btn-with-icon vocab-action-btn vocab-guide-btn"
                 onClick={onOpenGuide}
                 title="Xem hướng dẫn cách lưu từ & phím tắt"
-                style={{ padding: "6px 12px", fontSize: "0.8rem", borderRadius: "20px" }}
               >
                 <HelpCircle size={14} color="#6366f1" />
                 <span>Hướng dẫn</span>
@@ -400,16 +395,8 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
 
             {/* Manual Add Word Button */}
             <button
-              className="btn btn-primary btn-with-icon"
+              className="btn btn-primary btn-with-icon vocab-action-btn vocab-add-btn"
               onClick={() => setIsAddModalOpen(true)}
-              style={{
-                padding: "6px 14px",
-                fontSize: "0.82rem",
-                borderRadius: "20px",
-                background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
-                fontWeight: 600,
-                border: "none",
-              }}
               title="Thêm từ mới thủ công vào Sổ tay"
             >
               <Plus size={14} strokeWidth={2.5} />
@@ -418,17 +405,8 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
 
             {/* AI Extract & Import Vocabulary Button */}
             <button
-              className="btn btn-primary btn-with-icon"
+              className="btn btn-primary btn-with-icon vocab-action-btn vocab-ai-import-btn"
               onClick={() => setIsAIImportModalOpen(true)}
-              style={{
-                padding: "6px 14px",
-                fontSize: "0.82rem",
-                borderRadius: "20px",
-                background: "linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)",
-                fontWeight: 700,
-                border: "none",
-                boxShadow: "0 2px 10px rgba(139, 92, 246, 0.35)",
-              }}
               title="AI Tự động trích xuất & chèn từ vựng từ tệp PDF/Word hoặc văn bản dán (tranhuunam23022000 & vuthiquynhtrang)"
             >
               <Sparkles size={14} />
@@ -437,17 +415,8 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
 
             {/* Practice Vocabulary Button (Dạng 1) */}
             <button
-              className="btn btn-primary btn-with-icon"
+              className="btn btn-primary btn-with-icon vocab-action-btn vocab-practice-btn"
               onClick={() => setIsExerciseHubOpen(true)}
-              style={{
-                padding: "6px 14px",
-                fontSize: "0.82rem",
-                borderRadius: "20px",
-                background: "linear-gradient(135deg, #0284c7 0%, #059669 100%)",
-                fontWeight: 700,
-                border: "none",
-                boxShadow: "0 2px 10px rgba(2, 132, 199, 0.35)",
-              }}
               title="Luyện tập từ vựng chuẩn Dạng 1: Từ vựng ➔ Nghĩa tiếng Việt"
             >
               <Zap size={14} fill="currentColor" />
@@ -456,17 +425,8 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
 
             {/* Theme Vocab Explorer Button */}
             <button
-              className="btn btn-primary btn-with-icon"
+              className="btn btn-primary btn-with-icon vocab-action-btn vocab-theme-btn"
               onClick={() => setIsThemeExplorerOpen(true)}
-              style={{
-                padding: "6px 14px",
-                fontSize: "0.82rem",
-                borderRadius: "20px",
-                background: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
-                fontWeight: 700,
-                border: "none",
-                boxShadow: "0 2px 10px rgba(16, 185, 129, 0.35)",
-              }}
               title="Khám phá và thêm từ vựng theo 30 chủ đề (Tiếng Anh & Tiếng Pháp)"
             >
               <Layers size={14} />
@@ -476,9 +436,8 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
             {/* Export Dropdown Menu */}
             <div className="vocab-export-container" ref={exportMenuRef}>
               <button
-                className="btn btn-secondary btn-with-icon"
+                className="btn btn-secondary btn-with-icon vocab-action-btn vocab-export-btn"
                 onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
-                style={{ padding: "6px 12px", fontSize: "0.82rem", borderRadius: "20px" }}
                 title="Xuất file từ vựng"
               >
                 <Download size={14} />

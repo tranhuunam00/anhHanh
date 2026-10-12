@@ -1,0 +1,791 @@
+/* ==========================================================================
+   VOCABULARY & PRACTICE EXERCISE COMPREHENSIVE RESPONSIVE STYLES
+   Tương thích đa kích thước: Tablet, Mobile (Portrait & Landscape), Màn hình nhỏ
+   Sử dụng biến hệ thống: var(--bg-card), var(--border-color), var(--primary)...
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. BASE DESKTOP & SHARED ENHANCEMENTS FOR NEW TOOLBAR
+   -------------------------------------------------------------------------- */
+.vocab-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vocab-toolbar-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.vocab-search-wrap {
+  position: relative;
+  min-width: 220px;
+}
+
+.vocab-search-input {
+  padding: 6px 12px 6px 32px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  font-size: 0.85rem;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #1e293b);
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.vocab-search-input:focus {
+  border-color: var(--primary, #6366f1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.vocab-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted, #94a3b8);
+  pointer-events: none;
+}
+
+.vocab-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vocab-action-btn {
+  padding: 6px 13px !important;
+  font-size: 0.82rem !important;
+  border-radius: 20px !important;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.vocab-guide-btn {
+  font-size: 0.8rem !important;
+}
+
+.vocab-add-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  border: none !important;
+}
+
+.vocab-ai-import-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%) !important;
+  border: none !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.35);
+}
+
+.vocab-practice-btn {
+  background: linear-gradient(135deg, #0284c7 0%, #059669 100%) !important;
+  border: none !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+}
+
+.vocab-theme-btn {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  border: none !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+}
+
+.vocab-export-container {
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   2. TABLET RESPONSIVE (max-width: 900px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .vocab-header-bar {
+    gap: 12px;
+  }
+
+  .vocab-toolbar-container {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .vocab-search-wrap {
+    flex: 1 1 200px;
+  }
+
+  .vocab-grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+  }
+
+  .exercise-modal-window {
+    max-width: 94vw;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. MOBILE & COMPACT TABLET (max-width: 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Vocab Notebook Header */
+  .vocab-tab-wrapper {
+    padding: 0.85rem 0;
+  }
+
+  .vocab-header-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .vocab-title-wrap {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .vocab-title-wrap h2 {
+    font-size: 1.15rem !important;
+  }
+
+  .vocab-toolbar-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .vocab-search-wrap {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .vocab-search-input {
+    font-size: 0.88rem;
+    padding: 8px 12px 8px 34px;
+    border-radius: 12px;
+  }
+
+  /* Horizontal Scrollable Filter Pills on Mobile */
+  .vocab-filter-group {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .vocab-filter-group::-webkit-scrollbar {
+    display: none;
+  }
+
+  .vocab-filter-btn {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    border-radius: 999px;
+  }
+
+  /* Grid layout for Action Buttons on Mobile */
+  .vocab-actions-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .vocab-action-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 9px 8px !important;
+    font-size: 0.8rem !important;
+    border-radius: 10px !important;
+    min-height: 40px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  /* Practice button highlighted across 2 columns */
+  .vocab-practice-btn {
+    grid-column: span 2;
+    padding: 10px 12px !important;
+    font-size: 0.88rem !important;
+  }
+
+  .vocab-export-container {
+    width: 100%;
+  }
+
+  .vocab-export-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .vocab-export-menu {
+    left: 0;
+    right: 0;
+    min-width: unset;
+    width: 100%;
+  }
+
+  /* Cards Grid on Mobile */
+  .vocab-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+  }
+
+  .vocab-card {
+    border-radius: 10px;
+  }
+
+  .vocab-card-img-wrap {
+    height: 90px;
+  }
+
+  .vocab-card-body {
+    padding: 7px 8px;
+  }
+
+  .vocab-word-text {
+    font-size: 0.88rem;
+  }
+
+  .vocab-pronunciation-row {
+    font-size: 0.72rem;
+    gap: 2px;
+  }
+
+  .vocab-meaning-text {
+    font-size: 0.78rem;
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+
+  .vocab-context-box {
+    padding: 4px 6px;
+    font-size: 0.68rem;
+    max-height: 62px;
+    margin-bottom: 5px;
+  }
+
+  .vocab-card-footer {
+    padding-top: 6px;
+    gap: 3px;
+  }
+
+  .vocab-status-select {
+    min-width: 76px;
+    font-size: 0.68rem;
+    padding: 2px 4px;
+    border-radius: 8px;
+  }
+
+  .vocab-audio-btn {
+    padding: 2px;
+  }
+
+  /* Vocab Pagination Bar */
+  .vocab-pagination-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 8px;
+  }
+
+  .vocab-pagination-info {
+    font-size: 0.78rem;
+    text-align: center;
+  }
+
+  .vocab-pagination-controls {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .vocab-page-btn {
+    padding: 4px 8px;
+    font-size: 0.78rem;
+    min-width: 32px;
+    height: 32px;
+  }
+
+  /* ========================================================================
+     PRACTICE EXERCISE MODAL MOBILE (max-width: 768px)
+     ======================================================================== */
+  .exercise-modal-backdrop {
+    padding: 6px 4px;
+    align-items: center;
+  }
+
+  .exercise-modal-window {
+    max-height: 96vh;
+    border-radius: 14px;
+    width: 100%;
+  }
+
+  .exercise-header {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .ex-header-title {
+    font-size: 0.98rem;
+  }
+
+  .ex-header-subtitle {
+    font-size: 0.72rem;
+    line-height: 1.25;
+  }
+
+  .ex-header-icon-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+
+  .ex-header-meta {
+    gap: 6px;
+  }
+
+  .ex-score-badge,
+  .ex-combo-badge {
+    padding: 3px 8px;
+    font-size: 0.74rem;
+    border-radius: 12px;
+  }
+
+  .ex-back-menu-btn {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .ex-mode-banner {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    gap: 6px;
+  }
+
+  .ex-mode-tag {
+    font-size: 0.74rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  .ex-lang-tag,
+  .ex-counter-tag {
+    font-size: 0.72rem;
+  }
+
+  .exercise-body {
+    padding: 14px 12px;
+  }
+
+  /* Exercise Menu View on Mobile */
+  .ex-menu-container {
+    gap: 12px;
+  }
+
+  .ex-menu-headline h4 {
+    font-size: 0.95rem;
+  }
+
+  .ex-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .ex-format-card {
+    padding: 10px 12px;
+    border-radius: 12px;
+    gap: 6px;
+  }
+
+  .ex-card-title {
+    font-size: 0.88rem;
+  }
+
+  .ex-card-desc {
+    font-size: 0.74rem;
+  }
+
+  /* Status Filter Pills on Mobile */
+  .ex-status-filter-header {
+    font-size: 0.8rem;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .ex-status-filter-pills {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .ex-status-filter-btn {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    flex-direction: column;
+    gap: 3px;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .ex-status-badge {
+    font-size: 0.68rem;
+    padding: 1px 5px;
+  }
+
+  /* Quantity Selector on Mobile */
+  .ex-quantity-section {
+    gap: 6px;
+    padding-top: 6px;
+  }
+
+  .ex-quantity-label {
+    font-size: 0.82rem;
+  }
+
+  .ex-quantity-pills {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .ex-quantity-btn {
+    padding: 8px 2px;
+    font-size: 0.82rem;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .ex-start-btn {
+    width: 100%;
+    min-height: 46px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    margin-top: 4px;
+  }
+
+  /* Practice Screen Arena on Mobile */
+  .ex-question-card {
+    gap: 10px;
+    width: 100%;
+  }
+
+  .ex-target-word {
+    font-size: clamp(1.4rem, 5.5vw, 1.95rem);
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ex-audio-circle-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .ex-target-ipa {
+    font-size: 0.85rem;
+    padding: 2px 8px;
+  }
+
+  .ex-target-meaning-label {
+    font-size: 0.8rem;
+  }
+
+  .ex-target-meaning-text {
+    font-size: clamp(1.05rem, 4.5vw, 1.35rem);
+  }
+
+  .ex-target-thumb-wrap,
+  .ex-target-thumb {
+    max-height: 95px;
+  }
+
+  .ex-target-revealed-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.88rem;
+  }
+
+  .ex-target-cloze-wrap {
+    width: 100%;
+  }
+
+  .ex-cloze-prompt-label {
+    font-size: 0.78rem;
+  }
+
+  .ex-cloze-sentence-display {
+    font-size: 0.88rem;
+    padding: 8px 10px;
+    line-height: 1.45;
+    border-radius: 8px;
+  }
+
+  .ex-cloze-blank-box,
+  .ex-cloze-blank-filled {
+    padding: 1px 4px;
+    font-size: 0.86rem;
+  }
+
+  .ex-cloze-hint-row {
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    font-size: 0.78rem;
+  }
+
+  .ex-cloze-translation-box {
+    font-size: 0.78rem;
+    padding: 5px 8px;
+    line-height: 1.35;
+  }
+
+  .ex-audio-large-btn {
+    width: 60px;
+    height: 60px;
+  }
+
+  .ex-audio-click-hint {
+    font-size: 0.72rem;
+  }
+
+  .ex-eye-hint-btn {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 14px;
+  }
+
+  .ex-context-quote {
+    font-size: 0.82rem;
+    padding: 8px 10px;
+    line-height: 1.4;
+    border-radius: 8px;
+  }
+
+  /* 4 MCQ Buttons on Mobile */
+  .ex-mcq-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .ex-mcq-btn {
+    min-height: 48px;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    border-radius: 12px;
+  }
+
+  .ex-mcq-key-badge {
+    width: 22px;
+    height: 22px;
+    font-size: 0.72rem;
+    border-radius: 5px;
+  }
+
+  .ex-mcq-text {
+    font-size: 0.86rem;
+    line-height: 1.35;
+  }
+
+  .ex-keyboard-hint {
+    font-size: 0.72rem;
+    margin-top: 2px;
+  }
+
+  /* Summary Screen on Mobile */
+  .ex-summary-wrap {
+    padding: 12px 8px;
+    gap: 10px;
+  }
+
+  .ex-trophy-badge {
+    width: 56px;
+    height: 56px;
+  }
+
+  .ex-summary-wrap h2 {
+    font-size: 1.2rem !important;
+  }
+
+  .ex-summary-wrap p {
+    font-size: 0.78rem !important;
+    margin-bottom: 10px !important;
+  }
+
+  .ex-stats-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .ex-stat-card {
+    padding: 8px 4px;
+    border-radius: 10px;
+    gap: 2px;
+  }
+
+  .ex-stat-num {
+    font-size: 1.15rem;
+  }
+
+  .ex-stat-title {
+    font-size: 0.65rem;
+  }
+
+  .ex-history-title {
+    font-size: 0.78rem;
+  }
+
+  .ex-history-items-box {
+    max-height: 200px;
+    gap: 6px;
+  }
+
+  .ex-history-row {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .ex-history-row > div:last-child {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Summary Action Buttons on Mobile */
+  .ex-summary-wrap > div:last-child {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px !important;
+    margin-top: 10px !important;
+  }
+
+  .ex-btn-primary,
+  .ex-btn-secondary {
+    width: 100%;
+    justify-content: center;
+    min-height: 42px;
+    font-size: 0.86rem;
+    border-radius: 10px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. SMALL SMARTPHONES (max-width: 480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .vocab-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .vocab-card-img-wrap {
+    height: 80px;
+  }
+
+  .vocab-card-body {
+    padding: 6px 6px;
+  }
+
+  .vocab-word-text {
+    font-size: 0.84rem;
+  }
+
+  .vocab-meaning-text {
+    font-size: 0.75rem;
+  }
+
+  .vocab-context-box {
+    max-height: 54px;
+    font-size: 0.65rem;
+    padding: 3px 5px;
+  }
+
+  .vocab-card-footer {
+    padding-top: 4px;
+  }
+
+  .vocab-status-select {
+    min-width: 68px;
+    font-size: 0.65rem;
+    padding: 1px 3px;
+  }
+
+  .exercise-modal-backdrop {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .exercise-modal-window {
+    max-height: 100vh;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+  }
+
+  .exercise-header {
+    padding: 8px 12px;
+  }
+
+  .exercise-body {
+    padding: 10px 8px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. EXTRA SMALL MOBILE (max-width: 360px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 360px) {
+  .vocab-actions-group {
+    grid-template-columns: 1fr;
+  }
+
+  .vocab-practice-btn {
+    grid-column: span 1;
+  }
+
+  .vocab-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .vocab-card-img-wrap {
+    height: 95px;
+  }
+
+  .ex-status-filter-pills {
+    grid-template-columns: 1fr;
+  }
+
+  .ex-quantity-pills {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

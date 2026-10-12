@@ -48,6 +48,29 @@ export const VisualVocabCanvas = ({
     setIsDragging(false);
   }, []);
 
+  const handleTouchStart = useCallback((e) => {
+    if (e.touches.length !== 1 || scale <= 1) return;
+    const touch = e.touches[0];
+    setIsDragging(true);
+    dragStartRef.current = { x: touch.clientX, y: touch.clientY };
+    panStartRef.current = { ...pan };
+  }, [scale, pan]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - dragStartRef.current.x;
+    const dy = touch.clientY - dragStartRef.current.y;
+    setPan({
+      x: panStartRef.current.x + dx,
+      y: panStartRef.current.y + dy,
+    });
+  }, [isDragging]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
   const transformStyle = getZoomTransformStyle(scale, pan.x, pan.y);
 
   return (
@@ -58,6 +81,10 @@ export const VisualVocabCanvas = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
       >
         <div className="vv-image-layer-container" style={transformStyle}>
           {/* Main Diagram Illustration */}
