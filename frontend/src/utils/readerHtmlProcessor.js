@@ -111,8 +111,9 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
           }
           if (wCount === pLen) {
             const phraseStr = sliceTokens.join("").toLowerCase().trim().replace(/['’]/g, "'");
-            if (savedVocabMap[phraseStr]) {
-              matchedPhrase = savedVocabMap[phraseStr];
+            const item = savedVocabMap[phraseStr];
+            if (item && item.status !== "MASTERED") {
+              matchedPhrase = item;
               phraseSkip = sliceTokens.length;
               break;
             }
@@ -137,8 +138,9 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
         const variants = getWordVariants(t);
         let matchItem = null;
         for (const v of variants) {
-          if (savedVocabMap[v]) {
-            matchItem = savedVocabMap[v];
+          const item = savedVocabMap[v];
+          if (item && item.status !== "MASTERED") {
+            matchItem = item;
             break;
           }
         }

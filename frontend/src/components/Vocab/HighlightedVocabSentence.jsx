@@ -60,7 +60,8 @@ export const HighlightedVocabSentence = React.memo(({
       if (savedVocabMap && candidateWords.length >= 2) {
         for (let k = candidateWords.length; k >= 2; k--) {
           const phraseKey = candidateWords.slice(0, k).join(" ");
-          if (savedVocabMap[phraseKey]) {
+          const item = savedVocabMap[phraseKey];
+          if (item && item.status !== "MASTERED") {
             matchedKey = phraseKey;
             matchedEndTokenIdx = tokenIndices[k - 1];
             break;
@@ -84,7 +85,8 @@ export const HighlightedVocabSentence = React.memo(({
         // Single word hit/miss
         const clean = token.toLowerCase().replace(/^[’']+|[’']+$/g, "");
         const cleanNorm = clean.replace(/[’']/g, "'");
-        const isSaved = Boolean(savedVocabMap && (savedVocabMap[clean] || savedVocabMap[cleanNorm]));
+        const savedItem = savedVocabMap ? (savedVocabMap[clean] || savedVocabMap[cleanNorm]) : null;
+        const isSaved = Boolean(savedItem && savedItem.status !== "MASTERED");
 
         result.push({
           text: token,
