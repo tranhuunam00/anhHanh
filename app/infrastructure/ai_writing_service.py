@@ -16,6 +16,7 @@ from app.infrastructure.ai_writing_generator import (
 from app.infrastructure.ai_writing_evaluator import (
     generate_fallback_sentence_breakdown,
     evaluate_writing_impl,
+    normalize_vocab_upgrades,
 )
 
 load_dotenv(override=True)
@@ -114,6 +115,7 @@ __all__ = [
     "CURATED_PROMPTS",
     "LANGUAGES_CONFIG",
     "generate_fallback_sentence_breakdown",
+    "normalize_vocab_upgrades",
     "generate_prompt_impl",
     "suggest_structures_impl",
     "evaluate_writing_impl",

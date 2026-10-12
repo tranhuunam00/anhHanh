@@ -757,19 +757,24 @@ export const WritingPage = ({ isActive = false }) => {
       showToast("Vui lòng đăng nhập để lưu từ vựng", "warning");
       return;
     }
+    const word = typeof vocabItem === "string" ? vocabItem.trim() : (vocabItem?.word || vocabItem?.term || "").trim();
+    if (!word) {
+      showToast("Không tìm thấy từ vựng hợp lệ để lưu", "warning");
+      return;
+    }
     try {
       await createVocabWord(
         {
-          word: vocabItem.word,
-          meaning: vocabItem.meaning,
-          phonetic: vocabItem.phonetic,
-          context_sentence: vocabItem.context_sentence,
-          source_lang: vocabItem.source_lang || "en",
+          word,
+          meaning: typeof vocabItem === "object" ? (vocabItem.meaning || vocabItem.definition || "") : "",
+          phonetic: typeof vocabItem === "object" ? (vocabItem.phonetic || vocabItem.ipa || "") : "",
+          context_sentence: typeof vocabItem === "object" ? (vocabItem.context_sentence || vocabItem.example || "") : "",
+          source_lang: selectedLanguage || "en",
         },
         token
       );
-      setAddedWords((prev) => ({ ...prev, [vocabItem.word]: true }));
-      showToast(`Đã thêm "${vocabItem.word}" vào Sổ tay từ vựng!`, "success");
+      setAddedWords((prev) => ({ ...prev, [word]: true }));
+      showToast(`Đã thêm "${word}" vào Sổ tay từ vựng!`, "success");
       if (refreshSavedVocab) refreshSavedVocab();
     } catch (e) {
       showToast(e.message || "Lỗi lưu từ vựng", "error");
@@ -1694,44 +1699,59 @@ export const WritingPage = ({ isActive = false }) => {
                       <span>Gợi ý nâng cấp từ vựng C1/C2 ({evaluationResult.vocab_upgrades.length} từ)</span>
                     </div>
                     <div className="vocab-upgrades-grid">
-                      {evaluationResult.vocab_upgrades.map((v, idx) => (
-                        <div key={idx} className="vocab-upgrade-card">
-                          <div className="vu-header">
-                            <div>
-                              <strong className="vu-word">{v.word}</strong>
-                              {v.phonetic && <span className="vu-phonetic">{v.phonetic}</span>}
+                      {evaluationResult.vocab_upgrades.map((rawV, idx) => {
+                        const v = typeof rawV === "string" ? { word: rawV } : (rawV || {});
+                        const wordText = (v.word || v.term || v.vocabulary || v.phrase || "").trim();
+                        const phoneticText = (v.phonetic || v.ipa || "").trim();
+                        const meaningText = (v.meaning || v.definition || v.vietnamese || "").trim();
+                        const replaceForText = (v.replace_for || v.replace || "").trim();
+                        const contextText = (v.context_sentence || v.example || "").trim();
+
+                        return (
+                          <div key={idx} className="vocab-upgrade-card">
+                            <div className="vu-header">
+                              <div>
+                                <strong className="vu-word">{wordText || `Gợi ý #${idx + 1}`}</strong>
+                                {phoneticText && <span className="vu-phonetic">{phoneticText}</span>}
+                              </div>
+                              <button
+                                type="button"
+                                className={`btn-add-vocab-quick ${addedWords[wordText] ? "added" : ""}`}
+                                onClick={() => handleAddVocabToNotebook({
+                                  ...v,
+                                  word: wordText,
+                                  meaning: meaningText,
+                                  phonetic: phoneticText,
+                                  context_sentence: contextText,
+                                })}
+                                disabled={!wordText || addedWords[wordText]}
+                                title="Thêm từ này vào Sổ tay từ vựng"
+                              >
+                                {addedWords[wordText] ? (
+                                  <>
+                                    <IconCheckCircle size={13} />
+                                    <span>Đã thêm</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <IconPlus size={12} />
+                                    <span>Sổ tay</span>
+                                  </>
+                                )}
+                              </button>
                             </div>
-                            <button
-                              type="button"
-                              className={`btn-add-vocab-quick ${addedWords[v.word] ? "added" : ""}`}
-                              onClick={() => handleAddVocabToNotebook(v)}
-                              disabled={addedWords[v.word]}
-                              title="Thêm từ này vào Sổ tay từ vựng"
-                            >
-                              {addedWords[v.word] ? (
-                                <>
-                                  <IconCheckCircle size={13} />
-                                  <span>Đã thêm</span>
-                                </>
-                              ) : (
-                                <>
-                                  <IconPlus size={12} />
-                                  <span>+ Sổ tay</span>
-                                </>
-                              )}
-                            </button>
+                            {meaningText && <div className="vu-meaning">{meaningText}</div>}
+                            {replaceForText && (
+                              <div className="vu-replace">
+                                <span>Thay cho:</span> <del>{replaceForText}</del>
+                              </div>
+                            )}
+                            {contextText && (
+                              <div className="vu-context">"{contextText}"</div>
+                            )}
                           </div>
-                          <div className="vu-meaning">{v.meaning}</div>
-                          {v.replace_for && (
-                            <div className="vu-replace">
-                              <span>Thay cho:</span> <del>{v.replace_for}</del>
-                            </div>
-                          )}
-                          {v.context_sentence && (
-                            <div className="vu-context">"{v.context_sentence}"</div>
-                          )}
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}

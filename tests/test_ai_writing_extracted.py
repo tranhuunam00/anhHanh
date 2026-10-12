@@ -13,6 +13,7 @@ from app.infrastructure.writing_prompts_catalog import (
 from app.infrastructure.ai_writing_evaluator import (
     generate_fallback_sentence_breakdown,
     evaluate_writing_impl,
+    normalize_vocab_upgrades,
 )
 from app.infrastructure.ai_writing_generator import (
     generate_prompt_impl,
@@ -422,3 +423,74 @@ async def test_evaluate_writing_impl_multimodal_and_fallback_breakdown():
         assert "sentence_breakdown" in res
         assert len(res["sentence_breakdown"]) >= 1
         assert res["sentence_breakdown"][0]["is_grammar_correct"] is False
+
+
+def test_normalize_vocab_upgrades_comprehensive():
+    """Verify normalize_vocab_upgrades handles strings, diverse dict keys, edge cases, and invalid inputs."""
+    # 1. Input Coverage & Output Verification: Standard objects
+    standard_input = [
+        {
+            "word": "paramount",
+            "phonetic": "/ˈpær.ə.maʊnt/",
+            "meaning": "tối quan trọng",
+            "replace_for": "very important",
+            "context_sentence": "Education is of paramount significance."
+        }
+    ]
+    res1 = normalize_vocab_upgrades(standard_input)
+    assert len(res1) == 1
+    assert res1[0]["word"] == "paramount"
+    assert res1[0]["meaning"] == "tối quan trọng"
+
+    # 2. String inputs with and without definition colons
+    string_inputs = [
+        "ubiquitous",
+        "mitigate: làm giảm bớt",
+        "conducive - có lợi cho",
+        "   ",
+        ""
+    ]
+    res2 = normalize_vocab_upgrades(string_inputs)
+    assert len(res2) == 3
+    assert res2[0]["word"] == "ubiquitous"
+    assert res2[0]["meaning"] == ""
+    assert res2[1]["word"] == "mitigate"
+    assert res2[1]["meaning"] == "làm giảm bớt"
+    assert res2[2]["word"] == "conducive"
+    assert res2[2]["meaning"] == "có lợi cho"
+
+    # 3. Alternate keys & Internal Logic Coverage
+    alt_keys_input = [
+        {
+            "term": "bolster",
+            "definition": "củng cố, tăng cường",
+            "ipa": "/ˈboʊl.stɚ/",
+            "replaces": "strengthen",
+            "example": "To bolster the economy."
+        },
+        {
+            "vocabulary": "exacerbate",
+            "vietnamese": "làm trầm trọng thêm",
+            "replace_for": "none"
+        },
+        {
+            "phrase": "a double-edged sword",
+            "meaning_vi": "con dao hai lưỡi"
+        },
+        # Empty or invalid word
+        {"word": "", "meaning": "empty"}
+    ]
+    res3 = normalize_vocab_upgrades(alt_keys_input)
+    assert len(res3) == 3
+    assert res3[0]["word"] == "bolster"
+    assert res3[0]["phonetic"] == "/ˈboʊl.stɚ/"
+    assert res3[0]["replace_for"] == "strengthen"
+    assert res3[1]["word"] == "exacerbate"
+    assert res3[1]["replace_for"] == ""  # 'none' stripped
+    assert res3[2]["word"] == "a double-edged sword"
+
+    # 4. Error & Exception Handling (null, numbers, non-lists)
+    assert normalize_vocab_upgrades(None) == []
+    assert normalize_vocab_upgrades("not_a_list") == []
+    assert normalize_vocab_upgrades(12345) == []
+    assert normalize_vocab_upgrades([None, 42, {}]) == []

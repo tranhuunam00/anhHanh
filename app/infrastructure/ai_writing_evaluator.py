@@ -46,6 +46,78 @@ def generate_fallback_sentence_breakdown(content: str, corrections: List[Dict[st
     return breakdown
 
 
+def normalize_vocab_upgrades(vocab_upgrades: Any) -> List[Dict[str, Any]]:
+    """Normalize vocab_upgrades to ensure every item has word, phonetic, meaning, replace_for, context_sentence."""
+    if not vocab_upgrades or not isinstance(vocab_upgrades, list):
+        return []
+
+    normalized = []
+    for item in vocab_upgrades:
+        if isinstance(item, str):
+            clean = item.strip()
+            if not clean:
+                continue
+            parts = re.split(r'[:\-–—]\s*', clean, maxsplit=1)
+            word = parts[0].strip().strip('"*`')
+            meaning = parts[1].strip() if len(parts) > 1 else ""
+            if word:
+                normalized.append({
+                    "word": word,
+                    "phonetic": "",
+                    "meaning": meaning,
+                    "replace_for": "",
+                    "context_sentence": ""
+                })
+        elif isinstance(item, dict):
+            word = str(
+                item.get("word")
+                or item.get("term")
+                or item.get("vocabulary")
+                or item.get("vocab")
+                or item.get("collocation")
+                or item.get("phrase")
+                or ""
+            ).strip().strip('"*`')
+            if not word:
+                continue
+            meaning = str(
+                item.get("meaning")
+                or item.get("definition")
+                or item.get("vietnamese")
+                or item.get("meaning_vi")
+                or item.get("explanation")
+                or ""
+            ).strip()
+            phonetic = str(
+                item.get("phonetic")
+                or item.get("ipa")
+                or item.get("pronunciation")
+                or ""
+            ).strip()
+            replace_for = str(
+                item.get("replace_for")
+                or item.get("original")
+                or item.get("replace")
+                or item.get("replaces")
+                or ""
+            ).strip()
+            context_sentence = str(
+                item.get("context_sentence")
+                or item.get("example")
+                or item.get("sentence")
+                or item.get("context")
+                or ""
+            ).strip()
+            normalized.append({
+                "word": word,
+                "phonetic": phonetic,
+                "meaning": meaning,
+                "replace_for": replace_for if replace_for.lower() not in ("none", "null") else "",
+                "context_sentence": context_sentence
+            })
+    return normalized
+
+
 async def evaluate_writing_impl(
     topic: str,
     content: str,
@@ -101,6 +173,12 @@ YÊU CẦU CHẤM ĐIỂM & ĐÁNH GIÁ (BẮT BUỘC ĐỦ 5 PHẦN):
 
 4. Gợi ý từ vựng & Collocations nâng cấp (vocab_upgrades):
    - Trích xuất 5 đến 8 từ vựng hoặc collocations học thuật cao cấp (C1/C2) phù hợp với bài viết này.
+   - MỖI PHẦN TỬ BẮT BUỘC LÀ 1 OBJECT CÓ ĐỦ 5 THUỘC TÍNH:
+     + "word": từ hoặc cụm collocation nâng cấp (C1/C2)
+     + "phonetic": phiên âm IPA chuẩn (vd: "/ˈpær.ə.maʊnt/")
+     + "meaning": giải nghĩa tiếng Việt súc tích, dễ hiểu
+     + "replace_for": từ/cụm từ đơn giản trong bài học viên nên thay thế (hoặc null nếu là từ gợi ý mới)
+     + "context_sentence": câu văn ngữ cảnh học thuật chuẩn mực minh họa cách dùng từ này
 
 5. PHÂN TÍCH VÀ SỬA TỪNG CÂU MỘT (sentence_breakdown):
    - Chia toàn bộ bài viết của học viên thành danh sách tuần tự TỪNG CÂU MỘT.
@@ -123,7 +201,15 @@ BẮT BUỘC là JSON duy nhất:
   "corrections": [],
   "sentence_breakdown": [],
   "model_essay": "...",
-  "vocab_upgrades": []
+  "vocab_upgrades": [
+    {{
+      "word": "paramount",
+      "phonetic": "/ˈpær.ə.maʊnt/",
+      "meaning": "tối quan trọng, có ý nghĩa hàng đầu",
+      "replace_for": "very important",
+      "context_sentence": "Education is of paramount importance to personal and societal development."
+    }}
+  ]
 }}
 """
     if images and len(images) > 0:
@@ -175,6 +261,7 @@ LƯU Ý ĐẶC BIỆT VỀ HÌNH ẢNH ĐỀ BÀI ĐÍNH KÈM:
                     parsed = json.loads(raw_text)
                     if "sentence_breakdown" not in parsed or not isinstance(parsed["sentence_breakdown"], list):
                         parsed["sentence_breakdown"] = generate_fallback_sentence_breakdown(content, parsed.get("corrections", []))
+                    parsed["vocab_upgrades"] = normalize_vocab_upgrades(parsed.get("vocab_upgrades", []))
 
                     logger.info(f"Essay successfully evaluated by {model_name}.")
                     return parsed
