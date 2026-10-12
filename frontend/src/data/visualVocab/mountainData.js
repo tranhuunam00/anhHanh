@@ -281,5 +281,19 @@ export const MOUNTAIN_LANDFORMS_TOPIC = {
       x: 72.0,
       y: 68.0,
     }
+  ],
+  distractors: [
+    { id: "dist_volcano", word: "volcano", ipa: "/vɒlˈkeɪnəʊ/", meaning: "Núi lửa" },
+    { id: "dist_canyon", word: "canyon", ipa: "/ˈkænjən/", meaning: "Hẻm núi sâu" },
+    { id: "dist_waterfall", word: "waterfall", ipa: "/ˈwɔːtəfɔːl/", meaning: "Thác nước" },
+    { id: "dist_archipelago", word: "archipelago", ipa: "/ˌɑːkɪˈpeləɡəʊ/", meaning: "Quần đảo" },
+    { id: "dist_iceberg", word: "iceberg", ipa: "/ˈaɪsbɜːɡ/", meaning: "Tảng băng trôi" },
+    { id: "dist_rainforest", word: "rainforest", ipa: "/ˈreɪnfɒrɪst/", meaning: "Rừng mưa nhiệt đới" },
+    { id: "dist_tundra", word: "tundra", ipa: "/ˈtʌndrə/", meaning: "Đới lãnh nguyên" },
+    { id: "dist_gorge", word: "gorge", ipa: "/ɡɔːdʒ/", meaning: "Hẻm vực hẹp" },
+    { id: "dist_savanna", word: "savanna", ipa: "/səˈvænə/", meaning: "Xavan, trảng cỏ" },
+    { id: "dist_crater", word: "crater", ipa: "/ˈkreɪtər/", meaning: "Miệng núi lửa" },
+    { id: "dist_creek", word: "creek", ipa: "/kriːk/", meaning: "Con lạch, suối nhỏ" },
+    { id: "dist_summit", word: "summit", ipa: "/ˈsʌmɪt/", meaning: "Chóp đỉnh núi" },
   ]
 };

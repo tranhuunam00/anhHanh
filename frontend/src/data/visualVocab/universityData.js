@@ -165,5 +165,19 @@ export const UNIVERSITY_CAMPUS_TOPIC = {
       y: 60.5,
       pointerDirection: "center"
     }
+  ],
+  distractors: [
+    { id: "dist_canteen", word: "canteen", ipa: "/kænˈtiːn/", meaning: "Căng tin trường học" },
+    { id: "dist_semester", word: "semester", ipa: "/sɪˈmestər/", meaning: "Học kỳ" },
+    { id: "dist_tuition", word: "tuition", ipa: "/tjuːˈɪʃn/", meaning: "Học phí" },
+    { id: "dist_syllabus", word: "syllabus", ipa: "/ˈsɪləbəs/", meaning: "Đề cương môn học" },
+    { id: "dist_diploma", word: "diploma", ipa: "/dɪˈpləʊmə/", meaning: "Bằng tốt nghiệp" },
+    { id: "dist_chancellor", word: "chancellor", ipa: "/ˈtʃɑːnsələr/", meaning: "Hiệu trưởng đại học" },
+    { id: "dist_registrar", word: "registrar", ipa: "/ˌredʒɪˈstrɑːr/", meaning: "Phòng đào tạo sinh viên" },
+    { id: "dist_alumni", word: "alumni", ipa: "/əˈlʌmnaɪ/", meaning: "Cựu sinh viên" },
+    { id: "dist_curriculum", word: "curriculum", ipa: "/kəˈrɪkjələm/", meaning: "Chương trình giảng dạy" },
+    { id: "dist_thesis", word: "thesis", ipa: "/ˈθiːsɪs/", meaning: "Khóa luận tốt nghiệp" },
+    { id: "dist_scholarship", word: "scholarship", ipa: "/ˈskɒləʃɪp/", meaning: "Học bổng" },
+    { id: "dist_dean", word: "dean", ipa: "/diːn/", meaning: "Trưởng khoa" },
   ]
 };

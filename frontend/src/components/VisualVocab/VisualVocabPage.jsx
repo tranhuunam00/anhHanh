@@ -140,6 +140,7 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
           activeItemId={activeItemId}
           onSelectHotspot={handleSelectHotspot}
           showLabels={showLabels}
+          mode={activeMode}
           quizFeedback={quizFeedback}
           masteredIds={masteredIds}
         />

@@ -8,10 +8,12 @@ export const VisualVocabCanvas = ({
   activeItemId = null,
   onSelectHotspot,
   showLabels = true,
+  mode = "EXPLORE",
   // Quiz states
   quizFeedback = null, // { clickedId, correctId, isCorrect }
   masteredIds = null, // Set or Array of mastered word IDs
 }) => {
+  const isExplore = mode === "EXPLORE";
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -104,12 +106,12 @@ export const VisualVocabCanvas = ({
                   e.stopPropagation();
                   onSelectHotspot(item);
                 }}
-                title={`${item.word} (${item.meaning})`}
+                title={isExplore ? `${item.word} (${item.meaning})` : `Điểm ghim #${idx + 1}`}
               >
                 <div className="vv-pin-dot">{dotContent}</div>
 
-                {/* Floating Word Label */}
-                {(showLabels || isActive) && (
+                {/* Floating Word Label - ONLY in Explore mode */}
+                {isExplore && (showLabels || isActive) && (
                   <div className="vv-hotspot-label">
                     <span>{item.word}</span>
                     {item.ipa && <span className="vv-ipa">{item.ipa}</span>}

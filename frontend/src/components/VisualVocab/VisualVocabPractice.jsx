@@ -5,11 +5,12 @@ import {
   Trophy,
   Flame,
   CheckCircle,
+  Eye,
+  EyeOff,
 } from "../Icons";
 import {
   getRemainingPool,
   getNextMasteryQuestion,
-  generateDistractorOptions,
   isSpellingMatch,
 } from "../../utils/visualVocabUtils";
 import { playPronunciationAudio } from "../../services/authVocabService";
@@ -30,8 +31,9 @@ export const VisualVocabPractice = ({
   const [streak, setStreak] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [spellInput, setSpellInput] = useState("");
+  const [showSpellHint, setShowSpellHint] = useState(false);
   const [feedback, setFeedback] = useState(null); // { isCorrect, message }
-  const [options, setOptions] = useState([]);
+  const [availableLabels, setAvailableLabels] = useState([]);
   const lastQIdRef = useRef(null);
 
   // Pick next random question from remaining unmastered pool
@@ -47,6 +49,7 @@ export const VisualVocabPractice = ({
     setCurrentQ(next);
     setFeedback(null);
     setSpellInput("");
+    setShowSpellHint(false);
   }, [items]);
 
   // Reset practice session when topic or mode changes
@@ -58,15 +61,44 @@ export const VisualVocabPractice = ({
     setStreak(0);
     setIsFinished(false);
     lastQIdRef.current = null;
-    pickNextQuestion(newMastered);
-  }, [topic.id, mode, items, onUpdateMasteredIds, pickNextQuestion]);
+    setShowSpellHint(false);
 
-  // Generate options when in MATCH mode
-  useEffect(() => {
-    if (mode === "MATCH" && currentQ) {
-      setOptions(generateDistractorOptions(currentQ, items, 4));
+    // In MATCH mode: initialize full word bank with all items + contextual distractors (>=10)
+    if (mode === "MATCH") {
+      const targetLabels = items.map((it) => ({
+        id: it.id,
+        word: it.word,
+        ipa: it.ipa || "",
+        meaning: it.meaning,
+        isDistractor: false,
+      }));
+      const distractorLabels = (topic.distractors || []).map((d) => ({
+        id: d.id || `dist_${d.word}`,
+        word: d.word,
+        ipa: d.ipa || "",
+        meaning: d.meaning,
+        isDistractor: true,
+      }));
+      const combined = [...targetLabels, ...distractorLabels];
+      combined.sort(() => Math.random() - 0.5);
+      setAvailableLabels(combined);
     }
-  }, [mode, currentQ, items]);
+
+    pickNextQuestion(newMastered);
+  }, [topic.id, mode, items, topic.distractors, onUpdateMasteredIds, pickNextQuestion]);
+
+  // Keyboard shortcut Esc in SPELL mode to toggle Vietnamese meaning & IPA hint
+  useEffect(() => {
+    if (mode !== "SPELL") return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setShowSpellHint((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mode]);
 
   // Update highlighted pin on canvas for MATCH and SPELL
   useEffect(() => {
@@ -110,7 +142,7 @@ export const VisualVocabPractice = ({
       setTimeout(() => {
         if (onQuizFeedback) onQuizFeedback(null);
         pickNextQuestion(nextMastered);
-      }, 1200);
+      }, 1000);
     } else {
       setStreak(0);
       const clickedWordName = clickedItem ? `"${clickedItem.word}"` : "điểm này";
@@ -131,11 +163,39 @@ export const VisualVocabPractice = ({
 
       setTimeout(() => {
         if (onQuizFeedback) onQuizFeedback(null);
-        // Word stays in pool, pick another from pool
         pickNextQuestion(masteredSet);
-      }, 2400);
+      }, 2000);
     }
   }, [feedback, currentQ, masteredSet, items, onUpdateMasteredIds, onQuizFeedback, pickNextQuestion]);
+
+  // Click handler for MATCH label tags (disappears when correct)
+  const handleMatchLabelClick = (lbl) => {
+    if (feedback || !currentQ) return;
+
+    if (lbl.word.toLowerCase().trim() === currentQ.word.toLowerCase().trim()) {
+      // Correct! Label disappears from bank
+      setAvailableLabels((prev) => prev.filter((l) => l.id !== lbl.id));
+      handleCheckAnswer(true, lbl);
+    } else {
+      // Wrong selection
+      if (lbl.isDistractor) {
+        setStreak(0);
+        setFeedback({
+          isCorrect: false,
+          message: `❌ "${lbl.word}" là từ gây nhiễu (${lbl.meaning || "ngoài ngữ cảnh"}), không có trong sơ đồ này!`,
+        });
+        if (onQuizFeedback) {
+          onQuizFeedback({ clickedId: null, correctId: currentQ.id, isCorrect: false });
+        }
+        setTimeout(() => {
+          if (onQuizFeedback) onQuizFeedback(null);
+          setFeedback(null);
+        }, 1600);
+      } else {
+        handleCheckAnswer(false, lbl);
+      }
+    }
+  };
 
   // Listen to clicks on the canvas for SPOT_TAP mode
   useEffect(() => {
@@ -181,22 +241,24 @@ export const VisualVocabPractice = ({
             className="vv-save-vocab-btn"
             style={{ width: "auto" }}
             onClick={() => {
-              const fresh = new Set();
-              setMasteredSet(fresh);
-              if (onUpdateMasteredIds) onUpdateMasteredIds(fresh);
-              setScore(0);
+              const newMastered = new Set();
+              setMasteredSet(newMastered);
+              if (onUpdateMasteredIds) onUpdateMasteredIds(newMastered);
               setIsFinished(false);
-              pickNextQuestion(fresh);
+              setScore(0);
+              setStreak(0);
+              pickNextQuestion(newMastered);
             }}
           >
             <RotateCcw size={16} /> Luyện tập lại
           </button>
           <button
             type="button"
-            className="vv-topic-pill active"
+            className="vv-card-nav-btn"
+            style={{ padding: "10px 16px", borderRadius: "10px", border: "1px solid var(--border-color)" }}
             onClick={onResetToExplore}
           >
-            Khám phá sơ đồ
+            Trở về Khám Phá
           </button>
         </div>
       </div>
@@ -207,6 +269,7 @@ export const VisualVocabPractice = ({
 
   const total = items.length || 1;
   const progressPercent = Math.round((masteredSet.size / total) * 100);
+  const currentPinIndex = items.findIndex((it) => it.id === currentQ.id) + 1;
 
   return (
     <div className="vv-detail-card">
@@ -228,7 +291,7 @@ export const VisualVocabPractice = ({
         </div>
       </div>
 
-      {/* Mode 1: SPOT & TAP (Chỉ Điểm) */}
+      {/* Mode 1: SPOT & TAP (Chỉ Điểm) - Hotspot pins have NO words, user clicks matching pin */}
       {mode === "SPOT_TAP" && (
         <div>
           <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0 0 6px" }}>
@@ -251,48 +314,86 @@ export const VisualVocabPractice = ({
         </div>
       )}
 
-      {/* Mode 2: MATCH (Nối Nhãn) */}
+      {/* Mode 2: MATCH (Nối Nhãn - Full Word Bank with >=10 distractors, label disappears upon match) */}
       {mode === "MATCH" && (
-        <div>
-          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0 0 8px" }}>
-            Vị trí đang sáng là từ nào dưới đây?
-          </p>
-          <div style={{ background: "var(--bg-secondary)", padding: "10px 12px", borderRadius: "8px", marginBottom: "12px", border: "1px solid var(--border-color)" }}>
-            <span style={{ fontSize: "0.95rem", fontWeight: 700 }}>{currentQ.meaning}</span>
+        <div className="vv-match-practice-wrap">
+          <div className="vv-match-question-header">
+            <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: 600 }}>
+              🏷️ Chọn nhãn tương ứng với vị trí đang sáng trên tranh:
+            </span>
+            <div className="vv-match-target-indicator">
+              <span className="vv-target-pin-badge">Ghim #{currentPinIndex}</span>
+              <span className="vv-target-meaning">{currentQ.meaning}</span>
+            </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            {options.map((opt) => (
+
+          <div className="vv-match-bank-header">
+            <span>Kho nhãn từ vựng ({availableLabels.length} nhãn còn lại):</span>
+            <span className="vv-match-bank-hint">Bấm đúng nhãn sẽ biến mất</span>
+          </div>
+
+          <div className="vv-match-labels-grid">
+            {availableLabels.map((lbl) => (
               <button
-                key={opt.id}
+                key={lbl.id}
                 type="button"
-                className="vv-list-item-btn"
-                style={{ padding: "10px 14px", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.95rem" }}
-                onClick={() => handleCheckAnswer(opt.id === currentQ.id, opt)}
+                className="vv-match-label-pill"
+                onClick={() => handleMatchLabelClick(lbl)}
                 disabled={feedback !== null}
+                title={lbl.ipa ? `${lbl.word} ${lbl.ipa}` : lbl.word}
               >
-                <span><strong>{opt.word}</strong> <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{opt.ipa}</span></span>
+                <span className="vv-match-word">{lbl.word}</span>
+                {lbl.ipa && <span className="vv-match-ipa">{lbl.ipa}</span>}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Mode 3: SPELL (Gõ Từ) */}
+      {/* Mode 3: SPELL (Gõ Từ - Hint hidden by default, toggle with Eye / Esc) */}
       {mode === "SPELL" && (
-        <form onSubmit={handleSpellSubmit}>
-          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0 0 8px" }}>
-            Gõ từ tiếng Anh cho điểm ghim đang chọn:
-          </p>
-          <div style={{ background: "var(--bg-secondary)", padding: "10px 12px", borderRadius: "8px", marginBottom: "12px", border: "1px solid var(--border-color)" }}>
-            <span style={{ fontSize: "0.95rem", fontWeight: 700 }}>{currentQ.meaning}</span>
-            {currentQ.ipa && <div style={{ fontSize: "0.8rem", color: "var(--primary)" }}>{currentQ.ipa}</div>}
+        <form onSubmit={handleSpellSubmit} className="vv-spell-practice-wrap">
+          <div className="vv-spell-question-header">
+            <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: 600 }}>
+              ✍️ Gõ từ cho vị trí ghim #{currentPinIndex} đang sáng:
+            </span>
+            <button
+              type="button"
+              className={`vv-spell-eye-toggle-btn ${showSpellHint ? "active" : ""}`}
+              onClick={() => setShowSpellHint((v) => !v)}
+              title="Hiện / Ẩn gợi ý nghĩa TV & phiên âm (Phím Esc)"
+            >
+              {showSpellHint ? <EyeOff size={15} /> : <Eye size={15} />}
+              <span>{showSpellHint ? "Ẩn gợi ý" : "Xem gợi ý"}</span>
+              <kbd className="vv-kbd-hint">Esc</kbd>
+            </button>
           </div>
-          <div style={{ display: "flex", gap: "8px" }}>
+
+          {/* Target meaning box: hidden by default, revealed on Esc/click */}
+          {showSpellHint ? (
+            <div className="vv-spell-hint-box revealed">
+              <div className="vv-spell-hint-text">
+                <span className="vv-spell-meaning">{currentQ.meaning}</span>
+                {currentQ.ipa && <span className="vv-spell-ipa">{currentQ.ipa}</span>}
+              </div>
+            </div>
+          ) : (
+            <div
+              className="vv-spell-hint-box hidden"
+              onClick={() => setShowSpellHint(true)}
+              title="Click hoặc nhấn phím Esc để xem gợi ý"
+            >
+              <Eye size={15} style={{ opacity: 0.6 }} />
+              <span>Gợi ý tiếng Việt &amp; phiên âm đang ẩn (Nhấn <kbd className="vv-kbd-hint">Esc</kbd> để mở)</span>
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
             <input
               type="text"
               autoFocus
               className="vv-search-box"
-              style={{ flex: 1, padding: "10px 12px", fontSize: "0.95rem", borderRadius: "8px" }}
+              style={{ flex: 1, padding: "10px 14px", fontSize: "0.95rem", borderRadius: "8px" }}
               placeholder={`Gõ từ (${currentQ.word.length} chữ cái)...`}
               value={spellInput}
               onChange={(e) => setSpellInput(e.target.value)}
@@ -301,7 +402,7 @@ export const VisualVocabPractice = ({
             <button
               type="submit"
               className="vv-save-vocab-btn"
-              style={{ width: "auto", padding: "0 16px" }}
+              style={{ width: "auto", padding: "0 18px", whiteSpace: "nowrap" }}
               disabled={!spellInput.trim() || feedback !== null}
             >
               Kiểm tra
