@@ -16,6 +16,9 @@ export const VisualVocabHeader = ({
   onSelectTopic,
   activeMode = "EXPLORE", // "EXPLORE" | "SPOT_TAP" | "MATCH" | "SPELL"
   onChangeMode,
+  currentLang = "en",
+  onChangeLang,
+  languages = [],
   searchQuery = "",
   onSearchChange,
   showLabels = true,
@@ -62,7 +65,7 @@ export const VisualVocabHeader = ({
         </div>
       </div>
 
-      {/* Row 2: Sub-toolbar with Modes, Search, and Display toggles */}
+      {/* Row 2: Sub-toolbar with Modes, Language, Search, and Display toggles */}
       <div className="vv-subtoolbar">
         {/* Mode Selector */}
         <div className="vv-mode-tabs">
@@ -103,6 +106,24 @@ export const VisualVocabHeader = ({
             <span>Gõ Từ</span>
           </button>
         </div>
+
+        {/* Language Selector: English, French, Chinese */}
+        {languages && languages.length > 0 && (
+          <div className="vv-lang-tabs" role="radiogroup" aria-label="Chọn ngôn ngữ học">
+            {languages.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                className={`vv-lang-btn ${currentLang === l.code ? "active" : ""}`}
+                onClick={() => onChangeLang && onChangeLang(l.code)}
+                title={`Học từ vựng bằng ${l.label}`}
+              >
+                <span>{l.flag}</span>
+                <span>{l.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Tools: Search + Toggle Labels */}
         <div className="vv-tools-group">

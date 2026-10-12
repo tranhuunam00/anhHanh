@@ -90,6 +90,32 @@ SUPPORTED_EDGE_VOICES: Dict[str, Dict[str, Any]] = {
         "gender": "Male",
         "label": "Nam Minh • Việt Nam (Nam)",
     },
+    # French
+    "fr-FR-DeniseNeural": {
+        "name": "Denise",
+        "accent": "fr-FR",
+        "gender": "Female",
+        "label": "Denise • Pháp (Nữ chuẩn)",
+    },
+    "fr-FR-HenriNeural": {
+        "name": "Henri",
+        "accent": "fr-FR",
+        "gender": "Male",
+        "label": "Henri • Pháp (Nam chuẩn)",
+    },
+    # Chinese (Mandarin)
+    "zh-CN-XiaoxiaoNeural": {
+        "name": "Xiaoxiao",
+        "accent": "zh-CN",
+        "gender": "Female",
+        "label": "晓晓 • Trung (Nữ chuẩn)",
+    },
+    "zh-CN-YunxiNeural": {
+        "name": "Yunxi",
+        "accent": "zh-CN",
+        "gender": "Male",
+        "label": "云希 • Trung (Nam chuẩn)",
+    },
 }
 
 DEFAULT_EDGE_VOICE = "en-US-JennyNeural"

@@ -77,18 +77,42 @@ export const generateDistractorOptions = (targetItem, allItems, totalOptions = 4
 };
 
 /**
- * Filters items by query across word, meaning, or IPA
+/**
+ * Strips diacritics and tone marks from a string (e.g. "crête" -> "crete", "shān" -> "shan")
+ */
+export const stripDiacritics = (str) => {
+  if (typeof str !== "string") return "";
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
+/**
+ * Filters items by query across word, meaning, IPA, or Pinyin
  */
 export const filterItemsByQuery = (items, query = "") => {
   if (!Array.isArray(items)) return [];
   if (!query || !query.trim()) return items;
   const q = query.trim().toLowerCase();
+  const qStripped = stripDiacritics(q);
+  const qNoSpace = qStripped.replace(/\s+/g, "");
   return items.filter((item) => {
     if (!item) return false;
     const w = (item.word || "").toLowerCase();
     const m = (item.meaning || "").toLowerCase();
     const i = (item.ipa || "").toLowerCase();
-    return w.includes(q) || m.includes(q) || i.includes(q);
+    const p = (item.pinyin || "").toLowerCase();
+    const wStripped = stripDiacritics(w);
+    const pStripped = stripDiacritics(p);
+    const pNoSpace = pStripped.replace(/\s+/g, "");
+    const wNoSpace = wStripped.replace(/\s+/g, "");
+    return (
+      w.includes(q) ||
+      m.includes(q) ||
+      i.includes(q) ||
+      p.includes(q) ||
+      wStripped.includes(qStripped) ||
+      pStripped.includes(qStripped) ||
+      (qNoSpace.length > 0 && (pNoSpace.includes(qNoSpace) || wNoSpace.includes(qNoSpace)))
+    );
   });
 };
 
@@ -105,13 +129,34 @@ export const calculateCompletionRate = (completedIds, totalItems) => {
 };
 
 /**
- * Normalizes user input string for spelling comparison (ignores case, extra spaces, and hyphens)
+ * Normalizes user input string for spelling comparison (ignores case, extra spaces, hyphens, and diacritics)
+ * Supports pinyin matching for Chinese characters
  */
-export const isSpellingMatch = (input, target) => {
+export const isSpellingMatch = (input, target, options = {}) => {
   if (typeof input !== "string" || typeof target !== "string") return false;
-  const cleanA = input.trim().toLowerCase().replace(/[\s\-_]/g, "");
-  const cleanB = target.trim().toLowerCase().replace(/[\s\-_]/g, "");
-  return cleanA.length > 0 && cleanA === cleanB;
+  const cleanInput = input.trim().toLowerCase().replace(/[\s\-_'’]/g, "");
+  const cleanTarget = target.trim().toLowerCase().replace(/[\s\-_'’]/g, "");
+
+  if (cleanInput.length === 0) return false;
+
+  // 1. Direct match (e.g. "landscape" === "landscape", "paysage" === "paysage", "山峰" === "山峰")
+  if (cleanInput === cleanTarget) return true;
+
+  // 2. Diacritic-insensitive match (e.g. "crete" matches "crête", "bibliotheque" matches "bibliothèque")
+  const strippedInput = stripDiacritics(cleanInput);
+  const strippedTarget = stripDiacritics(cleanTarget);
+  if (strippedInput.length > 0 && strippedInput === strippedTarget) return true;
+
+  // 3. Pinyin match for Chinese characters (e.g. input "shanfeng" or "shānfēng" matches target with pinyin "shān fēng")
+  const pinyin = options?.pinyin;
+  if (pinyin && typeof pinyin === "string") {
+    const cleanPinyin = pinyin.trim().toLowerCase().replace(/[\s\-_'’]/g, "");
+    if (cleanInput === cleanPinyin) return true;
+    const strippedPinyin = stripDiacritics(cleanPinyin);
+    if (strippedInput === strippedPinyin) return true;
+  }
+
+  return false;
 };
 
 /**

@@ -1,5 +1,10 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { VISUAL_VOCAB_TOPICS, getVisualVocabTopicById } from "../../data/visualVocab";
+import {
+  VISUAL_VOCAB_TOPICS,
+  getVisualVocabTopicById,
+  VISUAL_VOCAB_LANGUAGES,
+  getLocalizedTopic,
+} from "../../data/visualVocab";
 import { filterItemsByQuery } from "../../utils/visualVocabUtils";
 import { VisualVocabHeader } from "./VisualVocabHeader";
 import { VisualVocabCanvas } from "./VisualVocabCanvas";
@@ -9,6 +14,7 @@ import "./VisualVocab.css";
 
 export const VisualVocabPage = ({ isActive = true, token = null }) => {
   const [currentTopicId, setCurrentTopicId] = useState("mountain_landforms");
+  const [currentLang, setCurrentLang] = useState("en");
   const [activeMode, setActiveMode] = useState("EXPLORE");
   const [activeItemId, setActiveItemId] = useState("landscape");
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,9 +23,13 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
   const [lastClickedHotspot, setLastClickedHotspot] = useState(null);
   const [masteredIds, setMasteredIds] = useState(new Set());
 
-  const currentTopic = useMemo(() => {
+  const rawTopic = useMemo(() => {
     return getVisualVocabTopicById(currentTopicId);
   }, [currentTopicId]);
+
+  const currentTopic = useMemo(() => {
+    return getLocalizedTopic(rawTopic, currentLang);
+  }, [rawTopic, currentLang]);
 
   // When switching topic, select first word and reset mastery
   useEffect(() => {
@@ -124,6 +134,9 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
         onSelectTopic={setCurrentTopicId}
         activeMode={activeMode}
         onChangeMode={handleChangeMode}
+        currentLang={currentLang}
+        onChangeLang={setCurrentLang}
+        languages={VISUAL_VOCAB_LANGUAGES}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         showLabels={showLabels}
@@ -151,6 +164,7 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
             <>
               <VisualVocabDetailCard
                 activeItem={activeItem}
+                currentLang={currentLang}
                 onSelectPrev={handleSelectPrev}
                 onSelectNext={handleSelectNext}
                 hasPrev={activeItemIndex > 0}
@@ -186,6 +200,7 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
               topic={currentTopic}
               items={currentTopic.items || []}
               mode={activeMode}
+              currentLang={currentLang}
               lastClickedHotspot={lastClickedHotspot}
               onHighlightHotspot={(id) => setActiveItemId(id)}
               onQuizFeedback={setQuizFeedback}

@@ -19,6 +19,7 @@ export const VisualVocabPractice = ({
   topic,
   items = [],
   mode = "SPOT_TAP", // "SPOT_TAP" | "MATCH" | "SPELL"
+  currentLang = "en",
   lastClickedHotspot = null, // { id, word, meaning }
   onHighlightHotspot,
   onQuizFeedback,
@@ -52,7 +53,7 @@ export const VisualVocabPractice = ({
     setShowSpellHint(false);
   }, [items]);
 
-  // Reset practice session when topic or mode changes
+  // Reset practice session when topic, mode or language changes
   useEffect(() => {
     const newMastered = new Set();
     setMasteredSet(newMastered);
@@ -85,7 +86,7 @@ export const VisualVocabPractice = ({
     }
 
     pickNextQuestion(newMastered);
-  }, [topic.id, mode, items, topic.distractors, onUpdateMasteredIds, pickNextQuestion]);
+  }, [topic.id, mode, items, currentLang, topic.distractors, onUpdateMasteredIds, pickNextQuestion]);
 
   // Keyboard shortcut Esc in SPELL mode to toggle Vietnamese meaning & IPA hint
   useEffect(() => {
@@ -110,7 +111,7 @@ export const VisualVocabPractice = ({
   }, [currentQ, mode, onHighlightHotspot]);
 
   const handlePlayAudio = (word) => {
-    if (word) playPronunciationAudio(word, "us").catch(() => {});
+    if (word) playPronunciationAudio(word, currentLang || "us").catch(() => {});
   };
 
   const handleCheckAnswer = useCallback((isCorrect, clickedItem = null) => {
@@ -208,7 +209,10 @@ export const VisualVocabPractice = ({
   const handleSpellSubmit = (e) => {
     e.preventDefault();
     if (!currentQ || !spellInput.trim()) return;
-    const isMatch = isSpellingMatch(spellInput, currentQ.word);
+    const isMatch = isSpellingMatch(spellInput, currentQ.word, {
+      pinyin: currentQ.pinyin,
+      lang: currentLang,
+    });
     handleCheckAnswer(isMatch, currentQ);
   };
 
@@ -300,13 +304,16 @@ export const VisualVocabPractice = ({
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg-secondary)", padding: "12px", borderRadius: "10px", border: "1px solid var(--border-color)" }}>
             <div>
               <div style={{ fontSize: "1.25rem", fontWeight: 800 }}>{currentQ.word}</div>
-              <div style={{ fontSize: "0.88rem", color: "var(--text-muted)" }}>{currentQ.ipa} • {currentQ.meaning}</div>
+              <div style={{ fontSize: "0.88rem", color: "var(--text-muted)" }}>
+                {currentQ.pinyin ? `${currentQ.pinyin} • ` : currentQ.ipa ? `${currentQ.ipa} • ` : ""}
+                {currentQ.meaning}
+              </div>
             </div>
             <button
               type="button"
               className="vv-audio-btn"
               onClick={() => handlePlayAudio(currentQ.word)}
-              title="Nghe phát âm"
+              title={`Nghe phát âm (${currentLang === "fr" ? "Pháp" : currentLang === "zh" ? "Trung" : "US"})`}
             >
               <Volume2 size={18} />
             </button>
@@ -374,7 +381,8 @@ export const VisualVocabPractice = ({
             <div className="vv-spell-hint-box revealed">
               <div className="vv-spell-hint-text">
                 <span className="vv-spell-meaning">{currentQ.meaning}</span>
-                {currentQ.ipa && <span className="vv-spell-ipa">{currentQ.ipa}</span>}
+                {currentQ.pinyin && <span className="vv-spell-ipa">[{currentQ.pinyin}]</span>}
+                {currentQ.ipa && !currentQ.pinyin && <span className="vv-spell-ipa">{currentQ.ipa}</span>}
               </div>
             </div>
           ) : (
@@ -394,7 +402,13 @@ export const VisualVocabPractice = ({
               autoFocus
               className="vv-search-box"
               style={{ flex: 1, padding: "10px 14px", fontSize: "0.95rem", borderRadius: "8px" }}
-              placeholder={`Gõ từ (${currentQ.word.length} chữ cái)...`}
+              placeholder={
+                currentLang === "zh"
+                  ? "Gõ chữ Hán hoặc Pinyin (vd: shanfeng)..."
+                  : currentLang === "fr"
+                  ? `Gõ từ tiếng Pháp (${currentQ.word.length} chữ cái)...`
+                  : `Gõ từ (${currentQ.word.length} chữ cái)...`
+              }
               value={spellInput}
               onChange={(e) => setSpellInput(e.target.value)}
               disabled={feedback !== null}

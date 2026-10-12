@@ -282,7 +282,22 @@ export const playPronunciationAudio = (word, ttsLang = "us", customAudioUrl = nu
 
     const langStr = String(ttsLang || "us").toLowerCase();
     const isUk = langStr === "uk" || langStr === "en-gb" || langStr.includes("gb");
-    const edgeVoice = isUk ? "en-GB-SoniaNeural" : "en-US-JennyNeural";
+    const isFr = langStr === "fr" || langStr.startsWith("fr");
+    const isZh = langStr === "zh" || langStr.startsWith("zh");
+
+    let edgeVoice = "en-US-JennyNeural";
+    let targetLang = "en-US";
+    if (isUk) {
+      edgeVoice = "en-GB-SoniaNeural";
+      targetLang = "en-GB";
+    } else if (isFr) {
+      edgeVoice = "fr-FR-DeniseNeural";
+      targetLang = "fr-FR";
+    } else if (isZh) {
+      edgeVoice = "zh-CN-XiaoxiaoNeural";
+      targetLang = "zh-CN";
+    }
+
     const primaryUrl = customAudioUrl || `/api/tts/stream?text=${encodeURIComponent(clean)}&voice=${edgeVoice}`;
 
     let resolved = false;
@@ -299,13 +314,22 @@ export const playPronunciationAudio = (word, ttsLang = "us", customAudioUrl = nu
         try {
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(clean);
-          const targetLang = isUk ? "en-GB" : "en-US";
           utterance.lang = targetLang;
           utterance.rate = 0.9;
 
           if (typeof window.speechSynthesis.getVoices === "function") {
             const allVoices = window.speechSynthesis.getVoices() || [];
-            if (isUk) {
+            if (isFr) {
+              const frVoice = allVoices.find(
+                (v) => (v.lang && v.lang.toLowerCase().startsWith("fr")) || /French|Français|Denise|Henri/i.test(v.name)
+              );
+              if (frVoice) utterance.voice = frVoice;
+            } else if (isZh) {
+              const zhVoice = allVoices.find(
+                (v) => (v.lang && (v.lang.toLowerCase().startsWith("zh") || v.lang.toLowerCase().includes("cn"))) || /Chinese|Mandarin|Xiaoxiao|Yunxi/i.test(v.name)
+              );
+              if (zhVoice) utterance.voice = zhVoice;
+            } else if (isUk) {
               const ukVoice = allVoices.find(
                 (v) =>
                   (v.lang && (v.lang === "en-GB" || v.lang.startsWith("en-GB") || v.lang.includes("GB"))) ||

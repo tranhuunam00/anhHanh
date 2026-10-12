@@ -11,6 +11,7 @@ import { playPronunciationAudio, createVocabWord } from "../../services/authVoca
 
 export const VisualVocabDetailCard = ({
   activeItem,
+  currentLang = "en",
   onSelectPrev,
   onSelectNext,
   hasPrev,
@@ -34,7 +35,7 @@ export const VisualVocabDetailCard = ({
     );
   }
 
-  const handlePlayAudio = (accent = "us") => {
+  const handlePlayAudio = (accent = currentLang || "us") => {
     if (!activeItem.word) return;
     setIsPlayingAudio(true);
     playPronunciationAudio(activeItem.word, accent)
@@ -52,7 +53,7 @@ export const VisualVocabDetailCard = ({
         phonetic: activeItem.ipa || "",
         pos: activeItem.pos || "noun",
         context_sentence: activeItem.example || "",
-        source_lang: "en",
+        source_lang: currentLang || "en",
         target_lang: "vi",
       };
       await createVocabWord(payload, token);
@@ -65,6 +66,13 @@ export const VisualVocabDetailCard = ({
     }
   };
 
+  const audioTitle =
+    currentLang === "fr"
+      ? "Nghe phát âm chuẩn Pháp"
+      : currentLang === "zh"
+      ? "Nghe phát âm chuẩn Trung"
+      : "Nghe phát âm chuẩn US";
+
   return (
     <div className="vv-detail-card">
       {/* Top row: Word name, IPA and Audio buttons */}
@@ -76,15 +84,22 @@ export const VisualVocabDetailCard = ({
               <span className="vv-detail-pos-badge">{activeItem.pos}</span>
             )}
           </div>
-          {activeItem.ipa && <div className="vv-detail-ipa">{activeItem.ipa}</div>}
+          {activeItem.pinyin && activeItem.rawIpa && activeItem.pinyin !== activeItem.rawIpa ? (
+            <div className="vv-detail-ipa">
+              <span>{activeItem.pinyin}</span>
+              <span style={{ opacity: 0.65, marginLeft: "6px", fontSize: "0.85em" }}>{activeItem.rawIpa}</span>
+            </div>
+          ) : (
+            activeItem.ipa && <div className="vv-detail-ipa">{activeItem.ipa}</div>
+          )}
         </div>
 
         <div className="vv-detail-actions">
           <button
             type="button"
             className="vv-audio-btn"
-            onClick={() => handlePlayAudio("us")}
-            title="Nghe phát âm chuẩn US"
+            onClick={() => handlePlayAudio(currentLang || "us")}
+            title={audioTitle}
             disabled={isPlayingAudio}
           >
             <Volume2 size={18} />
