@@ -214,3 +214,54 @@ export function computePopoverCoords(rect, viewportWidth = 1024, viewportHeight 
   return { top, left, placement, arrowLeft };
 }
 
+/**
+ * Resolves the initial display context sentence prioritizing current lookup context prop, then saved notebook data, then empty string.
+ * @param {string} contextSentence
+ * @param {object|null} savedItem
+ * @returns {string}
+ */
+export function resolveInitialContextSentence(contextSentence = "", savedItem = null) {
+  if (typeof contextSentence === "string" && contextSentence.trim()) {
+    return contextSentence.trim();
+  }
+  if (savedItem && typeof savedItem.context_sentence === "string" && savedItem.context_sentence.trim()) {
+    return savedItem.context_sentence.trim();
+  }
+  return "";
+}
+
+/**
+ * Checks whether user has modified the context sentence compared to the initial context sentence.
+ * @param {boolean} isSaved
+ * @param {string} customContext
+ * @param {string} initialContext
+ * @returns {boolean}
+ */
+export function isContextModified(isSaved, customContext = "", initialContext = "") {
+  if (!isSaved) return false;
+  const custom = (customContext || "").trim();
+  const initial = (initialContext || "").trim();
+  return custom !== initial;
+}
+
+/**
+ * Determines whether any editable vocab field (meaning, POS, context sentence) has been modified for a saved item.
+ * @param {object} params
+ * @returns {boolean}
+ */
+export function hasVocabChanges({
+  isSaved = false,
+  customMeaning = "",
+  savedMeaning = "",
+  customPos = "",
+  initialPos = "",
+  customContext = "",
+  initialContext = "",
+} = {}) {
+  if (!isSaved) return false;
+  const meaningChanged = isMeaningModified(isSaved, customMeaning, savedMeaning);
+  const posChanged = (customPos || "").trim() !== (initialPos || "").trim();
+  const contextChanged = isContextModified(isSaved, customContext, initialContext);
+  return meaningChanged || posChanged || contextChanged;
+}
+

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IconVolume, IconSparkles, IconBookmark, IconClose, IconCheckCircle } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
   quickLookupWord,
@@ -10,13 +9,17 @@ import {
 } from "../../services/authVocabService";
 import {
   resolveInitialMeaning,
-  isMeaningModified,
+  resolveInitialContextSentence,
+  hasVocabChanges,
   getMeaningSavePayload,
   calculateAutoTextareaHeight,
   computePopoverCoords,
 } from "../../utils/wordLookupUtils";
+import { PopoverHeader } from "./PopoverHeader";
+import { PopoverIpaSection } from "./PopoverIpaSection";
 import { PopoverTranslationSection } from "./PopoverTranslationSection";
-import { PopoverPosSelector } from "./PopoverPosSelector";
+import { PopoverContextSection } from "./PopoverContextSection";
+import { PopoverActionFooter } from "./PopoverActionFooter";
 
 const STATUS_MAP = {
   NEW: { label: "Mới lưu", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.12)" },
@@ -38,26 +41,32 @@ export const WordLookupPopover = ({
   const { token, refreshStreak, refreshSavedVocab, showToast, savedVocabMap } = useAuth();
   const popoverRef = useRef(null);
   const textareaRef = useRef(null);
+  const contextTextareaRef = useRef(null);
 
   const [lookupData, setLookupData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeAudio, setActiveAudio] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 12, placement: "bottom", arrowLeft: 140 });
+
   const [customMeaning, setCustomMeaning] = useState("");
   const [initialMeaning, setInitialMeaning] = useState("");
   const [customPos, setCustomPos] = useState("");
   const [initialPos, setInitialPos] = useState("");
+  const [customContext, setCustomContext] = useState("");
+  const [initialContext, setInitialContext] = useState("");
 
   // Clean word token for display and lookup
   const cleanWord = (word || "").trim().replace(/^[’'".:,;!?-]+|[’'".:,;!?-]+$/g, "");
 
-  // Reset custom meanings when word token changes
+  // Reset custom states when word token changes
   useEffect(() => {
     setCustomMeaning("");
     setInitialMeaning("");
     setCustomPos("");
     setInitialPos("");
+    setCustomContext("");
+    setInitialContext("");
   }, [cleanWord]);
 
   // Auto adjust textarea height to fit content nicely
@@ -68,6 +77,14 @@ export const WordLookupPopover = ({
       textareaRef.current.style.height = `${h}px`;
     }
   }, [customMeaning, loading]);
+
+  useEffect(() => {
+    if (contextTextareaRef.current) {
+      contextTextareaRef.current.style.height = "auto";
+      const h = calculateAutoTextareaHeight(contextTextareaRef.current.scrollHeight, 44, 120);
+      contextTextareaRef.current.style.height = `${h}px`;
+    }
+  }, [customContext, loading]);
 
   // Positioning relative to targetElement
   useEffect(() => {
@@ -114,6 +131,10 @@ export const WordLookupPopover = ({
         setCustomPos(posResolved);
         setInitialPos(posResolved);
 
+        const resolvedContext = resolveInitialContextSentence(contextSentence, savedItem);
+        setCustomContext(resolvedContext);
+        setInitialContext(resolvedContext);
+
         if (savedItem) {
           setLookupData({
             ...data,
@@ -140,6 +161,10 @@ export const WordLookupPopover = ({
         const posResolved = savedItem?.part_of_speech || (cleanWord.includes(" ") ? "phrase" : "");
         setCustomPos(posResolved);
         setInitialPos(posResolved);
+
+        const fallbackContext = resolveInitialContextSentence(contextSentence, savedItem);
+        setCustomContext(fallbackContext);
+        setInitialContext(fallbackContext);
 
         setLookupData({
           word: cleanWord,
@@ -200,7 +225,7 @@ export const WordLookupPopover = ({
     });
   };
 
-  // One-click save to notebook with edited translation
+  // One-click save to notebook with edited translation & context sentence
   const handleSaveToNotebook = async () => {
     if (!token) {
       showToast("Vui lòng đăng nhập để lưu từ vào Sổ tay", "warning");
@@ -215,7 +240,7 @@ export const WordLookupPopover = ({
         customMeaning,
         lookupMeaning: lookupData?.meaning,
         partOfSpeech: customPos,
-        contextSentence,
+        contextSentence: customContext,
         phonetic: lookupData?.ipa,
         videoId,
         timestamp,
@@ -232,6 +257,7 @@ export const WordLookupPopover = ({
         word: cleanWord,
         meaning: payload.meaning,
         part_of_speech: payload.part_of_speech,
+        context_sentence: payload.context_sentence,
         status: "NEW",
         phonetic: lookupData?.ipa,
       };
@@ -246,6 +272,8 @@ export const WordLookupPopover = ({
       setInitialMeaning(payload.meaning);
       setCustomMeaning(payload.meaning);
       setInitialPos(payload.part_of_speech);
+      setInitialContext(payload.context_sentence);
+      setCustomContext(payload.context_sentence);
     } catch (err) {
       showToast(err.message || "Không thể lưu từ này", "error");
     } finally {
@@ -253,23 +281,28 @@ export const WordLookupPopover = ({
     }
   };
 
-  // Update meaning for already saved word
-  const handleUpdateSavedMeaning = async () => {
+  // Update meaning, POS, and context sentence for already saved word
+  const handleUpdateSavedVocab = async () => {
     if (!token || !lookupData?.saved_vocab?.id) return;
     const finalMeaning = (customMeaning || "").trim();
     if (!finalMeaning) {
       showToast("Nghĩa từ vựng không được để trống", "warning");
       return;
     }
+    const finalContext = (customContext || "").trim();
 
     setIsSaving(true);
     try {
       const res = await updateVocabWord(
         lookupData.saved_vocab.id,
-        { meaning: finalMeaning, part_of_speech: customPos },
+        {
+          meaning: finalMeaning,
+          part_of_speech: customPos,
+          context_sentence: finalContext,
+        },
         token
       );
-      showToast(`Đã cập nhật nghĩa của "${cleanWord}"!`, "success");
+      showToast(`Đã cập nhật "${cleanWord}" trong Sổ tay!`, "success");
       refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
 
@@ -277,6 +310,7 @@ export const WordLookupPopover = ({
         ...lookupData.saved_vocab,
         meaning: finalMeaning,
         part_of_speech: customPos,
+        context_sentence: finalContext,
       };
 
       setLookupData((prev) => ({
@@ -288,8 +322,10 @@ export const WordLookupPopover = ({
       setInitialMeaning(finalMeaning);
       setCustomMeaning(finalMeaning);
       setInitialPos(customPos);
+      setInitialContext(finalContext);
+      setCustomContext(finalContext);
     } catch (err) {
-      showToast(err.message || "Không thể cập nhật nghĩa từ này", "error");
+      showToast(err.message || "Không thể cập nhật từ này", "error");
     } finally {
       setIsSaving(false);
     }
@@ -320,13 +356,13 @@ export const WordLookupPopover = ({
     }
   };
 
-  // Handle Enter key inside textarea
+  // Handle Enter key inside textareas
   const handleKeyDownTextarea = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (isSaved) {
-        if (isMeaningChanged) {
-          handleUpdateSavedMeaning();
+        if (hasChanges) {
+          handleUpdateSavedVocab();
         }
       } else {
         handleSaveToNotebook();
@@ -336,8 +372,16 @@ export const WordLookupPopover = ({
 
   const isSaved = Boolean(lookupData?.is_saved);
   const savedMeaning = lookupData?.saved_vocab?.meaning || lookupData?.meaning || "";
-  const isPosChanged = (customPos || "").trim() !== (initialPos || "").trim();
-  const isMeaningChanged = isMeaningModified(isSaved, customMeaning, savedMeaning) || (isSaved && isPosChanged);
+  const hasChanges = hasVocabChanges({
+    isSaved,
+    customMeaning,
+    savedMeaning,
+    customPos,
+    initialPos,
+    customContext,
+    initialContext,
+  });
+
   const savedStatus = lookupData?.saved_vocab?.status || (isSaved ? "NEW" : null);
   const statusConfig = savedStatus ? STATUS_MAP[savedStatus] || STATUS_MAP.NEW : null;
 
@@ -360,77 +404,25 @@ export const WordLookupPopover = ({
       />
 
       {/* Header: Word + Multi-POS Selector + UK / US Audio buttons + Close */}
-      <div className="lookup-popover-header">
-        <div className="lookup-word-title-group">
-          <span className="lookup-word-name" title={cleanWord}>{cleanWord}</span>
-          <PopoverPosSelector
-            partOfSpeech={customPos}
-            onChangePos={setCustomPos}
-            cleanWord={cleanWord}
-          />
-        </div>
-
-        <div className="lookup-audio-actions">
-          <button
-            type="button"
-            className={`lookup-audio-btn uk ${activeAudio === "uk" ? "playing" : ""}`}
-            onClick={() => handlePlayAudio("uk")}
-            title="Phát âm giọng Anh - Anh (UK)"
-          >
-            <span className="accent-label">UK</span>
-            <IconVolume size={14} className={activeAudio === "uk" ? "pulse-anim" : ""} />
-          </button>
-
-          <button
-            type="button"
-            className={`lookup-audio-btn us ${activeAudio === "us" ? "playing" : ""}`}
-            onClick={() => handlePlayAudio("us")}
-            title="Phát âm giọng Anh - Mỹ (US)"
-          >
-            <span className="accent-label">US</span>
-            <IconVolume size={14} className={activeAudio === "us" ? "pulse-anim" : ""} />
-          </button>
-
-          <button type="button" className="lookup-close-btn" onClick={onClose} title="Đóng (Esc)">
-            <IconClose size={15} />
-          </button>
-        </div>
-      </div>
+      <PopoverHeader
+        cleanWord={cleanWord}
+        customPos={customPos}
+        onChangePos={setCustomPos}
+        activeAudio={activeAudio}
+        onPlayAudio={handlePlayAudio}
+        onClose={onClose}
+      />
 
       <div className="lookup-divider" />
 
-      {/* IPA Section - Hiển thị nếu có IPA hoặc đang load */}
-      {(loading || Boolean(lookupData?.ipa_uk || lookupData?.ipa_us || lookupData?.ipa)) && (
-        <>
-          <div className="lookup-section">
-            <div className="lookup-section-title">IPA for {cleanWord}</div>
-            {loading ? (
-              <div className="lookup-skeleton-line" style={{ width: "65%" }} />
-            ) : (
-              <div className="lookup-ipa-row">
-                {lookupData?.ipa_uk && lookupData?.ipa_us && lookupData.ipa_uk !== lookupData.ipa_us ? (
-                  <>
-                    <span className="ipa-accent">UK</span>
-                    <span className="ipa-text">{lookupData.ipa_uk}</span>
-                    <span className="ipa-accent" style={{ marginLeft: "10px" }}>
-                      US
-                    </span>
-                    <span className="ipa-text">{lookupData.ipa_us}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="ipa-accent">UK • US</span>
-                    <span className="ipa-text">{lookupData?.ipa_uk || lookupData?.ipa_us || lookupData?.ipa || "/.../"}</span>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-          <div className="lookup-divider" />
-        </>
-      )}
+      {/* IPA Section */}
+      <PopoverIpaSection
+        loading={loading}
+        cleanWord={cleanWord}
+        lookupData={lookupData}
+      />
 
-      {/* Translation Section - User can edit directly before saving */}
+      {/* Translation Section */}
       <PopoverTranslationSection
         loading={loading}
         customMeaning={customMeaning}
@@ -442,48 +434,32 @@ export const WordLookupPopover = ({
         textareaRef={textareaRef}
       />
 
+      <div className="lookup-divider" />
+
+      {/* Context Sentence Section */}
+      <PopoverContextSection
+        loading={loading}
+        customContext={customContext}
+        initialContext={initialContext}
+        onContextChange={(e) => setCustomContext(e.target.value)}
+        onKeyDown={handleKeyDownTextarea}
+        onResetContext={() => setCustomContext(initialContext)}
+        contextTranslation={contextTranslation}
+        textareaRef={contextTextareaRef}
+      />
+
       {/* Smart Notebook Action */}
-      <div className="lookup-action-footer">
-        {isSaved && !isMeaningChanged ? (
-          <div className="lookup-saved-bar">
-            <div className="saved-indicator-group">
-              <IconBookmark size={16} className="text-emerald-500" />
-              <span className="saved-text">Đã có trong Sổ tay</span>
-              {statusConfig && (
-                <span
-                  className="saved-status-tag"
-                  style={{ color: statusConfig.color, background: statusConfig.bg }}
-                  onClick={handleCycleStatus}
-                  title="Bấm để đổi trạng thái học"
-                >
-                  {statusConfig.label} ↻
-                </span>
-              )}
-            </div>
-          </div>
-        ) : isSaved && isMeaningChanged ? (
-          <button
-            type="button"
-            className="lookup-save-btn lookup-update-btn"
-            onClick={handleUpdateSavedMeaning}
-            disabled={isSaving || loading || !customMeaning.trim()}
-            title="Lưu nghĩa mới đã chỉnh sửa vào Sổ tay"
-          >
-            <IconCheckCircle size={14} />
-            <span>{isSaving ? "Đang lưu..." : "Cập nhật nghĩa trong Sổ tay"}</span>
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="lookup-save-btn"
-            onClick={handleSaveToNotebook}
-            disabled={isSaving || loading}
-          >
-            <IconSparkles size={14} />
-            <span>{isSaving ? "Đang lưu..." : "Lưu vào Sổ tay"}</span>
-          </button>
-        )}
-      </div>
+      <PopoverActionFooter
+        isSaved={isSaved}
+        hasChanges={hasChanges}
+        isSaving={isSaving}
+        loading={loading}
+        customMeaning={customMeaning}
+        statusConfig={statusConfig}
+        onCycleStatus={handleCycleStatus}
+        onUpdateSavedVocab={handleUpdateSavedVocab}
+        onSaveToNotebook={handleSaveToNotebook}
+      />
     </div>
   );
 };

@@ -9,6 +9,9 @@ import {
   parsePosTokens,
   formatPosDisplay,
   togglePosInList,
+  resolveInitialContextSentence,
+  isContextModified,
+  hasVocabChanges,
 } from "../src/utils/wordLookupUtils.js";
 
 describe("wordLookupUtils - Unit Tests", () => {
@@ -206,5 +209,134 @@ describe("wordLookupUtils - Unit Tests", () => {
       assert.equal(resRight.left, 1000 - 12 - 320);
     });
   });
+
+  describe("resolveInitialContextSentence", () => {
+    it("prioritizes contextSentence prop when provided as non-empty string", () => {
+      const sentence = "The people of this country voted today.";
+      const saved = { context_sentence: "Old context sentence from notebook." };
+      const res = resolveInitialContextSentence(sentence, saved);
+      assert.equal(res, "The people of this country voted today.");
+    });
+
+    it("falls back to savedItem.context_sentence when contextSentence is empty or whitespace", () => {
+      const saved = { context_sentence: "Human beings have lived here for centuries." };
+      assert.equal(resolveInitialContextSentence("", saved), "Human beings have lived here for centuries.");
+      assert.equal(resolveInitialContextSentence("   ", saved), "Human beings have lived here for centuries.");
+    });
+
+    it("returns empty string when neither contextSentence nor savedItem provide context", () => {
+      assert.equal(resolveInitialContextSentence("", null), "");
+      assert.equal(resolveInitialContextSentence(null, null), "");
+      assert.equal(resolveInitialContextSentence(undefined, undefined), "");
+      assert.equal(resolveInitialContextSentence("", { context_sentence: "" }), "");
+    });
+
+    it("handles boundary, non-string, and invalid types safely", () => {
+      assert.equal(resolveInitialContextSentence(12345, null), "");
+      assert.equal(resolveInitialContextSentence(null, { context_sentence: 999 }), "");
+    });
+  });
+
+  describe("isContextModified", () => {
+    it("returns false when word is not saved yet", () => {
+      assert.equal(isContextModified(false, "New context", "Old context"), false);
+      assert.equal(isContextModified(null, "New context", "Old context"), false);
+    });
+
+    it("returns true when word is saved and custom context differs from initial context", () => {
+      assert.equal(
+        isContextModified(true, "Many people attended.", "Few people attended."),
+        true
+      );
+    });
+
+    it("returns false when custom context matches initial context (ignoring outer whitespace)", () => {
+      assert.equal(
+        isContextModified(true, "   Many people attended.   ", "Many people attended."),
+        false
+      );
+    });
+
+    it("returns true when custom context is emptied compared to initial context", () => {
+      assert.equal(
+        isContextModified(true, "", "Original context sentence."),
+        true
+      );
+    });
+
+    it("handles null and undefined values safely", () => {
+      assert.equal(isContextModified(true, null, null), false);
+      assert.equal(isContextModified(true, "Context", null), true);
+    });
+  });
+
+  describe("hasVocabChanges", () => {
+    it("returns false when item is not saved", () => {
+      const res = hasVocabChanges({
+        isSaved: false,
+        customMeaning: "new",
+        savedMeaning: "old",
+      });
+      assert.equal(res, false);
+    });
+
+    it("returns false when item is saved and no field changed", () => {
+      const res = hasVocabChanges({
+        isSaved: true,
+        customMeaning: "dân tộc",
+        savedMeaning: "dân tộc",
+        customPos: "noun",
+        initialPos: "noun",
+        customContext: "People are friendly.",
+        initialContext: "People are friendly.",
+      });
+      assert.equal(res, false);
+    });
+
+    it("returns true when meaning changed", () => {
+      const res = hasVocabChanges({
+        isSaved: true,
+        customMeaning: "con người; dân chúng",
+        savedMeaning: "dân tộc",
+        customPos: "noun",
+        initialPos: "noun",
+        customContext: "People are friendly.",
+        initialContext: "People are friendly.",
+      });
+      assert.equal(res, true);
+    });
+
+    it("returns true when POS changed", () => {
+      const res = hasVocabChanges({
+        isSaved: true,
+        customMeaning: "dân tộc",
+        savedMeaning: "dân tộc",
+        customPos: "noun, phrase",
+        initialPos: "noun",
+        customContext: "People are friendly.",
+        initialContext: "People are friendly.",
+      });
+      assert.equal(res, true);
+    });
+
+    it("returns true when context sentence changed", () => {
+      const res = hasVocabChanges({
+        isSaved: true,
+        customMeaning: "dân tộc",
+        savedMeaning: "dân tộc",
+        customPos: "noun",
+        initialPos: "noun",
+        customContext: "These people showed great courage.",
+        initialContext: "People are friendly.",
+      });
+      assert.equal(res, true);
+    });
+
+    it("handles missing or empty parameter object safely", () => {
+      assert.equal(hasVocabChanges(), false);
+      assert.equal(hasVocabChanges({}), false);
+    });
+  });
 });
+
 

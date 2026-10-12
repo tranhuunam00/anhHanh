@@ -976,6 +976,8 @@
   min-width: 320px;
   width: max-content;
   max-width: min(390px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
   background: var(--bg-card, #ffffff);
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 12px;
@@ -1435,6 +1437,59 @@
   line-height: 1.35;
   margin-top: 2px;
   font-style: italic;
+}
+
+.lookup-context-section {
+  gap: 5px;
+}
+
+.lookup-context-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.lookup-context-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary, #0f172a);
+  line-height: 1.45;
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 6px 10px;
+  resize: none;
+  min-height: 44px;
+  overflow-y: auto;
+  transition: all 0.15s ease;
+}
+
+.lookup-context-textarea:hover {
+  border-color: var(--border-color-hover, #cbd5e1);
+}
+
+.lookup-context-textarea:focus {
+  outline: none;
+  background: var(--bg-card, #ffffff);
+  border-color: var(--primary, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.lookup-context-textarea::placeholder {
+  color: var(--text-muted, #94a3b8);
+  font-weight: 400;
+  font-size: 0.82rem;
+}
+
+.lookup-context-translation {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.35;
+  margin-top: 2px;
+  font-style: italic;
+  padding-left: 1px;
 }
 
 .lookup-skeleton-line {
