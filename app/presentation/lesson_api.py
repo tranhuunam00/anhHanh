@@ -45,12 +45,14 @@ class PreviewApiRequest(BaseModel):
     url_or_id: str = Field(..., description='YouTube URL hoặc video ID')
     source_lang: Optional[str] = 'en'
     target_lang: Optional[str] = 'vi'
+    force_refresh: Optional[bool] = False
 
 
 class StartLessonRequest(BaseModel):
     video_id: str
     source_lang: Optional[str] = 'en'
     target_lang: Optional[str] = 'vi'
+    force_refresh: Optional[bool] = False
 
 
 class ProgressApiRequest(BaseModel):
@@ -136,6 +138,7 @@ async def preview_video(
             grouping_mode='sentence',
             source_lang=source_lang,
             target_lang=target_lang,
+            force_refresh=bool(payload.force_refresh),
         )
         try:
             lesson_dto, lesson_record = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
@@ -201,6 +204,7 @@ async def start_lesson_session(
         grouping_mode='sentence',
         source_lang=source_lang,
         target_lang=target_lang,
+        force_refresh=bool(payload.force_refresh),
     )
     lesson_dto, lesson_record = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
 

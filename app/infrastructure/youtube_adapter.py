@@ -9,6 +9,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from app.domain.models import SubtitleSnippet
 from app.domain.exceptions import TranscriptNotFoundException
 from app.application.interfaces import ITranscriptService
+from app.domain.subtitle_offset_detector import SubtitleOffsetDetector
 
 logger = logging.getLogger(__name__)
 
@@ -72,11 +73,11 @@ class YouTubeTranscriptAdapter(ITranscriptService):
         target_lang: Optional[str] = "vi",
     ) -> Tuple[str, List[SubtitleSnippet], Optional[List[SubtitleSnippet]], str]:
         title = self._fetch_video_title(video_id)
-        source_snippets, detected_source_lang = self._fetch_source_transcript(
+        source_snippets, detected_source_lang, offset = self._fetch_source_transcript(
             video_id, source_lang
         )
         target_snippets = self._fetch_target_transcript(
-            video_id, target_lang, detected_source_lang
+            video_id, target_lang, detected_source_lang, offset=offset
         )
         return title, source_snippets, target_snippets, detected_source_lang
 
@@ -165,7 +166,7 @@ class YouTubeTranscriptAdapter(ITranscriptService):
 
     def _fetch_source_transcript(
         self, video_id: str, source_lang: Optional[str] = "auto"
-    ) -> Tuple[List[SubtitleSnippet], str]:
+    ) -> Tuple[List[SubtitleSnippet], str, float]:
         """Fetch source transcript with auto-rotation on IP block and proxy fallback."""
         src = (source_lang or "auto").strip().lower()
         has_proxy = bool(os.getenv("YOUTUBE_PROXY") or self.proxy)
@@ -226,7 +227,33 @@ class YouTubeTranscriptAdapter(ITranscriptService):
                     for item in raw_data
                     if item.text and item.text.strip()
                 ]
-                return snippets, detected_lang
+
+                # Auto-detect audio offset if manual transcript has bumper/intro drift
+                offset = 0.0
+                if not selected_t.is_generated:
+                    try:
+                        gen_t = next((t for t in transcript_list if t.is_generated), None)
+                        if gen_t:
+                            gen_data = gen_t.fetch()
+                            auto_snippets = [
+                                SubtitleSnippet(
+                                    text=item.text,
+                                    start=float(item.start),
+                                    duration=float(item.duration),
+                                )
+                                for item in gen_data
+                                if item.text and item.text.strip()
+                            ]
+                            offset = SubtitleOffsetDetector.calculate_offset(snippets, auto_snippets)
+                            if offset != 0.0:
+                                snippets = SubtitleOffsetDetector.apply_offset(snippets, offset)
+                                logger.info(
+                                    f"Applied {offset:+.2f}s audio offset to manual source subtitles for {video_id}"
+                                )
+                    except Exception as offset_err:
+                        logger.warning(f"Could not calculate audio offset for {video_id}: {offset_err}")
+
+                return snippets, detected_lang, offset
             except Exception as e:
                 last_error = e
                 err_str = str(e).lower()
@@ -279,6 +306,7 @@ class YouTubeTranscriptAdapter(ITranscriptService):
         video_id: str,
         target_lang: Optional[str],
         detected_source_lang: str,
+        offset: float = 0.0,
     ) -> Optional[List[SubtitleSnippet]]:
         """Fetch target translation transcript from YouTube if available."""
         tgt = (target_lang or "").strip().lower()
@@ -322,7 +350,7 @@ class YouTubeTranscriptAdapter(ITranscriptService):
 
                 if target_t:
                     raw_data = target_t.fetch()
-                    return [
+                    tgt_snippets = [
                         SubtitleSnippet(
                             text=item.text,
                             start=float(item.start),
@@ -331,6 +359,9 @@ class YouTubeTranscriptAdapter(ITranscriptService):
                         for item in raw_data
                         if item.text and item.text.strip()
                     ]
+                    if offset != 0.0 and not target_t.is_generated:
+                        tgt_snippets = SubtitleOffsetDetector.apply_offset(tgt_snippets, offset)
+                    return tgt_snippets
             except Exception as e:
                 err_str = str(e).lower()
                 is_blocked = any(kw in err_str for kw in ["ipblocked", "blocking requests from your ip", "too many requests"])

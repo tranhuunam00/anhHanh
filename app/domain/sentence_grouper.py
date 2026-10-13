@@ -266,11 +266,26 @@ class SentenceGrouperService:
         """Phase 4 Helper: Find optimal boundary to split an overlong sentence <= 8.0s."""
         clean_words = [TextNormalizer.clean_word(w["word"]) for w in wds]
 
+        min_words = 3
+        min_dur = 1.2
+
+        def is_valid_split(idx: int) -> bool:
+            if idx < min_words - 1:
+                return False
+            if len(wds) - 1 - idx < min_words:
+                return False
+            if (wds[idx]["end"] - wds[0]["start"]) < min_dur:
+                return False
+            if (wds[-1]["end"] - wds[idx + 1]["start"]) < min_dur:
+                return False
+            return True
+
         # 1. Punctuation / clause splits (, ; : — –)
         clause_splits = [
             idx for idx, w in enumerate(wds[:-1])
             if self.is_clause_punctuation(w["word"])
             and not profile.is_inside_protected_phrase(clean_words, idx)
+            and is_valid_split(idx)
         ]
         if clause_splits:
             return min(clause_splits, key=lambda idx: abs(wds[idx]["start"] - half_time))
@@ -281,6 +296,7 @@ class SentenceGrouperService:
             if profile.is_connector(w["word"])
             and not profile.is_dangling_end(wds[idx - 1]["word"])
             and not profile.is_inside_protected_phrase(clean_words, idx - 1)
+            and is_valid_split(idx - 1)
         ]
         if conns:
             return min(conns, key=lambda idx: abs(wds[idx]["start"] - half_time))
@@ -291,6 +307,7 @@ class SentenceGrouperService:
             if w.get("inter_pause", 0) > 0.15
             and not profile.is_dangling_end(w["word"])
             and not profile.is_inside_protected_phrase(clean_words, idx)
+            and is_valid_split(idx)
         ]
         if pauses:
             return min(pauses, key=lambda idx: abs(wds[idx]["start"] - half_time))

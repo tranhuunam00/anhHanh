@@ -10,6 +10,7 @@ class GetLessonRequest:
     grouping_mode: str = "sentence"  # "sentence" or "snippet"
     source_lang: Optional[str] = "en"
     target_lang: Optional[str] = "vi"
+    force_refresh: bool = False
 
 
 @dataclass

@@ -115,6 +115,17 @@ class GetLessonUseCase:
                 detected_source_lang, src_snippets = cached
                 logger.info(f"Using cached source subtitles from DB for {video_id} (detected lang={detected_source_lang})")
 
+        # Invalidate stale cache if force_refresh or known unshifted legacy subtitles detected
+        if src_snippets and (
+            getattr(request, "force_refresh", False)
+            or (video_id == "5MuIMqhT8DM" and src_snippets[0].start < 5.0)
+        ):
+            logger.info(
+                f"Invalidating stale unshifted subtitle cache for {video_id} (old start={src_snippets[0].start:.2f}s)"
+            )
+            src_snippets = None
+            tgt_snippets = None
+
         if src_snippets is None:
             logger.info(f"No cached source subtitles for {video_id} lang={source_lang} — fetching YouTube")
             title, src_snippets, tgt_snippets_from_yt, detected_source_lang = (

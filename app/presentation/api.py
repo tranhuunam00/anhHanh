@@ -45,6 +45,9 @@ class LessonApiRequest(BaseModel):
     target_lang: Optional[str] = Field(
         default="vi", description="Ngôn ngữ dịch ('vi', 'en', 'fr', 'ja', 'ko', 'zh', 'de', 'es', 'none')"
     )
+    force_refresh: Optional[bool] = Field(
+        default=False, description="Bắt buộc làm mới phụ đề từ YouTube bỏ qua bộ nhớ đệm"
+    )
 
 
 class EvaluateApiRequest(BaseModel):
@@ -67,6 +70,7 @@ async def get_or_create_lesson(
             grouping_mode=body.grouping_mode,
             source_lang=body.source_lang,
             target_lang=body.target_lang,
+            force_refresh=bool(body.force_refresh),
         )
         subtitle_repo = LessonSubtitleRepo(db)
         lesson_response, _ = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
