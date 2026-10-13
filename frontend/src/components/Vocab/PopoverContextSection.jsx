@@ -1,11 +1,14 @@
-import React from "react";
-import { IconPen, IconRotate } from "../Icons";
+import React, { useState } from "react";
+import { IconPen, IconRotate, IconCheckCircle } from "../Icons";
+import { highlightWordInSentence } from "../../utils/wordLookupUtils";
 
 /**
  * Context Sentence section allowing user to view and edit the context sentence before saving/updating.
+ * Renders as a sleek, keyword-highlighted quote by default, and switches to inline edit on demand.
  */
 export const PopoverContextSection = ({
   loading = false,
+  cleanWord = "",
   customContext = "",
   initialContext = "",
   onContextChange,
@@ -14,37 +17,57 @@ export const PopoverContextSection = ({
   contextTranslation = "",
   textareaRef = null,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+
   const isModified = Boolean(
     initialContext &&
     customContext.trim() !== initialContext.trim()
   );
 
+  const segments = highlightWordInSentence(customContext, cleanWord);
+
   return (
     <div className="lookup-section lookup-context-section">
       <div className="lookup-section-header">
-        <div className="lookup-section-title-wrap">
-          <span className="lookup-section-title">Context</span>
-          <span className="lookup-edit-badge" title="Bạn có thể chỉnh sửa câu ngữ cảnh trước khi lưu">
-            <IconPen size={10} />
-            <span>sửa ngữ cảnh</span>
-          </span>
-        </div>
-        {isModified && (
+        <span className="lookup-section-label">Ngữ cảnh</span>
+
+        <div className="lookup-context-actions">
+          {isModified && (
+            <button
+              type="button"
+              className="lookup-reset-btn"
+              onClick={onResetContext}
+              title="Khôi phục lại câu ngữ cảnh ban đầu"
+            >
+              <IconRotate size={10} />
+              <span>Khôi phục</span>
+            </button>
+          )}
+
           <button
             type="button"
-            className="lookup-reset-btn"
-            onClick={onResetContext}
-            title="Khôi phục lại câu ngữ cảnh ban đầu"
+            className={`lookup-edit-toggle-btn ${isEditing ? "active" : ""}`}
+            onClick={() => setIsEditing((prev) => !prev)}
+            title={isEditing ? "Xong chỉnh sửa" : "Chỉnh sửa câu ngữ cảnh"}
           >
-            <IconRotate size={11} />
-            <span>Khôi phục</span>
+            {isEditing ? (
+              <>
+                <IconCheckCircle size={11} />
+                <span>Xong</span>
+              </>
+            ) : (
+              <>
+                <IconPen size={10} />
+                <span>Sửa</span>
+              </>
+            )}
           </button>
-        )}
+        </div>
       </div>
 
       {loading ? (
-        <div className="lookup-skeleton-line" style={{ width: "95%", height: "22px" }} />
-      ) : (
+        <div className="lookup-skeleton-line" style={{ width: "95%", height: "20px" }} />
+      ) : isEditing ? (
         <div className="lookup-context-input-wrap">
           <textarea
             ref={textareaRef}
@@ -55,7 +78,32 @@ export const PopoverContextSection = ({
             onKeyDown={onKeyDown}
             placeholder="Nhập hoặc chỉnh sửa câu ngữ cảnh chứa từ..."
             title="Câu ngữ cảnh chứa từ vựng. Nhấn Enter để lưu."
+            autoFocus
           />
+        </div>
+      ) : customContext ? (
+        <div
+          className="lookup-context-quote"
+          onClick={() => setIsEditing(true)}
+          title="Bấm để chỉnh sửa câu ngữ cảnh"
+        >
+          {segments.map((seg, idx) =>
+            seg.isMatch ? (
+              <mark key={idx} className="lookup-context-highlight">
+                {seg.text}
+              </mark>
+            ) : (
+              <span key={idx}>{seg.text}</span>
+            )
+          )}
+        </div>
+      ) : (
+        <div
+          className="lookup-context-empty"
+          onClick={() => setIsEditing(true)}
+          title="Bấm để thêm câu ngữ cảnh"
+        >
+          + Thêm ngữ cảnh ví dụ...
         </div>
       )}
 
@@ -67,3 +115,4 @@ export const PopoverContextSection = ({
     </div>
   );
 };
+

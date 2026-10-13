@@ -69,11 +69,11 @@ export const WordLookupPopover = ({
     setInitialContext("");
   }, [cleanWord]);
 
-  // Auto adjust textarea height to fit content nicely
+  // Auto adjust textarea height to fit content nicely without overflowing
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      const h = calculateAutoTextareaHeight(textareaRef.current.scrollHeight, 38, 120);
+      const h = calculateAutoTextareaHeight(textareaRef.current.scrollHeight, 26, 120);
       textareaRef.current.style.height = `${h}px`;
     }
   }, [customMeaning, loading]);
@@ -81,7 +81,7 @@ export const WordLookupPopover = ({
   useEffect(() => {
     if (contextTextareaRef.current) {
       contextTextareaRef.current.style.height = "auto";
-      const h = calculateAutoTextareaHeight(contextTextareaRef.current.scrollHeight, 44, 120);
+      const h = calculateAutoTextareaHeight(contextTextareaRef.current.scrollHeight, 36, 120);
       contextTextareaRef.current.style.height = `${h}px`;
     }
   }, [customContext, loading]);
@@ -403,7 +403,7 @@ export const WordLookupPopover = ({
         }}
       />
 
-      {/* Header: Word + Multi-POS Selector + UK / US Audio buttons + Close */}
+      {/* Header: Word + Multi-POS Selector + Integrated IPA + UK / US Audio + Close */}
       <PopoverHeader
         cleanWord={cleanWord}
         customPos={customPos}
@@ -411,16 +411,13 @@ export const WordLookupPopover = ({
         activeAudio={activeAudio}
         onPlayAudio={handlePlayAudio}
         onClose={onClose}
+        ipa={lookupData?.ipa}
+        ipaUk={lookupData?.ipa_uk}
+        ipaUs={lookupData?.ipa_us}
+        loading={loading}
       />
 
       <div className="lookup-divider" />
-
-      {/* IPA Section */}
-      <PopoverIpaSection
-        loading={loading}
-        cleanWord={cleanWord}
-        lookupData={lookupData}
-      />
 
       {/* Translation Section */}
       <PopoverTranslationSection
@@ -439,6 +436,7 @@ export const WordLookupPopover = ({
       {/* Context Sentence Section */}
       <PopoverContextSection
         loading={loading}
+        cleanWord={cleanWord}
         customContext={customContext}
         initialContext={initialContext}
         onContextChange={(e) => setCustomContext(e.target.value)}

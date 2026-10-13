@@ -12,6 +12,8 @@ import {
   resolveInitialContextSentence,
   isContextModified,
   hasVocabChanges,
+  escapeRegex,
+  highlightWordInSentence,
 } from "../src/utils/wordLookupUtils.js";
 
 describe("wordLookupUtils - Unit Tests", () => {
@@ -337,6 +339,64 @@ describe("wordLookupUtils - Unit Tests", () => {
       assert.equal(hasVocabChanges({}), false);
     });
   });
+
+  describe("escapeRegex", () => {
+    it("escapes regex meta-characters properly", () => {
+      assert.equal(escapeRegex("word (test) [abc] *+?"), "word \\(test\\) \\[abc\\] \\*\\+\\?");
+      assert.equal(escapeRegex("sleep-deprived"), "sleep-deprived");
+    });
+
+    it("handles non-string and empty inputs safely", () => {
+      assert.equal(escapeRegex(""), "");
+      assert.equal(escapeRegex(null), "");
+      assert.equal(escapeRegex(undefined), "");
+      assert.equal(escapeRegex(123), "");
+    });
+  });
+
+  describe("highlightWordInSentence", () => {
+    it("splits sentence and matches target word case-insensitively (happy path)", () => {
+      const sentence = "These spectacular bursts of electrical activity are called sleep spindles.";
+      const target = "spectacular bursts";
+      const res = highlightWordInSentence(sentence, target);
+
+      assert.equal(Array.isArray(res), true);
+      assert.equal(res.length, 3);
+      assert.deepEqual(res[0], { text: "These ", isMatch: false });
+      assert.deepEqual(res[1], { text: "spectacular bursts", isMatch: true });
+      assert.deepEqual(res[2], { text: " of electrical activity are called sleep spindles.", isMatch: false });
+    });
+
+    it("handles multiple occurrences in the same sentence", () => {
+      const sentence = "Burst after burst happened quickly.";
+      const res = highlightWordInSentence(sentence, "burst");
+      assert.equal(res.length, 4);
+      assert.equal(res[0].isMatch, true);
+      assert.equal(res[0].text, "Burst");
+      assert.equal(res[1].isMatch, false);
+      assert.equal(res[2].isMatch, true);
+      assert.equal(res[2].text, "burst");
+    });
+
+    it("handles empty or missing targetWord safely", () => {
+      const res1 = highlightWordInSentence("A simple sentence", "");
+      assert.deepEqual(res1, [{ text: "A simple sentence", isMatch: false }]);
+
+      const res2 = highlightWordInSentence("A simple sentence", "   ");
+      assert.deepEqual(res2, [{ text: "A simple sentence", isMatch: false }]);
+
+      const res3 = highlightWordInSentence("A simple sentence", null);
+      assert.deepEqual(res3, [{ text: "A simple sentence", isMatch: false }]);
+    });
+
+    it("handles empty or invalid sentence inputs safely", () => {
+      assert.deepEqual(highlightWordInSentence("", "word"), []);
+      assert.deepEqual(highlightWordInSentence(null, "word"), []);
+      assert.deepEqual(highlightWordInSentence(undefined, "word"), []);
+      assert.deepEqual(highlightWordInSentence(42, "word"), []);
+    });
+  });
 });
+
 
 

@@ -265,3 +265,39 @@ export function hasVocabChanges({
   return meaningChanged || posChanged || contextChanged;
 }
 
+/**
+ * Escapes regex special characters in a string.
+ * @param {string} str
+ * @returns {string}
+ */
+export function escapeRegex(str) {
+  if (typeof str !== "string") return "";
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Splits a context sentence into highlighted word tokens and plain text segments.
+ * Useful for lean, interactive context sentence previews with keyword emphasis.
+ * @param {string} sentence
+ * @param {string} targetWord
+ * @returns {Array<{ text: string, isMatch: boolean }>}
+ */
+export function highlightWordInSentence(sentence = "", targetWord = "") {
+  if (typeof sentence !== "string" || !sentence) return [];
+  const cleanTarget = (targetWord || "").trim();
+  if (!cleanTarget) return [{ text: sentence, isMatch: false }];
+
+  const escaped = escapeRegex(cleanTarget);
+  // Match with word boundaries where feasible, or whole substring match
+  const regex = new RegExp(`(${escaped})`, "gi");
+  const parts = sentence.split(regex);
+
+  return parts
+    .filter((part) => part.length > 0)
+    .map((part) => ({
+      text: part,
+      isMatch: part.toLowerCase() === cleanTarget.toLowerCase(),
+    }));
+}
+
+

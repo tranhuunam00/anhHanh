@@ -20,15 +20,9 @@ export const PopoverTranslationSection = ({
   );
 
   return (
-    <div className="lookup-section">
+    <div className="lookup-section lookup-translation-section">
       <div className="lookup-section-header">
-        <div className="lookup-section-title-wrap">
-          <span className="lookup-section-title">Translation</span>
-          <span className="lookup-edit-badge" title="Bạn có thể chỉnh sửa trực tiếp nghĩa này trước khi lưu">
-            <IconPen size={10} />
-            <span>sửa nghĩa</span>
-          </span>
-        </div>
+        <span className="lookup-section-label">Bản dịch</span>
         {isModified && (
           <button
             type="button"
@@ -36,30 +30,30 @@ export const PopoverTranslationSection = ({
             onClick={onResetMeaning}
             title="Khôi phục lại bản dịch ban đầu"
           >
-            <IconRotate size={11} />
+            <IconRotate size={10} />
             <span>Khôi phục</span>
           </button>
         )}
       </div>
 
       {loading ? (
-        <div className="lookup-skeleton-line" style={{ width: "85%", height: "20px" }} />
+        <div className="lookup-skeleton-line" style={{ width: "80%", height: "18px" }} />
       ) : (
         <div className="lookup-meaning-input-wrap">
           <textarea
             ref={textareaRef}
-            rows={2}
+            rows={1}
             className="lookup-meaning-textarea"
             value={customMeaning}
             onChange={onMeaningChange}
             onKeyDown={onKeyDown}
-            placeholder="Nhập hoặc chỉnh sửa bản dịch tiếng Việt..."
-            title="Bạn có thể chỉnh sửa bản dịch này trước khi lưu. Nhấn Enter để lưu."
+            placeholder="Nhập nghĩa tiếng Việt..."
+            title="Bấm để chỉnh sửa nghĩa. Nhấn Enter để lưu."
           />
         </div>
       )}
 
-      {/* English definition (if available) for deeper learning */}
+      {/* English definition (if available) */}
       {definition && !loading && (
         <div className="lookup-definition-text" title="English definition">
           {definition}
