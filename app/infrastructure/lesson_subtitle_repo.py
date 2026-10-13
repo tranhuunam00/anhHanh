@@ -151,14 +151,14 @@ class LessonSubtitleRepo:
         title: str,
         total_challenges: int,
         sentences_data: list,
+        force: bool = False,
     ) -> None:
         """Update lesson metadata after processing subtitles.
 
-        Only overwrites sentences_data on first load (total_challenges == 0).
-        Preserves existing sentences to avoid user current_position drift
-        when grouping algorithm changes.
+        Overwrites sentences_data on first load (total_challenges == 0) or when force is True.
+        Preserves existing sentences on normal cache hits to avoid position drift.
         """
         lesson.title = title
-        if lesson.total_challenges == 0 or not lesson.sentences_data:
+        if force or lesson.total_challenges == 0 or not lesson.sentences_data:
             lesson.total_challenges = total_challenges
             lesson.sentences_data = sentences_data

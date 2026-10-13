@@ -75,6 +75,7 @@ export const DictationStudio = React.memo(({
   onNext,
   onOpenDrawer,
   onRestartLesson,
+  onReloadSubtitles,
   isCompleted,
   strictPunctuation = false,
   onNextChallenge,
@@ -276,6 +277,18 @@ export const DictationStudio = React.memo(({
             >
               <RefreshCw size={14} strokeWidth={2} />
               <span>Làm lại bài này</span>
+            </button>
+          )}
+
+          {onReloadSubtitles && (
+            <button
+              className="btn btn-secondary btn-with-icon"
+              title="Tải và đồng bộ lại phụ đề mới nhất từ YouTube (xóa cache)"
+              onClick={onReloadSubtitles}
+              style={{ color: "var(--primary, #3b82f6)", borderColor: "var(--border, #cbd5e1)" }}
+            >
+              <RefreshCw size={14} strokeWidth={2} />
+              <span>Đồng bộ phụ đề</span>
             </button>
           )}
         </div>

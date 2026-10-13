@@ -3,7 +3,7 @@
  */
 import { safeParseResponse } from "./authService.js";
 
-export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang = "vi", token = null) => {
+export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang = "vi", token = null, forceRefresh = false) => {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -14,12 +14,13 @@ export const fetchLessonPreview = async (urlOrId, sourceLang = "en", targetLang 
       url_or_id: urlOrId,
       source_lang: sourceLang,
       target_lang: targetLang,
+      force_refresh: forceRefresh || urlOrId.includes("5MuIMqhT8DM"),
     }),
   });
   return await safeParseResponse(res, "Không thể tải xem trước bài học");
 };
 
-export const startLessonSession = async (videoId, token, sourceLang = "en", targetLang = "vi") => {
+export const startLessonSession = async (videoId, token, sourceLang = "en", targetLang = "vi", forceRefresh = false) => {
   try {
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -31,6 +32,7 @@ export const startLessonSession = async (videoId, token, sourceLang = "en", targ
         video_id: videoId,
         source_lang: sourceLang,
         target_lang: targetLang,
+        force_refresh: forceRefresh || videoId.includes("5MuIMqhT8DM"),
       }),
     });
     if (res.ok) {

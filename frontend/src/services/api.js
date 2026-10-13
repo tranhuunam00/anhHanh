@@ -18,19 +18,27 @@ const saveSessionLesson = (cacheKey, data) => {
   }
 };
 
-export const fetchLesson = async ({ urlOrId, sourceLang = "en", targetLang = "vi" }) => {
+export const fetchLesson = async ({ urlOrId, sourceLang = "en", targetLang = "vi", forceRefresh = false }) => {
   const cacheKey = `${urlOrId.trim()}_${sourceLang}_${targetLang}_sentence`;
+  const isTargetTed = urlOrId.includes("5MuIMqhT8DM");
 
-  // 1. Check in-memory cache first (instant 0ms)
-  if (lessonMemoryCache.has(cacheKey)) {
-    return lessonMemoryCache.get(cacheKey);
-  }
+  if (!forceRefresh && !isTargetTed) {
+    // 1. Check in-memory cache first (instant 0ms)
+    if (lessonMemoryCache.has(cacheKey)) {
+      return lessonMemoryCache.get(cacheKey);
+    }
 
-  // 2. Check sessionStorage cache
-  const cachedFromSession = getSessionLesson(cacheKey);
-  if (cachedFromSession) {
-    lessonMemoryCache.set(cacheKey, cachedFromSession);
-    return cachedFromSession;
+    // 2. Check sessionStorage cache
+    const cachedFromSession = getSessionLesson(cacheKey);
+    if (cachedFromSession) {
+      lessonMemoryCache.set(cacheKey, cachedFromSession);
+      return cachedFromSession;
+    }
+  } else {
+    lessonMemoryCache.delete(cacheKey);
+    try {
+      sessionStorage.removeItem(`dailydictation_lesson_${cacheKey}`);
+    } catch (_) {}
   }
 
   const response = await fetch("/api/lesson", {
@@ -43,6 +51,7 @@ export const fetchLesson = async ({ urlOrId, sourceLang = "en", targetLang = "vi
       source_lang: sourceLang,
       target_lang: targetLang,
       grouping_mode: "sentence",
+      force_refresh: forceRefresh || isTargetTed,
     }),
   });
 

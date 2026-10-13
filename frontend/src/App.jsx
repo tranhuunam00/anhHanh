@@ -364,7 +364,7 @@ export default function App() {
   };
 
   // Step 2: Confirm start lesson from preview modal (or direct load)
-  const executeLoadLesson = async (urlOrId, reqSourceLang, reqTargetLang, startPos = 0) => {
+  const executeLoadLesson = async (urlOrId, reqSourceLang, reqTargetLang, startPos = 0, forceRefresh = false) => {
     setIsLoading(true);
     setIsEmbedRestricted(false);
 
@@ -377,6 +377,7 @@ export default function App() {
         urlOrId: cleanUrl,
         sourceLang: sLang,
         targetLang: tLang,
+        forceRefresh,
       });
 
       // 1. Unified Global State Synchronization: Set lesson and canonical YouTube URL
@@ -574,6 +575,16 @@ export default function App() {
     saveLessonProgress(currentLesson.video_id, newProg, sL, tL);
     updateLessonProgress(currentLesson.video_id, 1, false, token, 0, sL, tL);
     playChallengeAtIndex(currentLesson, 0);
+  };
+
+  const handleReloadSubtitles = async () => {
+    if (!currentLesson?.video_id || isLoading) return;
+    const confirmReload = window.confirm(
+      "Bạn có muốn xóa toàn bộ bộ nhớ đệm và tải lại phụ đề chuẩn mới nhất từ YouTube cho bài này không?"
+    );
+    if (!confirmReload) return;
+
+    await executeLoadLesson(currentLesson.video_id, sourceLang, targetLang, 0, true);
   };
 
   const currentChallenge = useMemo(() => {
@@ -1036,6 +1047,7 @@ export default function App() {
                 onNext={() => goToChallenge(currentIndex + 1)}
                 onOpenDrawer={() => setIsDrawerOpen(true)}
                 onRestartLesson={handleRestartLesson}
+                onReloadSubtitles={handleReloadSubtitles}
                 isCompleted={isCompleted}
                 strictPunctuation={settings.strictPunctuation}
                 onNextChallenge={() => {
@@ -1186,6 +1198,7 @@ export default function App() {
         progressMap={progressMap}
         maxReachedIndex={maxReachedIndex}
         onRestartLesson={handleRestartLesson}
+        onReloadSubtitles={handleReloadSubtitles}
         onSelectQuestion={(pos) => goToChallenge(pos - 1)}
       />
 

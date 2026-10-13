@@ -116,15 +116,23 @@ class GetLessonUseCase:
                 logger.info(f"Using cached source subtitles from DB for {video_id} (detected lang={detected_source_lang})")
 
         # Invalidate stale cache if force_refresh or known unshifted legacy subtitles detected
-        if src_snippets and (
+        stale_meta = (
+            video_id == "5MuIMqhT8DM"
+            and bool(lesson.sentences_data)
+            and any(s.get("time_start", 0) < 5.0 for s in (lesson.sentences_data or [])[:3])
+        )
+        needs_force_refresh = bool(
             getattr(request, "force_refresh", False)
-            or (video_id == "5MuIMqhT8DM" and src_snippets[0].start < 5.0)
-        ):
-            logger.info(
-                f"Invalidating stale unshifted subtitle cache for {video_id} (old start={src_snippets[0].start:.2f}s)"
-            )
+            or (video_id == "5MuIMqhT8DM" and src_snippets and src_snippets[0].start < 5.0)
+            or stale_meta
+        )
+
+        if (src_snippets or stale_meta) and needs_force_refresh:
+            logger.info(f"Invalidating stale unshifted subtitle cache for {video_id}")
             src_snippets = None
             tgt_snippets = None
+            lesson.sentences_data = []
+            lesson.total_challenges = 0
 
         if src_snippets is None:
             logger.info(f"No cached source subtitles for {video_id} lang={source_lang} — fetching YouTube")
@@ -184,6 +192,7 @@ class GetLessonUseCase:
             title=title,
             total_challenges=len(sentences_list),
             sentences_data=sentences_list,
+            force=needs_force_refresh,
         )
 
         return lesson_response, lesson

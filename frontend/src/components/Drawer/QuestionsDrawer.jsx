@@ -11,6 +11,7 @@ export const QuestionsDrawer = React.memo(({
   progressMap,
   maxReachedIndex = 0,
   onRestartLesson,
+  onReloadSubtitles,
   onSelectQuestion,
 }) => {
   // If drawer is closed, don't render body at all to avoid reconciling 2000+ buttons
@@ -211,19 +212,36 @@ export const QuestionsDrawer = React.memo(({
             })}
           </div>
 
-          {onRestartLesson && (
-            <div style={{ marginTop: "1.25rem", borderTop: "1px solid var(--border, #e2e8f0)", paddingTop: "1rem" }}>
-              <button
-                className="btn btn-secondary btn-with-icon"
-                style={{ width: "100%", justifyContent: "center", color: "#ef4444", borderColor: "#fecaca" }}
-                onClick={() => {
-                  onClose();
-                  onRestartLesson();
-                }}
-              >
-                <RefreshCw size={15} strokeWidth={2} />
-                <span>Làm lại bài này từ câu số 1</span>
-              </button>
+          {(onRestartLesson || onReloadSubtitles) && (
+            <div style={{ marginTop: "1.25rem", borderTop: "1px solid var(--border, #e2e8f0)", paddingTop: "1rem", display: "flex", flexDirection: "column", gap: "8px" }}>
+              {onRestartLesson && (
+                <button
+                  className="btn btn-secondary btn-with-icon"
+                  style={{ width: "100%", justifyContent: "center", color: "#ef4444", borderColor: "#fecaca" }}
+                  onClick={() => {
+                    onClose();
+                    onRestartLesson();
+                  }}
+                >
+                  <RefreshCw size={15} strokeWidth={2} />
+                  <span>Làm lại bài này từ câu số 1</span>
+                </button>
+              )}
+
+              {onReloadSubtitles && (
+                <button
+                  className="btn btn-secondary btn-with-icon"
+                  style={{ width: "100%", justifyContent: "center", color: "var(--primary, #3b82f6)" }}
+                  onClick={() => {
+                    onClose();
+                    onReloadSubtitles();
+                  }}
+                  title="Xóa cache và tải lại phụ đề chuẩn mới nhất từ YouTube"
+                >
+                  <RefreshCw size={15} strokeWidth={2} />
+                  <span>Đồng bộ lại phụ đề YouTube</span>
+                </button>
+              )}
             </div>
           )}
         </div>
