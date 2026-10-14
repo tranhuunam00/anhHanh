@@ -185,7 +185,18 @@ export const WordLookupPopover = ({
     return () => {
       isMounted = false;
     };
-  }, [cleanWord, token, savedVocabMap, contextSentence]);
+  }, [cleanWord, token, contextSentence]);
+
+  // Sync saved status without wiping user's active edited context
+  useEffect(() => {
+    if (!cleanWord || !savedVocabMap) return;
+    const cleanLower = cleanWord.toLowerCase().replace(/\s+/g, " ");
+    const cleanNorm = cleanLower.replace(/[’']/g, "'");
+    const savedItem = savedVocabMap[cleanLower] || savedVocabMap[cleanNorm] || null;
+    if (savedItem) {
+      setLookupData((prev) => (prev ? { ...prev, is_saved: true, saved_vocab: savedItem } : prev));
+    }
+  }, [cleanWord, savedVocabMap]);
 
   // Click outside and Esc listener
   useEffect(() => {
@@ -372,6 +383,7 @@ export const WordLookupPopover = ({
 
   const isSaved = Boolean(lookupData?.is_saved);
   const savedMeaning = lookupData?.saved_vocab?.meaning || lookupData?.meaning || "";
+  const savedContext = lookupData?.saved_vocab?.context_sentence || "";
   const hasChanges = hasVocabChanges({
     isSaved,
     customMeaning,
@@ -380,6 +392,7 @@ export const WordLookupPopover = ({
     initialPos,
     customContext,
     initialContext,
+    savedContext,
   });
 
   const savedStatus = lookupData?.saved_vocab?.status || (isSaved ? "NEW" : null);
@@ -439,9 +452,13 @@ export const WordLookupPopover = ({
         cleanWord={cleanWord}
         customContext={customContext}
         initialContext={initialContext}
+        savedContext={savedContext}
         onContextChange={(e) => setCustomContext(e.target.value)}
         onKeyDown={handleKeyDownTextarea}
-        onResetContext={() => setCustomContext(initialContext)}
+        onResetContext={() => setCustomContext(initialContext || savedContext)}
+        onSaveContext={handleUpdateSavedVocab}
+        isSaved={isSaved}
+        isSaving={isSaving}
         contextTranslation={contextTranslation}
         textareaRef={contextTextareaRef}
       />

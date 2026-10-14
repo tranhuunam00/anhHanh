@@ -12,6 +12,7 @@ import {
   resolveInitialContextSentence,
   isContextModified,
   hasVocabChanges,
+  cleanTargetSentence,
   escapeRegex,
   highlightWordInSentence,
 } from "../src/utils/wordLookupUtils.js";
@@ -270,6 +271,20 @@ describe("wordLookupUtils - Unit Tests", () => {
       assert.equal(isContextModified(true, null, null), false);
       assert.equal(isContextModified(true, "Context", null), true);
     });
+
+    it("returns true when custom context differs from savedContext", () => {
+      assert.equal(
+        isContextModified(true, "New context from page", "New context from page", "Old context in notebook"),
+        true
+      );
+    });
+
+    it("returns false when custom context matches savedContext", () => {
+      assert.equal(
+        isContextModified(true, "Same context", "Same context", "Same context"),
+        false
+      );
+    });
   });
 
   describe("hasVocabChanges", () => {
@@ -334,6 +349,20 @@ describe("wordLookupUtils - Unit Tests", () => {
       assert.equal(res, true);
     });
 
+    it("returns true when context differs from savedContext", () => {
+      const res = hasVocabChanges({
+        isSaved: true,
+        customMeaning: "dân tộc",
+        savedMeaning: "dân tộc",
+        customPos: "noun",
+        initialPos: "noun",
+        customContext: "New sentence from page.",
+        initialContext: "New sentence from page.",
+        savedContext: "Old sentence in notebook.",
+      });
+      assert.equal(res, true);
+    });
+
     it("handles missing or empty parameter object safely", () => {
       assert.equal(hasVocabChanges(), false);
       assert.equal(hasVocabChanges({}), false);
@@ -394,6 +423,40 @@ describe("wordLookupUtils - Unit Tests", () => {
       assert.deepEqual(highlightWordInSentence(null, "word"), []);
       assert.deepEqual(highlightWordInSentence(undefined, "word"), []);
       assert.deepEqual(highlightWordInSentence(42, "word"), []);
+    });
+  });
+
+  describe("cleanTargetSentence", () => {
+    it("isolates target sentence line from multi-line text with UI tags", () => {
+      const raw = 'Câu 1\nCó lỗi ngữ pháp Có gợi ý nâng cấp Band 8.5+\n"Some individuals contend that competition is the best catalyst"';
+      const res = cleanTargetSentence(raw, "catalyst");
+      assert.equal(res, "Some individuals contend that competition is the best catalyst");
+    });
+
+    it("removes video timestamp and drill action text", () => {
+      const raw = "[01:23 - 01:28] She serves as the optimal catalyst. Luyện câu này ➔";
+      const res = cleanTargetSentence(raw, "catalyst");
+      assert.equal(res, "She serves as the optimal catalyst.");
+    });
+
+    it("handles empty or whitespace inputs safely", () => {
+      assert.equal(cleanTargetSentence("", "test"), "");
+      assert.equal(cleanTargetSentence(null, "test"), "");
+      assert.equal(cleanTargetSentence("   ", "test"), "");
+    });
+
+    it("strips wrapping smart and straight quotation marks", () => {
+      assert.equal(cleanTargetSentence('“Life is a journey.”', "journey"), "Life is a journey.");
+      assert.equal(cleanTargetSentence('"Exact phrase match."', "phrase"), "Exact phrase match.");
+    });
+
+    it("isolates academic upgrade sentence from complex IELTS Writing evaluation feedback", () => {
+      const complexFeedback = `Câu 2 Có lỗi ngữ pháp Có gợi ý nâng cấp Band 8.5+ "From my perspective, i think that mixing both these approaches can help people holisticly embody their potential skills that results in a various of unexpected-quality results." SAI Ở ĐÂU & VÌ SAO: Incorrect capitalization of 'i'. 'Holisticly' should be 'holistically'. SỬA ĐÚNG NGỮ PHÁP: From my perspective, I think that mixing both these approaches can help people holistically realize their potential skills, which results in a variety of high-quality results. NÂNG CẤP CÂU HỌC THUẬT (BAND 8.5+): From my perspective, I believe that integrating both these approaches can enable individuals to holistically cultivate their inherent capabilities, thereby yielding a diverse array of exceptional outcomes. Used 'integrating' and 'enable individuals to cultivate their inherent capabilities'`;
+      const res = cleanTargetSentence(complexFeedback, "yielding");
+      assert.equal(
+        res,
+        "From my perspective, I believe that integrating both these approaches can enable individuals to holistically cultivate their inherent capabilities, thereby yielding a diverse array of exceptional outcomes."
+      );
     });
   });
 });

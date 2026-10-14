@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { WordLookupPopover } from "./WordLookupPopover";
 import { splitContextSentence } from "../../utils/textNormalizer";
+import { cleanTargetSentence } from "../../utils/wordLookupUtils";
 
 export const FloatingVocabSaver = ({
   currentSentence = "",
@@ -47,9 +48,14 @@ export const FloatingVocabSaver = ({
       if (range && range.commonAncestorContainer) {
         const node = range.commonAncestorContainer;
         const element = node.nodeType === 3 ? node.parentElement : node;
-        const sentenceEl = element.closest(
-          ".sentence-card, .sentence-item, .transcript-item, .transcript-sentence, .dictation-sentence-text, .transcript-line, .reader-sentence, p, li"
+        // 1. Look for specific sentence containers first (Writing detail box, transcript lines, reader sentences, paragraphs, etc.)
+        const specificEl = element.closest(
+          ".box-content-text, .sentence-original-text, .transcript-en, .transcript-orig, .orig-text, .sentence-en, [data-lang='en'], .reader-sentence, .dictation-sentence-text, .transcript-line, .transcript-sentence, blockquote, q, p, li"
         );
+        const sentenceEl = specificEl || element.closest(
+          ".sentence-card, .sentence-item, .transcript-item"
+        );
+
         if (sentenceEl) {
           const origEl = sentenceEl.querySelector(".transcript-en, .transcript-orig, .orig-text, .sentence-en, [data-lang='en']");
           const transEl = sentenceEl.querySelector(".transcript-vi, .transcript-trans, .vi-text, .sentence-vi, [data-lang='vi']");
@@ -62,12 +68,8 @@ export const FloatingVocabSaver = ({
           }
           if (!extractedSentence) {
             const rawText = sentenceEl.innerText || sentenceEl.textContent || "";
-            const cleanText = rawText
-              .replace(/^\[\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\]\s*/, "")
-              .replace(/Luyện câu này\s*➔?/gi, "")
-              .trim();
-            const { orig, trans } = splitContextSentence(cleanText);
-            extractedSentence = trans ? `${orig}\n${trans}` : (orig || cleanText);
+            const cleanText = cleanTargetSentence(rawText, text);
+            extractedSentence = cleanText;
           }
         }
       }

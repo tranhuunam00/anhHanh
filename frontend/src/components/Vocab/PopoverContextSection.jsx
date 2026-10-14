@@ -11,20 +11,45 @@ export const PopoverContextSection = ({
   cleanWord = "",
   customContext = "",
   initialContext = "",
+  savedContext = "",
   onContextChange,
   onKeyDown,
   onResetContext,
+  onSaveContext,
+  isSaved = false,
+  isSaving = false,
+  isEditing: controlledIsEditing = undefined,
+  onToggleEdit = null,
   contextTranslation = "",
   textareaRef = null,
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [internalIsEditing, setInternalIsEditing] = useState(false);
+  const isEditing = controlledIsEditing !== undefined ? controlledIsEditing : internalIsEditing;
+  const setIsEditing = (val) => {
+    if (onToggleEdit) {
+      onToggleEdit(val);
+    } else {
+      setInternalIsEditing(val);
+    }
+  };
 
   const isModified = Boolean(
-    initialContext &&
-    customContext.trim() !== initialContext.trim()
+    (initialContext && customContext.trim() !== initialContext.trim()) ||
+    (savedContext && customContext.trim() !== savedContext.trim())
   );
 
   const segments = highlightWordInSentence(customContext, cleanWord);
+
+  const handleToggleEdit = async () => {
+    if (isEditing) {
+      setIsEditing(false);
+      if (onSaveContext) {
+        await onSaveContext();
+      }
+    } else {
+      setIsEditing(true);
+    }
+  };
 
   return (
     <div className="lookup-section lookup-context-section">
@@ -38,6 +63,7 @@ export const PopoverContextSection = ({
               className="lookup-reset-btn"
               onClick={onResetContext}
               title="Khôi phục lại câu ngữ cảnh ban đầu"
+              disabled={isSaving}
             >
               <IconRotate size={10} />
               <span>Khôi phục</span>
@@ -47,13 +73,14 @@ export const PopoverContextSection = ({
           <button
             type="button"
             className={`lookup-edit-toggle-btn ${isEditing ? "active" : ""}`}
-            onClick={() => setIsEditing((prev) => !prev)}
-            title={isEditing ? "Xong chỉnh sửa" : "Chỉnh sửa câu ngữ cảnh"}
+            onClick={handleToggleEdit}
+            disabled={isSaving}
+            title={isEditing ? (isSaved ? "Lưu ngữ cảnh vào Sổ tay" : "Xong chỉnh sửa") : "Chỉnh sửa câu ngữ cảnh"}
           >
             {isEditing ? (
               <>
                 <IconCheckCircle size={11} />
-                <span>Xong</span>
+                <span>{isSaving ? "Đang lưu..." : "Xong"}</span>
               </>
             ) : (
               <>

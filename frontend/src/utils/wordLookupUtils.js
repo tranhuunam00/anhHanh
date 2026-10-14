@@ -231,17 +231,25 @@ export function resolveInitialContextSentence(contextSentence = "", savedItem = 
 }
 
 /**
- * Checks whether user has modified the context sentence compared to the initial context sentence.
+ * Checks whether user has modified the context sentence compared to the initial context sentence or saved notebook context.
  * @param {boolean} isSaved
  * @param {string} customContext
  * @param {string} initialContext
+ * @param {string} savedContext
  * @returns {boolean}
  */
-export function isContextModified(isSaved, customContext = "", initialContext = "") {
+export function isContextModified(isSaved, customContext = "", initialContext = "", savedContext = "") {
   if (!isSaved) return false;
   const custom = (customContext || "").trim();
   const initial = (initialContext || "").trim();
-  return custom !== initial;
+  const saved = (savedContext || "").trim();
+
+  if (initial && custom !== initial) return true;
+  if (saved && custom !== saved) return true;
+  if (!initial && !saved && custom) return true;
+  if (initial && !custom) return true;
+
+  return false;
 }
 
 /**
@@ -257,12 +265,72 @@ export function hasVocabChanges({
   initialPos = "",
   customContext = "",
   initialContext = "",
+  savedContext = "",
 } = {}) {
   if (!isSaved) return false;
   const meaningChanged = isMeaningModified(isSaved, customMeaning, savedMeaning);
   const posChanged = (customPos || "").trim() !== (initialPos || "").trim();
-  const contextChanged = isContextModified(isSaved, customContext, initialContext);
+  const contextChanged = isContextModified(isSaved, customContext, initialContext, savedContext);
   return meaningChanged || posChanged || contextChanged;
+}
+
+/**
+ * Cleans extracted sentence and isolates the actual sentence or line containing the target word,
+ * stripping extraneous UI labels (e.g. "Câu 1", "Có gợi ý nâng cấp...", "Luyện câu này").
+ * @param {string} rawText
+ * @param {string} targetWord
+ * @returns {string}
+ */
+export function cleanTargetSentence(rawText = "", targetWord = "") {
+  if (typeof rawText !== "string" || !rawText) return "";
+  let clean = rawText
+    .replace(/^\[\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\]\s*/, "")
+    .replace(/Luyện câu này\s*➔?/gi, "")
+    .trim();
+
+  if (!clean) return "";
+
+  const cleanTarget = (targetWord || "").trim().toLowerCase();
+  if (!cleanTarget) {
+    return clean.replace(/^["'“‘]+|["'”’]+$/g, "").trim();
+  }
+
+  // 1. If text has newlines, try to find the line that contains targetWord
+  if (clean.includes("\n")) {
+    const lines = clean.split("\n").map((l) => l.trim()).filter(Boolean);
+    const lineWithTarget = lines.find((l) => l.toLowerCase().includes(cleanTarget));
+    if (lineWithTarget) {
+      clean = lineWithTarget;
+    }
+  }
+
+  // 2. If text contains known section labels (e.g. from Writing cards), split by labels
+  const labelRegex = /(?:NÂNG CẤP CÂU HỌC THUẬT[^:]*:|SỬA ĐÚNG NGỮ PHÁP:|SAI Ở ĐÂU[^:]*:|Nhận xét ngữ pháp:|Câu \d+|Có gợi ý nâng cấp[^:]*|Có lỗi ngữ pháp)/gi;
+  if (labelRegex.test(clean)) {
+    const sections = clean.split(labelRegex).map((s) => s.trim()).filter(Boolean);
+    const secWithTarget = sections.find((s) => s.toLowerCase().includes(cleanTarget));
+    if (secWithTarget) {
+      clean = secWithTarget;
+    }
+  }
+
+  // 3. If clean still contains multiple sentences ending in . or ! or ?, isolate the specific sentence containing targetWord
+  const sentenceRegex = /(?<=[.!?]["'”’]?)\s+(?=[A-Z"“'‘0-9])/;
+  if (sentenceRegex.test(clean)) {
+    const sentences = clean.split(sentenceRegex).map((s) => s.trim()).filter(Boolean);
+    const sentWithTarget = sentences.find((s) => s.toLowerCase().includes(cleanTarget));
+    if (sentWithTarget) {
+      clean = sentWithTarget;
+    }
+  }
+
+  // 4. Strip any trailing explanation note (e.g., "Used 'integrating' and...")
+  clean = clean.replace(/\s+Used\s+['"].*$/i, "");
+
+  // 5. Strip wrapping quotes
+  clean = clean.replace(/^["'“‘]+|["'”’]+$/g, "").trim();
+
+  return clean;
 }
 
 /**
