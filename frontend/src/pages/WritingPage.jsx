@@ -35,6 +35,7 @@ import { normalizeStructureList, mergeStructureLists } from "../utils/writingStr
 import { createVocabWord } from "../services/authVocabService";
 import { Task1Visualizer } from "../components/Writing/Task1Visualizer";
 import { IeltsPromptLibraryModal } from "../components/Writing/IeltsPromptLibraryModal";
+import { WritingOutlineTab } from "../components/Writing/WritingOutlineTab";
 import "../styles/writing.css";
 
 export const LANGUAGES = [
@@ -137,7 +138,7 @@ export const WritingPage = ({ isActive = false }) => {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState(null);
-  const [activeRightTab, setActiveRightTab] = useState("feedback"); // "feedback" | "history"
+  const [activeRightTab, setActiveRightTab] = useState("outline"); // "outline" | "feedback" | "history"
   const [feedbackViewTab, setFeedbackViewTab] = useState("sentences"); // "sentences" | "criteria"
   const [sentenceFilter, setSentenceFilter] = useState("all"); // "all" | "error" | "upgrade" | "correct"
 
@@ -1314,6 +1315,13 @@ export const WritingPage = ({ isActive = false }) => {
           {/* Tab selector */}
           <div className="feedback-nav-tabs">
             <button
+              className={`feedback-nav-btn ${activeRightTab === "outline" ? "active" : ""}`}
+              onClick={() => setActiveRightTab("outline")}
+            >
+              <IconBook size={15} />
+              <span>Dàn bài chi tiết</span>
+            </button>
+            <button
               className={`feedback-nav-btn ${activeRightTab === "feedback" ? "active" : ""}`}
               onClick={() => setActiveRightTab("feedback")}
             >
@@ -1333,7 +1341,23 @@ export const WritingPage = ({ isActive = false }) => {
           </div>
 
           <div className="feedback-body">
-            {activeRightTab === "history" ? (
+            {activeRightTab === "outline" ? (
+              <WritingOutlineTab
+                genre={selectedGenre}
+                subType={selectedSubType}
+                language={selectedLanguage}
+                targetBand={targetBand}
+                effectivePromptText={effectivePromptText}
+                token={token}
+                isAuthorized={isAuthorized}
+                onInsertTemplate={(template) => {
+                  setContent((prev) => (prev ? prev + "\n\n" + template : template));
+                  setHasUnsavedChanges(true);
+                  setIsTimerRunning(true);
+                }}
+                showToast={showToast}
+              />
+            ) : activeRightTab === "history" ? (
               <div className="history-tab-content">
                 {isLoadingHistory ? (
                   <div className="history-loading">
@@ -1830,6 +1854,11 @@ export const WritingPage = ({ isActive = false }) => {
         loadingAction={aiLoadingAction}
         isAuthorized={isAuthorized}
         onInsert={handleInsertPhrase}
+        genre={selectedGenre}
+        subType={selectedSubType}
+        language={selectedLanguage}
+        targetBand={targetBand}
+        token={token}
         showToast={showToast}
       />
 

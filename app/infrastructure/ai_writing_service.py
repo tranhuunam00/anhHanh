@@ -13,6 +13,9 @@ from app.infrastructure.ai_writing_generator import (
     generate_prompt_impl,
     suggest_structures_impl,
 )
+from app.infrastructure.ai_writing_outline_generator import (
+    generate_outline_impl,
+)
 from app.infrastructure.ai_writing_evaluator import (
     generate_fallback_sentence_breakdown,
     evaluate_writing_impl,
@@ -108,6 +111,27 @@ class AIWritingService:
         )
 
 
+    @classmethod
+    async def generate_outline(
+        cls,
+        topic: str,
+        genre: str = "ielts_task2",
+        sub_type: Optional[str] = "opinion",
+        language: str = "en",
+        target_band: float = 7.0,
+    ) -> Dict[str, Any]:
+        """Generate detailed Vietnamese outline tailored to this topic using Gemini AI."""
+        api_key = get_gemini_api_key()
+        return await generate_outline_impl(
+            topic=topic,
+            genre=genre,
+            sub_type=sub_type,
+            language=language,
+            target_band=target_band,
+            api_key=api_key,
+        )
+
+
 __all__ = [
     "AIWritingService",
     "get_gemini_api_key",
@@ -118,5 +142,7 @@ __all__ = [
     "normalize_vocab_upgrades",
     "generate_prompt_impl",
     "suggest_structures_impl",
+    "generate_outline_impl",
     "evaluate_writing_impl",
 ]
+

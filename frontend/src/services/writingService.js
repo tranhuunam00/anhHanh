@@ -84,6 +84,35 @@ export const suggestWritingStructures = async ({
   };
 };
 
+export const generateWritingOutline = async ({
+  topic,
+  genre = "ielts_task2",
+  subType = "opinion",
+  language = "en",
+  targetBand = 7.0,
+  token,
+}) => {
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch("/api/writing/generate-outline", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      topic,
+      genre,
+      sub_type: subType,
+      language,
+      target_band: targetBand,
+    }),
+  });
+
+  const data = await safeParseResponse(res, "Không thể tạo dàn bài AI");
+  return data.outline || null;
+};
+
 export const saveWritingSubmission = async ({ submissionId, topic, content, genre, targetBand, language = "en", subType, token }) => {
   const headers = { "Content-Type": "application/json" };
   if (token) {

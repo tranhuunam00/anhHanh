@@ -65,6 +65,14 @@ class SuggestStructuresRequest(BaseModel):
     existing_phrases: Optional[List[str]] = Field(default=[], description="Danh sách các cụm/câu đã có để tránh trùng")
 
 
+class GenerateOutlineRequest(BaseModel):
+    topic: str = Field(..., min_length=2, max_length=2000, description="Đề bài cần lập dàn ý")
+    genre: Optional[str] = Field(default="ielts_task2", description="Thể loại bài viết")
+    sub_type: Optional[str] = Field(default="opinion", description="Dạng đề chi tiết")
+    language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết")
+    target_band: Optional[float] = Field(default=7.0, description="Mục tiêu điểm")
+
+
 @router.get("/prompts")
 async def get_writing_prompts(language: Optional[str] = Query(default=None)):
     """Retrieve curated library of writing prompts grouped by genre and language (Free for all users)."""
@@ -193,6 +201,32 @@ async def suggest_writing_structures(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Lỗi khi AI gợi ý cấu trúc theo đề: {str(e)}"
+        )
+
+
+@router.post("/generate-outline")
+async def generate_writing_outline(
+    body: GenerateOutlineRequest,
+    current_user: User = Depends(require_ai_writing_permission)
+):
+    """AI automatically generates detailed Vietnamese outline specifically for this prompt."""
+    try:
+        result = await AIWritingService.generate_outline(
+            topic=body.topic,
+            genre=body.genre or "ielts_task2",
+            sub_type=body.sub_type or "opinion",
+            language=body.language or "en",
+            target_band=body.target_band or 7.0
+        )
+        return {
+            "success": True,
+            "outline": result
+        }
+    except Exception as e:
+        logger.error(f"Error generating outline: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi khi AI lập dàn ý theo đề: {str(e)}"
         )
 
 

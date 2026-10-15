@@ -14,6 +14,7 @@ import {
   splitPhraseParts,
   getBandDisplayLabel,
 } from "../../utils/writingStructureUtils";
+import { WritingOutlineTab } from "./WritingOutlineTab";
 
 export const StructuresModal = ({
   isOpen,
@@ -31,6 +32,11 @@ export const StructuresModal = ({
   loadingAction = null,
   isAuthorized = false,
   onInsert,
+  genre = "ielts_task2",
+  subType = "opinion",
+  language = "en",
+  targetBand = 7.0,
+  token,
   showToast,
 }) => {
   const [structureSearch, setStructureSearch] = useState("");
@@ -126,10 +132,32 @@ export const StructuresModal = ({
               <IconBook size={14} />
               <span>Thư viện mẫu câu học thuật</span>
             </button>
+            <button
+              type="button"
+              className={`structures-tab-btn ${structuresTab === "outline" ? "active" : ""}`}
+              onClick={() => setStructuresTab("outline")}
+            >
+              <IconBook size={14} />
+              <span>Dàn bài chi tiết (Tiếng Việt)</span>
+            </button>
           </div>
         </div>
 
-        {structuresTab === "ai_topic" ? (
+        {structuresTab === "outline" ? (
+          <div style={{ maxHeight: "calc(88vh - 140px)", overflowY: "auto" }}>
+            <WritingOutlineTab
+              genre={genre}
+              subType={subType}
+              language={language}
+              targetBand={targetBand}
+              effectivePromptText={effectivePromptText}
+              token={token}
+              isAuthorized={isAuthorized}
+              onInsertTemplate={onInsert}
+              showToast={showToast}
+            />
+          </div>
+        ) : structuresTab === "ai_topic" ? (
           <>
             {/* Sub-header toolbar: Topic info, filter pills & action buttons */}
             <div className="structures-compact-toolbar">
