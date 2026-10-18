@@ -14,6 +14,7 @@ import {
   getMeaningSavePayload,
   calculateAutoTextareaHeight,
   computePopoverCoords,
+  STATUS_MAP,
 } from "../../utils/wordLookupUtils";
 import { PopoverHeader } from "./PopoverHeader";
 import { PopoverIpaSection } from "./PopoverIpaSection";

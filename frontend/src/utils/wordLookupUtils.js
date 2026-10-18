@@ -368,4 +368,10 @@ export function highlightWordInSentence(sentence = "", targetWord = "") {
     }));
 }
 
+export const STATUS_MAP = {
+  NEW: { label: "Mới lưu", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.12)" },
+  LEARNING: { label: "Đang học", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.12)" },
+  MASTERED: { label: "Đã thuộc", color: "#10b981", bg: "rgba(16, 185, 129, 0.12)" },
+};
+
 
