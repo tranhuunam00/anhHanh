@@ -3,9 +3,11 @@ import { useAuth } from "../context/AuthContext";
 import { WordLookupPopover } from "../components/Vocab/WordLookupPopover";
 import { ReaderSidebar } from "../components/Reader/ReaderSidebar";
 import { ReaderPasteSection } from "../components/Reader/ReaderPasteSection";
+import { PdfPageNavigation } from "../components/Reader/PdfPageNavigation";
 import { SAMPLE_ARTICLE, sanitizePastedHtml } from "../utils/readerUtils";
 import { processReaderArticle } from "../utils/readerHtmlProcessor";
 import { useReaderSpeech } from "../hooks/useReaderSpeech";
+import { usePdfReader } from "../hooks/usePdfReader";
 import { stopEdgeAudio } from "../services/edgeTtsService";
 import { Lightbulb } from "../components/Icons";
 import "../styles/smart-reader.css";
@@ -41,10 +43,6 @@ export function SmartReaderPage({ isActive = true }) {
     }
   }, [mode, isActive]);
 
-  useEffect(() => {
-    localStorage.setItem("shotlang_reader_autoscroll", autoScroll);
-  }, [autoScroll]);
-
   // Sync editorContent to editorBoxRef when editorContent changes from outside
   useEffect(() => {
     if (editorBoxRef.current && mode === "paste") {
@@ -54,26 +52,44 @@ export function SmartReaderPage({ isActive = true }) {
     }
   }, [editorContent, mode]);
 
-  // Save changes to localStorage
+  // Save changes & preferences to localStorage
   useEffect(() => {
+    localStorage.setItem("shotlang_reader_autoscroll", autoScroll);
+    localStorage.setItem("shotlang_reader_fontsize", fontSize);
+    localStorage.setItem("shotlang_reader_fontfamily", fontFamily);
+    localStorage.setItem("shotlang_reader_theme", readerTheme);
     if (articleHtml) {
       localStorage.setItem("shotlang_reader_article", articleHtml);
     } else {
       localStorage.removeItem("shotlang_reader_article");
     }
-  }, [articleHtml]);
+  }, [autoScroll, fontSize, fontFamily, readerTheme, articleHtml]);
 
-  useEffect(() => {
-    localStorage.setItem("shotlang_reader_fontsize", fontSize);
-  }, [fontSize]);
-
-  useEffect(() => {
-    localStorage.setItem("shotlang_reader_fontfamily", fontFamily);
-  }, [fontFamily]);
-
-  useEffect(() => {
-    localStorage.setItem("shotlang_reader_theme", readerTheme);
-  }, [readerTheme]);
+  // Pure client-side PDF Reader Hook
+  const {
+    isPdfActive,
+    pdfFileName,
+    totalPages: pdfTotalPages,
+    currentPage: pdfCurrentPage,
+    isLoadingPdf,
+    loadPdfFile,
+    goToPage,
+    nextPage,
+    prevPage,
+    closePdf,
+  } = usePdfReader({
+    onPageLoaded: ({ html, pageNumber, totalPages, fileName }) => {
+      setArticleHtml(html);
+      setMode("reading");
+      window.scrollTo({ top: 0, behavior: "instant" });
+      if (showToast) {
+        showToast(`Đang đọc trang ${pageNumber} / ${totalPages} (${fileName})`, "info");
+      }
+    },
+    onError: (err) => {
+      if (showToast) showToast(err, "error");
+    },
+  });
 
   // Clean and import new text/HTML into editor
   const handleInsertIntoEditor = useCallback((rawHtmlOrText) => {
@@ -129,28 +145,21 @@ export function SmartReaderPage({ isActive = true }) {
   // Button handler: Paste from Clipboard API
   const handlePasteFromClipboardBtn = async () => {
     try {
-      if (navigator.clipboard && navigator.clipboard.read) {
+      if (navigator.clipboard?.read) {
         const items = await navigator.clipboard.read();
         for (const item of items) {
           if (item.types.includes("text/html")) {
             const blob = await item.getType("text/html");
-            const html = await blob.text();
-            handleInsertIntoEditor(html);
-            return;
+            return handleInsertIntoEditor(await blob.text());
           }
         }
       }
-      if (navigator.clipboard && navigator.clipboard.readText) {
+      if (navigator.clipboard?.readText) {
         const text = await navigator.clipboard.readText();
-        if (text) {
-          handleInsertIntoEditor(text);
-          return;
-        }
+        if (text) return handleInsertIntoEditor(text);
       }
-      alert("Hãy bấm chuột vào khung bên dưới và nhấn phím Ctrl + V (hoặc Cmd + V trên Mac) để dán bài báo!");
-    } catch {
-      alert("Hãy bấm chuột vào khung bên dưới và nhấn phím Ctrl + V (hoặc Cmd + V trên Mac) để dán bài báo!");
-    }
+    } catch {}
+    alert("Hãy bấm chuột vào khung bên dưới và nhấn phím Ctrl + V (hoặc Cmd + V trên Mac) để dán bài báo!");
   };
 
   // Start Reading: Switch from paste mode to reading mode
@@ -171,6 +180,7 @@ export function SmartReaderPage({ isActive = true }) {
 
   // Switch to paste mode to paste a new article
   const handleSwitchToPaste = () => {
+    closePdf();
     setEditorContent(articleHtml || "");
     setMode("paste");
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -249,40 +259,25 @@ export function SmartReaderPage({ isActive = true }) {
     isActive,
   });
 
-  // Keyboard shortcut: Space = play/pause, R = restart (only in reading mode, not when editor/input focused)
+  // Keyboard shortcut: Space = play/pause, R = restart
   useEffect(() => {
     if (mode !== "reading" || !isActive) return;
-
     const handleKeyDown = (e) => {
       setIsCtrlPressed(Boolean(e.ctrlKey || e.metaKey));
-
       const tag = document.activeElement?.tagName?.toLowerCase();
-      const isEditing = tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable;
-      if (isEditing) return;
-
-      if (e.code === "Space") {
-        e.preventDefault();
-        handleToggleSpeech();
-      } else if (e.code === "KeyR" && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        handleRestartSpeech();
-      }
+      if (tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable) return;
+      if (e.code === "Space") { e.preventDefault(); handleToggleSpeech(); }
+      else if (e.code === "KeyR" && !e.ctrlKey && !e.metaKey) { e.preventDefault(); handleRestartSpeech(); }
     };
-
-    const handleKeyUp = (e) => {
-      setIsCtrlPressed(Boolean(e.ctrlKey || e.metaKey));
-    };
-
-    const handleBlur = () => {
-      setIsCtrlPressed(false);
-    };
+    const updateCtrl = (e) => setIsCtrlPressed(Boolean(e.ctrlKey || e.metaKey));
+    const handleBlur = () => setIsCtrlPressed(false);
 
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keyup", updateCtrl);
     window.addEventListener("blur", handleBlur);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keyup", updateCtrl);
       window.removeEventListener("blur", handleBlur);
     };
   }, [mode, isActive, handleToggleSpeech, handleRestartSpeech]);
@@ -377,6 +372,8 @@ export function SmartReaderPage({ isActive = true }) {
             setEditorContent("");
             if (editorBoxRef.current) editorBoxRef.current.innerHTML = "";
           }}
+          onStartReadingPdf={loadPdfFile}
+          isLoadingPdf={isLoadingPdf}
         />
       )}
 
@@ -388,6 +385,7 @@ export function SmartReaderPage({ isActive = true }) {
             onSwitchToPaste={handleSwitchToPaste}
             onDeleteArticle={() => {
               if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+                closePdf();
                 setArticleHtml("");
                 setEditorContent("");
                 setMode("paste");
@@ -445,6 +443,20 @@ export function SmartReaderPage({ isActive = true }) {
                 "--reader-font-size": `${fontSize}px`,
               }}
             >
+              {/* PDF Page Navigation Controller */}
+              {isPdfActive && (
+                <PdfPageNavigation
+                  pdfFileName={pdfFileName}
+                  currentPage={pdfCurrentPage}
+                  totalPages={pdfTotalPages}
+                  isLoading={isLoadingPdf}
+                  onNextPage={nextPage}
+                  onPrevPage={prevPage}
+                  onGoToPage={goToPage}
+                  onSwitchPdf={handleSwitchToPaste}
+                />
+              )}
+
               <div className="reader-shortcut-tip-bar">
                 <Lightbulb size={15} color="#f59e0b" style={{ flexShrink: 0 }} />
                 <span><strong>Mẹo:</strong> Giữ <kbd className="reader-ctrl-kbd">Ctrl</kbd> + <strong>Click vào câu</strong> để nghe đọc • <strong>Nhấp đúp / Bôi đen</strong> từ để tra nghĩa</span>
