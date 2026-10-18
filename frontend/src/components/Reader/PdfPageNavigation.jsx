@@ -79,7 +79,7 @@ export function PdfPageNavigation({
         {/* Previous page button */}
         <button
           type="button"
-          className="btn btn-secondary pdf-nav-btn"
+          className="pdf-nav-btn"
           onClick={onPrevPage}
           disabled={currentPage <= 1 || isLoading}
           title="Trang trước (←)"
@@ -118,7 +118,7 @@ export function PdfPageNavigation({
         {/* Next page button */}
         <button
           type="button"
-          className="btn btn-secondary pdf-nav-btn"
+          className="pdf-nav-btn"
           onClick={onNextPage}
           disabled={currentPage >= totalPages || isLoading}
           title="Trang sau (→)"

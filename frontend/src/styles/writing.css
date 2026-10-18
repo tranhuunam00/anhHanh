@@ -442,6 +442,7 @@
   color: var(--text-primary);
 }
 
+/* Prompt Keywords Bar & New Word Weight System */
 .prompt-keywords-bar {
   display: flex;
   align-items: center;
@@ -470,6 +471,293 @@
   border-radius: 4px;
   color: var(--text-muted);
   font-family: var(--font-mono, monospace);
+}
+
+/* Prompt Keywords Bar V2 (New Word Weight Ranking) */
+.prompt-keywords-bar-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  animation: fadeIn 0.25s ease;
+}
+
+.keywords-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.keywords-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.keywords-label-v2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.keywords-usage-badge {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.keywords-usage-badge.has-used {
+  color: var(--success);
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  font-weight: 700;
+}
+
+.keywords-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-notebook-vocab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-notebook-vocab-label input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.keywords-list-v2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.keyword-chip-v2 {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  font-size: 0.75rem;
+}
+
+.keyword-chip-v2:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.keyword-chip-v2.is-used {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+}
+
+.keyword-chip-v2.is-used .chip-word-text {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.chip-used-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.chip-word-text {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+}
+
+.chip-status-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.chip-status-tag.badge-new {
+  background: rgba(147, 51, 234, 0.12);
+  color: #9333ea;
+  border: 1px solid rgba(147, 51, 234, 0.25);
+}
+
+.chip-status-tag.badge-overdue {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.chip-status-tag.badge-learning {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.chip-status-tag.badge-mastered {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.chip-status-tag.badge-prompt {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.chip-weight-score {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.chip-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.chip-action-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.chip-save-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary-border);
+}
+
+/* Popover Tooltip */
+.keyword-chip-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 100;
+  min-width: 220px;
+  max-width: 320px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  font-size: 0.76rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fadeIn 0.15s ease;
+  cursor: default;
+}
+
+.popover-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+}
+
+.popover-phonetic {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.popover-meaning {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.popover-weight-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.74rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.popover-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.reason-pill {
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-muted);
+}
+
+.popover-tip {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 /* AI Topic Prompt Input */

@@ -7,6 +7,8 @@ import {
   AlertCircle,
   Loader2,
   ChevronRight,
+  Minus,
+  Plus,
 } from "../Icons";
 import { formatFileSize, validatePageNumber } from "../../utils/pdfReaderUtils";
 import { getPdfPageCount } from "../../utils/pdfExtractor";
@@ -95,6 +97,20 @@ export function PdfUploadCard({ onStartReadingPdf, isLoading = false }) {
     setTargetPage(valid);
   };
 
+  const handleDecrementPage = () => {
+    setTargetPage((prev) => {
+      const current = typeof prev === "number" ? prev : parseInt(prev, 10) || 1;
+      return Math.max(1, current - 1);
+    });
+  };
+
+  const handleIncrementPage = () => {
+    setTargetPage((prev) => {
+      const current = typeof prev === "number" ? prev : parseInt(prev, 10) || 1;
+      return Math.min(totalPages, current + 1);
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!selectedFile) {
@@ -135,17 +151,17 @@ export function PdfUploadCard({ onStartReadingPdf, isLoading = false }) {
         >
           {isReadingPdfDoc ? (
             <div className="pdf-dropzone-loading">
-              <Loader2 size={36} className="spinning" color="var(--primary, #6366f1)" />
+              <Loader2 size={36} className="spinning" color="var(--primary, #3b82f6)" />
               <p>Đang phân tích cấu trúc tệp PDF...</p>
             </div>
           ) : (
             <>
               <div className="pdf-dropzone-icon-wrap">
-                <Upload size={32} color="var(--primary, #6366f1)" />
+                <Upload size={30} color="var(--primary, #3b82f6)" />
               </div>
               <h3 className="pdf-dropzone-title">Kéo & thả tệp PDF vào đây</h3>
               <p className="pdf-dropzone-desc">
-                Hoặc bấm vào khung để chọn tệp từ máy tính. Trình duyệt sẽ đọc trực tiếp 100% không tốn thời gian tải lên server!
+                Hoặc bấm vào khung để chọn tệp từ máy tính. Trình duyệt sẽ đọc trực tiếp 100% an toàn và không tốn thời gian tải lên server!
               </p>
               <button
                 type="button"
@@ -163,11 +179,11 @@ export function PdfUploadCard({ onStartReadingPdf, isLoading = false }) {
           )}
         </div>
       ) : (
-        /* When file is loaded: File Info + Mandatory Page Picker */
+        /* When file is loaded: File Info + Interactive Page Picker */
         <div className="pdf-selected-panel">
           <div className="pdf-file-info-row">
             <div className="pdf-file-icon">
-              <FileText size={28} color="#ef4444" />
+              <FileText size={26} color="#ef4444" />
             </div>
             <div className="pdf-file-meta">
               <h4 className="pdf-file-name" title={selectedFile.name}>
@@ -175,13 +191,14 @@ export function PdfUploadCard({ onStartReadingPdf, isLoading = false }) {
               </h4>
               <div className="pdf-file-badges">
                 <span className="pdf-badge-tag">{formatFileSize(selectedFile.size)}</span>
+                <span className="pdf-badge-divider">•</span>
                 <span className="pdf-badge-tag highlight">{totalPages} trang</span>
               </div>
             </div>
 
             <button
               type="button"
-              className="btn btn-secondary btn-with-icon"
+              className="pdf-change-file-btn"
               onClick={handleResetFile}
               title="Chọn tệp PDF khác"
             >
@@ -192,24 +209,67 @@ export function PdfUploadCard({ onStartReadingPdf, isLoading = false }) {
 
           <form onSubmit={handleSubmit} className="pdf-page-select-form">
             <div className="pdf-page-picker-box">
-              <label htmlFor="target-page-input" className="pdf-picker-label">
-                <strong>Chọn trang bạn muốn đọc (Bắt buộc):</strong>
-              </label>
+              <div className="pdf-picker-label">
+                <span>Chọn trang bạn muốn đọc:</span>
+                <span className="pdf-picker-badge-required">Bắt buộc</span>
+              </div>
 
-              <div className="pdf-picker-input-row">
-                <span>Trang số</span>
-                <input
-                  id="target-page-input"
-                  type="number"
-                  min={1}
-                  max={totalPages}
-                  value={targetPage}
-                  onChange={handlePageInputChange}
-                  onBlur={handlePageInputBlur}
-                  className="pdf-page-number-input"
-                  required
-                />
-                <span className="pdf-total-pages-label">/ {totalPages} trang</span>
+              <div className="pdf-picker-controls-wrap">
+                <div className="pdf-picker-stepper">
+                  <button
+                    type="button"
+                    className="pdf-stepper-btn"
+                    onClick={handleDecrementPage}
+                    disabled={targetPage <= 1 || isLoading}
+                    title="Trang trước"
+                  >
+                    <Minus size={16} />
+                  </button>
+
+                  <div className="pdf-picker-input-group">
+                    <span className="pdf-picker-prefix">Trang số</span>
+                    <input
+                      id="target-page-input"
+                      type="number"
+                      min={1}
+                      max={totalPages}
+                      value={targetPage}
+                      onChange={handlePageInputChange}
+                      onBlur={handlePageInputBlur}
+                      disabled={isLoading}
+                      className="pdf-page-number-input"
+                      required
+                    />
+                    <span className="pdf-total-pages-label">/ {totalPages} trang</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="pdf-stepper-btn"
+                    onClick={handleIncrementPage}
+                    disabled={targetPage >= totalPages || isLoading}
+                    title="Trang tiếp theo"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="pdf-slider-row">
+                    <span className="pdf-slider-bound">1</span>
+                    <input
+                      type="range"
+                      min={1}
+                      max={totalPages}
+                      value={typeof targetPage === "number" ? targetPage : 1}
+                      onChange={(e) => setTargetPage(parseInt(e.target.value, 10))}
+                      disabled={isLoading}
+                      className="pdf-page-range-slider"
+                      title="Kéo thanh trượt để lướt trang nhanh"
+                    />
+                    <span className="pdf-slider-bound">{totalPages}</span>
+                  </div>
+                )}
               </div>
 
               <p className="pdf-picker-hint">
@@ -220,9 +280,8 @@ export function PdfUploadCard({ onStartReadingPdf, isLoading = false }) {
             <div className="pdf-action-buttons">
               <button
                 type="submit"
-                className="btn btn-primary btn-with-icon btn-lg"
+                className="pdf-submit-read-btn"
                 disabled={isLoading || !targetPage}
-                style={{ padding: "11px 28px", fontSize: "1rem", fontWeight: 700 }}
               >
                 {isLoading ? (
                   <>
@@ -231,7 +290,7 @@ export function PdfUploadCard({ onStartReadingPdf, isLoading = false }) {
                   </>
                 ) : (
                   <>
-                    <BookOpen size={18} strokeWidth={2.4} />
+                    <BookOpen size={18} />
                     <span>Bắt đầu đọc trang {targetPage || 1}</span>
                     <ChevronRight size={16} />
                   </>

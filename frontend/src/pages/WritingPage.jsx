@@ -36,6 +36,7 @@ import { createVocabWord } from "../services/authVocabService";
 import { Task1Visualizer } from "../components/Writing/Task1Visualizer";
 import { IeltsPromptLibraryModal } from "../components/Writing/IeltsPromptLibraryModal";
 import { WritingOutlineTab } from "../components/Writing/WritingOutlineTab";
+import { PromptKeywordsBar } from "../components/Writing/PromptKeywordsBar";
 import "../styles/writing.css";
 
 export const LANGUAGES = [
@@ -84,7 +85,7 @@ const TARGET_BANDS = [
 ];
 
 export const WritingPage = ({ isActive = false }) => {
-  const { user, token, isAuthenticated, showToast, refreshSavedVocab } = useAuth();
+  const { user, token, isAuthenticated, showToast, refreshSavedVocab, savedVocabMap } = useAuth();
 
   // Strict check if current user is one of the 2 authorized accounts
   const isAuthorized = useMemo(() => {
@@ -1118,15 +1119,15 @@ export const WritingPage = ({ isActive = false }) => {
                       </div>
                     )}
 
-                    {!isPromptCollapsed && currentPrompt?.keywords && currentPrompt.keywords.length > 0 && (
-                      <div className="prompt-keywords-bar">
-                        <span className="keywords-label">Gợi ý từ khóa:</span>
-                        <div className="keywords-list">
-                          {currentPrompt.keywords.map((kw, idx) => (
-                            <span key={idx} className="keyword-chip">{kw}</span>
-                          ))}
-                        </div>
-                      </div>
+                    {!isPromptCollapsed && (
+                      <PromptKeywordsBar
+                        currentPrompt={currentPrompt}
+                        essayText={content}
+                        savedVocabMap={savedVocabMap}
+                        onInsertKeyword={handleInsertPhrase}
+                        onAddVocab={handleAddVocabToNotebook}
+                        showToast={showToast}
+                      />
                     )}
                   </>
                 )}
