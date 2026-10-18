@@ -50,6 +50,21 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
     }
   }, [vocab, initialSourceLang]);
 
+  // Close on Escape key press
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen || !vocab) return null;
 
   // Audio preview helper using browser Speech Synthesis

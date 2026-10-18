@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Plus,
   X,
@@ -32,6 +32,21 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess, sourceLang = "en" })
   const [isAutoEnriching, setIsAutoEnriching] = useState(false);
   const [isSearchingImages, setIsSearchingImages] = useState(false);
   const [imgLoadError, setImgLoadError] = useState(false);
+
+  // Close on Escape key press
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
