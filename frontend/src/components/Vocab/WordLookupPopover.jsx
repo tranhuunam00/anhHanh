@@ -54,6 +54,8 @@ export const WordLookupPopover = ({
   // Clean word token for display and lookup
   const cleanWord = (word || "").trim().replace(/^[’'".:,;!?-]+|[’'".:,;!?-]+$/g, "");
 
+  const [autoPlayedWord, setAutoPlayedWord] = useState(null);
+
   // Reset custom states when word token changes
   useEffect(() => {
     setCustomMeaning("");
@@ -62,7 +64,7 @@ export const WordLookupPopover = ({
     setInitialPos("");
     setCustomContext("");
     setInitialContext("");
-    autoPlayedWordRef.current = null;
+    setAutoPlayedWord(null);
   }, [cleanWord]);
 
   // Auto adjust textarea height to fit content nicely without overflowing
@@ -194,8 +196,6 @@ export const WordLookupPopover = ({
     }
   }, [cleanWord, savedVocabMap]);
 
-  const autoPlayedWordRef = useRef(null);
-
   // Audio speech
   const handlePlayAudio = useCallback((accent = "us") => {
     setActiveAudio(accent);
@@ -207,12 +207,12 @@ export const WordLookupPopover = ({
 
   // Auto-play pronunciation once when word lookup finishes loading
   useEffect(() => {
-    if (!loading && lookupData && cleanWord && autoPlayedWordRef.current !== cleanWord) {
-      autoPlayedWordRef.current = cleanWord;
+    if (!loading && lookupData && cleanWord && autoPlayedWord !== cleanWord) {
+      setAutoPlayedWord(cleanWord);
       const prefAccent = lookupData?.audio_us || !lookupData?.audio_uk ? "us" : "uk";
       handlePlayAudio(prefAccent);
     }
-  }, [loading, lookupData, cleanWord, handlePlayAudio]);
+  }, [loading, lookupData, cleanWord, autoPlayedWord, handlePlayAudio]);
 
   // Click outside, Esc listener (Esc để tắt), and Ctrl listener (Ctrl để nghe lại)
   useEffect(() => {
