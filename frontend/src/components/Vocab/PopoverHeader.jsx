@@ -66,7 +66,7 @@ export const PopoverHeader = ({
             type="button"
             className={`lookup-audio-btn us ${activeAudio === "us" ? "playing" : ""}`}
             onClick={() => onPlayAudio("us")}
-            title="Phát âm giọng Anh - Mỹ (US)"
+            title="Phát âm giọng Anh - Mỹ (US) • Phím tắt: Ctrl"
           >
             <span className="accent-label">US</span>
             <IconVolume size={11} className={activeAudio === "us" ? "pulse-anim" : ""} />

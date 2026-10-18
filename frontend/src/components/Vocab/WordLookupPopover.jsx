@@ -21,11 +21,6 @@ import { PopoverTranslationSection } from "./PopoverTranslationSection";
 import { PopoverContextSection } from "./PopoverContextSection";
 import { PopoverActionFooter } from "./PopoverActionFooter";
 
-const STATUS_MAP = {
-  NEW: { label: "Mới lưu", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.12)" },
-  LEARNING: { label: "Đang học", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.12)" },
-  MASTERED: { label: "Đã thuộc", color: "#10b981", bg: "rgba(16, 185, 129, 0.12)" },
-};
 
 export const WordLookupPopover = ({
   word,
@@ -67,6 +62,7 @@ export const WordLookupPopover = ({
     setInitialPos("");
     setCustomContext("");
     setInitialContext("");
+    autoPlayedWordRef.current = null;
   }, [cleanWord]);
 
   // Auto adjust textarea height to fit content nicely without overflowing
@@ -198,11 +194,39 @@ export const WordLookupPopover = ({
     }
   }, [cleanWord, savedVocabMap]);
 
-  // Click outside and Esc listener
+  const autoPlayedWordRef = useRef(null);
+
+  // Audio speech
+  const handlePlayAudio = useCallback((accent = "us") => {
+    setActiveAudio(accent);
+    const audioUrl = accent === "uk" ? lookupData?.audio_uk : lookupData?.audio_us;
+    playPronunciationAudio(cleanWord, accent, audioUrl).finally(() => {
+      setTimeout(() => setActiveAudio(null), 800);
+    });
+  }, [cleanWord, lookupData]);
+
+  // Auto-play pronunciation once when word lookup finishes loading
+  useEffect(() => {
+    if (!loading && lookupData && cleanWord && autoPlayedWordRef.current !== cleanWord) {
+      autoPlayedWordRef.current = cleanWord;
+      const prefAccent = lookupData?.audio_us || !lookupData?.audio_uk ? "us" : "uk";
+      handlePlayAudio(prefAccent);
+    }
+  }, [loading, lookupData, cleanWord, handlePlayAudio]);
+
+  // Click outside, Esc listener (Esc để tắt), and Ctrl listener (Ctrl để nghe lại)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
+        e.preventDefault();
         onClose();
+      } else if (e.key === "Control") {
+        const isTextInput = e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA");
+        if (!isTextInput) {
+          e.preventDefault();
+          const prefAccent = lookupData?.audio_us || !lookupData?.audio_uk ? "us" : "uk";
+          handlePlayAudio(prefAccent);
+        }
       }
     };
 
@@ -225,16 +249,7 @@ export const WordLookupPopover = ({
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
     };
-  }, [onClose, targetElement]);
-
-  // Audio speech
-  const handlePlayAudio = (accent) => {
-    setActiveAudio(accent);
-    const audioUrl = accent === "uk" ? lookupData?.audio_uk : lookupData?.audio_us;
-    playPronunciationAudio(cleanWord, accent, audioUrl).finally(() => {
-      setTimeout(() => setActiveAudio(null), 800);
-    });
-  };
+  }, [onClose, targetElement, lookupData, handlePlayAudio]);
 
   // One-click save to notebook with edited translation & context sentence
   const handleSaveToNotebook = async () => {
