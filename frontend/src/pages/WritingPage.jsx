@@ -1127,6 +1127,11 @@ export const WritingPage = ({ isActive = false }) => {
                         onInsertKeyword={handleInsertPhrase}
                         onAddVocab={handleAddVocabToNotebook}
                         showToast={showToast}
+                        token={token}
+                        language={selectedLanguage}
+                        targetBand={targetBand}
+                        genre={selectedGenre}
+                        isAuthorized={isAuthorized}
                       />
                     )}
                   </>
@@ -1312,7 +1317,7 @@ export const WritingPage = ({ isActive = false }) => {
         </div>
 
         {/* Right Column: AI Feedback / History */}
-        <div className="writing-feedback-panel" style={{ flex: "1 1 0", minWidth: 280 }}>
+        <div className="writing-feedback-panel" style={{ flex: "1 1 0", minWidth: 280, alignSelf: "stretch" }}>
           {/* Tab selector */}
           <div className="feedback-nav-tabs">
             <button

@@ -153,7 +153,7 @@ export const fetchWordTranslation = async (word, targetLang = "vi", token = null
     );
     if (res.ok) {
       const data = await res.json();
-      return data.translation || "";
+      return data.meaning || data.translation || "";
     }
   } catch (e) {
     console.debug("Error fetching word translation lookup:", e);
