@@ -115,6 +115,8 @@ export const WritingPage = ({ isActive = false }) => {
   const [aiTopicInput, setAiTopicInput] = useState("");
   const customPromptRef = useRef(null);
   const promptFileInputRef = useRef(null);
+  const leftPanelRef = useRef(null);
+  const [leftPanelHeight, setLeftPanelHeight] = useState(null);
 
   // Editor state
   const [content, setContent] = useState("");
@@ -553,6 +555,20 @@ export const WritingPage = ({ isActive = false }) => {
     return cleanPromptText(currentPrompt?.prompt);
   }, [isCustomPrompt, customPromptInput, customPromptImages, currentPrompt]);
 
+  // Đồng bộ chiều cao: Khóa bên phải luôn luôn bằng đúng chiều cao bên trái
+  useEffect(() => {
+    if (!leftPanelRef.current) return;
+    const updateHeight = () => {
+      if (leftPanelRef.current) {
+        setLeftPanelHeight(leftPanelRef.current.offsetHeight);
+      }
+    };
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(leftPanelRef.current);
+    return () => observer.disconnect();
+  }, [selectedGenre, selectedSubType, isCustomPrompt, currentPrompt, content]);
+
 
   // Insert selected structure / phrase at the current cursor position in the editor
   const handleInsertPhrase = (templateText) => {
@@ -874,7 +890,7 @@ export const WritingPage = ({ isActive = false }) => {
       {/* Main Studio Grid: Left (Editor) & Right (AI Feedback / History) */}
       <div className="writing-studio-layout" ref={splitContainerRef}>
         {/* Left Column: Topic, Controls, Textarea */}
-        <div className="writing-editor-panel" style={{ width: `${splitRatio}%`, flexShrink: 0 }}>
+        <div ref={leftPanelRef} className="writing-editor-panel" style={{ width: `${splitRatio}%`, flexShrink: 0 }}>
           {/* Genre selector tabs */}
           <div className="genre-nav-bar">
             {GENRES.map((g) => (
@@ -1306,6 +1322,7 @@ export const WritingPage = ({ isActive = false }) => {
           onMouseDown={handleSplitMouseDown}
           onDoubleClick={handleResetSplitRatio}
           title="Kéo thả để điều chỉnh tỷ lệ 2 bên (Nhấp đúp để đặt lại 50/50)"
+          style={{ height: leftPanelHeight ? `${leftPanelHeight}px` : "auto" }}
         >
           <div className="split-divider-line">
             <div className="split-divider-handle">
@@ -1316,8 +1333,16 @@ export const WritingPage = ({ isActive = false }) => {
           </div>
         </div>
 
-        {/* Right Column: AI Feedback / History */}
-        <div className="writing-feedback-panel" style={{ flex: "1 1 0", minWidth: 280, alignSelf: "stretch" }}>
+        {/* Right Column: AI Feedback / History (Khóa độ dài chỉ được bằng bên trái) */}
+        <div
+          className="writing-feedback-panel"
+          style={{
+            flex: "1 1 0",
+            minWidth: 280,
+            height: leftPanelHeight ? `${leftPanelHeight}px` : "auto",
+            maxHeight: leftPanelHeight ? `${leftPanelHeight}px` : "none",
+          }}
+        >
           {/* Tab selector */}
           <div className="feedback-nav-tabs">
             <button

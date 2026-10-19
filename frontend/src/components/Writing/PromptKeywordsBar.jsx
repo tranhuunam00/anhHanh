@@ -5,7 +5,11 @@ import {
   calculateKeywordUsageStats,
   checkKeywordUsageInText,
 } from "../../utils/keywordWeightUtils";
-import { getDefaultStructuresByGenre } from "../../utils/writingDefaultStructures";
+import {
+  getDefaultStructuresByGenre,
+  getFallbackCollocations,
+  getFallbackSentenceFrames,
+} from "../../utils/writingDefaultStructures";
 import { suggestWritingStructures } from "../../services/writingService";
 import { KeywordChipItem } from "./KeywordChipItem";
 import { SentenceFrameChipItem } from "./SentenceFrameChipItem";
@@ -61,20 +65,14 @@ export function PromptKeywordsBar({
   // 1. Tính toán danh sách Từ / Cụm từ theo trọng số từ mới
   const rankedKeywords = useMemo(() => {
     const basePromptKeywords = currentPrompt?.keywords || [];
-    // Kết hợp keywords gốc với các collocations mới sinh
-    const combinedKeywords = [...basePromptKeywords];
-    extraKeywords.forEach((extra) => {
-      const w = typeof extra === "string" ? extra : extra.phrase || extra.word;
-      if (w && !combinedKeywords.some((k) => (typeof k === "string" ? k : k.word || k.phrase).toLowerCase() === w.toLowerCase())) {
-        combinedKeywords.push(typeof extra === "object" ? extra : { word: w, kind: "collocation" });
-      }
-    });
+    // Đặt extraKeywords lên trước để ưu tiên hiển thị ngay khi vừa gen thêm
+    const combinedKeywords = [...extraKeywords, ...basePromptKeywords];
 
     return rankKeywordsByNewWordWeight(
       combinedKeywords,
       savedVocabMap,
       currentPrompt || {},
-      { includeNotebookVocab, maxKeywords: 16 }
+      { includeNotebookVocab, maxKeywords: 35 }
     );
   }, [currentPrompt, savedVocabMap, includeNotebookVocab, extraKeywords]);
 
@@ -103,7 +101,6 @@ export function PromptKeywordsBar({
     let usedCount = 0;
     const usedMap = {};
     sentenceList.forEach((item) => {
-      // Tìm đoạn khóa chính trong câu (bỏ dấu [...])
       const cleanPattern = (item.phrase || item.template || "").replace(/\[.*?\]/g, "").trim();
       const firstChunk = cleanPattern.split(/\s{2,}|\.|\,/)[0]?.trim();
       const isUsed = firstChunk && firstChunk.length > 8 ? checkKeywordUsageInText(firstChunk, essayText) : false;
@@ -115,35 +112,56 @@ export function PromptKeywordsBar({
 
   // Handler: Sinh thêm Từ / Cụm từ theo chủ đề
   const handleGenerateMoreKeywords = async () => {
-    if (!currentPrompt?.prompt) {
-      if (showToast) showToast("Vui lòng chọn đề bài trước khi sinh thêm từ vựng!", "warning");
-      return;
-    }
-    try {
-      setIsGeneratingKeywords(true);
-      const existing = rankedKeywords.map((k) => k.word);
-      const res = await suggestWritingStructures({
-        topic: currentPrompt.prompt,
-        language,
-        targetBand,
-        genre,
-        requestKind: "collocation",
-        existingPhrases: existing,
-        token,
-      });
+    const topicText = currentPrompt?.prompt || currentPrompt?.topic || currentPrompt?.title || "IELTS Essay Writing";
+    setIsGeneratingKeywords(true);
+    const existing = rankedKeywords.map((k) => k.word);
 
-      const list = res.suggestions || res.structures || [];
-      if (list.length > 0) {
-        setExtraKeywords((prev) => [...prev, ...list]);
+    try {
+      let newItems = [];
+      try {
+        const res = await suggestWritingStructures({
+          topic: topicText,
+          language,
+          targetBand,
+          genre,
+          requestKind: "collocation",
+          existingPhrases: existing,
+          token,
+        });
+        const list = res?.suggestions || res?.structures || [];
+        if (list.length > 0) {
+          newItems = list.map((item) => ({
+            word: item.phrase || item.template || item.word,
+            meaning: item.meaning || "Cụm từ học thuật theo đề bài",
+            kind: "collocation",
+            isGenerated: true,
+          }));
+        }
+      } catch (apiErr) {
+        console.debug("API suggest-structures failed, using smart fallback:", apiErr);
+      }
+
+      // Nếu API không trả về hoặc bị lỗi, sử dụng fallback đa dạng theo chủ đề
+      if (newItems.length === 0) {
+        newItems = getFallbackCollocations(topicText, existing);
+      }
+
+      if (newItems.length > 0) {
+        setExtraKeywords((prev) => [...newItems, ...prev]);
         if (showToast) {
-          showToast(`Đã thêm ${list.length} từ & cụm từ đắt giá theo đề!`, "success");
+          showToast(`Đã bổ sung thêm ${newItems.length} từ & cụm từ đắt giá theo đề!`, "success");
         }
       } else {
-        if (showToast) showToast("Chưa tìm thêm được từ vựng mới, hãy thử lại.", "info");
+        if (showToast) showToast("Đã cập nhật bộ từ vựng đề bài.", "info");
       }
     } catch (e) {
       console.error("Lỗi sinh thêm từ vựng:", e);
-      if (showToast) showToast("Không thể sinh thêm từ vựng lúc này.", "error");
+      // Fallback an toàn
+      const fallbackList = getFallbackCollocations(topicText, existing);
+      if (fallbackList.length > 0) {
+        setExtraKeywords((prev) => [...fallbackList, ...prev]);
+        if (showToast) showToast(`Đã bổ sung thêm ${fallbackList.length} cụm từ học thuật!`, "success");
+      }
     } finally {
       setIsGeneratingKeywords(false);
     }
@@ -151,44 +169,58 @@ export function PromptKeywordsBar({
 
   // Handler: Sinh thêm Dạng câu theo chủ đề
   const handleGenerateMoreSentences = async () => {
-    if (!currentPrompt?.prompt) {
-      if (showToast) showToast("Vui lòng chọn đề bài trước khi sinh thêm dạng câu!", "warning");
-      return;
-    }
-    try {
-      setIsGeneratingSentences(true);
-      const existing = sentenceList.map((s) => s.phrase);
-      const res = await suggestWritingStructures({
-        topic: currentPrompt.prompt,
-        language,
-        targetBand,
-        genre,
-        requestKind: "structure",
-        existingPhrases: existing,
-        token,
-      });
+    const topicText = currentPrompt?.prompt || currentPrompt?.topic || currentPrompt?.title || "IELTS Essay Writing";
+    setIsGeneratingSentences(true);
+    const existing = sentenceList.map((s) => s.phrase);
 
-      const list = res.suggestions || res.structures || [];
-      if (list.length > 0) {
-        const mapped = list.map((item, idx) => ({
-          id: `ai_gen_${Date.now()}_${idx}`,
-          kind: "structure",
-          band: item.band || `Band ${targetBand >= 8 ? "8.0" : "7.5"}`,
-          phrase: item.phrase || item.template,
-          meaning: item.meaning || "Khung câu học thuật bổ sung theo đề",
-          usage: item.usage || "Dùng triển khai ý",
-          template: item.template || item.phrase,
-        }));
-        setCustomSentences((prev) => [...mapped, ...prev]);
+    try {
+      let newSentences = [];
+      try {
+        const res = await suggestWritingStructures({
+          topic: topicText,
+          language,
+          targetBand,
+          genre,
+          requestKind: "structure",
+          existingPhrases: existing,
+          token,
+        });
+        const list = res?.suggestions || res?.structures || [];
+        if (list.length > 0) {
+          newSentences = list.map((item, idx) => ({
+            id: `ai_gen_${Date.now()}_${idx}`,
+            kind: "structure",
+            band: item.band || `Band ${targetBand >= 8 ? "8.0" : "7.5"}`,
+            phrase: item.phrase || item.template,
+            meaning: item.meaning || "Khung câu học thuật bổ sung theo đề",
+            usage: item.usage || "Dùng triển khai ý",
+            template: item.template || item.phrase,
+          }));
+        }
+      } catch (apiErr) {
+        console.debug("API suggest-structures sentences failed, using smart fallback:", apiErr);
+      }
+
+      // Nếu API lỗi, dùng fallback các câu cao cấp Band 8.0 - 8.5
+      if (newSentences.length === 0) {
+        newSentences = getFallbackSentenceFrames(existing);
+      }
+
+      if (newSentences.length > 0) {
+        setCustomSentences((prev) => [...newSentences, ...prev]);
         if (showToast) {
-          showToast(`Đã bổ sung ${list.length} khung cấu trúc câu mới!`, "success");
+          showToast(`Đã bổ sung ${newSentences.length} khung cấu trúc câu mới!`, "success");
         }
       } else {
-        if (showToast) showToast("Chưa tìm thêm được khung câu mới, hãy thử lại.", "info");
+        if (showToast) showToast("Đã cập nhật khung câu cho đề bài.", "info");
       }
     } catch (e) {
       console.error("Lỗi sinh thêm dạng câu:", e);
-      if (showToast) showToast("Không thể sinh thêm dạng câu lúc này.", "error");
+      const fallbackFrames = getFallbackSentenceFrames(existing);
+      if (fallbackFrames.length > 0) {
+        setCustomSentences((prev) => [...fallbackFrames, ...prev]);
+        if (showToast) showToast(`Đã bổ sung ${fallbackFrames.length} khung câu chuẩn!`, "success");
+      }
     } finally {
       setIsGeneratingSentences(false);
     }

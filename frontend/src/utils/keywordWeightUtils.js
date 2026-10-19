@@ -22,8 +22,8 @@ function escapeRegex(str) {
  * @returns {Object|null} Ranked word data or null if invalid
  */
 export function calculateWordWeight(rawWord, vocabItem = null, promptContext = {}) {
-  if (!rawWord || typeof rawWord !== "string") return null;
-  const word = rawWord.trim();
+  if (!rawWord) return null;
+  const word = typeof rawWord === "string" ? rawWord.trim() : (rawWord?.word || rawWord?.phrase || "").trim();
   if (!word) return null;
 
   const normalizedWord = word.toLowerCase();
@@ -223,22 +223,27 @@ export function rankKeywordsByNewWordWeight(
   promptContext = {},
   options = {}
 ) {
-  const { includeNotebookVocab = true, maxKeywords = 12 } = options;
+  const { includeNotebookVocab = true, maxKeywords = 35 } = options;
   const wordMap = new Map();
+  const extraMetaMap = new Map();
 
-  // 1. Add prompt keywords
+  // 1. Add prompt keywords (hỗ trợ cả string và object { word, phrase, meaning, kind })
   if (Array.isArray(promptKeywords)) {
     promptKeywords.forEach((kw) => {
-      if (typeof kw === "string" && kw.trim()) {
-        const clean = kw.trim();
-        wordMap.set(clean.toLowerCase(), clean);
+      const clean = typeof kw === "string" ? kw.trim() : (kw?.word || kw?.phrase || "").trim();
+      if (clean) {
+        const key = clean.toLowerCase();
+        wordMap.set(key, clean);
+        if (typeof kw === "object" && kw !== null) {
+          extraMetaMap.set(key, kw);
+        }
       }
     });
   }
 
   // 2. Optionally add relevant words from notebook
   if (includeNotebookVocab && savedVocabMap && typeof savedVocabMap === "object") {
-    const notebookItems = extractRelevantVocabFromNotebook(savedVocabMap, promptContext, 6);
+    const notebookItems = extractRelevantVocabFromNotebook(savedVocabMap, promptContext, 12);
     notebookItems.forEach((nb) => {
       if (nb?.word) {
         const clean = nb.word.trim();
@@ -254,8 +259,19 @@ export function rankKeywordsByNewWordWeight(
   const weightedList = [];
   wordMap.forEach((originalWord, key) => {
     const vocabItem = savedVocabMap?.[key] || null;
+    const extraMeta = extraMetaMap.get(key) || {};
     const weighted = calculateWordWeight(originalWord, vocabItem, promptContext);
     if (weighted) {
+      if (extraMeta.meaning && !weighted.meaning) {
+        weighted.meaning = extraMeta.meaning;
+      }
+      if (extraMeta.kind) {
+        weighted.kind = extraMeta.kind;
+      }
+      if (extraMeta.isGenerated) {
+        weighted.weightScore = Math.max(weighted.weightScore, 85);
+        weighted.reasons.unshift("AI vừa gợi ý (+35)");
+      }
       weightedList.push(weighted);
     }
   });

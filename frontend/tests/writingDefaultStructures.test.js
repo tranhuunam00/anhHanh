@@ -4,6 +4,8 @@ import {
   getDefaultStructuresByGenre,
   DEFAULT_TASK2_STRUCTURES,
   DEFAULT_TASK1_STRUCTURES,
+  getFallbackCollocations,
+  getFallbackSentenceFrames,
 } from "../src/utils/writingDefaultStructures.js";
 
 describe("writingDefaultStructures Unit Tests", () => {
@@ -47,4 +49,23 @@ describe("writingDefaultStructures Unit Tests", () => {
       assert.ok(item.usage, "Item must have usage guide");
     });
   });
+
+  it("fallback collocations: extracts collocations and avoids duplicates", () => {
+    const collocations = getFallbackCollocations("young professionals career work", ["retention incentives"]);
+    assert.ok(Array.isArray(collocations));
+    assert.ok(collocations.length > 0);
+    assert.ok(!collocations.some((c) => c.word === "retention incentives"));
+    assert.ok(collocations[0].meaning);
+    assert.equal(collocations[0].isGenerated, true);
+  });
+
+  it("fallback sentence frames: generates high band patterns without duplicate", () => {
+    const frames = getFallbackSentenceFrames(["Under no circumstances should the significance of [...] be underestimated."]);
+    assert.ok(Array.isArray(frames));
+    assert.ok(frames.length > 0);
+    assert.ok(!frames.some((f) => f.phrase === "Under no circumstances should the significance of [...] be underestimated."));
+    assert.ok(frames[0].meaning);
+    assert.ok(frames[0].band);
+  });
 });
+

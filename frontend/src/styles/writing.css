@@ -75,11 +75,10 @@
 /* Main Studio Layout: Draggable Split Screen */
 .writing-studio-layout {
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   position: relative;
   width: 100%;
   gap: 0;
-  min-height: calc(100vh - 110px);
 }
 
 /* Split Divider between left (editor) & right (feedback) panels */
@@ -509,6 +508,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  height: 250px; /* Fix cứng chiều cao đồng bộ giữa 2 bên */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
@@ -647,6 +647,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  align-content: flex-start;
+  padding-right: 4px;
 }
 
 .keyword-chip-v2 {
@@ -1338,9 +1343,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 540px;
-  align-self: stretch;
-  height: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 992px) {
