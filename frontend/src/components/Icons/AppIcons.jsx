@@ -363,6 +363,17 @@ export const IconArrowLeft = (props) => (
   </BaseIcon>
 );
 
+// 38b. Arrow Up Down (Sort)
+export const IconArrowUpDown = (props) => (
+  <BaseIcon {...props}>
+    <path d="m21 16-4 4-4-4" />
+    <path d="M17 20V4" />
+    <path d="m3 8 4-4 4 4" />
+    <path d="M7 4v16" />
+  </BaseIcon>
+);
+
+
 // 39. Chevron Up
 export const IconChevronUp = (props) => (
   <BaseIcon {...props}>
@@ -579,6 +590,7 @@ export const RotateCw = IconRotate;
 export const RotateCcw = IconRotate;
 export const ArrowLeft = IconArrowLeft;
 export const ArrowRight = IconArrowRight;
+export const ArrowUpDown = IconArrowUpDown;
 export const ChevronDown = IconChevronDown;
 export const ChevronUp = IconChevronUp;
 export const ChevronLeft = IconChevronLeft;

@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Sparkles, BookOpen, Layers } from "../Icons";
+import { Sparkles, BookOpen, Layers, ArrowUpDown } from "../Icons";
 import {
   rankKeywordsByNewWordWeight,
   calculateKeywordUsageStats,
   checkKeywordUsageInText,
+  sortKeywordsByOption,
+  sortSentencesByOption,
 } from "../../utils/keywordWeightUtils";
 import {
   getDefaultStructuresByGenre,
@@ -16,8 +18,8 @@ import { SentenceFrameChipItem } from "./SentenceFrameChipItem";
 
 /**
  * Component hiển thị gợi ý Từ khóa & Dạng câu theo chủ đề (chia 2 bên)
- * - Bên trái: Từ / Cụm từ theo chủ đề (có nút Gen thêm)
- * - Bên phải: Dạng câu theo chủ đề (có nút Gen thêm)
+ * - Bên trái: Từ / Cụm từ theo chủ đề (có nút Gen thêm, Sort thời gian asc/desc)
+ * - Bên phải: Dạng câu theo chủ đề (có nút Gen thêm, Sort thời gian asc/desc)
  * - Hỗ trợ Click để chèn nhanh vào bài viết tại vị trí con trỏ
  * - Click (i) giải thích nghĩa tiếng Việt
  * - Click (+) lưu vào sổ từ vựng
@@ -37,6 +39,10 @@ export function PromptKeywordsBar({
 }) {
   const [includeNotebookVocab, setIncludeNotebookVocab] = useState(true);
   const [activeTooltipId, setActiveTooltipId] = useState(null);
+
+  // Thứ tự sắp xếp từ vựng và câu (thời gian asc / desc / mặc định)
+  const [vocabSortOrder, setVocabSortOrder] = useState("time_desc");
+  const [sentenceSortOrder, setSentenceSortOrder] = useState("default");
 
   // Danh sách từ/cụm từ bổ sung do AI sinh thêm
   const [extraKeywords, setExtraKeywords] = useState([]);
@@ -76,6 +82,11 @@ export function PromptKeywordsBar({
     );
   }, [currentPrompt, savedVocabMap, includeNotebookVocab, extraKeywords]);
 
+  // Danh sách Từ / Cụm từ sau khi áp dụng Sắp xếp (Thời gian ASC / DESC / Trọng số)
+  const displayedKeywords = useMemo(() => {
+    return sortKeywordsByOption(rankedKeywords, vocabSortOrder);
+  }, [rankedKeywords, vocabSortOrder]);
+
   // 2. Danh sách Dạng câu theo chủ đề
   const sentenceList = useMemo(() => {
     const defaultList = getDefaultStructuresByGenre(genre);
@@ -90,6 +101,11 @@ export function PromptKeywordsBar({
     });
     return combined;
   }, [genre, customSentences]);
+
+  // Danh sách Dạng câu sau khi áp dụng Sắp xếp (Thời gian ASC / DESC / Khuyên dùng)
+  const displayedSentences = useMemo(() => {
+    return sortSentencesByOption(sentenceList, sentenceSortOrder);
+  }, [sentenceList, sentenceSortOrder]);
 
   // 3. Tính toán thống kê sử dụng từ khóa
   const keywordStats = useMemo(() => {
@@ -130,11 +146,12 @@ export function PromptKeywordsBar({
         });
         const list = res?.suggestions || res?.structures || [];
         if (list.length > 0) {
-          newItems = list.map((item) => ({
+          newItems = list.map((item, idx) => ({
             word: item.phrase || item.template || item.word,
             meaning: item.meaning || "Cụm từ học thuật theo đề bài",
             kind: "collocation",
             isGenerated: true,
+            createdAt: new Date(Date.now() + idx * 100).toISOString(),
           }));
         }
       } catch (apiErr) {
@@ -195,6 +212,7 @@ export function PromptKeywordsBar({
             meaning: item.meaning || "Khung câu học thuật bổ sung theo đề",
             usage: item.usage || "Dùng triển khai ý",
             template: item.template || item.phrase,
+            createdAt: new Date(Date.now() + idx * 100).toISOString(),
           }));
         }
       } catch (apiErr) {
@@ -263,6 +281,21 @@ export function PromptKeywordsBar({
           </div>
 
           <div className="column-actions-group">
+            {/* Bộ điều khiển Sort theo thời gian asc/desc */}
+            <div className="column-sort-box" title="Sắp xếp danh sách từ vựng theo thời gian hoặc độ ưu tiên">
+              <ArrowUpDown size={11} className="sort-icon" />
+              <select
+                className="column-sort-select"
+                value={vocabSortOrder}
+                onChange={(e) => setVocabSortOrder(e.target.value)}
+                aria-label="Sắp xếp từ vựng"
+              >
+                <option value="time_desc">Mới nhất (DESC)</option>
+                <option value="time_asc">Cũ nhất (ASC)</option>
+                <option value="weight">Trọng số (Mặc định)</option>
+              </select>
+            </div>
+
             <label className="toggle-notebook-vocab-label" title="Tự động lấy thêm các từ mới trong Sổ từ vựng">
               <input
                 type="checkbox"
@@ -287,7 +320,7 @@ export function PromptKeywordsBar({
 
         {/* Danh sách Chips từ / cụm từ */}
         <div className="keywords-list-v2">
-          {rankedKeywords.map((kw, idx) => {
+          {displayedKeywords.map((kw, idx) => {
             const isUsed = !!keywordStats.usedMap[kw.normalizedWord];
             const isTooltipOpen = activeTooltipId === `kw_${kw.word}`;
 
@@ -327,6 +360,21 @@ export function PromptKeywordsBar({
           </div>
 
           <div className="column-actions-group">
+            {/* Bộ điều khiển Sort dạng câu theo thời gian asc/desc */}
+            <div className="column-sort-box" title="Sắp xếp dạng câu theo thời gian hoặc mặc định">
+              <ArrowUpDown size={11} className="sort-icon" />
+              <select
+                className="column-sort-select"
+                value={sentenceSortOrder}
+                onChange={(e) => setSentenceSortOrder(e.target.value)}
+                aria-label="Sắp xếp dạng câu"
+              >
+                <option value="default">Khuyên dùng (Mặc định)</option>
+                <option value="time_desc">Mới nhất (DESC)</option>
+                <option value="time_asc">Cũ nhất (ASC)</option>
+              </select>
+            </div>
+
             <button
               type="button"
               className="btn-gen-more"
@@ -342,7 +390,7 @@ export function PromptKeywordsBar({
 
         {/* Danh sách Chips Dạng câu */}
         <div className="keywords-list-v2 sentences-list">
-          {sentenceList.map((item, idx) => {
+          {displayedSentences.map((item, idx) => {
             const itemKey = item.id || `sent_${idx}`;
             const isUsed = !!sentenceStats.usedMap[item.id || item.phrase];
             const isTooltipOpen = activeTooltipId === `sent_${itemKey}`;

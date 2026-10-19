@@ -120,6 +120,7 @@ export function calculateWordWeight(rawWord, vocabItem = null, promptContext = {
 
   // Clamp score between 10 and 100
   const finalScore = Math.max(10, Math.min(100, Math.round(score)));
+  const createdAt = (vocabItem && vocabItem.created_at) || (typeof rawWord === "object" && rawWord?.createdAt) || null;
 
   return {
     word,
@@ -133,6 +134,7 @@ export function calculateWordWeight(rawWord, vocabItem = null, promptContext = {
     isPromptKeyword,
     isOverdue,
     reasons,
+    createdAt,
   };
 }
 
@@ -272,6 +274,11 @@ export function rankKeywordsByNewWordWeight(
         weighted.weightScore = Math.max(weighted.weightScore, 85);
         weighted.reasons.unshift("AI vừa gợi ý (+35)");
       }
+      if (extraMeta.createdAt) {
+        weighted.createdAt = extraMeta.createdAt;
+      } else if (!weighted.createdAt) {
+        weighted.createdAt = promptContext?.created_at || promptContext?.createdAt || null;
+      }
       weightedList.push(weighted);
     }
   });
@@ -313,4 +320,50 @@ export function calculateKeywordUsageStats(rankedKeywords = [], essayText = "") 
     percentUsed,
     usedMap,
   };
+}
+
+/**
+ * Sắp xếp danh sách từ khóa theo thời gian (asc / desc) hoặc trọng số
+ * @param {Array<Object>} keywords
+ * @param {"weight" | "time_desc" | "time_asc"} order
+ * @returns {Array<Object>}
+ */
+export function sortKeywordsByOption(keywords = [], order = "weight") {
+  if (!Array.isArray(keywords) || keywords.length === 0) return [];
+  if (order === "weight") {
+    return [...keywords].sort((a, b) => (b.weightScore || 0) - (a.weightScore || 0));
+  }
+
+  return [...keywords].sort((a, b) => {
+    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    if (order === "time_asc") {
+      if (timeA !== timeB) return timeA - timeB;
+      return (a.weightScore || 0) - (b.weightScore || 0);
+    }
+    // "time_desc"
+    if (timeA !== timeB) return timeB - timeA;
+    return (b.weightScore || 0) - (a.weightScore || 0);
+  });
+}
+
+/**
+ * Sắp xếp danh sách dạng câu theo thời gian (asc / desc) hoặc thứ tự mặc định
+ * @param {Array<Object>} sentences
+ * @param {"default" | "time_desc" | "time_asc"} order
+ * @returns {Array<Object>}
+ */
+export function sortSentencesByOption(sentences = [], order = "default") {
+  if (!Array.isArray(sentences) || sentences.length === 0) return [];
+  if (order === "default") {
+    return sentences;
+  }
+  return [...sentences].sort((a, b) => {
+    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    if (order === "time_asc") {
+      return timeA - timeB;
+    }
+    return timeB - timeA;
+  });
 }

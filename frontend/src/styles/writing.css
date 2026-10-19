@@ -538,7 +538,55 @@
 .column-actions-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.column-sort-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 1px 4px 1px 5px;
+  transition: all 0.15s ease;
+}
+
+.column-sort-box:hover,
+.column-sort-box:focus-within {
+  border-color: var(--primary);
+  background: var(--bg-primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
+}
+
+.column-sort-box .sort-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.column-sort-box:hover .sort-icon,
+.column-sort-box:focus-within .sort-icon {
+  color: var(--primary);
+}
+
+.column-sort-select {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  padding: 2px 2px 2px 0;
+  line-height: 1.2;
+}
+
+.column-sort-select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.78rem;
 }
 
 .btn-gen-more {

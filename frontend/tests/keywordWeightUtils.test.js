@@ -6,6 +6,8 @@ import {
   extractRelevantVocabFromNotebook,
   rankKeywordsByNewWordWeight,
   calculateKeywordUsageStats,
+  sortKeywordsByOption,
+  sortSentencesByOption,
 } from "../src/utils/keywordWeightUtils.js";
 
 describe("keywordWeightUtils Unit Tests", () => {
@@ -170,6 +172,82 @@ describe("keywordWeightUtils Unit Tests", () => {
       assert.equal(stats.total, 0);
       assert.equal(stats.usedCount, 0);
       assert.equal(stats.percentUsed, 0);
+    });
+  });
+
+  describe("sortKeywordsByOption", () => {
+    const kw1 = { word: "first", weightScore: 90, createdAt: "2026-01-01T00:00:00.000Z" };
+    const kw2 = { word: "second", weightScore: 70, createdAt: "2026-06-01T00:00:00.000Z" };
+    const kw3 = { word: "third", weightScore: 95, createdAt: "2026-10-19T10:00:00.000Z" };
+
+    it("sorts by weightScore descending when order is 'weight'", () => {
+      const sorted = sortKeywordsByOption([kw1, kw2, kw3], "weight");
+      assert.equal(sorted[0].word, "third"); // 95
+      assert.equal(sorted[1].word, "first"); // 90
+      assert.equal(sorted[2].word, "second"); // 70
+    });
+
+    it("sorts by time descending (newest first) when order is 'time_desc'", () => {
+      const sorted = sortKeywordsByOption([kw1, kw2, kw3], "time_desc");
+      assert.equal(sorted[0].word, "third"); // Oct 2026
+      assert.equal(sorted[1].word, "second"); // June 2026
+      assert.equal(sorted[2].word, "first"); // Jan 2026
+    });
+
+    it("sorts by time ascending (oldest first) when order is 'time_asc'", () => {
+      const sorted = sortKeywordsByOption([kw1, kw2, kw3], "time_asc");
+      assert.equal(sorted[0].word, "first"); // Jan 2026
+      assert.equal(sorted[1].word, "second"); // June 2026
+      assert.equal(sorted[2].word, "third"); // Oct 2026
+    });
+
+    it("handles items without createdAt cleanly", () => {
+      const kwNoTime = { word: "notime", weightScore: 60 };
+      const sortedDesc = sortKeywordsByOption([kwNoTime, kw3], "time_desc");
+      assert.equal(sortedDesc[0].word, "third");
+      assert.equal(sortedDesc[1].word, "notime");
+
+      const sortedAsc = sortKeywordsByOption([kw3, kwNoTime], "time_asc");
+      assert.equal(sortedAsc[0].word, "notime");
+      assert.equal(sortedAsc[1].word, "third");
+    });
+
+    it("edge case: handles empty or invalid inputs", () => {
+      assert.deepEqual(sortKeywordsByOption([]), []);
+      assert.deepEqual(sortKeywordsByOption(null), []);
+      assert.deepEqual(sortKeywordsByOption(undefined), []);
+    });
+  });
+
+  describe("sortSentencesByOption", () => {
+    const s1 = { phrase: "First old", createdAt: "2025-01-01T00:00:00.000Z" };
+    const s2 = { phrase: "Second mid", createdAt: "2026-03-01T00:00:00.000Z" };
+    const s3 = { phrase: "Third new", createdAt: "2026-10-19T12:00:00.000Z" };
+
+    it("preserves default order when order is 'default'", () => {
+      const res = sortSentencesByOption([s1, s2, s3], "default");
+      assert.equal(res[0].phrase, "First old");
+      assert.equal(res[1].phrase, "Second mid");
+      assert.equal(res[2].phrase, "Third new");
+    });
+
+    it("sorts by time descending when order is 'time_desc'", () => {
+      const res = sortSentencesByOption([s1, s2, s3], "time_desc");
+      assert.equal(res[0].phrase, "Third new");
+      assert.equal(res[1].phrase, "Second mid");
+      assert.equal(res[2].phrase, "First old");
+    });
+
+    it("sorts by time ascending when order is 'time_asc'", () => {
+      const res = sortSentencesByOption([s3, s2, s1], "time_asc");
+      assert.equal(res[0].phrase, "First old");
+      assert.equal(res[1].phrase, "Second mid");
+      assert.equal(res[2].phrase, "Third new");
+    });
+
+    it("edge case: handles empty or invalid inputs", () => {
+      assert.deepEqual(sortSentencesByOption([]), []);
+      assert.deepEqual(sortSentencesByOption(null), []);
     });
   });
 });

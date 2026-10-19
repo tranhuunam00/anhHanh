@@ -180,12 +180,13 @@ export function getFallbackCollocations(promptText = "", existingWords = []) {
     return true;
   });
 
-  return matching.slice(0, 5).map((item) => ({
+  return matching.slice(0, 5).map((item, idx) => ({
     word: item.word,
     phrase: item.word,
     meaning: item.meaning,
     kind: "collocation",
     isGenerated: true,
+    createdAt: new Date(Date.now() + idx * 100).toISOString(),
   }));
 }
 
@@ -205,6 +206,7 @@ export function getFallbackSentenceFrames(existingPhrases = []) {
     meaning: item.meaning,
     usage: item.usage,
     template: item.template,
+    createdAt: new Date(Date.now() + idx * 100).toISOString(),
   }));
 }
 
