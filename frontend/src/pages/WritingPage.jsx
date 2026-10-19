@@ -340,7 +340,16 @@ export const WritingPage = ({ isActive = false }) => {
     }
   }, [content, selectedGenre, currentSubmissionId]);
 
-  // Start timer on first keystroke
+  // Tự động giãn chiều cao textarea theo toàn bộ nội dung bài viết để hiển thị đủ hết 100% không bị cuộn
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.max(450, textarea.scrollHeight)}px`;
+    }
+  }, [content]);
+
+  // Start timer on first keystroke & tự động giãn textarea khi gõ
   const handleContentChange = (e) => {
     const val = e.target.value;
     setContent(val);
@@ -348,6 +357,9 @@ export const WritingPage = ({ isActive = false }) => {
     if (!isTimerRunning && val.trim().length > 0) {
       setIsTimerRunning(true);
     }
+    const target = e.target;
+    target.style.height = "auto";
+    target.style.height = `${Math.max(450, target.scrollHeight)}px`;
   };
 
   const currentLangObj = useMemo(() => {
