@@ -234,11 +234,14 @@ export const submitVocabReviewResult = async (vocabId, isCorrect, token) => {
   return await safeParseResponse(res, "Không thể cập nhật kết quả ôn tập");
 };
 
-export const quickLookupWord = async (word, context = null, token = null, targetLang = "vi") => {
+export const quickLookupWord = async (word, context = null, token = null, targetLang = "vi", sourceLang = "auto") => {
   try {
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
     const params = new URLSearchParams({ word: word.trim(), target_lang: targetLang });
+    if (sourceLang && sourceLang !== "auto") {
+      params.append("source_lang", sourceLang);
+    }
     if (context && typeof context === "string") {
       params.append("context", context.trim());
     }

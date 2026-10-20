@@ -230,16 +230,17 @@
 
   /* Action Buttons Toolbar */
   .dictation-actions {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 6px;
+    margin-bottom: 12px;
   }
   .dictation-actions .btn {
-    flex: 1 1 calc(50% - 4px);
+    width: 100%;
     justify-content: center;
-    padding: 8px 10px;
-    font-size: 0.8rem;
-    min-height: 40px;
+    padding: 7px 6px;
+    font-size: 0.78rem;
+    min-height: 36px;
   }
 
   /* Full Audio Player Bar (Tab 2) */
@@ -388,23 +389,64 @@
   .header-actions .btn-secondary > span:not([class*="badge"]) {
     display: none;
   }
+  /* Compact Action Buttons for mobile (Image 3) */
+  .dictation-actions {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 5px !important;
+    margin-bottom: 10px !important;
+  }
   .dictation-actions .btn {
-    flex: 1 1 100%;
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 6px 3px !important;
+    font-size: 0.74rem !important;
+    min-height: 33px !important;
+    border-radius: 7px !important;
+    gap: 3px !important;
+  }
+  .dictation-actions .btn svg {
+    width: 13px !important;
+    height: 13px !important;
+    flex-shrink: 0;
+  }
+
+  /* Compact Video & Playback Controls for mobile (Image 2) */
+  .player-card {
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+  }
+  .video-wrapper {
+    margin-bottom: 6px !important;
+    border-radius: 8px !important;
+  }
+  .playback-controls {
+    gap: 4px !important;
   }
   .controls-row {
-    flex-wrap: wrap;
-    gap: 6px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 4px !important;
+    width: 100% !important;
+  }
+  .controls-row .btn-icon {
+    padding: 4px 6px !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
   }
   .speed-group {
-    margin-left: 0 !important;
-    margin-top: 4px;
-    width: 100%;
-    justify-content: center;
+    margin-left: 2px !important;
+    margin-top: 0 !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
   }
   .speed-btn {
-    flex: 1;
-    padding: 6px 4px;
-    font-size: 0.75rem;
+    padding: 4px 5px !important;
+    font-size: 0.72rem !important;
   }
 
   /* 1 Column for Cards on narrow phones */

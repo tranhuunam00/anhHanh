@@ -133,6 +133,95 @@ class TranslationService:
             pass
         return None
 
+    def _fetch_google_details(
+        self, text: str, source_lang: str = "auto", target_lang: str = "vi"
+    ) -> dict:
+        """Fetch translation along with phonetic romanization (Pinyin) and detected source language."""
+        try:
+            q = urllib.parse.quote(text)
+            sl = "auto" if not source_lang or source_lang == "auto" else source_lang
+            tl = target_lang or "vi"
+            url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl={sl}&tl={tl}&dt=t&dt=rm&q={q}"
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                },
+            )
+            with urllib.request.urlopen(req, timeout=4) as res:
+                data = json.loads(res.read().decode("utf-8"))
+                translated = ""
+                pinyin = None
+                detected_lang = None
+                if data and isinstance(data, list) and len(data) > 0:
+                    segments = data[0]
+                    if isinstance(segments, list):
+                        trans_parts = []
+                        for seg in segments:
+                            if seg and len(seg) > 0 and seg[0]:
+                                trans_parts.append(seg[0])
+                            if seg and len(seg) > 3 and seg[3] and not pinyin:
+                                pinyin = seg[3]
+                        translated = "".join(trans_parts).strip()
+                if len(data) > 2 and isinstance(data[2], str):
+                    detected_lang = data[2]
+                return {
+                    "translated": translated,
+                    "pinyin": pinyin,
+                    "detected_source": detected_lang,
+                }
+        except Exception:
+            return {"translated": "", "pinyin": None, "detected_source": None}
+
+    def resolve_word_details(
+        self, word: str, source_lang: Optional[str] = None, target_lang: str = "vi"
+    ) -> dict:
+        """Resolve rich word details, phonetic transcription (IPA or Pinyin), POS, and translation."""
+        clean = word.strip()
+        is_zh = bool(re.search(r"[\u4e00-\u9fff]", clean)) or bool(source_lang and source_lang.startswith("zh"))
+
+        if is_zh:
+            details = self._fetch_google_details(clean, source_lang="zh", target_lang=target_lang)
+            trans = details.get("translated") or clean
+            pinyin = details.get("pinyin")
+            return {
+                "ipa": pinyin,
+                "ipa_uk": pinyin,
+                "ipa_us": pinyin,
+                "pinyin": pinyin,
+                "part_of_speech": "Từ vựng tiếng Trung",
+                "definition": f"Pinyin: {pinyin}" if pinyin else None,
+                "meaning": trans,
+                "source_lang": "zh",
+            }
+
+        # English / Latin default
+        from app.infrastructure.image_search_service import ImageSearchService
+        clean_lower = clean.lower()
+        details = ImageSearchService.get_word_details(clean_lower)
+        ipa = details.get("ipa")
+        ipa_uk = details.get("ipa_uk") or ipa
+        ipa_us = details.get("ipa_us") or ipa
+        part_of_speech = details.get("part_of_speech")
+        definition = details.get("definition")
+
+        meaning = self.translate(clean_lower, source_lang=source_lang or "en", target_lang=target_lang)
+        if not meaning or meaning.lower().strip() == clean_lower:
+            meaning = self.translate(clean_lower, source_lang="auto", target_lang=target_lang)
+        if not meaning or not meaning.strip():
+            meaning = clean
+
+        return {
+            "ipa": ipa,
+            "ipa_uk": ipa_uk,
+            "ipa_us": ipa_us,
+            "pinyin": None,
+            "part_of_speech": part_of_speech,
+            "definition": definition,
+            "meaning": meaning,
+            "source_lang": "en",
+        }
+
     def _fetch_mymemory(
         self, text: str, source_lang: str = "en", target_lang: str = "vi"
     ) -> Optional[str]:

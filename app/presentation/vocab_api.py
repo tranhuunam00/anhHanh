@@ -1,4 +1,5 @@
 """Smart Vocabulary Notebook Core API Endpoints for DailyDictation Studio."""
+import re
 import logging
 from typing import Optional
 from datetime import datetime, timezone
@@ -196,44 +197,38 @@ async def quick_lookup_word(
     word: str = Query(..., min_length=1),
     context: Optional[str] = Query(None),
     target_lang: str = Query('vi'),
+    source_lang: Optional[str] = Query(None),
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
-    """Instant dictionary & vocabulary lookup."""
-    clean_word = word.strip().lower()
-    if not clean_word:
+    """Instant dictionary & vocabulary lookup (supports English, Chinese, etc.)."""
+    raw_word = word.strip()
+    if not raw_word:
         raise HTTPException(status_code=400, detail="Word cannot be empty")
+
+    is_zh = bool(re.search(r"[\u4e00-\u9fff]", raw_word)) or bool(source_lang and source_lang.startswith("zh"))
+    clean_word = raw_word if is_zh else raw_word.lower()
 
     dict_stmt = select(DictionaryWord).where(DictionaryWord.word == clean_word)
     dict_res = await db.execute(dict_stmt)
     cached_dict = dict_res.scalars().first()
 
+    pinyin = None
     if cached_dict:
         ipa, ipa_uk, ipa_us = cached_dict.ipa, cached_dict.ipa_uk, cached_dict.ipa_us
         part_of_speech, definition, meaning = cached_dict.part_of_speech, cached_dict.definition, cached_dict.meaning
         part_of_speech = normalize_pos_string(part_of_speech)
+        if is_zh:
+            pinyin = ipa
     else:
-        details = ImageSearchService.get_word_details(clean_word)
-        ipa = details.get('ipa')
-        ipa_uk = details.get('ipa_uk') or ipa
-        ipa_us = details.get('ipa_us') or ipa
-        part_of_speech = normalize_pos_string(details.get('part_of_speech'))
-        definition = details.get('definition')
-
-        meaning = None
-        try:
-            translated = _translation_service.translate(clean_word, source_lang='en', target_lang=target_lang)
-            if not translated or translated.lower().strip() == clean_word.lower().strip():
-                auto_trans = _translation_service.translate(clean_word, source_lang='auto', target_lang=target_lang)
-                if auto_trans and auto_trans.lower().strip() != clean_word.lower().strip():
-                    translated = auto_trans
-            if translated and translated.strip():
-                meaning = translated.strip()
-        except Exception as e:
-            logger.warning(f"Translation failed for lookup '{clean_word}': {e}")
-
-        if not meaning or not meaning.strip():
-            meaning = clean_word
+        resolved = _translation_service.resolve_word_details(clean_word, source_lang=source_lang, target_lang=target_lang)
+        ipa = resolved.get('ipa')
+        ipa_uk = resolved.get('ipa_uk') or ipa
+        ipa_us = resolved.get('ipa_us') or ipa
+        pinyin = resolved.get('pinyin')
+        part_of_speech = normalize_pos_string(resolved.get('part_of_speech'))
+        definition = resolved.get('definition')
+        meaning = resolved.get('meaning') or clean_word
 
         try:
             new_dict_word = DictionaryWord(
@@ -273,9 +268,11 @@ async def quick_lookup_word(
         'ipa': ipa,
         'ipa_uk': ipa_uk,
         'ipa_us': ipa_us,
+        'pinyin': pinyin,
         'part_of_speech': part_of_speech,
         'definition': definition,
         'meaning': meaning,
+        'source_lang': 'zh' if is_zh else 'en',
         'is_saved': is_saved,
         'saved_vocab': saved_vocab
     }

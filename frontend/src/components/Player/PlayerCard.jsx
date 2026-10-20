@@ -68,7 +68,7 @@ export const PlayerCard = React.memo(({
 
       {/* Playback Controls & Speed */}
       <div className="playback-controls">
-        <div className="controls-row" style={{ justifyContent: "center", gap: "8px", width: "100%" }}>
+        <div className="controls-row">
           <button className="btn btn-secondary btn-icon" title="Tua lùi 3 giây (←)" onClick={() => onSeekRelative && onSeekRelative(-3)}>
             <RotateCcw size={16} strokeWidth={2.2} />
           </button>
@@ -89,7 +89,7 @@ export const PlayerCard = React.memo(({
             <RotateCw size={16} strokeWidth={2.2} />
           </button>
 
-          <div className="speed-group" style={{ marginLeft: "4px" }}>
+          <div className="speed-group">
             {[0.75, 0.9, 1.0, 1.25].map((speed) => (
               <button
                 key={speed}

@@ -16,9 +16,12 @@ export const PopoverHeader = ({
   ipa = "",
   ipaUk = "",
   ipaUs = "",
+  pinyin = "",
+  sourceLang = "en",
   loading = false,
 }) => {
-  const displayIpa = ipaUk || ipaUs || ipa || "";
+  const isChinese = /[\u4e00-\u9fff]/.test(cleanWord) || sourceLang === "zh";
+  const displayPhonetic = pinyin || ipaUk || ipaUs || ipa || "";
 
   return (
     <div className="lookup-popover-header">
@@ -37,7 +40,7 @@ export const PopoverHeader = ({
         </button>
       </div>
 
-      {/* Row 2: Lean Meta Line (POS Badge + IPA Phonetic + Audio UK/US Chips) */}
+      {/* Row 2: Lean Meta Line (POS Badge + IPA/Pinyin Phonetic + Audio Chips) */}
       <div className="lookup-meta-row">
         <PopoverPosSelector
           partOfSpeech={customPos}
@@ -45,32 +48,46 @@ export const PopoverHeader = ({
           cleanWord={cleanWord}
         />
 
-        {!loading && displayIpa && (
-          <span className="lookup-ipa-pill" title="Phiên âm IPA">
-            {displayIpa}
+        {!loading && displayPhonetic && (
+          <span className="lookup-ipa-pill" title={isChinese ? "Phiên âm Pinyin" : "Phiên âm IPA"}>
+            {displayPhonetic}
           </span>
         )}
 
         <div className="lookup-audio-actions">
-          <button
-            type="button"
-            className={`lookup-audio-btn uk ${activeAudio === "uk" ? "playing" : ""}`}
-            onClick={() => onPlayAudio("uk")}
-            title="Phát âm giọng Anh - Anh (UK)"
-          >
-            <span className="accent-label">UK</span>
-            <IconVolume size={11} className={activeAudio === "uk" ? "pulse-anim" : ""} />
-          </button>
+          {isChinese ? (
+            <button
+              type="button"
+              className={`lookup-audio-btn zh ${activeAudio === "zh" ? "playing" : ""}`}
+              onClick={() => onPlayAudio("zh")}
+              title="Phát âm tiếng Trung (Mandarin) • Phím tắt: Ctrl"
+            >
+              <span className="accent-label">ZH</span>
+              <IconVolume size={11} className={activeAudio === "zh" ? "pulse-anim" : ""} />
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className={`lookup-audio-btn uk ${activeAudio === "uk" ? "playing" : ""}`}
+                onClick={() => onPlayAudio("uk")}
+                title="Phát âm giọng Anh - Anh (UK)"
+              >
+                <span className="accent-label">UK</span>
+                <IconVolume size={11} className={activeAudio === "uk" ? "pulse-anim" : ""} />
+              </button>
 
-          <button
-            type="button"
-            className={`lookup-audio-btn us ${activeAudio === "us" ? "playing" : ""}`}
-            onClick={() => onPlayAudio("us")}
-            title="Phát âm giọng Anh - Mỹ (US) • Phím tắt: Ctrl"
-          >
-            <span className="accent-label">US</span>
-            <IconVolume size={11} className={activeAudio === "us" ? "pulse-anim" : ""} />
-          </button>
+              <button
+                type="button"
+                className={`lookup-audio-btn us ${activeAudio === "us" ? "playing" : ""}`}
+                onClick={() => onPlayAudio("us")}
+                title="Phát âm giọng Anh - Mỹ (US) • Phím tắt: Ctrl"
+              >
+                <span className="accent-label">US</span>
+                <IconVolume size={11} className={activeAudio === "us" ? "pulse-anim" : ""} />
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -54,6 +54,7 @@ export const WordLookupPopover = ({
 
   // Clean word token for display and lookup
   const cleanWord = (word || "").trim().replace(/^[’'".:,;!?-]+|[’'".:,;!?-]+$/g, "");
+  const isChinese = /[\u4e00-\u9fff]/.test(cleanWord) || sourceLang === "zh";
 
   const [autoPlayedWord, setAutoPlayedWord] = useState(null);
 
@@ -119,7 +120,8 @@ export const WordLookupPopover = ({
       ? (savedVocabMap[cleanLower] || savedVocabMap[cleanNorm] || null)
       : null;
 
-    quickLookupWord(cleanWord, contextSentence, token)
+    const effectiveSource = isChinese ? "zh" : (sourceLang || "en");
+    quickLookupWord(cleanWord, contextSentence, token, targetLang, effectiveSource)
       .then((data) => {
         if (!isMounted) return;
         const resolved = resolveInitialMeaning(cleanWord, data, savedItem);
@@ -198,22 +200,22 @@ export const WordLookupPopover = ({
   }, [cleanWord, savedVocabMap]);
 
   // Audio speech
-  const handlePlayAudio = useCallback((accent = "us") => {
+  const handlePlayAudio = useCallback((accent = isChinese ? "zh" : "us") => {
     setActiveAudio(accent);
-    const audioUrl = accent === "uk" ? lookupData?.audio_uk : lookupData?.audio_us;
+    const audioUrl = accent === "uk" ? lookupData?.audio_uk : accent === "us" ? lookupData?.audio_us : null;
     playPronunciationAudio(cleanWord, accent, audioUrl).finally(() => {
       setTimeout(() => setActiveAudio(null), 800);
     });
-  }, [cleanWord, lookupData]);
+  }, [cleanWord, lookupData, isChinese]);
 
   // Auto-play pronunciation once when word lookup finishes loading
   useEffect(() => {
     if (!loading && lookupData && cleanWord && autoPlayedWord !== cleanWord) {
       setAutoPlayedWord(cleanWord);
-      const prefAccent = lookupData?.audio_us || !lookupData?.audio_uk ? "us" : "uk";
+      const prefAccent = isChinese ? "zh" : (lookupData?.audio_us || !lookupData?.audio_uk ? "us" : "uk");
       handlePlayAudio(prefAccent);
     }
-  }, [loading, lookupData, cleanWord, autoPlayedWord, handlePlayAudio]);
+  }, [loading, lookupData, cleanWord, autoPlayedWord, handlePlayAudio, isChinese]);
 
   // Click outside, Esc listener (Esc để tắt), and Ctrl listener (Ctrl để nghe lại)
   useEffect(() => {
@@ -225,7 +227,7 @@ export const WordLookupPopover = ({
         const isTextInput = e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA");
         if (!isTextInput) {
           e.preventDefault();
-          const prefAccent = lookupData?.audio_us || !lookupData?.audio_uk ? "us" : "uk";
+          const prefAccent = isChinese ? "zh" : (lookupData?.audio_us || !lookupData?.audio_uk ? "us" : "uk");
           handlePlayAudio(prefAccent);
         }
       }
@@ -263,15 +265,12 @@ export const WordLookupPopover = ({
     setIsSaving(true);
     try {
       const payload = getMeaningSavePayload({
-        cleanWord,
-        customMeaning,
+        cleanWord, customMeaning,
         lookupMeaning: lookupData?.meaning,
-        partOfSpeech: customPos,
-        contextSentence: customContext,
-        phonetic: lookupData?.ipa,
-        videoId,
-        timestamp,
-        sourceLang,
+        partOfSpeech: customPos, contextSentence: customContext,
+        phonetic: lookupData?.pinyin || lookupData?.ipa,
+        videoId, timestamp,
+        sourceLang: isChinese ? "zh" : sourceLang,
         targetLang,
       });
 
@@ -432,7 +431,7 @@ export const WordLookupPopover = ({
         }}
       />
 
-      {/* Header: Word + Multi-POS Selector + Integrated IPA + UK / US Audio + Close */}
+      {/* Header: Word + Multi-POS Selector + Integrated IPA/Pinyin + Audio + Close */}
       <PopoverHeader
         cleanWord={cleanWord}
         customPos={customPos}
@@ -443,6 +442,8 @@ export const WordLookupPopover = ({
         ipa={lookupData?.ipa}
         ipaUk={lookupData?.ipa_uk}
         ipaUs={lookupData?.ipa_us}
+        pinyin={lookupData?.pinyin}
+        sourceLang={isChinese ? "zh" : sourceLang}
         loading={loading}
       />
 

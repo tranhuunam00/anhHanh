@@ -153,6 +153,9 @@ export function getMeaningSavePayload({
   const lookup = (lookupMeaning || "").trim();
   const meaning = custom || lookup || word;
 
+  const isZh = /[\u4e00-\u9fff]/.test(word) || (sourceLang && sourceLang.toLowerCase().startsWith("zh"));
+  const resolvedSourceLang = isZh ? "zh" : (sourceLang || "en").trim().toLowerCase();
+
   return {
     word,
     context_sentence: (contextSentence || "").trim(),
@@ -161,7 +164,7 @@ export function getMeaningSavePayload({
     part_of_speech: (partOfSpeech || "").trim(),
     video_id: videoId || "",
     timestamp: typeof timestamp === "number" ? timestamp : Number(timestamp) || 0,
-    source_lang: (sourceLang || "en").trim().toLowerCase(),
+    source_lang: resolvedSourceLang,
     target_lang: (targetLang || "vi").trim().toLowerCase(),
   };
 }

@@ -69,14 +69,14 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
 
     textNodes.forEach((node) => {
       const text = node.nodeValue;
-      const wordsInNode = text.match(/\b[a-zA-Z0-9'’-]+\b/g) || [];
+      const wordsInNode = text.match(/\b[a-zA-Z0-9'’-]+\b|[\u4e00-\u9fff]/g) || [];
       totalWordCount += wordsInNode.length;
 
       if (!savedVocabMap || Object.keys(savedVocabMap).length === 0) {
         return;
       }
 
-      const tokens = text.split(/([a-zA-Z0-9'’-]+)/g);
+      const tokens = text.split(/([a-zA-Z0-9'’-]+|[\u4e00-\u9fff])/g);
       let hasReplacement = false;
       const fragment = doc.createDocumentFragment();
 
@@ -91,7 +91,7 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
           continue;
         }
 
-        const isWord = /^[a-zA-Z0-9'’-]+$/.test(t);
+        const isWord = /^[a-zA-Z0-9'’-]+$|^[\u4e00-\u9fff]$/.test(t);
         if (!isWord) {
           fragment.appendChild(doc.createTextNode(t));
           i++;
@@ -107,11 +107,11 @@ export function processReaderArticle(articleHtml, savedVocabMap = {}) {
           let wCount = 0;
           for (let j = i; j < len && wCount < pLen; j++) {
             sliceTokens.push(tokens[j]);
-            if (/^[a-zA-Z0-9'’-]+$/.test(tokens[j])) wCount++;
+            if (/^[a-zA-Z0-9'’-]+$|^[\u4e00-\u9fff]$/.test(tokens[j])) wCount++;
           }
           if (wCount === pLen) {
             const phraseStr = sliceTokens.join("").toLowerCase().trim().replace(/['’]/g, "'");
-            const item = savedVocabMap[phraseStr];
+            const item = savedVocabMap[phraseStr] || savedVocabMap[sliceTokens.join("")];
             if (item && item.status !== "MASTERED") {
               matchedPhrase = item;
               phraseSkip = sliceTokens.length;

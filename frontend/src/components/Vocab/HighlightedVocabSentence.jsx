@@ -9,6 +9,8 @@ export const HighlightedVocabSentence = React.memo(({
   contextTranslation = "",
   videoId = "",
   timestamp = 0,
+  sourceLang = "en",
+  targetLang = "vi",
 }) => {
   const { savedVocabMap } = useAuth();
   const [activeWordState, setActiveWordState] = useState(null);
@@ -16,7 +18,7 @@ export const HighlightedVocabSentence = React.memo(({
   const tokens = useMemo(() => {
     if (!text) return [];
 
-    const rawTokens = text.split(/([a-zA-Z0-9'’-]+)/g);
+    const rawTokens = text.split(/([a-zA-Z0-9'’-]+|[\u4e00-\u9fff])/g);
     const result = [];
     const len = rawTokens.length;
     const maxPhraseWords = 6;
@@ -29,7 +31,7 @@ export const HighlightedVocabSentence = React.memo(({
         continue;
       }
 
-      const isWord = /^[a-zA-Z0-9'’-]+$/.test(token);
+      const isWord = /^[a-zA-Z0-9'’-]+$|^[\u4e00-\u9fff]$/.test(token);
       if (!isWord) {
         result.push({ text: token, isWord: false });
         i++;
@@ -43,26 +45,27 @@ export const HighlightedVocabSentence = React.memo(({
 
       for (let j = i; j < len && wordCount < maxPhraseWords; j++) {
         const t = rawTokens[j];
-        if (/^[a-zA-Z0-9'’-]+$/.test(t)) {
+        if (/^[a-zA-Z0-9'’-]+$|^[\u4e00-\u9fff]$/.test(t)) {
           const clean = t.toLowerCase().replace(/^[’']+|[’']+$/g, "").replace(/[’']/g, "'");
           candidateWords.push(clean);
           tokenIndices.push(j);
           wordCount++;
-        } else if (/[\n.!?]/.test(t)) {
+        } else if (/[\n.!?。！？]/.test(t)) {
           break;
         }
       }
 
-      // Check multi-word phrases from longest (candidateWords.length) down to 2
+      // Check multi-word phrases (supports spaces for English and no-space for Chinese)
       let matchedEndTokenIdx = -1;
       let matchedKey = null;
 
       if (savedVocabMap && candidateWords.length >= 2) {
         for (let k = candidateWords.length; k >= 2; k--) {
-          const phraseKey = candidateWords.slice(0, k).join(" ");
-          const item = savedVocabMap[phraseKey];
+          const phraseKeySpace = candidateWords.slice(0, k).join(" ");
+          const phraseKeyNoSpace = candidateWords.slice(0, k).join("");
+          const item = savedVocabMap[phraseKeySpace] || savedVocabMap[phraseKeyNoSpace];
           if (item && item.status !== "MASTERED") {
-            matchedKey = phraseKey;
+            matchedKey = item.word || phraseKeyNoSpace;
             matchedEndTokenIdx = tokenIndices[k - 1];
             break;
           }
@@ -85,7 +88,7 @@ export const HighlightedVocabSentence = React.memo(({
         // Single word hit/miss
         const clean = token.toLowerCase().replace(/^[’']+|[’']+$/g, "");
         const cleanNorm = clean.replace(/[’']/g, "'");
-        const savedItem = savedVocabMap ? (savedVocabMap[clean] || savedVocabMap[cleanNorm]) : null;
+        const savedItem = savedVocabMap ? (savedVocabMap[clean] || savedVocabMap[cleanNorm] || savedVocabMap[token]) : null;
         const isSaved = Boolean(savedItem && savedItem.status !== "MASTERED");
 
         result.push({
@@ -173,6 +176,8 @@ export const HighlightedVocabSentence = React.memo(({
           contextTranslation={contextTranslation}
           videoId={videoId}
           timestamp={timestamp}
+          sourceLang={sourceLang}
+          targetLang={targetLang}
           onClose={() => setActiveWordState(null)}
         />
       )}

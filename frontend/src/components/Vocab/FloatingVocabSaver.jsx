@@ -28,8 +28,9 @@ export const FloatingVocabSaver = ({
         return;
       }
 
-      // Ignore accidental 1-character clicks unless standard 1-letter words 'a' or 'i'
-      if (text.length === 1 && !["a", "i", "A", "I"].includes(text)) {
+      // Ignore accidental 1-character clicks unless standard 1-letter words 'a' or 'i' or Chinese character
+      const isChineseChar = /[\u4e00-\u9fff]/.test(text);
+      if (text.length === 1 && !["a", "i", "A", "I"].includes(text) && !isChineseChar) {
         return;
       }
 
@@ -96,6 +97,8 @@ export const FloatingVocabSaver = ({
 
   if (!selectedWord || !targetRange) return null;
 
+  const isChineseWord = /[\u4e00-\u9fff]/.test(selectedWord) || sourceLang === "zh";
+
   return (
     <WordLookupPopover
       word={selectedWord}
@@ -103,7 +106,7 @@ export const FloatingVocabSaver = ({
       contextSentence={selectedSentence || currentSentence || ""}
       videoId={currentVideoId || ""}
       timestamp={currentTimestamp || 0}
-      sourceLang={sourceLang || "en"}
+      sourceLang={isChineseWord ? "zh" : (sourceLang || "en")}
       targetLang={targetLang || "vi"}
       onClose={() => {
         setSelectedWord("");

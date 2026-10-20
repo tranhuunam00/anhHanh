@@ -139,6 +139,18 @@ describe("wordLookupUtils - Unit Tests", () => {
       const payload = getMeaningSavePayload({ timestamp: "120.5" });
       assert.equal(payload.timestamp, 120.5);
     });
+
+    it("auto-detects Chinese words and assigns source_lang as 'zh'", () => {
+      const payload = getMeaningSavePayload({
+        cleanWord: "你好",
+        customMeaning: "Xin chào",
+        phonetic: "Nǐ hǎo",
+      });
+      assert.equal(payload.word, "你好");
+      assert.equal(payload.meaning, "Xin chào");
+      assert.equal(payload.phonetic, "Nǐ hǎo");
+      assert.equal(payload.source_lang, "zh");
+    });
   });
 
   describe("POS Utility Functions", () => {
