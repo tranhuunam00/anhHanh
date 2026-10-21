@@ -12,6 +12,7 @@ import {
   getFallbackCollocations,
   getFallbackSentenceFrames,
 } from "../../utils/writingDefaultStructures";
+import { formatBandLabel } from "../../utils/bandVocabularyUtils";
 import { suggestWritingStructures } from "../../services/writingService";
 import { KeywordChipItem } from "./KeywordChipItem";
 import { SentenceFrameChipItem } from "./SentenceFrameChipItem";
@@ -68,7 +69,7 @@ export function PromptKeywordsBar({
     return () => window.removeEventListener("click", handleGlobalClick);
   }, []);
 
-  // 1. Tính toán danh sách Từ / Cụm từ theo trọng số từ mới
+  // 1. Tính toán danh sách Từ / Cụm từ theo trọng số từ mới và Mục tiêu Band
   const rankedKeywords = useMemo(() => {
     const basePromptKeywords = currentPrompt?.keywords || [];
     // Đặt extraKeywords lên trước để ưu tiên hiển thị ngay khi vừa gen thêm
@@ -78,9 +79,9 @@ export function PromptKeywordsBar({
       combinedKeywords,
       savedVocabMap,
       currentPrompt || {},
-      { includeNotebookVocab, maxKeywords: 35 }
+      { includeNotebookVocab, maxKeywords: 35, targetBand }
     );
-  }, [currentPrompt, savedVocabMap, includeNotebookVocab, extraKeywords]);
+  }, [currentPrompt, savedVocabMap, includeNotebookVocab, extraKeywords, targetBand]);
 
   // Danh sách Từ / Cụm từ sau khi áp dụng Sắp xếp (Thời gian ASC / DESC / Trọng số)
   const displayedKeywords = useMemo(() => {
@@ -150,6 +151,7 @@ export function PromptKeywordsBar({
             word: item.phrase || item.template || item.word,
             meaning: item.meaning || "Cụm từ học thuật theo đề bài",
             kind: "collocation",
+            band: formatBandLabel(item.band, targetBand),
             isGenerated: true,
             createdAt: new Date(Date.now() + idx * 100).toISOString(),
           }));
@@ -158,9 +160,9 @@ export function PromptKeywordsBar({
         console.debug("API suggest-structures failed, using smart fallback:", apiErr);
       }
 
-      // Nếu API không trả về hoặc bị lỗi, sử dụng fallback đa dạng theo chủ đề
+      // Nếu API không trả về hoặc bị lỗi, sử dụng fallback đa dạng theo chủ đề và Band
       if (newItems.length === 0) {
-        newItems = getFallbackCollocations(topicText, existing);
+        newItems = getFallbackCollocations(topicText, existing, targetBand);
       }
 
       if (newItems.length > 0) {
@@ -174,7 +176,7 @@ export function PromptKeywordsBar({
     } catch (e) {
       console.error("Lỗi sinh thêm từ vựng:", e);
       // Fallback an toàn
-      const fallbackList = getFallbackCollocations(topicText, existing);
+      const fallbackList = getFallbackCollocations(topicText, existing, targetBand);
       if (fallbackList.length > 0) {
         setExtraKeywords((prev) => [...fallbackList, ...prev]);
         if (showToast) showToast(`Đã bổ sung thêm ${fallbackList.length} cụm từ học thuật!`, "success");

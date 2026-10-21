@@ -3,6 +3,12 @@
  * Helps learners apply high-priority new/review vocabulary from their notebook into essays.
  */
 
+import {
+  estimateWordBand,
+  calculateBandMatchBonus,
+  formatBandLabel,
+} from "./bandVocabularyUtils.js";
+
 /**
  * Escape special regex characters in a string
  * @param {string} str
@@ -16,12 +22,13 @@ function escapeRegex(str) {
  * Calculate the new word weight for a specific word/phrase.
  * Score range: 10 - 100 (higher score = higher priority to use in essay)
  *
- * @param {string} rawWord - The keyword or phrase
+ * @param {string|Object} rawWord - The keyword or phrase
  * @param {Object|null} vocabItem - The saved vocabulary item from user notebook (if any)
- * @param {Object} [promptContext={}] - The prompt context { prompt, keywords, topic_category }
+ * @param {Object} [promptContext={}] - The prompt context { prompt, keywords, topic_category, targetBand }
+ * @param {number|string} [targetBand=null] - Target IELTS Band to adapt weights
  * @returns {Object|null} Ranked word data or null if invalid
  */
-export function calculateWordWeight(rawWord, vocabItem = null, promptContext = {}) {
+export function calculateWordWeight(rawWord, vocabItem = null, promptContext = {}, targetBand = null) {
   if (!rawWord) return null;
   const word = typeof rawWord === "string" ? rawWord.trim() : (rawWord?.word || rawWord?.phrase || "").trim();
   if (!word) return null;
@@ -29,6 +36,15 @@ export function calculateWordWeight(rawWord, vocabItem = null, promptContext = {
   const normalizedWord = word.toLowerCase();
   const reasons = [];
   let score = 0;
+
+  // Determine target band and estimate word's band level
+  const effectiveTargetBand = targetBand ?? promptContext?.targetBand ?? 7.0;
+  const wordBand = estimateWordBand(rawWord, promptContext, effectiveTargetBand);
+  const bandBonus = calculateBandMatchBonus(wordBand, effectiveTargetBand);
+  if (bandBonus > 0) {
+    score += bandBonus;
+    reasons.push(`Khớp mục tiêu ${wordBand} (+${bandBonus})`);
+  }
 
   // 1. Learning Status & Need Score (Max 50 pts)
   let status = "UNSAVED";
@@ -125,6 +141,7 @@ export function calculateWordWeight(rawWord, vocabItem = null, promptContext = {
   return {
     word,
     normalizedWord,
+    band: wordBand,
     weightScore: finalScore,
     status,
     isSaved,
@@ -225,11 +242,12 @@ export function rankKeywordsByNewWordWeight(
   promptContext = {},
   options = {}
 ) {
-  const { includeNotebookVocab = true, maxKeywords = 35 } = options;
+  const { includeNotebookVocab = true, maxKeywords = 35, targetBand = 7.0 } = options;
+  const effectiveTargetBand = options.targetBand ?? promptContext?.targetBand ?? targetBand ?? 7.0;
   const wordMap = new Map();
   const extraMetaMap = new Map();
 
-  // 1. Add prompt keywords (hỗ trợ cả string và object { word, phrase, meaning, kind })
+  // 1. Add prompt keywords (hỗ trợ cả string và object { word, phrase, meaning, kind, band })
   if (Array.isArray(promptKeywords)) {
     promptKeywords.forEach((kw) => {
       const clean = typeof kw === "string" ? kw.trim() : (kw?.word || kw?.phrase || "").trim();
@@ -262,8 +280,11 @@ export function rankKeywordsByNewWordWeight(
   wordMap.forEach((originalWord, key) => {
     const vocabItem = savedVocabMap?.[key] || null;
     const extraMeta = extraMetaMap.get(key) || {};
-    const weighted = calculateWordWeight(originalWord, vocabItem, promptContext);
+    const weighted = calculateWordWeight(originalWord, vocabItem, promptContext, effectiveTargetBand);
     if (weighted) {
+      if (extraMeta.band) {
+        weighted.band = formatBandLabel(extraMeta.band, effectiveTargetBand);
+      }
       if (extraMeta.meaning && !weighted.meaning) {
         weighted.meaning = extraMeta.meaning;
       }

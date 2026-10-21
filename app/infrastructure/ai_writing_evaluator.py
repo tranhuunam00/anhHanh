@@ -139,6 +139,7 @@ async def evaluate_writing_impl(
     lang_name = cfg["name"]
     examiner = cfg["examiner"]
     system_scale = cfg["system"]
+    upgrade_target = min(9.0, round((float(target_band) + 0.5) * 2) / 2)
 
     eval_prompt = f"""Bạn là {examiner}.
 Nhiệm vụ của bạn là đánh giá, chấm điểm cực kỳ khách quan, tỉ mỉ và đưa ra nhận xét sửa lỗi chi tiết cho bài viết bằng {lang_name} của học viên dưới đây theo thang điểm {system_scale}.
@@ -183,6 +184,9 @@ YÊU CẦU CHẤM ĐIỂM & ĐÁNH GIÁ (BẮT BUỘC ĐỦ 5 PHẦN):
 5. PHÂN TÍCH VÀ SỬA TỪNG CÂU MỘT (sentence_breakdown):
    - Chia toàn bộ bài viết của học viên thành danh sách tuần tự TỪNG CÂU MỘT.
    - Với MỖI CÂU: sentence_num, original, is_grammar_correct, grammar_analysis, grammar_fix, upgrade_needed, upgraded_sentence, upgrade_notes.
+   - QUY TẮC CỐT LÕI VỀ NÂNG CẤP HỌC THUẬT (upgraded_sentence):
+     + CHỈ NÂNG CẤP VƯỢT NỬA BAND (+0.5 band) so với mục tiêu Band {target_band} của học viên (tức là nâng cấp đến mức Band {upgrade_target:.1f}).
+     + TUYỆT ĐỐI KHÔNG NÂNG CẤP KỊCH TRẦN (không nhảy cóc lên Band 8.5 - 9.0 nếu mục tiêu học viên chỉ là Band 6.0 hay 7.0). Nâng cấp phải vừa sức, tự nhiên, bám sát ý tưởng gốc và collocations thực tế ở mức Band {upgrade_target:.1f}.
 
 ĐỊNH DẠNG TRẢ VỀ:
 BẮT BUỘC là JSON duy nhất:

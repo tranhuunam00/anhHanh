@@ -101,25 +101,40 @@ export function getDefaultStructuresByGenre(genre = "ielts_task2") {
   return DEFAULT_TASK2_STRUCTURES;
 }
 
+import { formatBandLabel, parseBandScore } from "./bandVocabularyUtils.js";
+
 /**
- * Kho collocations học thuật dự phòng đa chủ đề (Band 7.5 - 8.5)
+ * Kho collocations học thuật dự phòng đa chủ đề phân cấp theo Band (6.5 - 8.5)
  */
 export const TOPIC_COLLOCATIONS_BANK = [
-  { word: "exponential professional growth", meaning: "sự phát triển vượt bậc về chuyên môn", category: "work" },
-  { word: "merit-based remuneration", meaning: "chế độ đãi ngộ dựa trên năng lực", category: "work" },
-  { word: "retention incentives", meaning: "chính sách khuyến khích giữ chân nhân tài", category: "work" },
-  { word: "volatile labor landscape", meaning: "thị trường lao động nhiều biến động", category: "work" },
-  { word: "interpersonal adaptability", meaning: "khả năng thích ứng giao tiếp linh hoạt", category: "work" },
-  { word: "career stagnation perils", meaning: "nguy cơ trì trệ trong con đường sự nghiệp", category: "work" },
-  { word: "paradigm shift", meaning: "sự chuyển dịch căn bản mang tính hệ hình", category: "general" },
-  { word: "sustainable economic equilibrium", meaning: "trạng thái cân bằng kinh tế bền vững", category: "economy" },
-  { word: "socio-economic disparity", meaning: "sự chênh lệch về kinh tế - xã hội", category: "society" },
-  { word: "long-term viability", meaning: "khả năng duy trì hiệu quả trong dài hạn", category: "general" },
-  { word: "catalyst for innovation", meaning: "chất xúc tác thúc đẩy sự đổi mới sáng tạo", category: "general" },
-  { word: "mitigate detrimental impacts", meaning: "giảm thiểu các tác động tiêu cực", category: "general" },
-  { word: "ecological preservation", meaning: "sự bảo tồn hệ sinh thái tự nhiên", category: "environment" },
-  { word: "pedagogical enhancement", meaning: "sự cải tiến phương pháp giáo dục", category: "education" },
-  { word: "technological proliferation", meaning: "sự phổ biến nhanh chóng của công nghệ", category: "technology" },
+  // Band 8.0 - 8.5 (C2 Sophisticated Expressions)
+  { word: "exponential professional growth", meaning: "sự phát triển vượt bậc về chuyên môn", category: "work", band: "Band 8.5" },
+  { word: "merit-based remuneration", meaning: "chế độ đãi ngộ dựa trên năng lực", category: "work", band: "Band 8.0" },
+  { word: "volatile labor landscape", meaning: "thị trường lao động nhiều biến động", category: "work", band: "Band 8.0" },
+  { word: "career stagnation perils", meaning: "nguy cơ trì trệ trong con đường sự nghiệp", category: "work", band: "Band 8.0" },
+  { word: "paradigm shift", meaning: "sự chuyển dịch căn bản mang tính hệ hình", category: "general", band: "Band 8.5" },
+  { word: "sustainable economic equilibrium", meaning: "trạng thái cân bằng kinh tế bền vững", category: "economy", band: "Band 8.0" },
+  { word: "socio-economic disparity", meaning: "sự chênh lệch về kinh tế - xã hội", category: "society", band: "Band 8.0" },
+  { word: "mitigate detrimental impacts", meaning: "giảm thiểu các tác động tiêu cực", category: "general", band: "Band 8.0" },
+  { word: "technological proliferation", meaning: "sự phổ biến nhanh chóng của công nghệ", category: "technology", band: "Band 8.0" },
+
+  // Band 7.0 - 7.5 (C1 Academic Collocations)
+  { word: "retention incentives", meaning: "chính sách khuyến khích giữ chân nhân tài", category: "work", band: "Band 7.5" },
+  { word: "interpersonal adaptability", meaning: "khả năng thích ứng giao tiếp linh hoạt", category: "work", band: "Band 7.5" },
+  { word: "long-term viability", meaning: "khả năng duy trì hiệu quả trong dài hạn", category: "general", band: "Band 7.5" },
+  { word: "catalyst for innovation", meaning: "chất xúc tác thúc đẩy sự đổi mới sáng tạo", category: "general", band: "Band 7.5" },
+  { word: "ecological preservation", meaning: "sự bảo tồn hệ sinh thái tự nhiên", category: "environment", band: "Band 7.5" },
+  { word: "pedagogical enhancement", meaning: "sự cải tiến phương pháp giáo dục", category: "education", band: "Band 7.5" },
+  { word: "career advancement prospects", meaning: "triển vọng thăng tiến nghề nghiệp", category: "work", band: "Band 7.0" },
+  { word: "renewable energy transition", meaning: "sự chuyển đổi sang năng lượng tái tạo", category: "environment", band: "Band 7.0" },
+  { word: "technological advancements", meaning: "những tiến bộ về mặt công nghệ", category: "technology", band: "Band 7.0" },
+
+  // Band 6.0 - 6.5 (B2 Solid Collocations)
+  { word: "practical work experience", meaning: "kinh nghiệm làm việc thực tế", category: "work", band: "Band 6.5" },
+  { word: "workplace productivity", meaning: "năng suất tại nơi làm việc", category: "work", band: "Band 6.5" },
+  { word: "environmental protection", meaning: "bảo vệ môi trường sống", category: "environment", band: "Band 6.0" },
+  { word: "academic achievement", meaning: "thành tích trong học tập", category: "education", band: "Band 6.5" },
+  { word: "cost of living pressure", meaning: "áp lực chi phí sinh hoạt", category: "society", band: "Band 6.5" },
 ];
 
 /**
@@ -164,20 +179,46 @@ export const EXTRA_SENTENCE_PATTERNS = [
 ];
 
 /**
- * Trích xuất các collocations học thuật dự phòng dựa trên prompt text
+ * Trích xuất các collocations học thuật dự phòng dựa trên prompt text và targetBand
+ * @param {string} promptText
+ * @param {Array<string|Object>} existingWords
+ * @param {number|string} [targetBand=7.0]
+ * @returns {Array<Object>}
  */
-export function getFallbackCollocations(promptText = "", existingWords = []) {
-  const existingLower = new Set(existingWords.map((w) => (typeof w === "string" ? w : w.word || w.phrase || "").toLowerCase()));
+export function getFallbackCollocations(promptText = "", existingWords = [], targetBand = 7.0) {
+  const existingLower = new Set(
+    existingWords.map((w) => (typeof w === "string" ? w : w.word || w.phrase || "").toLowerCase())
+  );
   const pLower = (promptText || "").toLowerCase();
+  const targetNum = parseBandScore(targetBand, 7.0);
 
-  // Tìm các từ phù hợp với topic
-  const matching = TOPIC_COLLOCATIONS_BANK.filter((item) => {
+  // 1. Lọc theo chủ đề bài viết
+  let matching = TOPIC_COLLOCATIONS_BANK.filter((item) => {
     if (existingLower.has(item.word.toLowerCase())) return false;
     if (pLower.includes(item.category)) return true;
     if (pLower.includes("job") || pLower.includes("career") || pLower.includes("work") || pLower.includes("employ")) {
       return item.category === "work" || item.category === "general";
     }
+    if (pLower.includes("environ") || pLower.includes("green") || pLower.includes("nature")) {
+      return item.category === "environment" || item.category === "general";
+    }
+    if (pLower.includes("tech") || pLower.includes("ai") || pLower.includes("digital")) {
+      return item.category === "technology" || item.category === "general";
+    }
     return true;
+  });
+
+  if (matching.length === 0) {
+    matching = TOPIC_COLLOCATIONS_BANK.filter((item) => !existingLower.has(item.word.toLowerCase()));
+  }
+
+  // 2. Sắp xếp ưu tiên theo độ tiệm cận với targetBand của người học
+  matching.sort((a, b) => {
+    const scoreA = parseBandScore(a.band, 7.0);
+    const scoreB = parseBandScore(b.band, 7.0);
+    const diffA = Math.abs(scoreA - targetNum);
+    const diffB = Math.abs(scoreB - targetNum);
+    return diffA - diffB;
   });
 
   return matching.slice(0, 5).map((item, idx) => ({
@@ -185,6 +226,7 @@ export function getFallbackCollocations(promptText = "", existingWords = []) {
     phrase: item.word,
     meaning: item.meaning,
     kind: "collocation",
+    band: item.band || formatBandLabel(targetBand),
     isGenerated: true,
     createdAt: new Date(Date.now() + idx * 100).toISOString(),
   }));

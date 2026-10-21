@@ -11,9 +11,30 @@ export const HighlightedVocabSentence = React.memo(({
   timestamp = 0,
   sourceLang = "en",
   targetLang = "vi",
+  extraHighlightWords = [],
 }) => {
   const { savedVocabMap } = useAuth();
   const [activeWordState, setActiveWordState] = useState(null);
+
+  const effectiveVocabMap = useMemo(() => {
+    const map = { ...(savedVocabMap || {}) };
+    if (Array.isArray(extraHighlightWords) && extraHighlightWords.length > 0) {
+      extraHighlightWords.forEach((item) => {
+        const w = typeof item === "string" ? item.trim() : (item?.word || item?.phrase || "").trim();
+        if (w) {
+          const key = w.toLowerCase();
+          if (!map[key]) {
+            map[key] = {
+              word: w,
+              status: item?.status || "NEW",
+              meaning: item?.meaning || "Từ vựng / Collocation học thuật",
+            };
+          }
+        }
+      });
+    }
+    return map;
+  }, [savedVocabMap, extraHighlightWords]);
 
   const tokens = useMemo(() => {
     if (!text) return [];
@@ -59,11 +80,11 @@ export const HighlightedVocabSentence = React.memo(({
       let matchedEndTokenIdx = -1;
       let matchedKey = null;
 
-      if (savedVocabMap && candidateWords.length >= 2) {
+      if (effectiveVocabMap && candidateWords.length >= 2) {
         for (let k = candidateWords.length; k >= 2; k--) {
           const phraseKeySpace = candidateWords.slice(0, k).join(" ");
           const phraseKeyNoSpace = candidateWords.slice(0, k).join("");
-          const item = savedVocabMap[phraseKeySpace] || savedVocabMap[phraseKeyNoSpace];
+          const item = effectiveVocabMap[phraseKeySpace] || effectiveVocabMap[phraseKeyNoSpace];
           if (item && item.status !== "MASTERED") {
             matchedKey = item.word || phraseKeyNoSpace;
             matchedEndTokenIdx = tokenIndices[k - 1];
@@ -88,7 +109,7 @@ export const HighlightedVocabSentence = React.memo(({
         // Single word hit/miss
         const clean = token.toLowerCase().replace(/^[’']+|[’']+$/g, "");
         const cleanNorm = clean.replace(/[’']/g, "'");
-        const savedItem = savedVocabMap ? (savedVocabMap[clean] || savedVocabMap[cleanNorm] || savedVocabMap[token]) : null;
+        const savedItem = effectiveVocabMap ? (effectiveVocabMap[clean] || effectiveVocabMap[cleanNorm] || effectiveVocabMap[token]) : null;
         const isSaved = Boolean(savedItem && savedItem.status !== "MASTERED");
 
         result.push({
@@ -104,7 +125,7 @@ export const HighlightedVocabSentence = React.memo(({
     }
 
     return result;
-  }, [text, savedVocabMap]);
+  }, [text, effectiveVocabMap]);
 
   if (!text) return null;
 

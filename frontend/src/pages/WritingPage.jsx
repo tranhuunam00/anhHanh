@@ -35,8 +35,8 @@ import { normalizeStructureList, mergeStructureLists } from "../utils/writingStr
 import { createVocabWord } from "../services/authVocabService";
 import { Task1Visualizer } from "../components/Writing/Task1Visualizer";
 import { IeltsPromptLibraryModal } from "../components/Writing/IeltsPromptLibraryModal";
-import { WritingOutlineTab } from "../components/Writing/WritingOutlineTab";
 import { PromptKeywordsBar } from "../components/Writing/PromptKeywordsBar";
+import { HighlightedVocabSentence } from "../components/Vocab/HighlightedVocabSentence";
 import "../styles/writing.css";
 
 export const LANGUAGES = [
@@ -156,6 +156,13 @@ export const WritingPage = ({ isActive = false }) => {
     if (sentenceFilter === "upgrade") return sentencesList.filter((s) => s.upgrade_needed);
     return sentencesList;
   }, [sentencesList, sentenceFilter]);
+
+  // Upgrade target band (+0.5 band, capped at 9.0)
+  const upgradeTargetBand = useMemo(() => {
+    const base = parseFloat(targetBand) || 7.0;
+    const bumped = Math.min(9.0, Math.round((base + 0.5) * 2) / 2);
+    return bumped.toFixed(1);
+  }, [targetBand]);
 
   // History state
   const [historyItems, setHistoryItems] = useState([]);
@@ -1629,7 +1636,7 @@ export const WritingPage = ({ isActive = false }) => {
                             {sent.upgrade_needed ? (
                               <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#7c3aed", background: "rgba(124, 58, 237, 0.12)", padding: "2px 6px", borderRadius: "4px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                                 <IconSparkles size={11} />
-                                <span>Có gợi ý nâng cấp Band 8.5+</span>
+                                <span>Có gợi ý nâng cấp Band {upgradeTargetBand}</span>
                               </span>
                             ) : (
                               <span className="sentence-no-upgrade-tag" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
@@ -1641,7 +1648,12 @@ export const WritingPage = ({ isActive = false }) => {
 
                           {/* Câu gốc của học viên */}
                           <div className="sentence-original-text">
-                            "{sent.original}"
+                            "<HighlightedVocabSentence
+                              text={sent.original}
+                              sourceLang={selectedLanguage}
+                              targetLang="vi"
+                              extraHighlightWords={currentPrompt?.keywords || []}
+                            />"
                           </div>
 
                           {/* Phân tích ngữ pháp */}
@@ -1668,7 +1680,14 @@ export const WritingPage = ({ isActive = false }) => {
                                 <span>Sửa đúng ngữ pháp:</span>
                               </div>
                               <div className="box-content-text">
-                                <strong>{sent.grammar_fix}</strong>
+                                <strong>
+                                  <HighlightedVocabSentence
+                                    text={sent.grammar_fix}
+                                    sourceLang={selectedLanguage}
+                                    targetLang="vi"
+                                    extraHighlightWords={currentPrompt?.keywords || []}
+                                  />
+                                </strong>
                               </div>
                             </div>
                           )}
@@ -1678,10 +1697,20 @@ export const WritingPage = ({ isActive = false }) => {
                             <div className="sentence-detail-box upgrade">
                               <div className="box-title-label" style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
                                 <IconSparkles size={12} />
-                                <span>Nâng cấp câu học thuật (Band 8.5+):</span>
+                                <span>Nâng cấp câu học thuật (Band {upgradeTargetBand}):</span>
                               </div>
                               <div className="box-content-text">
-                                <strong>{sent.upgraded_sentence}</strong>
+                                <strong>
+                                  <HighlightedVocabSentence
+                                    text={sent.upgraded_sentence}
+                                    sourceLang={selectedLanguage}
+                                    targetLang="vi"
+                                    extraHighlightWords={[
+                                      ...(currentPrompt?.keywords || []),
+                                      ...(evaluationResult?.vocab_upgrades || []),
+                                    ]}
+                                  />
+                                </strong>
                               </div>
                               {sent.upgrade_notes && (
                                 <div style={{ fontSize: "0.75rem", marginTop: "4px", opacity: 0.9, display: "flex", alignItems: "center", gap: "4px" }}>

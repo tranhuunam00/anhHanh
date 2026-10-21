@@ -798,10 +798,37 @@
   border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
-.chip-status-tag.badge-sentence-band {
+.chip-status-tag.badge-sentence-band,
+.chip-status-tag.badge-word-band {
   background: rgba(139, 92, 246, 0.12);
   color: #7c3aed;
   border: 1px solid rgba(139, 92, 246, 0.25);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+[data-theme="dark"] .chip-status-tag.badge-sentence-band,
+[data-theme="dark"] .chip-status-tag.badge-word-band {
+  background: rgba(167, 139, 250, 0.18);
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+.popover-band-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  text-transform: uppercase;
+}
+
+[data-theme="dark"] .popover-band-tag {
+  background: rgba(167, 139, 250, 0.18);
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.35);
 }
 
 .chip-weight-score {

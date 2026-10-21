@@ -115,6 +115,16 @@ export function KeywordChipItem({
       {/* Text từ khóa */}
       <span className="chip-word-text">{kw.word}</span>
 
+      {/* Badge Band */}
+      {kw.band && (
+        <span
+          className="chip-status-tag badge-word-band"
+          title={`Cấp độ Band khuyến nghị: ${kw.band}`}
+        >
+          {kw.band}
+        </span>
+      )}
+
       {/* Badge trạng thái */}
       <span className={`chip-status-tag ${badgeClass}`}>{badgeText}</span>
 
@@ -159,6 +169,7 @@ export function KeywordChipItem({
         >
           <div className="popover-header">
             <strong>{kw.word}</strong>
+            {kw.band && <span className="popover-band-tag">{kw.band}</span>}
             {kw.phonetic && <span className="popover-phonetic">/{kw.phonetic}/</span>}
           </div>
 
