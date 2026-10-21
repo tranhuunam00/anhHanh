@@ -23,10 +23,19 @@
 - Khi một file vượt quá 500 dòng, phải chủ động refactor tách nhỏ thành các submodules/components/utils/hooks chuyên biệt theo nguyên lý Single Responsibility.
 - **Yêu cầu viết Unit Test chi tiết cho từng hàm được tách**: Phải bao phủ đầy đủ các dạng input, output và logic xử lý (happy path, edge cases, boundary cases, bad cases).
 
-## 5. Quy Tắc Kiểm Thử & Biên Dịch (Build & Verification Integrity)
-- **BẮT BUỘC PHẢI CHẠY BUILD VÀ KIỂM THỬ TRƯỚC KHI KẾT THÚC TASK**:
-  - Frontend: Bắt buộc chạy `npm run build` kiểm tra toàn bộ imports/exports, tuyệt đối không để sót undefined component hay cú pháp lỗi.
-  - Backend: Bắt buộc chạy toàn bộ test suite (`python -m pytest tests/ -q`), đảm bảo 100% test passes.
+## 5. Quy Tắc Kiểm Thử, Linter & Biên Dịch Bắt Buộc (Mandatory Verification Protocol)
+- **SAU MỖI LẦN SỬA ĐỔI HOẶC TRƯỚC KHI KẾT THÚC TASK, BẮT BUỘC PHẢI CHẠY ĐỦ CÁC BƯỚC KIỂM THỬ SAU**:
+  - **Frontend Kiểm Tra Lỗi Undefined & Linter (CỰC KỲ QUAN TRỌNG)**:
+    - Bắt buộc chạy `npx oxlint src --quiet` (hoặc `npm run lint`) trong thư mục `frontend/`.
+    - **Lý do**: Vite build thông thường chỉ transpile JSX chứ **KHÔNG** bắt được lỗi runtime như thiếu import component (`WritingOutlineTab is not defined`), `no-undef`, biến chưa khai báo. Chạy `oxlint` là chốt chặn bắt buộc để đảm bảo **0 errors**, tuyệt đối không để sót undefined component/variable.
+  - **Frontend Unit Tests**:
+    - Bắt buộc chạy `npm test` trong thư mục `frontend/` (`node --test tests/**/*.test.js`), đảm bảo 100% unit tests pass.
+  - **Frontend Production Build**:
+    - Bắt buộc chạy `npm run build` trong thư mục `frontend/` để kiểm tra toàn bộ pipeline biên dịch bundle `dist/`, không có lỗi cú pháp hay thiếu file tài nguyên.
+  - **Backend Tests**:
+    - Bắt buộc chạy test suite (`python -m pytest tests/ -q`), đảm bảo 100% test passes.
+- **NGUYÊN TẮC KHÔNG NGOẠI LỆ**: Nếu chưa chạy kiểm tra linter (`npx oxlint src --quiet`), unit tests và build, **TUYỆT ĐỐI KHÔNG ĐƯỢC BÁO HOÀN THÀNH TASK CHO NGƯỜI DÙNG**.
+
 
 ## 6. Quy Tắc Bắt Buộc Viết Test Cho Mọi Hàm Mới / Hàm Được Tách (Mandatory Function-Level Unit Testing)
 - **MỌI HÀM ĐƯỢC VIẾT MỚI HOẶC ĐƯỢC REFACTOR TÁCH RA ĐỀU BẮT BUỘC PHẢI CÓ UNIT TEST RIÊNG**.

@@ -31,6 +31,7 @@ import {
   deleteSubmission,
 } from "../services/writingService";
 import { StructuresModal } from "../components/Writing/StructuresModal";
+import { WritingOutlineTab } from "../components/Writing/WritingOutlineTab";
 import { normalizeStructureList, mergeStructureLists } from "../utils/writingStructureUtils";
 import { createVocabWord } from "../services/authVocabService";
 import { Task1Visualizer } from "../components/Writing/Task1Visualizer";
