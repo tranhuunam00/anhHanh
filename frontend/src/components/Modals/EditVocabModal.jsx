@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Pencil,
-  X,
-  Volume2,
-  Check,
-  Loader2,
-  Zap,
-} from "../Icons";
+import { Pencil, X, Volume2, Check, Loader2, Zap } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
   updateVocabWord,
@@ -108,6 +101,8 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
           setImageUrl(candidates[0]);
           setImgLoadError(false);
         }
+      } else if (imageUrl && imageUrl.includes("unsplash.com/photo-1456513080510")) {
+        setImageUrl("");
       }
 
       showToast(`Đã tự động cập nhật phiên âm & dịch cho "${clean}"!`, "success");

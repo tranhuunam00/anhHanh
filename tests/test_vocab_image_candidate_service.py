@@ -118,3 +118,102 @@ def test_get_image_candidates_chinese_word():
         # Verify call used zh.wikipedia.org
         first_call_args = mock_urlopen.call_args_list[0][0][0]
         assert "zh.wikipedia.org" in first_call_args.full_url
+
+
+# ============================================================================
+# 3. is_abstract_word and is_result_title_relevant Unit Tests
+# ============================================================================
+
+from app.infrastructure.image_search_service import is_abstract_word, is_result_title_relevant
+
+
+def test_is_abstract_word_coverage():
+    """Covers input coverage, output verification, logic coverage, and bad cases."""
+    # English abstract concepts
+    assert is_abstract_word("resilience") is True
+    assert is_abstract_word("aspect") is True
+    assert is_abstract_word("theory") is True
+    assert is_abstract_word("concept") is True
+    assert is_abstract_word("factor") is True
+    assert is_abstract_word("perspective") is True
+
+    # Chinese abstract concepts
+    assert is_abstract_word("概念") is True
+    assert is_abstract_word("理论") is True
+    assert is_abstract_word("方面") is True
+    assert is_abstract_word("韧性") is True
+
+    # Concrete physical concepts
+    assert is_abstract_word("apple") is False
+    assert is_abstract_word("computer") is False
+    assert is_abstract_word("cat") is False
+    assert is_abstract_word("苹果") is False
+
+    # Edge cases and bad inputs
+    assert is_abstract_word("") is False
+    assert is_abstract_word("   ") is False
+    assert is_abstract_word(None) is False
+    assert is_abstract_word(12345) is False
+
+
+def test_is_result_title_relevant_coverage():
+    """Covers input coverage, output verification, logic coverage, and bad cases."""
+    # 1. English relevant matches
+    assert is_result_title_relevant("apple", "Apple (fruit)", is_zh=False) is True
+    assert is_result_title_relevant("apples", "Apple", is_zh=False) is True
+    assert is_result_title_relevant("manoeuvre", "File:Road_manoeuvre_exercise.jpg", is_zh=False) is True
+
+    # 2. Chinese relevant matches
+    assert is_result_title_relevant("苹果", "苹果 (水果)", is_zh=True) is True
+    assert is_result_title_relevant("跑步", "跑步机", is_zh=True) is True
+
+    # 3. Disqualified qualifiers (media, vehicles, people)
+    assert is_result_title_relevant("swift", "Taylor Swift (singer)", is_zh=False) is False
+    assert is_result_title_relevant("resilience", "Crew Dragon Resilience", is_zh=False) is False
+    assert is_result_title_relevant("foster", "Foster (film)", is_zh=False) is False
+
+    # 4. Irrelevant/incidental titles
+    assert is_result_title_relevant("manoeuvre", "Cadastre de France 1812", is_zh=False) is False
+    assert is_result_title_relevant("苹果", "史蒂夫·乔布斯传记", is_zh=True) is False
+
+    # 5. Bad / empty inputs
+    assert is_result_title_relevant("", "Some Title", is_zh=False) is False
+    assert is_result_title_relevant("apple", "", is_zh=False) is False
+    assert is_result_title_relevant(None, None, is_zh=False) is False
+
+
+def test_get_image_candidates_abstract_words_return_empty():
+    """Verify abstract words return empty candidate list immediately without network requests."""
+    with patch("urllib.request.urlopen") as mock_urlopen:
+        assert ImageSearchService.get_image_candidates("resilience") == []
+        assert ImageSearchService.get_image_candidates("aspect") == []
+        assert ImageSearchService.get_image_candidates("theory") == []
+        assert ImageSearchService.get_image_candidates("概念") == []
+        mock_urlopen.assert_not_called()
+
+
+def test_get_image_candidates_rejects_irrelevant_title():
+    """Verify that search results with irrelevant titles are strictly rejected."""
+    mock_wiki_resp = {
+        "query": {
+            "pages": {
+                "1": {
+                    "title": "SpaceX Crew Dragon Resilience",
+                    "thumbnail": {"source": "https://wiki.org/dragon.jpg"}
+                },
+                "2": {
+                    "title": "Unrelated Topic",
+                    "thumbnail": {"source": "https://wiki.org/unrelated.jpg"}
+                }
+            }
+        }
+    }
+    raw_bytes = json.dumps(mock_wiki_resp).encode("utf-8")
+    mock_fp = MagicMock()
+    mock_fp.read.return_value = raw_bytes
+    mock_fp.__enter__.return_value = mock_fp
+
+    with patch("urllib.request.urlopen", return_value=mock_fp):
+        candidates = ImageSearchService.get_image_candidates("bicycle")
+        # bicycle does not appear in "SpaceX Crew Dragon Resilience" nor "Unrelated Topic"
+        assert candidates == []

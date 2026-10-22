@@ -26,14 +26,115 @@ BAD_PATTERNS = [
     'manuscript', 'sermon', 'library', 'handbook', 'manual', 'gazette', 'volume', 'edition',
     'portrait', 'monument', 'statue', 'grave', 'tomb', 'cemetery', 'census',
     'valsalva', 'heimlich', 'cadastre', 'geologie', 'g%c3%a9ologie', 'hydro', 'natura_2000',
-    'orthophoto', 'medical', 'surgery', 'patient', 'hospital', 'clinical', 'radiography', 'x-ray', 'anatomy', 'procedure'
+    'orthophoto', 'medical', 'surgery', 'patient', 'hospital', 'clinical', 'radiography', 'x-ray', 'anatomy', 'procedure',
+    'plaque', 'coin', 'banknote', 'stamp', 'commemorative', 'headstone', 'sketch', 'drawing',
+    'graph', 'formula', 'micrograph', 'endoscopy', 'ultrasound', 'pathology', 'cadaver',
+    'satellite_image', 'aerial_view', 'topographic', 'geological', 'spacecraft', 'capsule'
 ]
 
 ABSTRACT_WORDS = {
     'none', 'less', 'more', 'all', 'any', 'some', 'much', 'many', 'such', 'so',
     'far', 'ever', 'never', 'well', 'quite', 'just', 'too', 'very', 'once', 'least',
-    'way', 'thing', 'item', 'something', 'anything', 'nothing'
+    'way', 'thing', 'item', 'something', 'anything', 'nothing',
+    'resilience', 'aspect', 'aspects', 'theory', 'theories', 'concept', 'concepts',
+    'factor', 'factors', 'context', 'significance', 'perspective', 'perspectives',
+    'situation', 'process', 'policy', 'policies', 'condition', 'conditions',
+    'possibility', 'capacity', 'relationship', 'relationships', 'responsibility',
+    'ability', 'abilities', 'attitude', 'attitudes', 'behavior', 'behaviour',
+    'circumstance', 'circumstances', 'consequence', 'consequences', 'decision',
+    'difficulty', 'difficulties', 'effort', 'efforts', 'emphasis', 'experience',
+    'importance', 'influence', 'intention', 'issue', 'issues', 'knowledge',
+    'manner', 'method', 'methods', 'nature', 'notion', 'opinion', 'opinions',
+    'outcome', 'outcomes', 'performance', 'principle', 'principles', 'problem', 'problems',
+    'purpose', 'purposes', 'reason', 'reasons', 'requirement', 'requirements',
+    'result', 'results', 'role', 'roles', 'solution', 'solutions', 'strategy', 'strategies',
+    'tendency', 'thought', 'thoughts', 'tradition', 'traditions', 'understanding',
+    'value', 'values', 'variety', 'view', 'views', 'definition', 'definitions',
+    'philosophy', 'hypothesis', 'hypotheses', 'logic', 'morality', 'ethics',
+    'belief', 'beliefs', 'feeling', 'feelings', 'emotion', 'emotions', 'mood',
+    'impression', 'sympathy', 'empathy', 'gratitude', 'integrity', 'freedom',
+    'justice', 'peace', 'democracy', 'truth', 'fact', 'facts', 'evidence', 'reality',
+    'existence', 'presence', 'absence', 'instance', 'phenomenon', 'occurrence',
+    'incident', 'dimension', 'extent', 'degree', 'frequency', 'intensity',
+    'priority', 'status', 'stance',
+    '概念', '理论', '方面', '因素', '情况', '过程', '政策', '关系', '责任',
+    '能力', '态度', '经验', '重要性', '原则', '问题', '目的', '原因', '结果',
+    '策略', '价值观', '传统', '思维', '哲学', '逻辑', '道德', '正义', '自由',
+    '真理', '事实', '现实', '存在', '程度', '状态', '韧性'
 }
+
+DISALLOWED_TITLE_QUALIFIERS = [
+    '(album)', '(song)', '(band)', '(film)', '(movie)', '(tv series)', '(television)',
+    '(actor)', '(actress)', '(politician)', '(footballer)', '(cricketer)', '(singer)',
+    '(ship)', '(disambiguation)', '(surname)', '(given name)', '(crater)',
+    'hms ', 'uss ', 'crew dragon', 'spacecraft', 'satellite', 'constellation',
+    'parish', 'canton', 'arrondissement', 'commune', 'electoral district', 'municipality'
+]
+
+
+def is_abstract_word(word: str) -> bool:
+    """Check if a word represents an abstract concept that lacks concrete visual illustration."""
+    if not word or not isinstance(word, str):
+        return False
+    clean = word.strip().lower()
+    if clean in ABSTRACT_WORDS:
+        return True
+    if any(char in clean for char in ['概念', '理论', '方面', '因素', '情况', '原则']):
+        return True
+    tokens = [w for w in re.findall(r'[a-zA-Z]+', clean) if w not in STOP_WORDS]
+    if tokens and all(t in ABSTRACT_WORDS for t in tokens):
+        return True
+    return False
+
+
+def is_result_title_relevant(word: str, title: str, is_zh: bool) -> bool:
+    """Validate that the search result title is strongly relevant to the target word."""
+    if not word or not title:
+        return False
+
+    clean_title = title.lower()
+    if any(q in clean_title for q in DISALLOWED_TITLE_QUALIFIERS):
+        return False
+
+    if is_zh:
+        clean_word = word.strip()
+        if clean_word in title:
+            return True
+        if len(clean_word) >= 2:
+            return any(clean_word[i:i+2] in title for i in range(len(clean_word) - 1))
+        return False
+
+    clean_word = word.strip().lower()
+    word_tokens = [w for w in re.findall(r'[a-zA-Z]+', clean_word) if w not in STOP_WORDS and len(w) > 2]
+    if not word_tokens:
+        word_tokens = [w for w in re.findall(r'[a-zA-Z]+', clean_word) if w]
+
+    if clean_title.startswith("file:"):
+        clean_title = clean_title[5:]
+
+    title_tokens = set(re.findall(r'[a-zA-Z]+', clean_title))
+
+    def normalize_uk_us(token_str: str) -> str:
+        s = token_str.replace('oeu', 'eu').replace('our', 'or')
+        s = re.sub(r'tre$', 'ter', s)
+        s = re.sub(r'ise$', 'ize', s)
+        return re.sub(r'ogue$', 'og', s)
+
+    def match_token(w: str, t_set: set) -> bool:
+        norm_w = normalize_uk_us(w)
+        norm_t_set = {normalize_uk_us(t) for t in t_set}
+        if norm_w in norm_t_set:
+            return True
+        for t in norm_t_set:
+            if t == norm_w or (norm_w.endswith('s') and norm_w[:-1] == t) or (norm_w + 's' == t):
+                return True
+            if norm_w.endswith('es') and norm_w[:-2] == t:
+                return True
+            if len(norm_w) >= 5 and len(t) >= 5 and (t.startswith(norm_w[:5]) or norm_w.startswith(t[:5])):
+                return True
+        return False
+
+    return any(match_token(token, title_tokens) for token in word_tokens)
 
 
 class ImageSearchService:
@@ -46,7 +147,7 @@ class ImageSearchService:
         max_results: int = 6
     ) -> List[str]:
         raw_word = (word or "").strip()
-        if not raw_word:
+        if not raw_word or is_abstract_word(raw_word):
             return []
 
         candidates: List[str] = []
@@ -59,7 +160,6 @@ class ImageSearchService:
         if is_zh:
             queries.append(raw_word)
             if context_sentence and re.search(r'[\u4e00-\u9fff]', context_sentence):
-                # Context words for Chinese if available
                 zh_parts = re.findall(r'[\u4e00-\u9fff]{2,4}', context_sentence)
                 for part in zh_parts:
                     if part != raw_word and part not in queries:
@@ -71,6 +171,8 @@ class ImageSearchService:
             tokens = [w for w in re.findall(r'[a-zA-Z]+', clean_word) if w not in STOP_WORDS]
             token_set = set(tokens)
             meaningful_tokens = [w for w in tokens if w not in ABSTRACT_WORDS and len(w) > 2]
+            if not meaningful_tokens and tokens:
+                return []
 
             # Context sentence salient words extraction
             c_words = [
@@ -116,8 +218,10 @@ class ImageSearchService:
                     data = json.loads(resp.read().decode('utf-8'))
                     pages = data.get('query', {}).get('pages', {})
                     for p in pages.values():
-                        title = p.get('title', '').lower()
-                        if any(bad in title for bad in BAD_PATTERNS):
+                        title = p.get('title', '')
+                        if not is_result_title_relevant(raw_word, title, is_zh):
+                            continue
+                        if any(bad in title.lower() for bad in BAD_PATTERNS):
                             continue
                         thumb = p.get('thumbnail', {}).get('source')
                         if thumb and thumb not in seen:
@@ -144,8 +248,10 @@ class ImageSearchService:
                     data = json.loads(resp.read().decode('utf-8'))
                     pages = data.get('query', {}).get('pages', {})
                     for p in pages.values():
-                        title = p.get('title', '').lower()
-                        if any(bad in title for bad in BAD_PATTERNS):
+                        title = p.get('title', '')
+                        if not is_result_title_relevant(raw_word, title, is_zh):
+                            continue
+                        if any(bad in title.lower() for bad in BAD_PATTERNS):
                             continue
                         info = p.get('imageinfo', [])
                         if info:

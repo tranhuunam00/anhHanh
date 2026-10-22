@@ -86,6 +86,8 @@ export const AddVocabModal = ({ isOpen, onClose, onSuccess, sourceLang = "en" })
       if (candidates && candidates.length > 0) {
         setImageUrl(candidates[0]);
         setImgLoadError(false);
+      } else {
+        setImageUrl("");
       }
 
       showToast(`Đã tự động điền phiên âm, dịch & ảnh cho "${clean}"!`, "success");
