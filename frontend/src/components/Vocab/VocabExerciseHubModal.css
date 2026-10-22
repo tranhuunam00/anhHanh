@@ -434,6 +434,132 @@
   background: var(--success-bg, #ecfdf5);
 }
 
+/* ============================================================
+   TIME RANGE FILTER SECTION ("Quét đến đâu ra đến đó")
+   ============================================================ */
+.ex-time-filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.ex-time-filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.ex-time-filter-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.ex-time-scanned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.ex-time-filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ex-time-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-secondary, #f1f5f9);
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-secondary, #334155);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ex-time-pill-btn:hover {
+  border-color: var(--primary-border, #bfdbfe);
+  background: var(--primary-light, rgba(37, 99, 235, 0.08));
+}
+
+.ex-time-pill-btn.selected {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-color: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
+.ex-time-pill-count {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.ex-time-pill-btn.selected .ex-time-pill-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.ex-custom-date-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px dashed var(--border-color, #cbd5e1);
+  padding: 8px 12px;
+  border-radius: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.ex-date-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ex-date-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+}
+
+.ex-date-input {
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  outline: none;
+}
+
+.ex-date-divider {
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
+}
+
 /* Status Filter Section: Chưa thuộc vs Đã thuộc vs Tất cả */
 .ex-status-filter-section {
   display: flex;

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { submitVocabReviewResult, fetchPracticeSession } from "../../services/authVocabService";
 import { fetchSystemDistractors } from "../../services/systemVocabService";
 import { EXERCISE_FORMATS } from "../../utils/vocabExerciseGenerators";
+import { filterVocabByTimeRange, countVocabByTimeRanges } from "../../utils/vocabTimeFilterUtils";
 import { VocabExerciseMenu } from "./Exercise/VocabExerciseMenu";
 import { VocabExercisePractice } from "./Exercise/VocabExercisePractice";
 import { VocabExerciseSummary } from "./Exercise/VocabExerciseSummary";
@@ -22,6 +23,11 @@ export default function VocabExerciseHubModal({
   // Status Filter: "UNMASTERED" (Từ chưa thuộc - mặc định) | "MASTERED" (Từ đã thuộc) | "ALL" (Tất cả)
   const [statusFilter, setStatusFilter] = useState("UNMASTERED");
 
+  // Time Range Filter: "ALL" | "TODAY" | "3DAYS" | "7DAYS" | "30DAYS" | "CUSTOM"
+  const [timeRange, setTimeRange] = useState("ALL");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+
   // Selected word quantity: 20, 40, 60, 80 or "ALL"
   const [selectedLimit, setSelectedLimit] = useState(20);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -35,11 +41,22 @@ export default function VocabExerciseHubModal({
     return (vocabPool || []).filter((w) => w.status === "MASTERED");
   }, [vocabPool]);
 
-  const activePool = useMemo(() => {
+  // Words matching current mastery status filter
+  const statusFilteredPool = useMemo(() => {
     if (statusFilter === "UNMASTERED") return unmasteredPool;
     if (statusFilter === "MASTERED") return masteredPool;
     return vocabPool || [];
   }, [statusFilter, unmasteredPool, masteredPool, vocabPool]);
+
+  // Live count for each time range option based on statusFilteredPool ("đến đâu quét đến đó luôn")
+  const timeCounts = useMemo(() => {
+    return countVocabByTimeRanges(statusFilteredPool);
+  }, [statusFilteredPool]);
+
+  // Active word pool filtered by both status AND time range
+  const activePool = useMemo(() => {
+    return filterVocabByTimeRange(statusFilteredPool, timeRange, customStartDate, customEndDate);
+  }, [statusFilteredPool, timeRange, customStartDate, customEndDate]);
 
   // Active practice session words, bank distractors and score tracking
   const [items, setItems] = useState([]);
@@ -58,10 +75,17 @@ export default function VocabExerciseHubModal({
     try {
       let sessionWords = [];
 
-      // 1. If user is authenticated, request BE to randomly sample according to statusFilter
+      // 1. If user is authenticated, request BE to randomly sample according to statusFilter and time range
       if (token) {
         const limitParam = selectedLimit === "ALL" ? null : selectedLimit;
-        const res = await fetchPracticeSession(limitParam, statusFilter, token);
+        const res = await fetchPracticeSession(
+          limitParam,
+          statusFilter,
+          token,
+          timeRange,
+          customStartDate,
+          customEndDate
+        );
         if (res && Array.isArray(res.items) && res.items.length > 0) {
           sessionWords = res.items;
         }
@@ -202,6 +226,13 @@ export default function VocabExerciseHubModal({
         availableWords={activePool.length}
         statusFilter={statusFilter}
         onSelectStatusFilter={setStatusFilter}
+        timeRange={timeRange}
+        onSelectTimeRange={setTimeRange}
+        customStartDate={customStartDate}
+        onCustomStartDateChange={setCustomStartDate}
+        customEndDate={customEndDate}
+        onCustomEndDateChange={setCustomEndDate}
+        timeCounts={timeCounts}
         selectedFormat={selectedFormat}
         onSelectFormat={setSelectedFormat}
         selectedLimit={selectedLimit}

@@ -22,35 +22,45 @@
 }
 
 .vocab-search-wrap {
-  position: relative;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
   min-width: 220px;
+  height: 38px !important;
+  box-sizing: border-box !important;
 }
 
 .vocab-search-input {
-  padding: 6px 12px 6px 32px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color, #cbd5e1);
-  font-size: 0.85rem;
-  background: var(--bg-card, #ffffff);
-  color: var(--text-primary, #1e293b);
-  width: 100%;
-  box-sizing: border-box;
-  outline: none;
+  width: 100% !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  line-height: 38px !important;
+  padding: 0 12px 0 36px !important;
+  border-radius: 20px !important;
+  border: 1px solid var(--border-color, #cbd5e1) !important;
+  font-size: 0.85rem !important;
+  background: var(--bg-card, #ffffff) !important;
+  color: var(--text-primary, #1e293b) !important;
+  box-sizing: border-box !important;
+  outline: none !important;
+  margin: 0 !important;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .vocab-search-input:focus {
-  border-color: var(--primary, #6366f1);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  border-color: var(--primary, #6366f1) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
 }
 
 .vocab-search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted, #94a3b8);
-  pointer-events: none;
+  position: absolute !important;
+  left: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: var(--text-muted, #94a3b8) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
 }
 
 .vocab-actions-group {
@@ -165,14 +175,22 @@
   }
 
   .vocab-search-wrap {
-    width: 100%;
-    min-width: 0;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    margin: 0 !important;
   }
 
   .vocab-search-input {
-    font-size: 0.88rem;
-    padding: 8px 12px 8px 34px;
-    border-radius: 12px;
+    font-size: 0.88rem !important;
+    padding: 0 12px 0 36px !important;
+    border-radius: 12px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    line-height: 38px !important;
   }
 
   /* Horizontal Scrollable Filter Pills on Mobile */
@@ -193,26 +211,26 @@
 
   .vocab-filter-btn {
     flex-shrink: 0;
-    padding: 7px 12px;
+    padding: 6px 12px;
     font-size: 0.8rem;
     border-radius: 999px;
   }
 
-  /* Grid layout for Action Buttons on Mobile */
+  /* Grid layout for Action Buttons on Mobile - Compact and balanced */
   .vocab-actions-group {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 6px;
     width: 100%;
   }
 
   .vocab-action-btn {
     width: 100% !important;
     justify-content: center !important;
-    padding: 9px 8px !important;
-    font-size: 0.8rem !important;
-    border-radius: 10px !important;
-    min-height: 40px;
+    padding: 6px 8px !important;
+    font-size: 0.78rem !important;
+    border-radius: 8px !important;
+    min-height: 35px !important;
     box-sizing: border-box;
     text-align: center;
   }
@@ -220,8 +238,9 @@
   /* Practice button highlighted across 2 columns */
   .vocab-practice-btn {
     grid-column: span 2;
-    padding: 10px 12px !important;
-    font-size: 0.88rem !important;
+    padding: 8px 12px !important;
+    font-size: 0.86rem !important;
+    min-height: 38px !important;
   }
 
   .vocab-export-container {

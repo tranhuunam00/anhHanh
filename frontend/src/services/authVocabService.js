@@ -204,13 +204,23 @@ export const fetchDueVocabSession = async (limit = 20, token = null) => {
   return { items: [], total_due: 0 };
 };
 
-export const fetchPracticeSession = async (limit = 10, status = "UNMASTERED", token = null) => {
+export const fetchPracticeSession = async (
+  limit = 10,
+  status = "UNMASTERED",
+  token = null,
+  timeRange = "ALL",
+  startDate = null,
+  endDate = null
+) => {
   try {
     const headers = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
     const params = new URLSearchParams();
     if (limit && limit !== "ALL") params.append("limit", limit);
     if (status && status !== "ALL") params.append("status", status);
+    if (timeRange && timeRange !== "ALL") params.append("time_range", timeRange);
+    if (startDate) params.append("start_date", startDate);
+    if (endDate) params.append("end_date", endDate);
     const query = params.toString() ? `?${params.toString()}` : "";
     const res = await fetch(`/api/vocab/practice-session${query}`, { headers });
     if (res.ok) {

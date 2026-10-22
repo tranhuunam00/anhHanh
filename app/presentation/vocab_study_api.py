@@ -2,7 +2,7 @@
 import re
 import random
 from typing import Optional
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
@@ -97,6 +97,9 @@ async def get_due_vocab_session(
 async def get_practice_session(
     limit: Optional[int] = Query(None, ge=1),
     status_filter: Optional[str] = Query(None, alias='status'),
+    time_range: Optional[str] = Query(None, alias='time_range'),
+    start_date: Optional[str] = Query(None, alias='start_date'),
+    end_date: Optional[str] = Query(None, alias='end_date'),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -108,6 +111,32 @@ async def get_practice_session(
             stmt = stmt.where(UserVocabulary.status != 'MASTERED')
         else:
             stmt = stmt.where(UserVocabulary.status == sf)
+
+    if time_range and time_range.upper() != 'ALL':
+        tr = time_range.upper()
+        now = datetime.now(timezone.utc)
+        if tr == 'TODAY':
+            today_start = datetime(now.year, now.month, now.day, 0, 0, 0, tzinfo=timezone.utc)
+            stmt = stmt.where(UserVocabulary.created_at >= today_start)
+        elif tr == '3DAYS':
+            stmt = stmt.where(UserVocabulary.created_at >= now - timedelta(days=3))
+        elif tr == '7DAYS':
+            stmt = stmt.where(UserVocabulary.created_at >= now - timedelta(days=7))
+        elif tr == '30DAYS':
+            stmt = stmt.where(UserVocabulary.created_at >= now - timedelta(days=30))
+        elif tr == 'CUSTOM':
+            if start_date:
+                try:
+                    s_dt = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc)
+                    stmt = stmt.where(UserVocabulary.created_at >= s_dt)
+                except Exception:
+                    pass
+            if end_date:
+                try:
+                    e_dt = datetime.fromisoformat(end_date).replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
+                    stmt = stmt.where(UserVocabulary.created_at <= e_dt)
+                except Exception:
+                    pass
 
     res = await db.execute(stmt)
     all_words = list(res.scalars().all())

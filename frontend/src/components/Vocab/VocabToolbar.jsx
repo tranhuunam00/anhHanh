@@ -61,6 +61,7 @@ export const VocabToolbar = ({
       <div className="vocab-toolbar-container">
         {/* Search Box */}
         <div className="vocab-search-wrap">
+          <Search size={15} className="vocab-search-icon" />
           <input
             type="text"
             placeholder="Tìm kiếm từ hoặc nghĩa..."
@@ -68,7 +69,6 @@ export const VocabToolbar = ({
             onChange={(e) => onSearchChange(e.target.value)}
             className="vocab-search-input"
           />
-          <Search size={14} className="vocab-search-icon" />
         </div>
 
         {/* Filter Pills */}

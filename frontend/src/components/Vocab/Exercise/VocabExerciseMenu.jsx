@@ -10,6 +10,7 @@ import {
   Keyboard,
 } from "../../Icons";
 import { EXERCISE_FORMATS } from "../../../utils/vocabExerciseGenerators";
+import { VocabTimeFilterSection } from "./VocabTimeFilterSection";
 
 const QUANTITY_OPTIONS = [20, 40, 60, 80, "ALL"];
 
@@ -20,6 +21,13 @@ export const VocabExerciseMenu = ({
   availableWords = 0,
   statusFilter = "UNMASTERED",
   onSelectStatusFilter,
+  timeRange = "ALL",
+  onSelectTimeRange,
+  customStartDate = "",
+  onCustomStartDateChange,
+  customEndDate = "",
+  onCustomEndDateChange,
+  timeCounts = {},
   selectedFormat = EXERCISE_FORMATS.D1,
   onSelectFormat,
   selectedLimit = 20,
@@ -277,6 +285,18 @@ export const VocabExerciseMenu = ({
                 </div>
               )}
             </div>
+
+            {/* Time Range Filter Section: Lọc theo thời gian lưu từ vựng */}
+            <VocabTimeFilterSection
+              timeRange={timeRange}
+              onSelectTimeRange={onSelectTimeRange}
+              customStartDate={customStartDate}
+              onCustomStartDateChange={onCustomStartDateChange}
+              customEndDate={customEndDate}
+              onCustomEndDateChange={onCustomEndDateChange}
+              timeCounts={timeCounts}
+              scannedCount={poolCount}
+            />
 
             {/* Quantity Selector Section */}
             <div className="ex-quantity-section">

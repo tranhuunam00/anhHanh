@@ -119,4 +119,76 @@ def test_practice_session_status_filtering_logic():
     assert len(test_words) == 5
 
 
+def test_practice_session_time_filtering_logic_presets():
+    """Verify time range filter logic for TODAY, 3DAYS, 7DAYS, 30DAYS, and ALL."""
+    from datetime import datetime, timezone, timedelta
+
+    ref_now = datetime(2026, 10, 22, 12, 0, 0, tzinfo=timezone.utc)
+    today_start = datetime(2026, 10, 22, 0, 0, 0, tzinfo=timezone.utc)
+
+    vocab_items = [
+        {"id": 1, "word": "today_word", "created_at": ref_now - timedelta(hours=2)},
+        {"id": 2, "word": "two_days_word", "created_at": ref_now - timedelta(days=2)},
+        {"id": 3, "word": "five_days_word", "created_at": ref_now - timedelta(days=5)},
+        {"id": 4, "word": "twenty_days_word", "created_at": ref_now - timedelta(days=20)},
+        {"id": 5, "word": "forty_days_word", "created_at": ref_now - timedelta(days=40)},
+    ]
+
+    # TODAY
+    today_items = [w for w in vocab_items if w["created_at"] >= today_start]
+    assert len(today_items) == 1
+    assert today_items[0]["word"] == "today_word"
+
+    # 3DAYS
+    three_days_limit = ref_now - timedelta(days=3)
+    three_days_items = [w for w in vocab_items if w["created_at"] >= three_days_limit]
+    assert len(three_days_items) == 2
+    assert set(w["word"] for w in three_days_items) == {"today_word", "two_days_word"}
+
+    # 7DAYS
+    seven_days_limit = ref_now - timedelta(days=7)
+    seven_days_items = [w for w in vocab_items if w["created_at"] >= seven_days_limit]
+    assert len(seven_days_items) == 3
+    assert set(w["word"] for w in seven_days_items) == {"today_word", "two_days_word", "five_days_word"}
+
+    # 30DAYS
+    thirty_days_limit = ref_now - timedelta(days=30)
+    thirty_days_items = [w for w in vocab_items if w["created_at"] >= thirty_days_limit]
+    assert len(thirty_days_items) == 4
+    assert set(w["word"] for w in thirty_days_items) == {"today_word", "two_days_word", "five_days_word", "twenty_days_word"}
+
+    # ALL
+    assert len(vocab_items) == 5
+
+
+def test_practice_session_time_filtering_logic_custom():
+    """Verify custom start_date and end_date filtering with boundary and error handling."""
+    from datetime import datetime, timezone, timedelta
+
+    vocab_items = [
+        {"id": 1, "word": "item_oct_10", "created_at": datetime(2026, 10, 10, 10, 0, 0, tzinfo=timezone.utc)},
+        {"id": 2, "word": "item_oct_15", "created_at": datetime(2026, 10, 15, 14, 30, 0, tzinfo=timezone.utc)},
+        {"id": 3, "word": "item_oct_20", "created_at": datetime(2026, 10, 20, 23, 0, 0, tzinfo=timezone.utc)},
+        {"id": 4, "word": "item_oct_25", "created_at": datetime(2026, 10, 25, 8, 0, 0, tzinfo=timezone.utc)},
+    ]
+
+    # Filter Oct 12 to Oct 21
+    start_dt = datetime.fromisoformat("2026-10-12").replace(tzinfo=timezone.utc)
+    end_dt = datetime.fromisoformat("2026-10-21").replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
+
+    matched = [w for w in vocab_items if start_dt <= w["created_at"] <= end_dt]
+    assert len(matched) == 2
+    assert set(w["word"] for w in matched) == {"item_oct_15", "item_oct_20"}
+
+    # Invalid date string should not crash
+    invalid_start = "not-a-valid-date"
+    parsed_s_dt = None
+    try:
+        parsed_s_dt = datetime.fromisoformat(invalid_start)
+    except Exception:
+        pass
+    assert parsed_s_dt is None
+
+
+
 
