@@ -47,9 +47,13 @@ export const VocabCard = ({
       ref={cardRef}
       className={`vocab-card ${isFocused ? "is-keyboard-focused" : ""}`}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onEdit(v);
+      }}
       tabIndex={0}
       role="article"
       aria-label={`Từ vựng: ${v.word}`}
+      title="Nhấp để xem và chỉnh sửa chi tiết thẻ từ vựng"
       style={{
         position: "relative",
         cursor: "pointer",
@@ -66,15 +70,40 @@ export const VocabCard = ({
 
       {/* Image Thumbnail & Quick Image Controls */}
       <div className="vocab-card-img-wrap">
-        <img
-          src={
-            v.image_url ||
-            "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80"
-          }
-          className="vocab-card-img"
-          alt={v.word}
-          loading="lazy"
-        />
+        {v.image_url ? (
+          <img
+            src={v.image_url}
+            className="vocab-card-img"
+            alt={v.word}
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        ) : (
+          <div
+            className="vocab-card-no-img"
+            style={{
+              width: "100%",
+              height: "100%",
+              minHeight: "140px",
+              background: "linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.12) 100%)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "4px",
+              color: "var(--text-muted, #94a3b8)",
+            }}
+          >
+            <span style={{ fontSize: "1.8rem", fontWeight: 700, color: "var(--primary, #6366f1)", opacity: 0.85 }}>
+              {(v.word || "").trim().slice(0, 2).toUpperCase()}
+            </span>
+            <span style={{ fontSize: "0.72rem", color: "var(--text-secondary, #64748b)" }}>
+              {v.source_lang === "zh" ? "Từ vựng tiếng Trung" : "Chưa gắn ảnh"}
+            </span>
+          </div>
+        )}
         <div
           style={{
             position: "absolute",
@@ -90,10 +119,10 @@ export const VocabCard = ({
             type="button"
             className="vocab-img-rotate-btn"
             onClick={() => onRotateImage(v.id, v.word, v.image_url, v.context_sentence)}
-            title="Tìm ảnh minh họa khác theo ngữ cảnh"
+            title="Tìm ảnh minh họa phù hợp ngữ cảnh"
           >
             <RotateCw size={13} style={{ marginRight: 4 }} />
-            Đổi ảnh
+            {v.image_url ? "Đổi ảnh" : "Tìm ảnh"}
           </button>
           <button
             type="button"
@@ -188,8 +217,28 @@ export const VocabCard = ({
               title={orig ? `"${orig.replace(/^"+|"+$/g, "")}"` : undefined}
             >
               {orig && (
-                <div className="vocab-context-orig">
-                  "{orig.replace(/^"+|"+$/g, "")}"
+                <div className="vocab-context-orig" style={{ display: "flex", alignItems: "flex-start", gap: "6px" }}>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSpeak(orig, v.source_lang);
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "var(--primary, #6366f1)",
+                      cursor: "pointer",
+                      padding: "1px 2px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      flexShrink: 0,
+                    }}
+                    title="Nghe câu ví dụ minh họa"
+                  >
+                    <Volume2 size={13} />
+                  </button>
+                  <span style={{ flex: 1 }}>"{orig.replace(/^"+|"+$/g, "")}"</span>
                 </div>
               )}
               {trans && (

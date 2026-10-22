@@ -24,7 +24,9 @@ BAD_PATTERNS = [
     'spider', 'insect', 'fly', 'bug', 'spoiler', 'disclaimer', 'locomotive', 'diesel', 'paraffin',
     '.pdf', '.djvu', '.tif', '.svg', 'ia ', 'dlibra', 'bulletin', 'journal', 'report',
     'manuscript', 'sermon', 'library', 'handbook', 'manual', 'gazette', 'volume', 'edition',
-    'portrait', 'monument', 'statue', 'grave', 'tomb', 'cemetery', 'census'
+    'portrait', 'monument', 'statue', 'grave', 'tomb', 'cemetery', 'census',
+    'valsalva', 'heimlich', 'cadastre', 'geologie', 'g%c3%a9ologie', 'hydro', 'natura_2000',
+    'orthophoto', 'medical', 'surgery', 'patient', 'hospital', 'clinical', 'radiography', 'x-ray', 'anatomy', 'procedure'
 ]
 
 ABSTRACT_WORDS = {
@@ -43,60 +45,70 @@ class ImageSearchService:
         meaning: str = "",
         max_results: int = 6
     ) -> List[str]:
-        clean_word = word.strip().lower()
+        raw_word = (word or "").strip()
+        if not raw_word:
+            return []
+
         candidates: List[str] = []
         seen = set()
+        headers = {'User-Agent': 'DailyDictationStudio/2.0 (Smart Vocabulary Learning Tool)'}
 
-        tokens = [w for w in re.findall(r'[a-zA-Z]+', clean_word) if w not in STOP_WORDS]
-        meaningful_tokens = [w for w in tokens if w not in ABSTRACT_WORDS and len(w) > 2]
-        token_set = set(tokens)
-
-        # Build list of contextual search queries
+        is_zh = bool(re.search(r'[\u4e00-\u9fff]', raw_word))
         queries: List[str] = []
 
-        # 1. Exact phrase query
-        if len(tokens) > 1:
-            queries.append(f'"{clean_word}"')
-
-        # 2. Semantic expansions for common phrases / idioms
-        if 'home' in token_set and any(w in token_set for w in ('way', 'walk', 'commute', 'go', 'drive', 'heading')):
-            queries.append('commute home')
-            queries.append('walking home')
-            queries.append('evening street')
-        elif 'care' in token_set and 'take' in token_set:
-            queries.append('caring nursing')
-            queries.append('helping hand')
-        elif 'look' in token_set and 'forward' in token_set:
-            queries.append('anticipation celebration')
-        elif meaningful_tokens:
-            if len(meaningful_tokens) > 1:
-                queries.append(' '.join(meaningful_tokens))
-            queries.append(meaningful_tokens[-1])
+        if is_zh:
+            queries.append(raw_word)
+            if context_sentence and re.search(r'[\u4e00-\u9fff]', context_sentence):
+                # Context words for Chinese if available
+                zh_parts = re.findall(r'[\u4e00-\u9fff]{2,4}', context_sentence)
+                for part in zh_parts:
+                    if part != raw_word and part not in queries:
+                        queries.append(part)
+            wiki_domain = "zh.wikipedia.org"
         else:
-            queries.append(clean_word)
+            wiki_domain = "en.wikipedia.org"
+            clean_word = raw_word.lower()
+            tokens = [w for w in re.findall(r'[a-zA-Z]+', clean_word) if w not in STOP_WORDS]
+            token_set = set(tokens)
+            meaningful_tokens = [w for w in tokens if w not in ABSTRACT_WORDS and len(w) > 2]
 
-        # 3. Context sentence fallback: extract concrete nouns/adjectives if phrase is abstract
-        if (not meaningful_tokens or clean_word in ('none the less', 'nonetheless', 'as well as', 'in addition to')) and context_sentence:
+            # Context sentence salient words extraction
             c_words = [
-                w for w in re.findall(r'[a-zA-Z]+', context_sentence.lower())
+                w for w in re.findall(r'[a-zA-Z]+', (context_sentence or "").lower())
                 if len(w) > 3 and w not in STOP_WORDS and w not in ABSTRACT_WORDS and w not in token_set
             ]
-            if c_words:
-                queries.append(c_words[0])
-                if len(c_words) > 1:
-                    queries.append(f'{c_words[0]} {c_words[1]}')
 
-        headers = {'User-Agent': 'DailyDictationStudio/2.0 (Smart Vocabulary Learning Tool)'}
+            # 1. High priority: Contextual noun/action + target word
+            if c_words:
+                queries.append(f"{c_words[0]} {clean_word}")
+                if len(c_words) > 1:
+                    queries.append(f"{c_words[1]} {clean_word}")
+                queries.append(f"{c_words[0]} {c_words[1]}")
+
+            # 2. Idiom expansions
+            if 'home' in token_set and any(w in token_set for w in ('way', 'walk', 'commute', 'go', 'drive', 'heading')):
+                queries.append('commute home')
+                queries.append('walking home')
+            elif 'care' in token_set and 'take' in token_set:
+                queries.append('caring nursing')
+            elif 'look' in token_set and 'forward' in token_set:
+                queries.append('anticipation celebration')
+            elif meaningful_tokens:
+                if len(meaningful_tokens) > 1:
+                    queries.append(' '.join(meaningful_tokens))
+                queries.append(meaningful_tokens[-1])
+            else:
+                queries.append(clean_word)
 
         for q in queries:
             if len(candidates) >= max_results:
                 break
             encoded = urllib.parse.quote(q)
 
-            # 1. Query Wikipedia PageImages (curated, highest semantic accuracy)
+            # 1. Query Wikipedia PageImages (curated semantic accuracy)
             try:
                 wiki_url = (
-                    "https://en.wikipedia.org/w/api.php?action=query&generator=search"
+                    f"https://{wiki_domain}/w/api.php?action=query&generator=search"
                     f"&gsrsearch={encoded}&gsrlimit=5&prop=pageimages&pithumbsize=800&format=json"
                 )
                 req = urllib.request.Request(wiki_url, headers=headers)
@@ -146,22 +158,6 @@ class ImageSearchService:
                                         candidates.append(img_url)
             except Exception as e:
                 logger.debug(f"Wikimedia Commons search error for '{q}': {e}")
-
-        # 3. Fallback high-quality diverse photos
-        fallback_pool = [
-            "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1493612276216-ee3925520721?auto=format&fit=crop&w=800&q=80",
-            "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
-        ]
-        for fb in fallback_pool:
-            if len(candidates) >= max_results:
-                break
-            if fb not in seen:
-                seen.add(fb)
-                candidates.append(fb)
 
         return candidates[:max_results]
 

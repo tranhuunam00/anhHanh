@@ -391,7 +391,10 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 vocab={v}
                 isFocused={focusedIndex === idx}
                 cardRef={setCardRef(idx)}
-                onClick={() => setFocusedIndex(idx)}
+                onClick={() => {
+                  setFocusedIndex(idx);
+                  setEditingVocab(v);
+                }}
                 onRotateImage={handleRotateImage}
                 onEdit={(item) => setEditingVocab(item)}
                 onSpeak={speakWord}

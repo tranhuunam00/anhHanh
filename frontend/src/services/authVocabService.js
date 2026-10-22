@@ -161,13 +161,24 @@ export const fetchWordTranslation = async (word, targetLang = "vi", token = null
   return "";
 };
 
-export const fetchImageCandidates = async (word, contextSentence = "", token = null) => {
+export const fetchImageCandidates = async (word, contextSentence = "", meaning = "", token = null) => {
   try {
+    let actualMeaning = meaning;
+    let actualToken = token;
+    // Backwards-compatible check if 3rd arg is a bearer token
+    if (typeof meaning === "string" && !token && meaning.startsWith("ey")) {
+      actualToken = meaning;
+      actualMeaning = "";
+    }
+
     const headers = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    let url = `/api/vocab/image-candidates?word=${encodeURIComponent(word.trim())}`;
+    if (actualToken) headers["Authorization"] = `Bearer ${actualToken}`;
+    let url = `/api/vocab/image-candidates?word=${encodeURIComponent((word || "").trim())}`;
     if (contextSentence) {
       url += `&context_sentence=${encodeURIComponent(contextSentence.trim())}`;
+    }
+    if (actualMeaning) {
+      url += `&meaning=${encodeURIComponent(actualMeaning.trim())}`;
     }
     const res = await fetch(url, { headers });
     if (res.ok) {

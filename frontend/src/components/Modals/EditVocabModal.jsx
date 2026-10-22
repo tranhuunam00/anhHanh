@@ -15,8 +15,10 @@ import {
   fetchImageCandidates,
 } from "../../services/authVocabService";
 import { getVoiceLang } from "../../utils/languageVoices";
+import { cleanContextSentenceForSpeech, buildVocabPayload } from "../../utils/vocabModalUtils";
 import { VocabImagePickerField } from "../Vocab/VocabImagePickerField";
 import { VocabPosPickerField } from "../Vocab/VocabPosPickerField";
+import { EditVocabModalHeader } from "./EditVocabModalHeader";
 
 export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: initialSourceLang }) => {
   const { token, refreshStreak, refreshSavedVocab, showToast } = useAuth();
@@ -92,7 +94,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
       const [phoneticRes, transRes, candidates] = await Promise.all([
         fetchPhoneticLookup(clean, token),
         fetchWordTranslation(clean, "vi", token),
-        fetchImageCandidates(clean, contextSentence, token),
+        fetchImageCandidates(clean, contextSentence, meaning, token),
       ]);
 
       if (phoneticRes?.phonetic) {
@@ -127,16 +129,16 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
 
     setIsSubmitting(true);
     try {
-      const updatePayload = {
+      const updatePayload = buildVocabPayload({
         word: cleanWord,
-        phonetic: phonetic.trim() || undefined,
-        part_of_speech: partOfSpeech.trim() || undefined,
-        meaning: meaning.trim() || cleanWord,
-        image_url: imageUrl.trim() || undefined,
-        context_sentence: contextSentence.trim() || "",
+        phonetic,
+        partOfSpeech,
+        meaning,
+        imageUrl,
+        contextSentence,
         status: vocabStatus,
-        source_lang: sourceLang || "en",
-      };
+        sourceLang,
+      });
 
       const res = await updateVocabWord(vocab.id, updatePayload, token);
 
@@ -168,36 +170,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
         }}
       >
         {/* Header */}
-        <div className="modal-header" style={{ padding: "16px 20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "10px",
-                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(59, 130, 246, 0.2))",
-                border: "1px solid rgba(99, 102, 241, 0.3)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#6366f1",
-              }}
-            >
-              <Pencil size={18} strokeWidth={2.5} />
-            </div>
-            <div>
-              <h3 className="modal-title" style={{ margin: 0, fontSize: "1.1rem" }}>
-                Chỉnh sửa thẻ từ vựng
-              </h3>
-              <div style={{ fontSize: "0.78rem", color: "var(--text-muted, #64748b)" }}>
-                Cập nhật từ gốc, phiên âm IPA, nghĩa tiếng Việt và link ảnh
-              </div>
-            </div>
-          </div>
-          <button className="btn btn-secondary btn-icon" onClick={onClose} aria-label="Đóng">
-            <X size={18} strokeWidth={2} />
-          </button>
-        </div>
+        <EditVocabModalHeader onClose={onClose} />
 
         {/* Scrollable Form Body */}
         <form
@@ -222,28 +195,51 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
               >
                 Từ vựng <span style={{ color: "#ef4444" }}>*</span>
               </label>
-              <button
-                type="button"
-                onClick={handleAutoEnrich}
-                disabled={isAutoEnriching || !word.trim()}
-                style={{
-                  background: "rgba(99, 102, 241, 0.1)",
-                  color: "#6366f1",
-                  border: "1px solid rgba(99, 102, 241, 0.25)",
-                  borderRadius: "6px",
-                  padding: "3px 8px",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "4px",
-                }}
-                title="Tự động tra cứu phiên âm IPA, dịch nghĩa và tìm ảnh"
-              >
-                {isAutoEnriching ? <Loader2 size={12} className="spinning" /> : <Zap size={12} />}
-                <span>{isAutoEnriching ? "Đang tra..." : "Tra cứu tự động cả 3"}</span>
-              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <button
+                  type="button"
+                  onClick={() => handleTestPronounce(word)}
+                  disabled={!word.trim()}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--primary, #6366f1)",
+                    cursor: "pointer",
+                    padding: "2px 6px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                  }}
+                  title="Nghe phát âm từ vựng"
+                >
+                  <Volume2 size={13} />
+                  <span>Nghe từ</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAutoEnrich}
+                  disabled={isAutoEnriching || !word.trim()}
+                  style={{
+                    background: "rgba(99, 102, 241, 0.1)",
+                    color: "#6366f1",
+                    border: "1px solid rgba(99, 102, 241, 0.25)",
+                    borderRadius: "6px",
+                    padding: "3px 8px",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                  title="Tự động tra cứu phiên âm IPA, dịch nghĩa và tìm ảnh"
+                >
+                  {isAutoEnriching ? <Loader2 size={12} className="spinning" /> : <Zap size={12} />}
+                  <span>{isAutoEnriching ? "Đang tra..." : "Tra cứu tự động cả 3"}</span>
+                </button>
+              </div>
             </div>
             <input
               type="text"
@@ -350,6 +346,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
           <VocabImagePickerField
             word={word}
             contextSentence={contextSentence}
+            meaning={meaning}
             imageUrl={imageUrl}
             setImageUrl={setImageUrl}
             imgLoadError={imgLoadError}
@@ -362,17 +359,41 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
 
           {/* Row 4: Context Sentence */}
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.83rem",
-                fontWeight: 600,
-                color: "var(--text-primary, #1e293b)",
-                marginBottom: "6px",
-              }}
-            >
-              Câu ví dụ ngữ cảnh (Context sentence)
-            </label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+              <label
+                style={{
+                  fontSize: "0.83rem",
+                  fontWeight: 600,
+                  color: "var(--text-primary, #1e293b)",
+                }}
+              >
+                Câu ví dụ ngữ cảnh (Context sentence)
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  const cleanSentence = cleanContextSentenceForSpeech(contextSentence);
+                  if (cleanSentence) handleTestPronounce(cleanSentence);
+                }}
+                disabled={!contextSentence.trim()}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--primary, #6366f1)",
+                  cursor: "pointer",
+                  padding: "2px 4px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                }}
+                title="Nghe phát âm câu ví dụ minh họa"
+              >
+                <Volume2 size={13} />
+                <span>Nghe câu ví dụ</span>
+              </button>
+            </div>
             <textarea
               className="dict-input"
               rows={2}

@@ -181,12 +181,14 @@ async def list_vocabulary(
 async def get_image_candidates(
     word: str = Query(..., min_length=1),
     context_sentence: Optional[str] = Query(None),
+    meaning: Optional[str] = Query(None),
     current_user: User = Depends(get_current_user)
 ):
     """Retrieve multiple image options so user can cycle through and pick their preferred image."""
     candidates = ImageSearchService.get_image_candidates(
         word=word.strip(),
         context_sentence=context_sentence or "",
+        meaning=meaning or "",
         max_results=8
     )
     return {'word': word, 'candidates': candidates}
@@ -435,7 +437,10 @@ async def update_vocabulary_details(
         if new_ipa:
             vocab.phonetic = new_ipa
 
-    if payload.image_url is not None:
+    if "image_url" in payload.model_fields_set:
+        clean_img = (payload.image_url or "").strip()
+        vocab.image_url = clean_img or None
+    elif payload.image_url is not None:
         clean_img = payload.image_url.strip()
         vocab.image_url = clean_img or None
 

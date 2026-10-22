@@ -69,9 +69,12 @@ def resolve_word_image_helper(
     meaning: str
 ) -> Optional[str]:
     """Auto-search relevant thumbnail illustration candidates for a word."""
-    if provided_image_url and provided_image_url.strip():
-        return provided_image_url.strip()
+    if provided_image_url is not None:
+        clean_img = provided_image_url.strip()
+        # If user explicitly provided empty string or whitespace, honor user's wish (no image)
+        return clean_img if clean_img else None
 
+    # Only auto-search if image_url was not provided (e.g. None from quick video save)
     try:
         candidates = ImageSearchService.get_image_candidates(
             word=clean_word,
