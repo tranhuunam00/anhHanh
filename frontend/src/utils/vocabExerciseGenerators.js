@@ -9,6 +9,8 @@ export const EXERCISE_FORMATS = {
   D2: "FORMAT_D2", // Dạng 2: Nghĩa tiếng Việt -> Chọn Từ vựng (Active Recall)
   D3: "FORMAT_D3", // Dạng 3: Điền từ vào câu ngữ cảnh (Context Cloze / Sentence Completion)
   D4: "FORMAT_D4", // Dạng 4: Nghe phát âm -> Chọn từ vựng (Listening Recall)
+  D5_FLIP: "FORMAT_D5_FLIP", // Dạng 5: Thẻ Flashcard di động (Walking / Mobile 1-Tap)
+  D6_AI_STORY: "FORMAT_D6_AI_STORY", // Dạng 6: AI Kể chuyện nối từ (AI Storytelling Cloze)
 };
 
 export const EXERCISE_CATEGORIES = {

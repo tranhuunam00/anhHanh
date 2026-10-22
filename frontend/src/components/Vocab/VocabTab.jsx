@@ -22,7 +22,7 @@ import { VocabPagination } from "./VocabPagination";
 import { useVocabKeyboardNav } from "../../hooks/useVocabKeyboardNav";
 
 export const VocabTab = ({ isActive = false, onOpenGuide }) => {
-  const { token, isAuthenticated, refreshStreak, showToast, refreshSavedVocab } = useAuth();
+  const { token, isAuthenticated, user, refreshStreak, showToast, refreshSavedVocab } = useAuth();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [filterStatus, setFilterStatus] = useState("ALL");
@@ -311,6 +311,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
         <VocabExerciseHubModal
           vocabPool={items}
           token={token}
+          user={user}
           onClose={() => {
             setIsExerciseHubOpen(false);
             loadWords();

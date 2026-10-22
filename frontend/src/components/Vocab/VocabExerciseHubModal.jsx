@@ -6,11 +6,14 @@ import { filterVocabByTimeRange, countVocabByTimeRanges } from "../../utils/voca
 import { VocabExerciseMenu } from "./Exercise/VocabExerciseMenu";
 import { VocabExercisePractice } from "./Exercise/VocabExercisePractice";
 import { VocabExerciseSummary } from "./Exercise/VocabExerciseSummary";
+import { VocabExerciseMobileFlip } from "./Exercise/VocabExerciseMobileFlip";
+import { VocabExerciseAIStory } from "./Exercise/VocabExerciseAIStory";
 import "./VocabExerciseHubModal.css";
 
 export default function VocabExerciseHubModal({
   vocabPool = [],
   token = null,
+  user = null,
   onClose,
   onFinished,
 }) {
@@ -240,6 +243,7 @@ export default function VocabExerciseHubModal({
         onStart={handleStartPractice}
         isLoading={isLoadingSession}
         onClose={onClose}
+        user={user}
       />
     );
   }
@@ -260,6 +264,31 @@ export default function VocabExerciseHubModal({
   }
 
   // View 3: Practice interactive arena
+  if (selectedFormat === EXERCISE_FORMATS.D5_FLIP) {
+    return (
+      <VocabExerciseMobileFlip
+        items={items}
+        currentIndex={currentIndex}
+        onProceed={handleProceed}
+        onBackToMenu={handleBackToMenu}
+        onClose={onClose}
+      />
+    );
+  }
+
+  if (selectedFormat === EXERCISE_FORMATS.D6_AI_STORY) {
+    return (
+      <VocabExerciseAIStory
+        items={items}
+        token={token}
+        user={user}
+        onBackToMenu={handleBackToMenu}
+        onClose={onClose}
+        onFinishExercise={() => setViewMode("SUMMARY")}
+      />
+    );
+  }
+
   return (
     <VocabExercisePractice
       format={selectedFormat}

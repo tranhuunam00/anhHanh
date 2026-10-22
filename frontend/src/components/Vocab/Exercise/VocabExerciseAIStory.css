@@ -1,0 +1,279 @@
+/* VocabExerciseAIStory.css - Dạng 6: AI Kể chuyện nối từ */
+
+.ai-story-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  gap: 18px;
+  padding: 10px 16px 24px;
+  box-sizing: border-box;
+}
+
+/* Locked Screen */
+.ai-locked-card {
+  text-align: center;
+  padding: 48px 24px;
+  border-radius: 16px;
+  background: var(--bg-card, #ffffff);
+  border: 1.5px dashed var(--border-color, #cbd5e1);
+  margin: 20px auto;
+  max-width: 520px;
+}
+
+.ai-locked-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fef2f2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.ai-locked-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  margin-bottom: 8px;
+}
+
+.ai-locked-desc {
+  font-size: 0.92rem;
+  color: var(--text-secondary, #475569);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Configuration & Prompt Area */
+.ai-config-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+}
+
+.ai-theme-select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.btn-ai-generate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.btn-ai-generate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-ai-generate:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* Story Presentation Box */
+.ai-story-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.ai-story-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+}
+
+.ai-story-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+.ai-story-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-ai-audio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: transparent;
+  color: var(--text-primary, #0f172a);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ai-story-text-en {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-primary, #0f172a);
+  margin-bottom: 14px;
+}
+
+.ai-highlight-word {
+  background: rgba(139, 92, 246, 0.15);
+  color: #6d28d9;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border-bottom: 2px solid #8b5cf6;
+}
+
+.ai-story-text-vi {
+  padding: 12px 14px;
+  background: rgba(16, 185, 129, 0.06);
+  border-left: 3px solid #10b981;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  color: var(--text-secondary, #475569);
+  line-height: 1.55;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* Cloze Challenge Arena */
+.ai-quiz-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.ai-quiz-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.ai-quiz-question-text {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.ai-quiz-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-ai-option {
+  padding: 10px 14px;
+  text-align: left;
+  border-radius: 10px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary, #0f172a);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-ai-option:hover:not(:disabled) {
+  border-color: var(--primary, #3b82f6);
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.btn-ai-option.correct {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  color: #065f46 !important;
+}
+
+.btn-ai-option.wrong {
+  background: #fef2f2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+
+/* Mobile Screen Adaptations */
+@media (max-width: 640px) {
+  .ai-story-wrapper {
+    padding: 6px 8px 18px;
+    gap: 12px;
+  }
+
+  .ai-config-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+  }
+
+  .btn-ai-generate {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+
+  .ai-story-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .ai-story-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .btn-ai-audio {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 10px;
+  }
+
+  .ai-quiz-options-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .btn-ai-option {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+}
+

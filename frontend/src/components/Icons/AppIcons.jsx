@@ -1032,5 +1032,31 @@ export const Mail = (props) => (
   </BaseIcon>
 );
 
+export const Smartphone = (props) => (
+  <BaseIcon {...props}>
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+    <path d="M12 18h.01" />
+  </BaseIcon>
+);
+
+export const Footprints = (props) => (
+  <BaseIcon {...props}>
+    <path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.5-2 8.5V16a2 2 0 0 1-2 2 2 2 0 0 1-2-2z" />
+    <path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.5 2 8.5V20a2 2 0 0 0 2 2 2 2 0 0 0 2-2z" />
+  </BaseIcon>
+);
+
+export const Bot = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12 8V4H8" />
+    <rect width="16" height="12" x="4" y="8" rx="2" />
+    <path d="M2 14h2" />
+    <path d="M20 14h2" />
+    <path d="M15 13v2" />
+    <path d="M9 13v2" />
+  </BaseIcon>
+);
+
+
 
 

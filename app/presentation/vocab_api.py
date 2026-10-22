@@ -20,6 +20,7 @@ from app.presentation.vocab_schemas import (
 )
 from app.presentation.vocab_study_api import router as vocab_study_router
 from app.presentation.vocab_import_api import router as vocab_import_router
+from app.presentation.vocab_ai_exercise_api import router as vocab_ai_exercise_router
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/api/vocab', tags=['Vocabulary'])
@@ -28,6 +29,7 @@ _translation_service = TranslationService()
 # Include sub-routers under the same /api/vocab namespace
 router.include_router(vocab_study_router)
 router.include_router(vocab_import_router)
+router.include_router(vocab_ai_exercise_router)
 
 
 from app.infrastructure.pos_service import normalize_pos_string

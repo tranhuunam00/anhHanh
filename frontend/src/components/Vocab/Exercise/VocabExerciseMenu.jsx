@@ -8,6 +8,9 @@ import {
   Lightbulb,
   CheckCircle,
   Keyboard,
+  Smartphone,
+  Lock,
+  Bot,
 } from "../../Icons";
 import { EXERCISE_FORMATS } from "../../../utils/vocabExerciseGenerators";
 import { VocabTimeFilterSection } from "./VocabTimeFilterSection";
@@ -35,9 +38,23 @@ export const VocabExerciseMenu = ({
   onStart,
   isLoading = false,
   onClose,
+  user = null,
 }) => {
+  const isAIAuthorized = Boolean(
+    user?.can_use_ai_import ||
+      user?.can_use_ai_writing ||
+      (user?.email &&
+        ["tranhuunam23022000", "vuthiquynhtrang", "vuthiquynhtrangbl6d"].includes(
+          user.email.toLowerCase().split("@")[0]
+        ))
+  );
+
   const getFormatLabel = () => {
     switch (selectedFormat) {
+      case EXERCISE_FORMATS.D6_AI_STORY:
+        return "Dạng 6 (AI Kể chuyện nối từ)";
+      case EXERCISE_FORMATS.D5_FLIP:
+        return "Dạng 5 (Thẻ di động đi đường)";
       case EXERCISE_FORMATS.D4:
         return "Dạng 4 (Gõ từ chính tả)";
       case EXERCISE_FORMATS.D2:
@@ -216,6 +233,76 @@ export const VocabExerciseMenu = ({
 
                 <div className="ex-card-footer">
                   <span className="ex-card-tag">Active Typing</span>
+                </div>
+              </div>
+
+              {/* DẠNG 5: THẺ FLASHCARD DI ĐỘNG (WALKING / 1-TAP MOBILE FLIP) */}
+              <div
+                className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D5_FLIP ? "active" : ""}`}
+                onClick={() => onSelectFormat(EXERCISE_FORMATS.D5_FLIP)}
+              >
+                <div className="ex-card-top">
+                  <div className="ex-card-icon-wrap" style={{ background: "rgba(16, 185, 129, 0.12)", color: "#10b981" }}>
+                    <Smartphone size={18} />
+                  </div>
+                  <div className="ex-card-status">
+                    {selectedFormat === EXERCISE_FORMATS.D5_FLIP ? (
+                      <span className="ex-selected-chip">
+                        <Check size={12} /> Đang chọn
+                      </span>
+                    ) : (
+                      <span className="ex-format-code">Dạng 5</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="ex-card-main">
+                  <h4 className="ex-card-title">Thẻ di động đi đường</h4>
+                  <p className="ex-card-desc">
+                    Lật thẻ 3D toàn màn hình, chạm 1 ngón rảnh tay khi dạo bộ hoặc đi đường.
+                  </p>
+                </div>
+
+                <div className="ex-card-footer">
+                  <span className="ex-card-tag" style={{ color: "#059669" }}>Đi đường / 1 Chạm</span>
+                </div>
+              </div>
+
+              {/* DẠNG 6: AI KỂ CHUYỆN NỐI TỪ (AI NARRATIVE CLOZE) */}
+              <div
+                className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D6_AI_STORY ? "active" : ""}`}
+                onClick={() => onSelectFormat(EXERCISE_FORMATS.D6_AI_STORY)}
+              >
+                <div className="ex-card-top">
+                  <div className="ex-card-icon-wrap" style={{ background: "rgba(139, 92, 246, 0.12)", color: "#8b5cf6" }}>
+                    <Bot size={18} />
+                  </div>
+                  <div className="ex-card-status">
+                    {selectedFormat === EXERCISE_FORMATS.D6_AI_STORY ? (
+                      <span className="ex-selected-chip">
+                        <Check size={12} /> Đang chọn
+                      </span>
+                    ) : isAIAuthorized ? (
+                      <span className="ex-format-code" style={{ color: "#8b5cf6" }}>AI Beta</span>
+                    ) : (
+                      <span className="ex-format-code" style={{ color: "#ef4444", display: "flex", alignItems: "center", gap: "3px" }}>
+                        <Lock size={12} /> Khóa
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="ex-card-main">
+                  <h4 className="ex-card-title">AI Kể chuyện nối từ</h4>
+                  <p className="ex-card-desc">
+                    AI liên kết từ vựng thành câu chuyện tình huống sinh động &amp; tạo câu đố ngữ cảnh.
+                  </p>
+                </div>
+
+                <div className="ex-card-footer">
+                  <span className="ex-card-tag" style={{ color: "#8b5cf6" }}>
+                    {isAIAuthorized ? "AI Đặc Quyền" : "Yêu cầu cấp quyền"}
+                  </span>
                 </div>
               </div>
             </div>
