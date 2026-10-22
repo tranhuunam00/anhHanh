@@ -11,6 +11,7 @@ import {
   BookOpen,
 } from "../../Icons";
 import { playSoundFeedback } from "../../../utils/vocabAudioFeedback";
+import { WordLookupPopover } from "../WordLookupPopover";
 import "./VocabExerciseAIStory.css";
 
 const STORY_THEMES = [
@@ -19,6 +20,14 @@ const STORY_THEMES = [
   { id: "adventure", label: "Khám phá & Du lịch" },
   { id: "mystery", label: "Bí ẩn & Hài hước" },
 ];
+
+const extractSentenceFromText = (fullText, targetWord) => {
+  if (!fullText || !targetWord) return fullText || "";
+  const sentences = fullText.split(/(?<=[.!?])\s+/);
+  const cleanWord = targetWord.trim().toLowerCase();
+  const matched = sentences.find((s) => s.toLowerCase().includes(cleanWord));
+  return matched ? matched.trim() : fullText.trim();
+};
 
 export const VocabExerciseAIStory = ({
   items = [],
@@ -51,6 +60,11 @@ export const VocabExerciseAIStory = ({
   const [userAnswers, setUserAnswers] = useState({});
   const [quizScore, setQuizScore] = useState(0);
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
+
+  // Word Lookup Popover state (tra từ khi bôi đen hoặc click từ highlight)
+  const [lookupWord, setLookupWord] = useState("");
+  const [lookupTarget, setLookupTarget] = useState(null);
+  const [lookupContext, setLookupContext] = useState("");
 
   // Generate Story from Backend
   const handleGenerateStory = async () => {
@@ -134,6 +148,57 @@ export const VocabExerciseAIStory = ({
     }
   };
 
+  // Handle text selection in story for word lookup & saving
+  const handleStoryMouseUp = (e) => {
+    if (e?.target?.closest(".word-lookup-popover, button, select, input, textarea")) {
+      return;
+    }
+
+    const selection = window.getSelection();
+    const text = selection?.toString().trim();
+
+    if (!text || text.length > 80 || text.includes("\n")) {
+      return;
+    }
+
+    const isChineseChar = /[\u4e00-\u9fff]/.test(text);
+    if (text.length === 1 && !["a", "i", "A", "I"].includes(text) && !isChineseChar) {
+      return;
+    }
+
+    let range;
+    try {
+      range = selection.getRangeAt(0);
+    } catch {
+      return;
+    }
+
+    const rect = range.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const ctx = extractSentenceFromText(storyData?.story_en, text);
+    setLookupWord(text);
+    setLookupTarget(range.cloneRange());
+    setLookupContext(ctx);
+  };
+
+  // Handle clicking on pre-highlighted target words
+  const handleHighlightWordClick = (e, word) => {
+    e.stopPropagation();
+    const cleanWord = (word || "").trim();
+    if (!cleanWord) return;
+    const ctx = extractSentenceFromText(storyData?.story_en, cleanWord);
+    setLookupWord(cleanWord);
+    setLookupTarget(e.currentTarget);
+    setLookupContext(ctx);
+  };
+
+  const handleCloseLookup = () => {
+    setLookupWord("");
+    setLookupTarget(null);
+    setLookupContext("");
+  };
+
   // Highlight words in story
   const renderHighlightedStory = () => {
     if (!storyData?.story_en) return null;
@@ -144,7 +209,12 @@ export const VocabExerciseAIStory = ({
       const clean = tokenStr.toLowerCase().replace(/[^a-z0-9]/g, "");
       if (clean && targetSet.has(clean)) {
         return (
-          <span key={idx} className="ai-highlight-word" title="Từ vựng mục tiêu">
+          <span
+            key={idx}
+            className="ai-highlight-word"
+            title="Nhấn để tra từ & xem nghĩa tiếng Việt"
+            onClick={(e) => handleHighlightWordClick(e, clean)}
+          >
             {tokenStr}
           </span>
         );
@@ -242,6 +312,30 @@ export const VocabExerciseAIStory = ({
             {/* Generated Story Content */}
             {storyData ? (
               <>
+                {/* Target Vocabulary Chips Bar */}
+                {storyData.target_words && storyData.target_words.length > 0 && (
+                  <div className="ai-target-words-bar">
+                    <div className="ai-target-words-title">
+                      <Sparkles size={14} color="#8b5cf6" />
+                      <span>Từ vựng mục tiêu trong bài ({storyData.target_words.length}):</span>
+                    </div>
+                    <div className="ai-target-chips-wrap">
+                      {storyData.target_words.map((tw, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          className="ai-target-chip"
+                          onClick={(e) => handleHighlightWordClick(e, tw.word)}
+                          title={`Bấm để xem nghĩa & tra từ: ${tw.word}`}
+                        >
+                          <span className="ai-chip-word">{tw.word}</span>
+                          {tw.meaning && <span className="ai-chip-meaning">• {tw.meaning}</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="ai-story-card">
                   <div className="ai-story-header">
                     <h3 className="ai-story-title">📖 {storyData.title}</h3>
@@ -261,12 +355,34 @@ export const VocabExerciseAIStory = ({
                     </div>
                   </div>
 
-                  <div className="ai-story-text-en">{renderHighlightedStory()}</div>
+                  <div
+                    className="ai-story-text-en"
+                    onMouseUp={handleStoryMouseUp}
+                    title="Bôi đen bất kỳ từ hoặc cụm từ nào để tra cứu nghĩa và lưu vào Sổ từ vựng"
+                  >
+                    {renderHighlightedStory()}
+                  </div>
+
+                  <div className="ai-selection-hint">
+                    <span>💡 <strong>Chọn từ mới:</strong> Bôi đen bất kỳ từ nào trong đoạn văn hoặc chạm vào từ màu tím để xem nghĩa &amp; lưu vào Sổ từ vựng!</span>
+                  </div>
 
                   {showTranslation && (
                     <div className="ai-story-text-vi">{storyData.story_vi}</div>
                   )}
                 </div>
+
+                {/* Word Lookup Popover for selected text or clicked highlight word */}
+                {lookupWord && lookupTarget && (
+                  <WordLookupPopover
+                    word={lookupWord}
+                    targetElement={lookupTarget}
+                    contextSentence={lookupContext || storyData?.story_en || ""}
+                    sourceLang="en"
+                    targetLang="vi"
+                    onClose={handleCloseLookup}
+                  />
+                )}
 
                 {/* Cloze Challenge Section */}
                 {storyData.cloze_questions && storyData.cloze_questions.length > 0 && (
