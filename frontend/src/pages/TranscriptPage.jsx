@@ -62,7 +62,10 @@ export const TranscriptPage = React.memo(({ lesson, playerController, onGoToChal
     if (!isActive) return;
     const measure = () => {
       const header = document.querySelector(".app-header");
-      if (header) setHeroTop(header.getBoundingClientRect().height);
+      if (header) {
+        const isSticky = window.getComputedStyle(header).position === "sticky";
+        setHeroTop(isSticky ? header.getBoundingClientRect().height : 0);
+      }
     };
     measure();
     window.addEventListener("resize", measure);
@@ -127,12 +130,38 @@ export const TranscriptPage = React.memo(({ lesson, playerController, onGoToChal
     }
   }, [activeIndex, visibleCount]);
 
-  // Auto scroll active item into view
+  // Auto scroll active item into view with safe offset below sticky player card
   useEffect(() => {
-    if (isAutoScroll && activeIndex !== -1 && activeItemRef.current && isActive) {
-      activeItemRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
+    if (!isAutoScroll || activeIndex === -1 || !activeItemRef.current || !isActive) return;
+
+    const activeEl = activeItemRef.current;
+    const heroCard = document.querySelector(".full-audio-hero-card");
+    
+    // Bottom of the sticky card in viewport coordinates
+    let stickyBottom = 0;
+    if (heroCard) {
+      const heroRect = heroCard.getBoundingClientRect();
+      stickyBottom = Math.max(0, heroRect.bottom);
+    }
+
+    const safeTop = stickyBottom + 16;
+    const elRect = activeEl.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+
+    // Check if element is obstructed by sticky card or scrolled too far down
+    const isObstructed = elRect.top < safeTop;
+    const isTooLow = elRect.bottom > (viewportHeight - 50);
+
+    if (isObstructed || isTooLow) {
+      // Position active item comfortably in visible area below sticky player
+      const visibleRange = Math.max(viewportHeight - safeTop, 120);
+      const targetCenterY = safeTop + Math.min(Math.max(visibleRange * 0.35, 60), 220);
+      const currentCenterY = elRect.top + elRect.height / 2;
+      const scrollDiff = currentCenterY - targetCenterY;
+
+      window.scrollBy({
+        top: scrollDiff,
+        behavior: "smooth"
       });
     }
   }, [activeIndex, isAutoScroll, isActive]);
@@ -218,41 +247,41 @@ export const TranscriptPage = React.memo(({ lesson, playerController, onGoToChal
     <div id="tab-transcript" className="tab-content">
       {/* Full Audio Hero Card – sticky */}
       <div className="card full-audio-hero-card" style={{ top: `${heroTop}px` }}>
-        <div className="full-audio-hero-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-          <div className="hero-header-title" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Headphones size={22} color="#3b82f6" />
-            <div>
-              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, margin: 0 }}>{lesson.title}</h3>
-              <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+        <div className="full-audio-hero-header">
+          <div className="hero-header-title">
+            <Headphones className="hero-headphones-icon" size={20} color="#3b82f6" />
+            <div className="hero-title-text-group">
+              <h3 className="hero-lesson-title" title={lesson.title}>{lesson.title}</h3>
+              <div className="hero-lesson-subtitle">
                 Toàn bộ audio bài nghe ({totalChallengesCount} câu)
               </div>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="hero-header-actions">
             <button
-              className={`btn ${isAutoScroll ? "btn-primary" : "btn-secondary"} btn-with-icon`}
-              style={{ padding: "6px 14px", fontSize: "0.83rem" }}
+              className={`btn ${isAutoScroll ? "btn-primary" : "btn-secondary"} btn-with-icon btn-autoscroll`}
               onClick={() => setIsAutoScroll(!isAutoScroll)}
               title="Bật/Tắt tự động cuộn danh sách câu theo thời gian audio"
             >
-              <ChevronsDown size={15} />
+              <ChevronsDown size={14} />
               <span>{isAutoScroll ? "Tự cuộn: BẬT" : "Tự cuộn: TẮT"}</span>
             </button>
           </div>
         </div>
 
         <div className="full-audio-player-bar">
-          <button className="full-audio-play-btn" onClick={toggleFullPlay}>
+          <button
+            className="full-audio-play-btn"
+            onClick={toggleFullPlay}
+            title={isPlayingFull ? "Tạm dừng" : "Phát toàn bộ audio"}
+          >
             {isPlayingFull ? (
-              <Pause size={17} fill="currentColor" />
+              <Pause size={16} fill="currentColor" />
             ) : (
-              <Play size={17} fill="currentColor" style={{ marginLeft: "2px" }} />
+              <Play size={16} fill="currentColor" style={{ marginLeft: "2px" }} />
             )}
           </button>
-          <span className="full-audio-time">
-            {formatTime(currentTime)} / {formatTime(duration)}
-          </span>
           <input
             type="range"
             className="full-audio-progress"
@@ -264,6 +293,9 @@ export const TranscriptPage = React.memo(({ lesson, playerController, onGoToChal
             onChange={handleSeek}
             title="Kéo để tua thời gian audio"
           />
+          <span className="full-audio-time">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
         </div>
       </div>
 

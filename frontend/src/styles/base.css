@@ -156,6 +156,19 @@ body {
   color: var(--primary);
 }
 .brand span { color: var(--text-primary); }
+.brand-logo-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  object-fit: cover;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.35);
+}
+.brand-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
 
 .url-input-form {
   display: flex;
@@ -163,6 +176,16 @@ body {
   min-width: 0;
   gap: 8px;
   align-items: center;
+}
+.url-form-actions-row {
+  display: contents;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 .url-input-container {
   position: relative;

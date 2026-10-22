@@ -12,16 +12,47 @@
   z-index: 10;
 }
 .full-audio-hero-header {
-  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 .hero-header-title {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
-.hero-header-title svg {
+.hero-headphones-icon {
   color: var(--primary);
   flex-shrink: 0;
+}
+.hero-title-text-group {
+  flex: 1;
+  min-width: 0;
+}
+.hero-lesson-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+.hero-lesson-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.hero-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.btn-autoscroll {
+  padding: 6px 14px;
+  font-size: 0.83rem;
 }
 .full-audio-player-bar {
   display: flex;
@@ -78,6 +109,7 @@
   border-radius: 10px;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
+  scroll-margin-top: 140px;
   cursor: pointer;
   transition: all 0.15s;
 }
