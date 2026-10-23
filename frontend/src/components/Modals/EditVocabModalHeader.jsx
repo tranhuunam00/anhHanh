@@ -20,10 +20,10 @@ export const EditVocabModalHeader = ({ onClose }) => (
         <Pencil size={18} strokeWidth={2.5} />
       </div>
       <div>
-        <h3 className="modal-title" style={{ margin: 0, fontSize: "1.1rem" }}>
+        <h3 className="modal-title edit-vocab-title" style={{ margin: 0, fontSize: "1.05rem" }}>
           Chỉnh sửa thẻ từ vựng
         </h3>
-        <div style={{ fontSize: "0.78rem", color: "var(--text-muted, #64748b)" }}>
+        <div className="edit-vocab-subtitle" style={{ fontSize: "0.76rem", color: "var(--text-muted, #64748b)" }}>
           Cập nhật từ gốc, phiên âm IPA, nghĩa tiếng Việt và link ảnh
         </div>
       </div>

@@ -151,43 +151,16 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
 
   return (
     <div className={`modal-overlay ${isOpen ? "active" : ""}`} onClick={onClose}>
-      <div
-        className="settings-modal edit-vocab-modal"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: "540px",
-          maxWidth: "94vw",
-          borderRadius: "16px",
-          overflow: "hidden",
-          maxHeight: "92vh",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div className="settings-modal edit-vocab-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <EditVocabModalHeader onClose={onClose} />
 
         {/* Scrollable Form Body */}
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            padding: "18px 22px",
-            overflowY: "auto",
-            display: "flex",
-            flexDirection: "column",
-            gap: "14px",
-          }}
-        >
+        <form onSubmit={handleSubmit} className="edit-vocab-form">
           {/* Row 1: Word & Auto Enrich Button */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-              <label
-                style={{
-                  fontSize: "0.85rem",
-                  fontWeight: 700,
-                  color: "var(--text-primary, #1e293b)",
-                }}
-              >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <label className="edit-vocab-label">
                 Từ vựng <span style={{ color: "#ef4444" }}>*</span>
               </label>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -204,7 +177,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "4px",
-                    fontSize: "0.75rem",
+                    fontSize: "0.74rem",
                     fontWeight: 600,
                   }}
                   title="Nghe phát âm từ vựng"
@@ -218,11 +191,11 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
                   disabled={isAutoEnriching || !word.trim()}
                   style={{
                     background: "rgba(99, 102, 241, 0.1)",
-                    color: "#6366f1",
+                    color: "var(--primary, #6366f1)",
                     border: "1px solid rgba(99, 102, 241, 0.25)",
                     borderRadius: "6px",
-                    padding: "3px 8px",
-                    fontSize: "0.75rem",
+                    padding: "2px 8px",
+                    fontSize: "0.74rem",
                     fontWeight: 600,
                     cursor: "pointer",
                     display: "inline-flex",
@@ -238,18 +211,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
             </div>
             <input
               type="text"
-              className="dict-input"
-              style={{
-                width: "100%",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                border: "1px solid var(--border-color, #e2e8f0)",
-                background: "var(--bg-input, #fff)",
-                color: "var(--text-primary, #0f172a)",
-                fontSize: "1.05rem",
-                fontWeight: 600,
-                boxSizing: "border-box",
-              }}
+              className="dict-input edit-vocab-word-input"
               value={word}
               onChange={(e) => setWord(e.target.value)}
               placeholder="Nhập từ gốc..."
@@ -258,20 +220,18 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
           </div>
 
           {/* Row 2: Phonetic IPA & Meaning (2 Columns) */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "12px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "10px" }}>
             {/* Phonetic */}
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
-                  Phiên âm IPA
-                </label>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                <label className="edit-vocab-label">Phiên âm IPA</label>
                 <button
                   type="button"
                   onClick={() => handleTestPronounce(word)}
                   style={{
                     background: "none",
                     border: "none",
-                    color: "#2563eb",
+                    color: "var(--primary, #2563eb)",
                     cursor: "pointer",
                     padding: "2px 4px",
                     display: "inline-flex",
@@ -287,18 +247,8 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
               </div>
               <input
                 type="text"
-                className="dict-input"
-                style={{
-                  width: "100%",
-                  padding: "9px 12px",
-                  borderRadius: "8px",
-                  border: "1px solid var(--border-color, #e2e8f0)",
-                  background: "var(--bg-input, #fff)",
-                  color: "var(--text-primary, #0f172a)",
-                  fontSize: "0.9rem",
-                  fontFamily: "monospace",
-                  boxSizing: "border-box",
-                }}
+                className="dict-input edit-vocab-input"
+                style={{ fontFamily: "monospace" }}
                 value={phonetic}
                 onChange={(e) => setPhonetic(e.target.value)}
                 placeholder="/ˈflʌr.ɪ.ʃɪŋ/"
@@ -307,25 +257,15 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
 
             {/* Meaning */}
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                <label className="edit-vocab-label">
                   Nghĩa tiếng Việt <span style={{ color: "#ef4444" }}>*</span>
                 </label>
               </div>
               <input
                 type="text"
-                className="dict-input"
-                style={{
-                  width: "100%",
-                  padding: "9px 12px",
-                  borderRadius: "8px",
-                  border: "1px solid var(--border-color, #e2e8f0)",
-                  background: "var(--bg-input, #fff)",
-                  color: "#16a34a",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  boxSizing: "border-box",
-                }}
+                className="dict-input edit-vocab-input"
+                style={{ color: "#16a34a", fontWeight: 600 }}
                 value={meaning}
                 onChange={(e) => setMeaning(e.target.value)}
                 placeholder="Nghĩa tiếng Việt..."
@@ -354,14 +294,8 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
 
           {/* Row 4: Context Sentence */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-              <label
-                style={{
-                  fontSize: "0.83rem",
-                  fontWeight: 600,
-                  color: "var(--text-primary, #1e293b)",
-                }}
-              >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <label className="edit-vocab-label">
                 Câu ví dụ ngữ cảnh (Context sentence)
               </label>
               <button
@@ -380,7 +314,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "4px",
-                  fontSize: "0.75rem",
+                  fontSize: "0.74rem",
                   fontWeight: 600,
                 }}
                 title="Nghe phát âm câu ví dụ minh họa"
@@ -390,20 +324,8 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
               </button>
             </div>
             <textarea
-              className="dict-input"
-              rows={2}
-              style={{
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: "8px",
-                border: "1px solid var(--border-color, #e2e8f0)",
-                background: "var(--bg-input, #fff)",
-                color: "var(--text-primary, #0f172a)",
-                fontSize: "0.85rem",
-                boxSizing: "border-box",
-                resize: "vertical",
-                fontFamily: "inherit",
-              }}
+              className="dict-input edit-vocab-context-textarea"
+              rows={3}
               value={contextSentence}
               onChange={(e) => setContextSentence(e.target.value)}
               placeholder="Câu văn chứa từ vựng này..."
@@ -412,30 +334,12 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
 
           {/* Row 5: Status */}
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.83rem",
-                fontWeight: 600,
-                color: "var(--text-primary, #1e293b)",
-                marginBottom: "6px",
-              }}
-            >
+            <label className="edit-vocab-label" style={{ display: "block", marginBottom: "4px" }}>
               Trạng thái ghi nhớ
             </label>
             <select
-              className="dict-input"
-              style={{
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: "8px",
-                border: "1px solid var(--border-color, #e2e8f0)",
-                background: "var(--bg-input, #fff)",
-                color: "var(--text-primary, #0f172a)",
-                fontSize: "0.88rem",
-                boxSizing: "border-box",
-                cursor: "pointer",
-              }}
+              className="dict-input edit-vocab-input"
+              style={{ cursor: "pointer" }}
               value={vocabStatus}
               onChange={(e) => setVocabStatus(e.target.value)}
             >
@@ -446,22 +350,13 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
           </div>
 
           {/* Footer Actions */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              marginTop: "8px",
-              paddingTop: "12px",
-              borderTop: "1px solid var(--border-color, #e2e8f0)",
-            }}
-          >
+          <div className="edit-vocab-footer">
             <button
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
               disabled={isSubmitting}
-              style={{ padding: "8px 16px", fontSize: "0.88rem" }}
+              style={{ padding: "8px 16px", fontSize: "0.85rem" }}
             >
               Hủy
             </button>
@@ -469,16 +364,16 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
               type="submit"
               className="btn btn-primary btn-with-icon"
               disabled={isSubmitting}
-              style={{ padding: "8px 20px", fontSize: "0.88rem", fontWeight: 700 }}
+              style={{ padding: "8px 18px", fontSize: "0.85rem", fontWeight: 700 }}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={16} className="spinning" />
+                  <Loader2 size={15} className="spinning" />
                   <span>Đang lưu...</span>
                 </>
               ) : (
                 <>
-                  <Check size={16} strokeWidth={2.5} />
+                  <Check size={15} strokeWidth={2.5} />
                   <span>Lưu thay đổi</span>
                 </>
               )}

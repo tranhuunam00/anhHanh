@@ -54,8 +54,8 @@ export const VocabImagePickerField = ({
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-        <label style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+        <label className="edit-vocab-label">
           Link ảnh minh họa (Tùy chọn)
         </label>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -71,7 +71,7 @@ export const VocabImagePickerField = ({
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "4px",
-                fontSize: "0.75rem",
+                fontSize: "0.74rem",
                 fontWeight: 600,
               }}
               title="Xóa link ảnh hiện tại (không dùng ảnh)"
@@ -92,7 +92,7 @@ export const VocabImagePickerField = ({
               display: "inline-flex",
               alignItems: "center",
               gap: "4px",
-              fontSize: "0.75rem",
+              fontSize: "0.74rem",
               fontWeight: 600,
             }}
             title="Tìm ảnh minh họa phù hợp theo ngữ cảnh"
@@ -106,8 +106,8 @@ export const VocabImagePickerField = ({
       <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
         <div
           style={{
-            width: "64px",
-            height: "64px",
+            width: "58px",
+            height: "58px",
             borderRadius: "8px",
             border: "1px solid var(--border-color, #cbd5e1)",
             overflow: "hidden",
@@ -128,8 +128,8 @@ export const VocabImagePickerField = ({
             />
           ) : (
             <div style={{ textAlign: "center", color: "#94a3b8" }}>
-              <ImageIcon size={20} />
-              <div style={{ fontSize: "0.58rem" }}>{imgLoadError ? "Lỗi link" : "Không ảnh"}</div>
+              <ImageIcon size={18} />
+              <div style={{ fontSize: "0.56rem" }}>{imgLoadError ? "Lỗi link" : "Không ảnh"}</div>
             </div>
           )}
         </div>
@@ -137,17 +137,7 @@ export const VocabImagePickerField = ({
         <div style={{ flex: 1 }}>
           <input
             type="url"
-            className="dict-input"
-            style={{
-              width: "100%",
-              padding: "8px 12px",
-              borderRadius: "8px",
-              border: "1px solid var(--border-color, #e2e8f0)",
-              background: "var(--bg-input, #fff)",
-              color: "var(--text-primary, #0f172a)",
-              fontSize: "0.82rem",
-              boxSizing: "border-box",
-            }}
+            className="dict-input edit-vocab-input"
             value={imageUrl}
             onChange={(e) => {
               setImageUrl(e.target.value);

@@ -1,0 +1,460 @@
+/* ==========================================================================
+   Brand Mindmap (Sơ đồ tư duy Xây dựng Thương hiệu) - Isolated Styles
+   Namespace: .brand-mindmap-* (Hoàn toàn độc lập, không ảnh hưởng module khác)
+   ========================================================================== */
+
+.brand-mindmap-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: mindmapFadeIn 0.25s ease-out;
+}
+
+@keyframes mindmapFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header & Stat Banner */
+.brand-mindmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.brand-mindmap-title h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-mindmap-title p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.brand-mindmap-view-switcher {
+  display: flex;
+  background: var(--bg-secondary);
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  gap: 3px;
+}
+
+.brand-mindmap-view-btn {
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.brand-mindmap-view-btn.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Toolbar & Filters */
+.brand-mindmap-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.brand-mindmap-search-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.brand-mindmap-search-input {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.84rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.brand-mindmap-search-input:focus {
+  border-color: var(--primary);
+}
+
+.brand-mindmap-action-btn {
+  padding: 6px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.brand-mindmap-action-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--primary);
+}
+
+/* Part Filter Pills */
+.brand-mindmap-filter-pills {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.brand-mindmap-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.brand-mindmap-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.brand-mindmap-pill.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* Tree Mindmap Structure */
+.brand-mindmap-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.brand-mindmap-part-section {
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.brand-mindmap-part-header {
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.15s ease;
+}
+
+.brand-mindmap-part-header:hover {
+  background: rgba(99, 102, 241, 0.04);
+}
+
+.brand-mindmap-part-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mindmap-part-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.brand-mindmap-part-heading {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.brand-mindmap-questions-list {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Question Node */
+.brand-mindmap-qnode {
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.brand-mindmap-qnode:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.brand-mindmap-qnode-header {
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  background: var(--bg-card);
+}
+
+.brand-mindmap-qnode-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.brand-mindmap-qnum-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary, #6366f1);
+}
+
+.brand-mindmap-qnode-title {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.brand-mindmap-qnode-summary {
+  margin: 3px 0 0 0;
+  font-size: 0.77rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.brand-mindmap-toggle-icon {
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Branches Inside Question */
+.brand-mindmap-branches {
+  padding: 10px 14px 14px 14px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.brand-mindmap-branch-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--primary, #6366f1);
+}
+
+.brand-mindmap-branch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.brand-mindmap-branch-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-mindmap-type-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.brand-mindmap-type-concept {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.brand-mindmap-type-comparison {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.brand-mindmap-type-formula {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.brand-mindmap-type-example {
+  background: rgba(236, 72, 153, 0.1);
+  color: #ec4899;
+}
+
+.brand-mindmap-branch-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.77rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.brand-mindmap-branch-list li {
+  margin-bottom: 4px;
+}
+
+.brand-mindmap-branch-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Quick Cheat Sheet Table */
+.brand-mindmap-sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.brand-mindmap-sheet-table th {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 700;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.brand-mindmap-sheet-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.brand-mindmap-sheet-table tr:hover td {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Exam Formula Cards */
+.brand-mindmap-formula-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.brand-mindmap-step-card {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.brand-mindmap-step-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.brand-mindmap-step-text {
+  margin: 0;
+  font-size: 0.79rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .brand-mindmap-header {
+    padding: 12px 14px;
+  }
+
+  .brand-mindmap-title h2 {
+    font-size: 1.02rem;
+  }
+
+  .brand-mindmap-view-switcher {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .brand-mindmap-view-btn {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.72rem;
+    padding: 5px 6px;
+  }
+
+  .brand-mindmap-part-heading {
+    font-size: 0.86rem;
+  }
+
+  .brand-mindmap-qnode-title {
+    font-size: 0.82rem;
+  }
+
+  .brand-mindmap-branch-list {
+    font-size: 0.74rem;
+    padding-left: 14px;
+  }
+}

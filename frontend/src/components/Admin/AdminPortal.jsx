@@ -26,6 +26,7 @@ import {
   ChevronDown,
   ChevronUp,
   Layers,
+  Network,
 } from '../Icons';
 import {
   fetchAdminOverview,
@@ -40,9 +41,10 @@ import {
   uploadFeedbackImage
 } from '../../services/feedbackService';
 import { AdminVocabBankTab } from './AdminVocabBankTab';
+import { BrandMindmapTab } from './BrandMindmap/BrandMindmapTab';
 
 export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'users' | 'feedbacks' | 'vocab_bank'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'users' | 'feedbacks' | 'vocab_bank' | 'brand_mindmap'
   const [overview, setOverview] = useState(null);
   const [users, setUsers] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
@@ -68,6 +70,20 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
 
   // Security check: Only role === 'ADMIN'
   const isAdmin = user && user.role === 'ADMIN';
+
+  // Specific admin emails authorized to view Brand Mindmap tab
+  const isAuthorizedAdminEmail = (email) => {
+    if (!email) return false;
+    const clean = String(email).trim().toLowerCase();
+    const allowed = [
+      'itdaogroup@gmail.com',
+      'tranhuunam23022000@gmail.com',
+      'vuthiquynhtrangbl6d@gmail.com',
+      'admin@dictation.local'
+    ];
+    return allowed.includes(clean);
+  };
+  const canViewBrandMindmap = isAdmin && isAuthorizedAdminEmail(user?.email);
 
   const loadOverview = useCallback(async () => {
     if (!token || !isAdmin) return;
@@ -426,6 +442,17 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
               <Layers size={15} /> Ngân hàng từ vựng (30 chủ đề)
             </span>
           </button>
+          {canViewBrandMindmap && (
+            <button
+              type="button"
+              className={`admin-tab-btn ${activeTab === 'brand_mindmap' ? 'active' : ''}`}
+              onClick={() => setActiveTab('brand_mindmap')}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Network size={15} /> Sơ đồ tư duy Thương hiệu
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1161,6 +1188,11 @@ export const AdminPortal = ({ user, token, showToast, onOpenAuth }) => {
       {/* TAB 4: SYSTEM VOCABULARY BANK (30 CATEGORIES) */}
       {activeTab === 'vocab_bank' && (
         <AdminVocabBankTab token={token} showToast={showToast} />
+      )}
+
+      {/* TAB 5: BRAND MINDMAP (ONLY VISIBLE TO AUTHORIZED ADMIN EMAIL) */}
+      {canViewBrandMindmap && activeTab === 'brand_mindmap' && (
+        <BrandMindmapTab />
       )}
 
       {/* LIGHTBOX MODAL */}
