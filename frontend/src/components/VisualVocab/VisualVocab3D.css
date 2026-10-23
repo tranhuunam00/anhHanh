@@ -6,8 +6,8 @@
   aspect-ratio: 16 / 9;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  background: #7dd3fc;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  background: var(--bg-card, #ffffff);
 }
 
 .vv-3d-viewport {
@@ -17,25 +17,44 @@
   cursor: grab;
   user-select: none;
   overflow: hidden;
+  perspective: 1200px;
 }
 
-.vv-3d-viewport:active {
+.vv-3d-viewport.dragging {
   cursor: grabbing;
 }
 
-.vv-3d-mount {
+.vv-3d-scene-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.vv-3d-base-layer {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  pointer-events: none;
+}
+
+/* 3D Dynamic Glare Reflection */
+.vv-3d-glare {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.vv-3d-mount canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-  outline: none;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border-radius: 14px;
+  z-index: 5;
+  mix-blend-mode: overlay;
+  transition: opacity 0.3s ease;
 }
 
 /* 3D Badge Indicator */
@@ -43,32 +62,37 @@
   position: absolute;
   top: 14px;
   left: 14px;
-  z-index: 20;
+  z-index: 25;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(2, 132, 199, 0.3);
   border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 700;
   color: #0369a1;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.15);
   pointer-events: none;
 }
 
-/* 3D Floating Pins (Projected from 3D coordinates) */
+/* 3D Floating Pins (Elevated in 3D Space) */
 .vv-hotspot-pin.vv-3d-pin {
-  transition: transform 0.1s ease-out;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  transform-style: preserve-3d;
 }
 
 .vv-hotspot-pin.vv-3d-pin:hover .vv-pin-dot,
 .vv-hotspot-pin.vv-3d-pin.active .vv-pin-dot {
-  transform: scale(1.3);
-  box-shadow: 0 0 0 5px rgba(2, 132, 199, 0.4);
+  transform: scale(1.35);
+  box-shadow: 0 0 0 6px rgba(2, 132, 199, 0.45), 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.vv-hotspot-label.vv-3d-label {
+  white-space: nowrap;
 }
 
 .active-3d-btn {
