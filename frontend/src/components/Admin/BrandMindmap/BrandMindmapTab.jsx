@@ -2,8 +2,11 @@ import React, { useState, useMemo } from "react";
 import { BRAND_MINDMAP_PARTS } from "../../../data/brandMindmap/index.js";
 import { BrandMindmapNode } from "./BrandMindmapNode.jsx";
 import { BrandExamFormulaView } from "./BrandExamFormulaView.jsx";
+import { BrandVisualTreeCanvas } from "./BrandVisualTreeCanvas.jsx";
 import {
   Network,
+  GitBranch,
+  Layers,
   Search,
   BookOpen,
   FileText,
@@ -14,7 +17,7 @@ import {
 import "../../../styles/brand-mindmap.css";
 
 export const BrandMindmapTab = () => {
-  const [viewMode, setViewMode] = useState("mindmap"); // 'mindmap' | 'formula'
+  const [viewMode, setViewMode] = useState("tree"); // 'tree' | 'cards' | 'formula'
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPartId, setSelectedPartId] = useState("all");
   const [expandAll, setExpandAll] = useState(false);
@@ -84,16 +87,27 @@ export const BrandMindmapTab = () => {
         <div className="brand-mindmap-view-switcher">
           <button
             type="button"
-            className={`brand-mindmap-view-btn ${viewMode === "mindmap" ? "active" : ""}`}
-            onClick={() => setViewMode("mindmap")}
+            className={`brand-mindmap-view-btn ${viewMode === "tree" ? "active" : ""}`}
+            onClick={() => setViewMode("tree")}
+            title="Sơ đồ cây tư duy trực quan đóng mở đa cấp"
           >
-            <Network size={14} />
-            <span>Sơ đồ tư duy (18 câu)</span>
+            <GitBranch size={14} />
+            <span>Cây tư duy (Đóng/Mở nhánh)</span>
+          </button>
+          <button
+            type="button"
+            className={`brand-mindmap-view-btn ${viewMode === "cards" ? "active" : ""}`}
+            onClick={() => setViewMode("cards")}
+            title="Xem dạng danh sách thẻ chi tiết"
+          >
+            <Layers size={14} />
+            <span>Danh sách thẻ (18 câu)</span>
           </button>
           <button
             type="button"
             className={`brand-mindmap-view-btn ${viewMode === "formula" ? "active" : ""}`}
             onClick={() => setViewMode("formula")}
+            title="Công thức làm bài tự luận và bảng 18 câu trọng tâm"
           >
             <FileText size={14} />
             <span>Công thức thi & Bảng nhớ</span>
@@ -101,7 +115,52 @@ export const BrandMindmapTab = () => {
         </div>
       </div>
 
-      {viewMode === "formula" ? (
+      {viewMode === "tree" ? (
+        <>
+          {/* Quick Search For Tree */}
+          <div className="brand-mindmap-toolbar">
+            <div className="brand-mindmap-search-row">
+              <div style={{ position: "relative", flex: 1, display: "flex", alignItems: "center" }}>
+                <Search
+                  size={15}
+                  style={{
+                    position: "absolute",
+                    left: 10,
+                    color: "var(--text-muted)",
+                    pointerEvents: "none",
+                  }}
+                />
+                <input
+                  type="text"
+                  className="brand-mindmap-search-input"
+                  style={{ paddingLeft: "32px" }}
+                  placeholder="Lọc / Tìm nhanh trên cây tư duy (VD: 3C, aaker, keller, 131/2025, vinamilk, bitis, pop, pod...)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      background: "none",
+                      border: "none",
+                      color: "var(--text-muted)",
+                      cursor: "pointer",
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+          <BrandVisualTreeCanvas searchQuery={searchQuery} />
+        </>
+      ) : viewMode === "formula" ? (
         <BrandExamFormulaView />
       ) : (
         <>
