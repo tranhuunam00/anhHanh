@@ -3,6 +3,36 @@
   z-index: 10005 !important;
 }
 
+/* Menu Button Styling (Shared & Fallback) */
+.ex-back-menu-btn,
+.btn-ex-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-secondary, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-secondary, #334155);
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  line-height: 1;
+}
+
+.ex-back-menu-btn:hover,
+.btn-ex-back:hover {
+  background: var(--border-color, #e2e8f0);
+  color: var(--text-primary, #0f172a);
+  transform: translateY(-1px);
+}
+
+.ex-back-menu-btn:active,
+.btn-ex-back:active {
+  transform: translateY(0);
+}
+
 .ai-story-wrapper {
   display: flex;
   flex-direction: column;
@@ -10,7 +40,7 @@
   max-width: 760px;
   margin: 0 auto;
   gap: 18px;
-  padding: 10px 16px 24px;
+  padding: 10px 16px 36px;
   box-sizing: border-box;
 }
 
@@ -65,13 +95,19 @@
 }
 
 .ai-theme-select {
-  padding: 6px 12px;
+  padding: 7px 12px;
   border-radius: 8px;
   border: 1px solid var(--border-color, #cbd5e1);
   background: var(--bg-card, #ffffff);
   color: var(--text-primary, #0f172a);
   font-size: 0.88rem;
   font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.ai-theme-select:focus {
+  border-color: var(--primary, #3b82f6);
 }
 
 .btn-ai-generate {
@@ -112,9 +148,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color, #f1f5f9);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ai-story-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
 }
 
 .ai-story-title {
@@ -134,51 +180,59 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 7px 12px;
   border-radius: 8px;
   border: 1px solid var(--border-color, #cbd5e1);
-  background: transparent;
+  background: var(--bg-card, #ffffff);
   color: var(--text-primary, #0f172a);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-ai-audio:hover {
+  background: var(--bg-secondary, #f8fafc);
+  border-color: var(--primary, #3b82f6);
 }
 
 .ai-story-text-en {
   font-size: 1.05rem;
-  line-height: 1.7;
+  line-height: 1.75;
   color: var(--text-primary, #0f172a);
   margin-bottom: 14px;
 }
 
 .ai-highlight-word {
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(139, 92, 246, 0.16);
   color: #6d28d9;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 6px;
   border-bottom: 2px solid #8b5cf6;
   cursor: pointer;
   transition: all 0.18s ease;
   user-select: text;
+  display: inline-block;
+  margin: 0 1px;
 }
 
 .ai-highlight-word:hover {
-  background: rgba(139, 92, 246, 0.28);
+  background: rgba(139, 92, 246, 0.32);
   color: #4c1d95;
   transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
 }
 
+/* Target Vocabulary Chips Bar */
 .ai-target-words-bar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   background: rgba(139, 92, 246, 0.05);
-  border: 1px solid rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 12px;
-  padding: 10px 14px;
-  margin-bottom: 14px;
+  padding: 12px 14px;
 }
 
 .ai-target-words-title {
@@ -202,7 +256,7 @@
   gap: 6px;
   background: var(--bg-card, #ffffff);
   border: 1px solid rgba(139, 92, 246, 0.25);
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.84rem;
   color: var(--text-primary, #0f172a);
@@ -214,6 +268,15 @@
   border-color: #8b5cf6;
   background: rgba(139, 92, 246, 0.1);
   transform: translateY(-1px);
+}
+
+.ai-target-chip.found {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.ai-target-chip.found .ai-chip-word {
+  color: #059669;
 }
 
 .ai-chip-word {
@@ -230,12 +293,13 @@
   font-size: 0.82rem;
   color: var(--text-muted, #64748b);
   margin-top: 10px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   background: var(--bg-secondary, #f8fafc);
   border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  line-height: 1.45;
 }
 
 .ai-story-text-vi {
@@ -245,17 +309,57 @@
   border-radius: 8px;
   font-size: 0.92rem;
   color: var(--text-secondary, #475569);
-  line-height: 1.55;
+  line-height: 1.6;
   font-style: italic;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
-/* Cloze Challenge Arena */
+/* Quizzes & Question Arenas */
 .ai-quiz-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 12px;
+  gap: 20px;
+  margin-top: 14px;
+}
+
+.ai-quiz-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-quiz-block-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-quiz-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ai-comp-block .ai-quiz-icon-badge {
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.ai-quiz-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+.ai-quiz-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .ai-quiz-card {
@@ -263,6 +367,11 @@
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 14px;
   padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.ai-comp-card {
+  border-left: 3.5px solid var(--primary, #3b82f6);
 }
 
 .ai-quiz-question-text {
@@ -273,6 +382,19 @@
   line-height: 1.5;
 }
 
+.ai-quiz-num {
+  font-weight: 800;
+  color: var(--primary, #3b82f6);
+  margin-right: 4px;
+}
+
+.ai-quiz-hint {
+  color: var(--text-muted, #64748b);
+  margin-left: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
 .ai-quiz-options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -280,6 +402,8 @@
 }
 
 .btn-ai-option {
+  display: flex;
+  align-items: center;
   padding: 10px 14px;
   text-align: left;
   border-radius: 10px;
@@ -290,6 +414,23 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.ai-opt-label {
+  font-weight: 700;
+  margin-right: 8px;
+  color: var(--text-muted, #64748b);
+}
+
+.ai-opt-text {
+  flex: 1;
+}
+
+.ai-feedback-icon {
+  margin-left: 8px;
+  flex-shrink: 0;
 }
 
 .btn-ai-option:hover:not(:disabled) {
@@ -309,10 +450,23 @@
   color: #991b1b !important;
 }
 
-/* Mobile Screen Adaptations */
+.ai-comp-explanation {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #475569);
+  line-height: 1.5;
+  border-left: 3px solid #10b981;
+}
+
+/* =========================================================================
+   Mobile Screen Adaptations (≤ 640px and ≤ 480px)
+   ========================================================================= */
 @media (max-width: 640px) {
   .ai-story-wrapper {
-    padding: 6px 8px 18px;
+    padding: 6px 10px 36px;
     gap: 12px;
   }
 
@@ -327,24 +481,51 @@
     justify-content: center;
     padding: 12px 14px;
     font-size: 0.95rem;
+    min-height: 44px;
   }
 
   .ai-story-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 10px;
+  }
+
+  .ai-story-title-wrap {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .ai-story-title {
+    font-size: 1.15rem;
   }
 
   .ai-story-actions {
     width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    display: flex;
+    gap: 8px;
   }
 
   .btn-ai-audio {
     flex: 1;
     justify-content: center;
-    padding: 8px 10px;
+    padding: 9px 12px;
+    min-height: 42px;
+    font-size: 0.82rem;
+  }
+
+  .ai-story-text-en {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .ai-highlight-word {
+    padding: 2px 5px;
+    font-size: 0.98rem;
+  }
+
+  .ai-target-chip {
+    padding: 5px 10px;
+    font-size: 0.8rem;
   }
 
   .ai-quiz-options-grid {
@@ -355,6 +536,13 @@
   .btn-ai-option {
     padding: 12px 14px;
     font-size: 0.95rem;
+    min-height: 46px;
+  }
+
+  .ex-back-menu-btn,
+  .btn-ex-back {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    border-radius: 8px;
   }
 }
-

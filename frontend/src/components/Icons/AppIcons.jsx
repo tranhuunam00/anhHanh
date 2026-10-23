@@ -374,6 +374,15 @@ export const IconArrowLeft = (props) => (
   </BaseIcon>
 );
 
+// 38-menu. Menu / Hamburger
+export const IconMenu = (props) => (
+  <BaseIcon {...props}>
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <line x1="3" y1="18" x2="21" y2="18" />
+  </BaseIcon>
+);
+
 // 38b. Arrow Up Down (Sort)
 export const IconArrowUpDown = (props) => (
   <BaseIcon {...props}>
@@ -600,6 +609,7 @@ export const Flame = IconFlame;
 export const RotateCw = IconRotate;
 export const RotateCcw = IconRotate;
 export const ArrowLeft = IconArrowLeft;
+export const Menu = IconMenu;
 export const ArrowRight = IconArrowRight;
 export const ArrowUpDown = IconArrowUpDown;
 export const ChevronDown = IconChevronDown;

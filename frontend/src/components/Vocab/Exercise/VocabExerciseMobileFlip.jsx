@@ -126,7 +126,7 @@ export const VocabExerciseMobileFlip = ({
         <div className="exercise-header">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button
-              className="btn-ex-back"
+              className="ex-back-menu-btn"
               onClick={onBackToMenu}
               title="Quay lại danh mục chọn dạng bài tập"
             >

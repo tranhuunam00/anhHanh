@@ -66,7 +66,20 @@ def build_fallback_story(words_list: List[Dict[str, Any]]) -> Dict[str, Any]:
                 "Relying solely on sheer luck"
             ],
             "correct_answer": "Continuous learning and practice"
-        }
+        },
+        "comprehension_questions": [
+            {
+                "question": "What is the key factor emphasized in the passage?",
+                "options": [
+                    "Continuous learning and practice",
+                    "Giving up when facing difficulties",
+                    "Avoiding all challenges",
+                    "Relying solely on sheer luck"
+                ],
+                "correct_answer": "Continuous learning and practice",
+                "explanation": "Đoạn văn nhấn mạnh sự kiên trì và luyện tập tận tâm luôn vượt qua mọi bấp bênh."
+            }
+        ]
     }
 
 
@@ -110,13 +123,19 @@ Bắt buộc trả về đúng định dạng JSON duy nhất (không có markdo
       "hint": "Gợi ý nghĩa tiếng Việt"
     }}
   ],
-  "comprehension_question": {{
-    "question": "Câu hỏi đọc hiểu bằng tiếng Anh về câu chuyện",
-    "options": ["Đáp án A", "Đáp án B", "Đáp án C", "Đáp án D"],
-    "correct_answer": "Đáp án đúng chính xác"
-  }}
+  "comprehension_questions": [
+    {{
+      "question": "Câu hỏi đọc hiểu bằng tiếng Anh về câu chuyện",
+      "options": ["Đáp án A", "Đáp án B", "Đáp án C", "Đáp án D"],
+      "correct_answer": "Đáp án đúng chính xác",
+      "explanation": "Giải thích ngắn gọn tại sao chọn đáp án này bằng tiếng Việt"
+    }}
+  ]
 }}
-Lưu ý: Tạo từ 3 đến 5 cloze_questions từ chính câu chuyện trên. Các options phải có đúng 4 lựa chọn.
+Lưu ý quan trọng:
+1. BẮT BUỘC phải lồng ghép đầy đủ tất cả các từ vựng mục tiêu vào story_en một cách tự nhiên. Giữ nguyên dạng từ hoặc biến thể ngữ pháp chuẩn.
+2. Tạo từ 3 đến 5 cloze_questions từ chính câu chuyện trên. Các options phải có đúng 4 lựa chọn.
+3. Tạo từ 1 đến 2 comprehension_questions kiểm tra khả năng đọc hiểu nội dung câu chuyện.
 """
 
         api_key = get_gemini_api_key()
@@ -152,6 +171,25 @@ Lưu ý: Tạo từ 3 đến 5 cloze_questions từ chính câu chuyện trên. 
                                 raw_text = re.sub(r"\s*```$", "", raw_text, flags=re.MULTILINE)
                                 parsed_data = json.loads(raw_text)
                                 if isinstance(parsed_data, dict) and "story_en" in parsed_data:
+                                    comp_list = []
+                                    if "comprehension_questions" in parsed_data and isinstance(parsed_data["comprehension_questions"], list):
+                                        comp_list = parsed_data["comprehension_questions"]
+                                    elif "comprehension_question" in parsed_data and isinstance(parsed_data["comprehension_question"], dict):
+                                        comp_list = [parsed_data["comprehension_question"]]
+                                    if not comp_list:
+                                        comp_list = [{
+                                            "question": f"What is the central theme of '{parsed_data.get('title', 'the passage')}'?",
+                                            "options": [
+                                                "Continuous observation and dedication",
+                                                "Giving up when facing difficulties",
+                                                "Ignoring environmental impacts",
+                                                "Relying solely on coincidence"
+                                            ],
+                                            "correct_answer": "Continuous observation and dedication",
+                                            "explanation": "Câu chuyện nêu bật tinh thần quan sát thực tế và kiên trì học hỏi."
+                                        }]
+                                    parsed_data["comprehension_questions"] = comp_list
+                                    parsed_data["comprehension_question"] = comp_list[0]
                                     return parsed_data
                     else:
                         last_error = f"Gemini API ({model_name}) HTTP {response.status_code}: {response.text}"

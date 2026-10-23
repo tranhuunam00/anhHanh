@@ -6,12 +6,16 @@ import {
   ArrowLeft,
   X,
   Eye,
-  Check,
-  RotateCcw,
   BookOpen,
+  Lightbulb,
 } from "../../Icons";
-import { playSoundFeedback } from "../../../utils/vocabAudioFeedback";
 import { WordLookupPopover } from "../WordLookupPopover";
+import { VocabExerciseAIStoryQuiz } from "./VocabExerciseAIStoryQuiz";
+import {
+  extractSentenceFromText,
+  parseHighlightedStorySegments,
+  checkTargetWordsCoverage,
+} from "../../../utils/storyHighlightUtils";
 import "./VocabExerciseAIStory.css";
 
 const STORY_THEMES = [
@@ -20,14 +24,6 @@ const STORY_THEMES = [
   { id: "adventure", label: "Khám phá & Du lịch" },
   { id: "mystery", label: "Bí ẩn & Hài hước" },
 ];
-
-const extractSentenceFromText = (fullText, targetWord) => {
-  if (!fullText || !targetWord) return fullText || "";
-  const sentences = fullText.split(/(?<=[.!?])\s+/);
-  const cleanWord = targetWord.trim().toLowerCase();
-  const matched = sentences.find((s) => s.toLowerCase().includes(cleanWord));
-  return matched ? matched.trim() : fullText.trim();
-};
 
 export const VocabExerciseAIStory = ({
   items = [],
@@ -56,23 +52,24 @@ export const VocabExerciseAIStory = ({
   const [showTranslation, setShowTranslation] = useState(false);
   const [isReadingStory, setIsReadingStory] = useState(false);
 
-  // Quiz state
-  const [userAnswers, setUserAnswers] = useState({});
-  const [quizScore, setQuizScore] = useState(0);
-  const [isQuizCompleted, setIsQuizCompleted] = useState(false);
-
   // Word Lookup Popover state (tra từ khi bôi đen hoặc click từ highlight)
   const [lookupWord, setLookupWord] = useState("");
   const [lookupTarget, setLookupTarget] = useState(null);
   const [lookupContext, setLookupContext] = useState("");
+
+  // Coverage statistics of target words in story
+  const coverageStats = useMemo(() => {
+    if (!storyData?.story_en || !storyData?.target_words) {
+      return { foundWords: new Set(), missingWords: [], coveragePercent: 0 };
+    }
+    return checkTargetWordsCoverage(storyData.story_en, storyData.target_words);
+  }, [storyData]);
 
   // Generate Story from Backend
   const handleGenerateStory = async () => {
     if (!items || items.length === 0) return;
     setIsLoading(true);
     setStoryData(null);
-    setUserAnswers({});
-    setIsQuizCompleted(false);
 
     try {
       const payload = {
@@ -132,22 +129,6 @@ export const VocabExerciseAIStory = ({
     window.speechSynthesis.speak(utter);
   }, [isReadingStory, storyData]);
 
-  // Handle answering cloze question
-  const handleSelectOption = (qIdx, chosenOpt, correctWord) => {
-    if (userAnswers[qIdx] !== undefined) return;
-
-    const isCorrect = chosenOpt.trim().toLowerCase() === correctWord.trim().toLowerCase();
-    playSoundFeedback(isCorrect);
-    setUserAnswers((prev) => ({
-      ...prev,
-      [qIdx]: { chosen: chosenOpt, isCorrect },
-    }));
-
-    if (isCorrect) {
-      setQuizScore((s) => s + 1);
-    }
-  };
-
   // Handle text selection in story for word lookup & saving
   const handleStoryMouseUp = (e) => {
     if (e?.target?.closest(".word-lookup-popover, button, select, input, textarea")) {
@@ -199,29 +180,43 @@ export const VocabExerciseAIStory = ({
     setLookupContext("");
   };
 
-  // Highlight words in story
+  // Highlight words & multi-word phrases in story
   const renderHighlightedStory = () => {
     if (!storyData?.story_en) return null;
-    const targetSet = new Set((storyData.target_words || []).map((tw) => tw.word.toLowerCase()));
 
-    const words = storyData.story_en.split(/(\s+|[.,!?;:"])/);
-    return words.map((tokenStr, idx) => {
-      const clean = tokenStr.toLowerCase().replace(/[^a-z0-9]/g, "");
-      if (clean && targetSet.has(clean)) {
+    const segments = parseHighlightedStorySegments(
+      storyData.story_en,
+      storyData.target_words || []
+    );
+
+    return segments.map((seg, idx) => {
+      if (seg.isTarget) {
         return (
           <span
             key={idx}
             className="ai-highlight-word"
             title="Nhấn để tra từ & xem nghĩa tiếng Việt"
-            onClick={(e) => handleHighlightWordClick(e, clean)}
+            onClick={(e) => handleHighlightWordClick(e, seg.targetWord || seg.text)}
           >
-            {tokenStr}
+            {seg.text}
           </span>
         );
       }
-      return tokenStr;
+      return seg.text;
     });
   };
+
+  // Normalize comprehension questions array
+  const comprehensionQuestions = useMemo(() => {
+    if (!storyData) return [];
+    if (Array.isArray(storyData.comprehension_questions) && storyData.comprehension_questions.length > 0) {
+      return storyData.comprehension_questions;
+    }
+    if (storyData.comprehension_question && typeof storyData.comprehension_question === "object") {
+      return [storyData.comprehension_question];
+    }
+    return [];
+  }, [storyData]);
 
   // If Not Authorized
   if (!isAuthorized) {
@@ -229,10 +224,20 @@ export const VocabExerciseAIStory = ({
       <div className="exercise-modal-backdrop" onClick={onClose}>
         <div className="exercise-modal-window" onClick={(e) => e.stopPropagation()}>
           <div className="exercise-header">
-            <button className="btn-ex-back" onClick={onBackToMenu}>
+            <button
+              type="button"
+              className="ex-back-menu-btn"
+              onClick={onBackToMenu}
+              title="Quay lại danh mục chọn dạng bài tập"
+            >
               <ArrowLeft size={16} /> <span>Menu</span>
             </button>
-            <button className="btn-ex-close" onClick={onClose}>
+            <button
+              type="button"
+              className="btn-ex-close"
+              onClick={onClose}
+              title="Đóng cửa sổ bài tập"
+            >
               <X size={20} />
             </button>
           </div>
@@ -245,7 +250,12 @@ export const VocabExerciseAIStory = ({
               Dạng bài tập <strong>AI Kể chuyện nối từ</strong> được bảo vệ chặt chẽ và chỉ cấp quyền
               cho các tài khoản quản trị được ủy quyền (tranhuunam23022000, vuthiquynhtrang...) nhằm quản lý chi phí API.
             </p>
-            <button className="btn-flip-nav" style={{ margin: "0 auto" }} onClick={onBackToMenu}>
+            <button
+              type="button"
+              className="ex-back-menu-btn"
+              style={{ margin: "0 auto", padding: "10px 18px" }}
+              onClick={onBackToMenu}
+            >
               <ArrowLeft size={16} /> <span>Quay lại chọn dạng bài tập khác</span>
             </button>
           </div>
@@ -261,10 +271,15 @@ export const VocabExerciseAIStory = ({
         style={{ maxWidth: "800px" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {/* Header Bar */}
         <div className="exercise-header">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button className="btn-ex-back" onClick={onBackToMenu}>
+            <button
+              type="button"
+              className="ex-back-menu-btn"
+              onClick={onBackToMenu}
+              title="Quay lại danh mục chọn dạng bài tập"
+            >
               <ArrowLeft size={16} /> <span>Menu</span>
             </button>
             <div className="ex-header-divider" />
@@ -272,7 +287,12 @@ export const VocabExerciseAIStory = ({
               Dạng 6: AI Kể chuyện nối từ
             </span>
           </div>
-          <button className="btn-ex-close" onClick={onClose}>
+          <button
+            type="button"
+            className="btn-ex-close"
+            onClick={onClose}
+            title="Đóng bài tập"
+          >
             <X size={20} />
           </button>
         </div>
@@ -280,7 +300,7 @@ export const VocabExerciseAIStory = ({
         {/* Story Workspace Body */}
         <div className="exercise-body">
           <div className="ai-story-wrapper">
-            {/* Config & Action */}
+            {/* Config & Action Bar */}
             <div className="ai-config-bar">
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>Chủ đề:</span>
@@ -316,31 +336,45 @@ export const VocabExerciseAIStory = ({
                 {storyData.target_words && storyData.target_words.length > 0 && (
                   <div className="ai-target-words-bar">
                     <div className="ai-target-words-title">
-                      <Sparkles size={14} color="#8b5cf6" />
-                      <span>Từ vựng mục tiêu trong bài ({storyData.target_words.length}):</span>
+                      <Sparkles size={14} color="var(--primary)" />
+                      <span>
+                        Từ vựng mục tiêu trong bài ({storyData.target_words.length})
+                      </span>
                     </div>
                     <div className="ai-target-chips-wrap">
-                      {storyData.target_words.map((tw, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          className="ai-target-chip"
-                          onClick={(e) => handleHighlightWordClick(e, tw.word)}
-                          title={`Bấm để xem nghĩa & tra từ: ${tw.word}`}
-                        >
-                          <span className="ai-chip-word">{tw.word}</span>
-                          {tw.meaning && <span className="ai-chip-meaning">• {tw.meaning}</span>}
-                        </button>
-                      ))}
+                      {storyData.target_words.map((tw, idx) => {
+                        const isFound = coverageStats.foundWords.has(tw.word.toLowerCase());
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            className={`ai-target-chip ${isFound ? "found" : "missing"}`}
+                            onClick={(e) => handleHighlightWordClick(e, tw.word)}
+                            title={`Bấm để tra từ: ${tw.word}${isFound ? " (Đã có trong bài đọc)" : ""}`}
+                          >
+                            <span className="ai-chip-word">{tw.word}</span>
+                            {tw.meaning && <span className="ai-chip-meaning">• {tw.meaning}</span>}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
 
+                {/* Main Story Reading Card */}
                 <div className="ai-story-card">
                   <div className="ai-story-header">
-                    <h3 className="ai-story-title">📖 {storyData.title}</h3>
+                    <div className="ai-story-title-wrap">
+                      <BookOpen size={20} color="var(--primary)" />
+                      <h3 className="ai-story-title">{storyData.title}</h3>
+                    </div>
                     <div className="ai-story-actions">
-                      <button type="button" className="btn-ai-audio" onClick={handleReadStory}>
+                      <button
+                        type="button"
+                        className="btn-ai-audio"
+                        onClick={handleReadStory}
+                        title="Nghe máy đọc câu chuyện tiếng Anh bằng giọng AI"
+                      >
                         <Volume2 size={16} color="var(--primary)" />
                         <span>{isReadingStory ? "Dừng đọc" : "Nghe đọc truyện"}</span>
                       </button>
@@ -348,6 +382,7 @@ export const VocabExerciseAIStory = ({
                         type="button"
                         className="btn-ai-audio"
                         onClick={() => setShowTranslation((prev) => !prev)}
+                        title="Bật/Tắt bản dịch song ngữ tiếng Việt"
                       >
                         <Eye size={16} />
                         <span>{showTranslation ? "Ẩn dịch" : "Dịch tiếng Việt"}</span>
@@ -364,7 +399,10 @@ export const VocabExerciseAIStory = ({
                   </div>
 
                   <div className="ai-selection-hint">
-                    <span>💡 <strong>Chọn từ mới:</strong> Bôi đen bất kỳ từ nào trong đoạn văn hoặc chạm vào từ màu tím để xem nghĩa &amp; lưu vào Sổ từ vựng!</span>
+                    <Lightbulb size={16} color="#eab308" />
+                    <span>
+                      <strong>Chọn từ mới:</strong> Bôi đen bất kỳ từ nào trong đoạn văn hoặc chạm vào từ màu tím để xem nghĩa &amp; lưu vào Sổ từ vựng!
+                    </span>
                   </div>
 
                   {showTranslation && (
@@ -384,55 +422,11 @@ export const VocabExerciseAIStory = ({
                   />
                 )}
 
-                {/* Cloze Challenge Section */}
-                {storyData.cloze_questions && storyData.cloze_questions.length > 0 && (
-                  <div className="ai-quiz-section">
-                    <h4 style={{ margin: "4px 0", fontSize: "1.05rem", fontWeight: 700 }}>
-                      🎯 Thử thách điền từ khuyết theo ngữ cảnh ({quizScore} / {storyData.cloze_questions.length}):
-                    </h4>
-
-                    {storyData.cloze_questions.map((q, qIdx) => {
-                      const answered = userAnswers[qIdx];
-                      return (
-                        <div key={qIdx} className="ai-quiz-card">
-                          <div className="ai-quiz-question-text">
-                            <strong>{qIdx + 1}.</strong> {q.sentence}
-                            {q.hint && (
-                              <span style={{ color: "var(--text-muted)", marginLeft: "8px", fontSize: "0.85rem" }}>
-                                (Gợi ý: {q.hint})
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="ai-quiz-options-grid">
-                            {(q.options || []).map((opt, optIdx) => {
-                              let btnClass = "btn-ai-option";
-                              if (answered) {
-                                if (opt.trim().toLowerCase() === q.correct_word.trim().toLowerCase()) {
-                                  btnClass += " correct";
-                                } else if (answered.chosen === opt) {
-                                  btnClass += " wrong";
-                                }
-                              }
-
-                              return (
-                                <button
-                                  key={optIdx}
-                                  type="button"
-                                  className={btnClass}
-                                  disabled={Boolean(answered)}
-                                  onClick={() => handleSelectOption(qIdx, opt, q.correct_word)}
-                                >
-                                  {opt}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                {/* Quizzes: Cloze Fill-in-Blank & Reading Comprehension Questions */}
+                <VocabExerciseAIStoryQuiz
+                  clozeQuestions={storyData.cloze_questions || []}
+                  comprehensionQuestions={comprehensionQuestions}
+                />
               </>
             ) : (
               !isLoading && (
