@@ -23,8 +23,9 @@ test("tagObject correctly tags group and child meshes with itemId and populates 
   assert.equal(interactiveList[1], mesh2);
 });
 
-test("OCEAN_3D_MODEL_DEFINITIONS contains all 15 required ocean models", () => {
+test("OCEAN_3D_MODEL_DEFINITIONS contains all 30 required ocean models", () => {
   const requiredKeys = [
+    // Original 15
     "lighthouse",
     "palm_tree",
     "beach",
@@ -40,7 +41,25 @@ test("OCEAN_3D_MODEL_DEFINITIONS contains all 15 required ocean models", () => {
     "coral_reef",
     "clownfish",
     "submarine",
+    // 15 New Models
+    "mangrove_forest",
+    "fishing_village",
+    "sunset",
+    "resort",
+    "shipwreck",
+    "jellyfish",
+    "octopus",
+    "manta_ray",
+    "pier",
+    "cliff",
+    "starfish",
+    "volcano",
+    "kayak",
+    "waterfall",
+    "sea_cave",
   ];
+
+  assert.equal(requiredKeys.length, 30);
 
   requiredKeys.forEach((key) => {
     assert.ok(typeof OCEAN_3D_MODEL_DEFINITIONS[key] === "function", `Missing builder for ${key}`);
@@ -70,4 +89,22 @@ test("submarine model builds with yellow hull and propeller", () => {
   assert.ok(group instanceof THREE.Group);
   assert.ok(prop instanceof THREE.Mesh);
   assert.equal(group.position.x, 18);
+});
+
+test("new models build correctly: mangrove, resort, sunset, shipwreck", () => {
+  const { group: mangrove } = OCEAN_3D_MODEL_DEFINITIONS.mangrove_forest();
+  assert.ok(mangrove instanceof THREE.Group);
+  assert.equal(mangrove.position.x, -24);
+
+  const { group: resort } = OCEAN_3D_MODEL_DEFINITIONS.resort();
+  assert.ok(resort instanceof THREE.Group);
+  assert.equal(resort.position.x, -12);
+
+  const { group: sunset } = OCEAN_3D_MODEL_DEFINITIONS.sunset();
+  assert.ok(sunset instanceof THREE.Group);
+  assert.equal(sunset.position.y, 16);
+
+  const { group: shipwreck } = OCEAN_3D_MODEL_DEFINITIONS.shipwreck();
+  assert.ok(shipwreck instanceof THREE.Group);
+  assert.equal(shipwreck.position.x, 26);
 });

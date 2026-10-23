@@ -227,6 +227,37 @@
   width: 100%;
 }
 
+/* 3D / 2D Dimension Switcher */
+.vv-dimension-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-secondary);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+.vv-dimension-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.vv-dimension-btn:hover { color: var(--text-primary); }
+.vv-dimension-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
 .vv-toggle-labels-btn {
   display: inline-flex;
   align-items: center;

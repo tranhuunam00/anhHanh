@@ -40,25 +40,30 @@ export const VisualVocab3DCanvas = ({
   const mouseNormRef = useRef(new THREE.Vector2());
 
   // Camera spherical coordinates (azimuth, elevation, distance)
-  // Initial wide panoramic view showing all 15 objects comfortably
+  // Initial wide panoramic view showing all 30 objects comfortably
   const orbitRef = useRef({
-    radius: 54,
+    radius: 65,
     theta: Math.PI / 3.6,
-    phi: Math.PI / 3.3,
-    target: new THREE.Vector3(0, 0, 2),
-    targetTarget: new THREE.Vector3(0, 0, 2),
-    targetRadius: 54,
+    phi: Math.PI / 3.2,
+    target: new THREE.Vector3(0, 0, 0),
+    targetTarget: new THREE.Vector3(0, 0, 0),
+    targetRadius: 65,
   });
 
-  // Camera smooth fly-to when active item changes
+  // Track if user explicitly selected an item (prevents auto-zoom on page load)
+  const hasUserSelectedRef = useRef(false);
+
+  // Camera smooth fly-to when active item changes (only if user explicitly clicked)
   useEffect(() => {
     if (!activeItemId || !items) return;
+    if (!hasUserSelectedRef.current) return;
+
     const targetItem = items.find((it) => it.id === activeItemId);
     if (!targetItem || !targetItem.pos3d) return;
 
     const [px, py, pz] = targetItem.pos3d;
     orbitRef.current.targetTarget.set(px, py + 0.5, pz);
-    orbitRef.current.targetRadius = 22; // Smooth zoom into focused 3D object
+    orbitRef.current.targetRadius = 24; // Smooth zoom into focused 3D object
   }, [activeItemId, items]);
 
   // Audio pronunciation on hover popup
@@ -284,11 +289,12 @@ export const VisualVocab3DCanvas = ({
   };
 
   const handleResetCamera = () => {
+    hasUserSelectedRef.current = false;
     const orbit = orbitRef.current;
-    orbit.targetRadius = 54;
-    orbit.targetTarget.set(0, 0, 2);
+    orbit.targetRadius = 65;
+    orbit.targetTarget.set(0, 0, 0);
     orbit.theta = Math.PI / 3.6;
-    orbit.phi = Math.PI / 3.3;
+    orbit.phi = Math.PI / 3.2;
   };
 
   return (
@@ -358,6 +364,7 @@ export const VisualVocab3DCanvas = ({
               }}
               onClick={(e) => {
                 e.stopPropagation();
+                hasUserSelectedRef.current = true;
                 onSelectHotspot(item);
               }}
               title={isExplore ? `${item.word} (${item.meaning})` : `Điểm 3D #${idx + 1}`}
@@ -392,6 +399,7 @@ export const VisualVocab3DCanvas = ({
             onMouseLeave={() => setHoveredItem(null)}
             onClick={(e) => {
               e.stopPropagation();
+              hasUserSelectedRef.current = true;
               onSelectHotspot(hoveredItem);
             }}
           >

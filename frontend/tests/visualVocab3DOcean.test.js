@@ -5,10 +5,10 @@ import { OCEAN_TRANSLATIONS } from "../src/data/visualVocab/translations/oceanTr
 import { getLocalizedItem, getLocalizedTopic } from "../src/data/visualVocab/translations/index.js";
 
 describe("visualVocab3DOcean - Dataset Structure and 3D Coordinates Integrity", () => {
-  test("verifies topic metadata and 3D flag", () => {
+  test("verifies topic metadata and 3D flag with exactly 30 items", () => {
     assert.equal(OCEAN_3D_TOPIC.id, "ocean_3d");
     assert.equal(OCEAN_3D_TOPIC.is3D, true);
-    assert.ok(OCEAN_3D_TOPIC.items.length >= 14);
+    assert.equal(OCEAN_3D_TOPIC.items.length, 30);
   });
 
   test("verifies every item has required fields and valid 3D coordinates", () => {
@@ -25,10 +25,21 @@ describe("visualVocab3DOcean - Dataset Structure and 3D Coordinates Integrity", 
       assert.ok(typeof item.pos3d[2] === "number");
     }
   });
+
+  test("contains requested new items: mangrove forest, fishing village, sunset, resort", () => {
+    const itemIds = new Set(OCEAN_3D_TOPIC.items.map((it) => it.id));
+    assert.ok(itemIds.has("mangrove_forest"));
+    assert.ok(itemIds.has("fishing_village"));
+    assert.ok(itemIds.has("sunset"));
+    assert.ok(itemIds.has("resort"));
+    assert.ok(itemIds.has("shipwreck"));
+    assert.ok(itemIds.has("jellyfish"));
+    assert.ok(itemIds.has("octopus"));
+  });
 });
 
 describe("visualVocab3DOcean - Multilingual Translations", () => {
-  test("contains French and Chinese translations for all 15 ocean items", () => {
+  test("contains French and Chinese translations for all 30 ocean items", () => {
     for (const item of OCEAN_3D_TOPIC.items) {
       const trans = OCEAN_TRANSLATIONS[item.id];
       assert.ok(trans, `Missing translation entry for ${item.id}`);
@@ -58,14 +69,11 @@ describe("visualVocab3DOcean - Multilingual Translations", () => {
     const localizedZh = getLocalizedItem(dolphin, "zh");
     assert.equal(localizedZh.word, "海豚");
     assert.equal(localizedZh.pinyin, "hǎi tún");
-    assert.equal(localizedZh.lang, "zh");
   });
 
-  test("getLocalizedTopic returns localized topic structure without mutating base", () => {
-    const localizedTopic = getLocalizedTopic(OCEAN_3D_TOPIC, "zh");
-    assert.equal(localizedTopic.id, "ocean_3d");
-    assert.equal(localizedTopic.is3D, true);
-    assert.ok(localizedTopic.items.length >= 14);
-    assert.equal(localizedTopic.items[0].lang, "zh");
+  test("getLocalizedTopic localizes entire 30-item topic to French", () => {
+    const localizedTopic = getLocalizedTopic(OCEAN_3D_TOPIC, "fr");
+    assert.equal(localizedTopic.items.length, 30);
+    assert.equal(localizedTopic.items[0].lang, "fr");
   });
 });

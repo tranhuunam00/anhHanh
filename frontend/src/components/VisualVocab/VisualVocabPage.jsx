@@ -17,7 +17,8 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
   const [currentTopicId, setCurrentTopicId] = useState("mountain_landforms");
   const [currentLang, setCurrentLang] = useState("en");
   const [activeMode, setActiveMode] = useState("EXPLORE");
-  const [activeItemId, setActiveItemId] = useState("landscape");
+  const [activeItemId, setActiveItemId] = useState(null);
+  const [viewDimension, setViewDimension] = useState("3D");
   const [searchQuery, setSearchQuery] = useState("");
   const [showLabels, setShowLabels] = useState(true);
   const [quizFeedback, setQuizFeedback] = useState(null);
@@ -32,14 +33,12 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
     return getLocalizedTopic(rawTopic, currentLang);
   }, [rawTopic, currentLang]);
 
-  // When switching topic, select first word and reset mastery
+  // When switching topic, reset selection and reset mastery so map starts at full overview
   useEffect(() => {
-    if (currentTopic && currentTopic.items && currentTopic.items.length > 0) {
-      setActiveItemId(currentTopic.items[0].id);
-      setSearchQuery("");
-      setQuizFeedback(null);
-      setMasteredIds(new Set());
-    }
+    setActiveItemId(null);
+    setSearchQuery("");
+    setQuizFeedback(null);
+    setMasteredIds(new Set());
   }, [currentTopicId]);
 
   // Filtered items based on search query
@@ -143,12 +142,15 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
         showLabels={showLabels}
         onToggleLabels={() => setShowLabels((v) => !v)}
         totalCount={currentTopic.items?.length || 0}
+        is3DTopic={Boolean(currentTopic.is3D)}
+        viewDimension={viewDimension}
+        onChangeDimension={setViewDimension}
       />
 
       {/* Main Grid: Diagram Canvas + Sidebar Inspector */}
       <div className="vv-content-layout">
         {/* Left: Interactive Diagram or 3D World Canvas */}
-        {currentTopic.is3D ? (
+        {currentTopic.is3D && viewDimension === "3D" ? (
           <VisualVocab3DCanvas
             topic={currentTopic}
             items={filteredItems}

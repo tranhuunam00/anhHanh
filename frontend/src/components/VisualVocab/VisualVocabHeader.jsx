@@ -25,6 +25,9 @@ export const VisualVocabHeader = ({
   onToggleLabels,
   completedCount = 0,
   totalCount = 0,
+  is3DTopic = false,
+  viewDimension = "3D",
+  onChangeDimension,
 }) => {
   return (
     <div className="vv-header">
@@ -141,6 +144,28 @@ export const VisualVocabHeader = ({
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
+
+          {/* 3D / 2D Dimension Switcher */}
+          {is3DTopic && onChangeDimension && (
+            <div className="vv-dimension-toggle" role="group" aria-label="Chuyển chế độ 3D / 2D">
+              <button
+                type="button"
+                className={`vv-dimension-btn ${viewDimension === "3D" ? "active" : ""}`}
+                onClick={() => onChangeDimension("3D")}
+                title="Xem không gian 3D tương tác"
+              >
+                <span>🌐 3D</span>
+              </button>
+              <button
+                type="button"
+                className={`vv-dimension-btn ${viewDimension === "2D" ? "active" : ""}`}
+                onClick={() => onChangeDimension("2D")}
+                title="Chuyển về xem bản đồ 2D"
+              >
+                <span>🗺️ 2D</span>
+              </button>
+            </div>
+          )}
 
           <button
             type="button"

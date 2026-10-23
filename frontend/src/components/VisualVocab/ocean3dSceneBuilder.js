@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { OCEAN_3D_MODEL_DEFINITIONS, tagObject } from "../../constants/ocean3dModelConstants";
+import { OCEAN_3D_MODEL_DEFINITIONS, tagObject } from "../../constants/ocean3dModelConstants.js";
 
 /**
  * Builds a high-fidelity 3D Ocean ecosystem using reusable model constants.
@@ -151,6 +151,22 @@ export function buildOcean3DScene(scene) {
       // 10. Submarine propeller
       if (modelHandles.submarine?.prop) {
         modelHandles.submarine.prop.rotation.x = time * 15;
+      }
+
+      // 11. Jellyfish gentle bobbing
+      if (modelHandles.jellyfish?.group) {
+        modelHandles.jellyfish.group.position.y = 0.1 + Math.sin(time * 1.5) * 0.15;
+      }
+
+      // 12. Manta ray gliding
+      if (modelHandles.manta_ray?.group) {
+        modelHandles.manta_ray.group.position.x = 18 + Math.sin(time * 0.8) * 1.2;
+        modelHandles.manta_ray.group.position.z = -4 + Math.cos(time * 0.8) * 1.2;
+      }
+
+      // 13. Kayak floating on waves
+      if (modelHandles.kayak?.group) {
+        modelHandles.kayak.group.position.y = 0.3 + Math.sin(time * 2.2) * 0.06;
       }
     },
     dispose: () => {
