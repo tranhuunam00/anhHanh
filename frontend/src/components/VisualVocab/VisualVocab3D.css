@@ -53,6 +53,21 @@
 
 .vv-hotspot-label.vv-3d-label {
   white-space: nowrap;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.vv-hotspot-pin.vv-3d-pin:hover .vv-hotspot-label.vv-3d-label,
+.vv-hotspot-pin.vv-3d-pin.active .vv-hotspot-label.vv-3d-label,
+.vv-hotspot-pin.vv-3d-pin.hovered .vv-hotspot-label.vv-3d-label {
+  background: rgba(2, 132, 199, 0.7);
+  border-color: rgba(56, 189, 248, 0.7);
+  transform: translateX(-50%) translateY(4px) scale(1.08);
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
 }
 
 .active-3d-btn {

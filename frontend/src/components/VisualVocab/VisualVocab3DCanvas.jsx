@@ -40,13 +40,14 @@ export const VisualVocab3DCanvas = ({
   const mouseNormRef = useRef(new THREE.Vector2());
 
   // Camera spherical coordinates (azimuth, elevation, distance)
+  // Initial wide panoramic view showing all 15 objects comfortably
   const orbitRef = useRef({
-    radius: 36,
-    theta: Math.PI / 4,
-    phi: Math.PI / 3.4,
-    target: new THREE.Vector3(0, 1.2, 2),
-    targetTarget: new THREE.Vector3(0, 1.2, 2),
-    targetRadius: 36,
+    radius: 54,
+    theta: Math.PI / 3.6,
+    phi: Math.PI / 3.3,
+    target: new THREE.Vector3(0, 0, 2),
+    targetTarget: new THREE.Vector3(0, 0, 2),
+    targetRadius: 54,
   });
 
   // Camera smooth fly-to when active item changes
@@ -284,10 +285,10 @@ export const VisualVocab3DCanvas = ({
 
   const handleResetCamera = () => {
     const orbit = orbitRef.current;
-    orbit.targetRadius = 36;
-    orbit.targetTarget.set(0, 1.2, 2);
-    orbit.theta = Math.PI / 4;
-    orbit.phi = Math.PI / 3.4;
+    orbit.targetRadius = 54;
+    orbit.targetTarget.set(0, 0, 2);
+    orbit.theta = Math.PI / 3.6;
+    orbit.phi = Math.PI / 3.3;
   };
 
   return (
@@ -363,11 +364,10 @@ export const VisualVocab3DCanvas = ({
             >
               <div className="vv-pin-dot">{dotContent}</div>
 
-              {/* Floating Word Label - in Explore mode */}
+              {/* Floating Word Label - in Explore mode (Short word only, no IPA to avoid long clutter) */}
               {isExplore && (showLabels || isActive || isHovered) && (
                 <div className="vv-hotspot-label vv-3d-label">
                   <span>{item.word}</span>
-                  {item.ipa && <span className="vv-ipa">{item.ipa}</span>}
                 </div>
               )}
             </div>

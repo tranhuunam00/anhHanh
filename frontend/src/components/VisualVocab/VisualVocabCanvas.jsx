@@ -141,7 +141,6 @@ export const VisualVocabCanvas = ({
                 {isExplore && (showLabels || isActive) && (
                   <div className="vv-hotspot-label">
                     <span>{item.word}</span>
-                    {item.ipa && <span className="vv-ipa">{item.ipa}</span>}
                   </div>
                 )}
               </div>

@@ -14,6 +14,7 @@ import {
   isSpellingMatch,
 } from "../../utils/visualVocabUtils";
 import { playPronunciationAudio } from "../../services/authVocabService";
+import { playSoundFeedback } from "../../utils/vocabAudioFeedback";
 
 export const VisualVocabPractice = ({
   topic,
@@ -117,6 +118,8 @@ export const VisualVocabPractice = ({
   const handleCheckAnswer = useCallback((isCorrect, clickedItem = null) => {
     if (feedback || !currentQ) return; // Prevent double submit
 
+    playSoundFeedback(isCorrect);
+
     if (isCorrect) {
       const nextMastered = new Set(masteredSet);
       nextMastered.add(currentQ.id);
@@ -180,6 +183,7 @@ export const VisualVocabPractice = ({
     } else {
       // Wrong selection
       if (lbl.isDistractor) {
+        playSoundFeedback(false);
         setStreak(0);
         setFeedback({
           isCorrect: false,
