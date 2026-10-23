@@ -142,6 +142,29 @@
   border-color: var(--primary, #3b82f6);
 }
 
+.vv-3d-hover-thumb-container {
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vv-3d-hover-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.vv-3d-hover-card:hover .vv-3d-hover-thumb {
+  transform: scale(1.05);
+}
+
 .btn-vv-hover-audio:hover svg {
   stroke: #ffffff !important;
 }

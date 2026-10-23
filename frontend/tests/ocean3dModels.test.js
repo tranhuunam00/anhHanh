@@ -3,15 +3,8 @@ import assert from "node:assert/strict";
 import * as THREE from "three";
 import {
   tagObject,
-  createOceanBuoy,
-  createBeachArea,
-  createLighthouse,
-  createSailboat,
-  createDolphin,
-  createWhale,
-  createSeaTurtle,
-  createSubmarine,
-} from "../src/components/VisualVocab/ocean3dModels.js";
+  OCEAN_3D_MODEL_DEFINITIONS,
+} from "../src/constants/ocean3dModelConstants.js";
 
 test("tagObject correctly tags group and child meshes with itemId and populates list", () => {
   const group = new THREE.Group();
@@ -30,68 +23,51 @@ test("tagObject correctly tags group and child meshes with itemId and populates 
   assert.equal(interactiveList[1], mesh2);
 });
 
-test("createOceanBuoy builds 3D buoy group with lantern and correct hierarchy", () => {
-  const { group, lantern } = createOceanBuoy();
-  assert.ok(group instanceof THREE.Group);
-  assert.ok(lantern instanceof THREE.Mesh);
-  assert.equal(group.position.y, 0.4);
-  assert.equal(group.position.z, 10);
-  assert.ok(group.children.length >= 4);
+test("OCEAN_3D_MODEL_DEFINITIONS contains all 15 required ocean models", () => {
+  const requiredKeys = [
+    "lighthouse",
+    "palm_tree",
+    "beach",
+    "anchor",
+    "crab",
+    "seashell",
+    "ocean",
+    "seagull",
+    "sailboat",
+    "whale",
+    "dolphin",
+    "sea_turtle",
+    "coral_reef",
+    "clownfish",
+    "submarine",
+  ];
+
+  requiredKeys.forEach((key) => {
+    assert.ok(typeof OCEAN_3D_MODEL_DEFINITIONS[key] === "function", `Missing builder for ${key}`);
+    const result = OCEAN_3D_MODEL_DEFINITIONS[key]();
+    const group = result.group || result;
+    assert.ok(group instanceof THREE.Group, `${key} builder must return a THREE.Group`);
+    assert.ok(group.children.length > 0, `${key} must have geometric 3D children`);
+  });
 });
 
-test("createBeachArea builds 3D resort area with parasol, lounger, and sandcastle", () => {
-  const group = createBeachArea();
-  assert.ok(group instanceof THREE.Group);
-  assert.equal(group.position.x, -7);
-  assert.equal(group.position.z, 2);
-  assert.ok(group.children.length >= 4);
-});
-
-test("createLighthouse builds 3D lighthouse with cliff base and rotating beam", () => {
-  const { group, lightBeam } = createLighthouse();
+test("lighthouse model builds with cliff rock and rotating lightBeam", () => {
+  const { group, lightBeam } = OCEAN_3D_MODEL_DEFINITIONS.lighthouse();
   assert.ok(group instanceof THREE.Group);
   assert.ok(lightBeam instanceof THREE.Mesh);
-  assert.equal(group.position.x, -14);
-  assert.ok(group.children.length >= 7);
+  assert.equal(group.position.x, -20);
 });
 
-test("createSailboat builds 3D wooden hull and mainsail", () => {
-  const group = createSailboat();
+test("dolphin model builds with arched body and flippers", () => {
+  const { group } = OCEAN_3D_MODEL_DEFINITIONS.dolphin();
   assert.ok(group instanceof THREE.Group);
-  assert.equal(group.position.x, 13);
-  assert.ok(group.children.length >= 3);
+  assert.equal(group.position.x, 12);
+  assert.equal(group.position.z, 12);
 });
 
-test("createDolphin builds 3D cone body, dorsal fin, and tail", () => {
-  const group = createDolphin();
-  assert.ok(group instanceof THREE.Group);
-  assert.equal(group.position.x, 7);
-  assert.equal(group.position.z, 7);
-  assert.equal(group.children.length, 3);
-});
-
-test("createWhale builds 3D torso, belly, tail, and water spout", () => {
-  const { group, tail, spout } = createWhale();
-  assert.ok(group instanceof THREE.Group);
-  assert.ok(tail instanceof THREE.Mesh);
-  assert.ok(spout instanceof THREE.Mesh);
-  assert.equal(group.position.x, 16);
-  assert.ok(group.children.length >= 4);
-});
-
-test("createSeaTurtle builds 3D shell, head, and paddling flippers", () => {
-  const { group, flipperL, flipperR } = createSeaTurtle();
-  assert.ok(group instanceof THREE.Group);
-  assert.ok(flipperL instanceof THREE.Mesh);
-  assert.ok(flipperR instanceof THREE.Mesh);
-  assert.equal(group.position.x, 2);
-  assert.equal(group.children.length, 4);
-});
-
-test("createSubmarine builds 3D yellow hull, conning tower, and propeller", () => {
-  const { group, prop } = createSubmarine();
+test("submarine model builds with yellow hull and propeller", () => {
+  const { group, prop } = OCEAN_3D_MODEL_DEFINITIONS.submarine();
   assert.ok(group instanceof THREE.Group);
   assert.ok(prop instanceof THREE.Mesh);
-  assert.equal(group.position.x, -13);
-  assert.equal(group.children.length, 3);
+  assert.equal(group.position.x, 18);
 });

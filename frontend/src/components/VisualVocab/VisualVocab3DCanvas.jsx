@@ -380,7 +380,7 @@ export const VisualVocab3DCanvas = ({
             className="vv-3d-hover-card"
             style={{
               left: `${Math.min(Math.max(16, hoverPopupPos.x), (containerRef.current?.clientWidth || 600) - 270)}px`,
-              top: `${Math.max(16, hoverPopupPos.y - 150)}px`,
+              top: `${Math.max(16, hoverPopupPos.y - 170)}px`,
             }}
             onMouseEnter={() => {
               if (clearHoverTimeoutRef.current) {
@@ -395,6 +395,11 @@ export const VisualVocab3DCanvas = ({
               onSelectHotspot(hoveredItem);
             }}
           >
+            {hoveredItem.thumbnail && (
+              <div className="vv-3d-hover-thumb-container">
+                <img src={hoveredItem.thumbnail} alt={hoveredItem.word} className="vv-3d-hover-thumb" />
+              </div>
+            )}
             <div className="vv-3d-hover-header">
               <div className="vv-3d-hover-word-box">
                 <h4 className="vv-3d-hover-word">{hoveredItem.word}</h4>
