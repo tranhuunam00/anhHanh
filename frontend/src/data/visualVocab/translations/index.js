@@ -3,6 +3,7 @@
  */
 import { MOUNTAIN_TRANSLATIONS } from "./mountainTranslations.js";
 import { UNIVERSITY_TRANSLATIONS } from "./universityTranslations.js";
+import { OCEAN_TRANSLATIONS } from "./oceanTranslations.js";
 import { DISTRACTOR_TRANSLATIONS } from "./distractorTranslations.js";
 
 export const VISUAL_VOCAB_LANGUAGES = [
@@ -35,6 +36,7 @@ export const VISUAL_VOCAB_LANGUAGES = [
 const ALL_ITEM_TRANSLATIONS = {
   ...MOUNTAIN_TRANSLATIONS,
   ...UNIVERSITY_TRANSLATIONS,
+  ...OCEAN_TRANSLATIONS,
 };
 
 /**

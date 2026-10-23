@@ -56,8 +56,13 @@ export const VisualVocabHeader = ({
                 onClick={() => onSelectTopic(t.id)}
                 type="button"
               >
-                <span>{t.id === "mountain_landforms" ? "🏔️" : "🎓"}</span>
+                <span>{t.id === "ocean_3d" ? "🌊" : t.id === "mountain_landforms" ? "🏔️" : "🎓"}</span>
                 <span>{t.title}</span>
+                {t.is3D && (
+                  <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "#0284c7", color: "#ffffff", padding: "1px 6px", borderRadius: "10px", marginLeft: "2px" }}>
+                    3D
+                  </span>
+                )}
                 <span className="vv-badge">{t.items?.length || 0} từ</span>
               </button>
             );

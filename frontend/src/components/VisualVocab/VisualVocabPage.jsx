@@ -8,6 +8,7 @@ import {
 import { filterItemsByQuery } from "../../utils/visualVocabUtils";
 import { VisualVocabHeader } from "./VisualVocabHeader";
 import { VisualVocabCanvas } from "./VisualVocabCanvas";
+import { VisualVocab3DCanvas } from "./VisualVocab3DCanvas";
 import { VisualVocabDetailCard } from "./VisualVocabDetailCard";
 import { VisualVocabPractice } from "./VisualVocabPractice";
 import "./VisualVocab.css";
@@ -146,17 +147,30 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
 
       {/* Main Grid: Diagram Canvas + Sidebar Inspector */}
       <div className="vv-content-layout">
-        {/* Left: Interactive Image Canvas */}
-        <VisualVocabCanvas
-          topic={currentTopic}
-          items={filteredItems}
-          activeItemId={activeItemId}
-          onSelectHotspot={handleSelectHotspot}
-          showLabels={showLabels}
-          mode={activeMode}
-          quizFeedback={quizFeedback}
-          masteredIds={masteredIds}
-        />
+        {/* Left: Interactive Diagram or 3D World Canvas */}
+        {currentTopic.is3D ? (
+          <VisualVocab3DCanvas
+            topic={currentTopic}
+            items={filteredItems}
+            activeItemId={activeItemId}
+            onSelectHotspot={handleSelectHotspot}
+            showLabels={showLabels}
+            mode={activeMode}
+            quizFeedback={quizFeedback}
+            masteredIds={masteredIds}
+          />
+        ) : (
+          <VisualVocabCanvas
+            topic={currentTopic}
+            items={filteredItems}
+            activeItemId={activeItemId}
+            onSelectHotspot={handleSelectHotspot}
+            showLabels={showLabels}
+            mode={activeMode}
+            quizFeedback={quizFeedback}
+            masteredIds={masteredIds}
+          />
+        )}
 
         {/* Right Sidebar: Active Word Inspector or Practice Mode */}
         <div className="vv-sidebar">

@@ -1,0 +1,261 @@
+/**
+ * Multilingual Translations for 3D Ocean & Marine Life Topic
+ * Supported Languages: French (fr), Chinese (zh with Pinyin)
+ */
+export const OCEAN_TRANSLATIONS = {
+  ocean: {
+    fr: {
+      word: "océan",
+      ipa: "/ɔ.se.ɑ̃/",
+      pos: "nom masculin",
+      meaning: "Đại dương mênh mông",
+      example: "L'océan bleu et vaste couvre la majorité de la surface terrestre.",
+    },
+    zh: {
+      word: "海洋",
+      pinyin: "hǎi yáng",
+      ipa: "[xai jɑŋ]",
+      pos: "名词",
+      meaning: "Đại dương mênh mông",
+      example: "辽阔的蓝色海洋覆盖了地球表面的大部分。",
+    },
+  },
+  beach: {
+    fr: {
+      word: "plage",
+      ipa: "/plaʒ/",
+      pos: "nom féminin",
+      meaning: "Bãi biển cát vàng",
+      example: "Les touristes se détendent au soleil sur la plage de sable chaud.",
+    },
+    zh: {
+      word: "海滩",
+      pinyin: "hǎi tān",
+      ipa: "[xai tʰan]",
+      pos: "名词",
+      meaning: "Bãi biển cát vàng",
+      example: "游客们在金色的热带海滩上沐浴温暖的阳光。",
+    },
+  },
+  lighthouse: {
+    fr: {
+      word: "phare",
+      ipa: "/faʁ/",
+      pos: "nom masculin",
+      meaning: "Ngọn hải đăng",
+      example: "Le phare émet une lumière puissante pour guider les navires la nuit.",
+    },
+    zh: {
+      word: "灯塔",
+      pinyin: "dēng tǎ",
+      ipa: "[təŋ tʰa]",
+      pos: "名词",
+      meaning: "Ngọn hải đăng",
+      example: "古老的灯塔在黑夜中发出耀眼的光束指引航船。",
+    },
+  },
+  sailboat: {
+    fr: {
+      word: "voilier",
+      ipa: "/vwa.lje/",
+      pos: "nom masculin",
+      meaning: "Thuyền buồm",
+      example: "Un voilier blanc glisse doucement sur les eaux turquoise de la baie.",
+    },
+    zh: {
+      word: "帆船",
+      pinyin: "fān chuán",
+      ipa: "[fan tʂʰwan]",
+      pos: "名词",
+      meaning: "Thuyền buồm",
+      example: "一艘白色的帆船在湛蓝的海面上迎风航行。",
+    },
+  },
+  dolphin: {
+    fr: {
+      word: "dauphin",
+      ipa: "/do.fɛ̃/",
+      pos: "nom masculin",
+      meaning: "Cá heo nhảy sóng",
+      example: "Un dauphin joueur saute avec grâce au-dessus des vagues marines.",
+    },
+    zh: {
+      word: "海豚",
+      pinyin: "hǎi tún",
+      ipa: "[xai tʰwən]",
+      pos: "名词",
+      meaning: "Cá heo nhảy sóng",
+      example: "欢快的海豚在翻滚的碧海浪花中优雅跃起。",
+    },
+  },
+  whale: {
+    fr: {
+      word: "baleine",
+      ipa: "/ba.lɛn/",
+      pos: "nom féminin",
+      meaning: "Cá voi khổng lồ",
+      example: "La majestueuse baleine bleue souffle un grand jet d'eau vers le ciel.",
+    },
+    zh: {
+      word: "鲸鱼",
+      pinyin: "jīng yú",
+      ipa: "[tɕiŋ y]",
+      pos: "名词",
+      meaning: "Cá voi khổng lồ",
+      example: "巨大的蓝鲸向清晨的天空喷出壮观的水雾柱。",
+    },
+  },
+  sea_turtle: {
+    fr: {
+      word: "tortue de mer",
+      ipa: "/tɔʁ.ty də mɛʁ/",
+      pos: "nom féminin",
+      meaning: "Rùa biển",
+      example: "Une tortue de mer nage paisiblement le long du récif corallien.",
+    },
+    zh: {
+      word: "海龟",
+      pinyin: "hǎi guī",
+      ipa: "[xai kwei]",
+      pos: "名词",
+      meaning: "Rùa biển",
+      example: "珍稀的海龟在清澈温暖的海水中悠然划行。",
+    },
+  },
+  clownfish: {
+    fr: {
+      word: "poisson-clown",
+      ipa: "/pwa.sɔ̃ klu n/",
+      pos: "nom masculin",
+      meaning: "Cá hề (Nemo)",
+      example: "Le petit poisson-clown orange s'abrite parmi les tentacules d'anémone.",
+    },
+    zh: {
+      word: "小丑鱼",
+      pinyin: "xiǎo chǒu yú",
+      ipa: "[ɕjau tʂʰou y]",
+      pos: "名词",
+      meaning: "Cá hề (Nemo)",
+      example: "鲜艳橙色的小丑鱼在海葵柔软的花瓣间欢快穿梭。",
+    },
+  },
+  coral_reef: {
+    fr: {
+      word: "récif corallien",
+      ipa: "/ʁe.sif kɔ.ʁa.ljɛ̃/",
+      pos: "nom masculin",
+      meaning: "Rạn san hô",
+      example: "Le magnifique récif corallien abrite des milliers d'espèces marines.",
+    },
+    zh: {
+      word: "珊瑚礁",
+      pinyin: "shān hú jiāo",
+      ipa: "[ʂan xu tɕjau]",
+      pos: "名词",
+      meaning: "Rạn san hô",
+      example: "五彩斑斓的珊瑚礁孕育着繁华多样的热带海洋生物。",
+    },
+  },
+  palm_tree: {
+    fr: {
+      word: "palmier",
+      ipa: "/pal.mje/",
+      pos: "nom masculin",
+      meaning: "Cây dừa nhiệt đới",
+      example: "Les grands palmiers se balancent au gré de la brise tropicale.",
+    },
+    zh: {
+      word: "棕榈树",
+      pinyin: "zōng lǘ shù",
+      ipa: "[tsuŋ ly ʂu]",
+      pos: "名词",
+      meaning: "Cây dừa nhiệt đới",
+      example: "高耸婀娜的椰树和棕榈树在海风中沙沙作响。",
+    },
+  },
+  crab: {
+    fr: {
+      word: "crabe",
+      ipa: "/kʁab/",
+      pos: "nom masculin",
+      meaning: "Chú cua biển",
+      example: "Un petit crabe rouge avance de côté sur le rivage sablonneux.",
+    },
+    zh: {
+      word: "螃蟹",
+      pinyin: "páng xiè",
+      ipa: "[pʰaŋ ɕjɛ]",
+      pos: "名词",
+      meaning: "Chú cua biển",
+      example: "一只小红蟹在潮湿的海滩边缘灵巧地横行游走。",
+    },
+  },
+  seashell: {
+    fr: {
+      word: "coquillage",
+      ipa: "/kɔ.ki.jaʒ/",
+      pos: "nom masculin",
+      meaning: "Vỏ sò biển",
+      example: "Les enfants découvrent de magnifiques coquillages polis par les marées.",
+    },
+    zh: {
+      word: "贝壳",
+      pinyin: "bèi ké",
+      ipa: "[pei kʰɤ]",
+      pos: "名词",
+      meaning: "Vỏ sò biển",
+      example: "海浪冲刷上海滩留下许多纹理奇美的贝壳与海螺。",
+    },
+  },
+  seagull: {
+    fr: {
+      word: "mouette",
+      ipa: "/mwɛt/",
+      pos: "nom féminin",
+      meaning: "Chim hải âu",
+      example: "Une mouette blanche plane en cercles dans le ciel côtier ensoleillé.",
+    },
+    zh: {
+      word: "海鸥",
+      pinyin: "hǎi ōu",
+      ipa: "[xai ou]",
+      pos: "名词",
+      meaning: "Chim hải âu",
+      example: "几只洁白的海鸥在阳光灿烂的碧海蓝天中展翅翱翔。",
+    },
+  },
+  submarine: {
+    fr: {
+      word: "sous-marin",
+      ipa: "/su.ma.ʁɛ̃/",
+      pos: "nom masculin",
+      meaning: "Tàu ngầm thám hiểm",
+      example: "Le sous-marin de recherche plonge dans les abysses inexplorés.",
+    },
+    zh: {
+      word: "潜水艇",
+      pinyin: "qián shuǐ tǐng",
+      ipa: "[tɕʰjɛn ʂwei tʰiŋ]",
+      pos: "名词",
+      meaning: "Tàu ngầm thám hiểm",
+      example: "黄色科考潜水艇正潜入幽深壮美的海底世界探索。",
+    },
+  },
+  anchor: {
+    fr: {
+      word: "ancre",
+      ipa: "/ɑ̃kʁ/",
+      pos: "nom féminin",
+      meaning: "Mỏ neo tàu",
+      example: "La lourde ancre de fer stabilise le bateau face aux vagues côtières.",
+    },
+    zh: {
+      word: "船锚",
+      pinyin: "chuán máo",
+      ipa: "[tʂʰwan mau]",
+      pos: "名词",
+      meaning: "Mỏ neo tàu",
+      example: "沉重坚固的生铁船锚牢牢维系着泊在港湾的小舟。",
+    },
+  },
+};

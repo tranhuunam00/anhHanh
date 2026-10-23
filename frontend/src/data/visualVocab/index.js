@@ -3,6 +3,7 @@
  */
 import { MOUNTAIN_LANDFORMS_TOPIC } from "./mountainData.js";
 import { UNIVERSITY_CAMPUS_TOPIC } from "./universityData.js";
+import { OCEAN_3D_TOPIC } from "./ocean3dData.js";
 
 export {
   VISUAL_VOCAB_LANGUAGES,
@@ -14,6 +15,7 @@ export {
 export const VISUAL_VOCAB_TOPICS = [
   MOUNTAIN_LANDFORMS_TOPIC,
   UNIVERSITY_CAMPUS_TOPIC,
+  OCEAN_3D_TOPIC,
 ];
 
 export const getVisualVocabTopicById = (topicId) => {
