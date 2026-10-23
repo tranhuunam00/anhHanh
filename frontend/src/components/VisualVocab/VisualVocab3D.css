@@ -7,7 +7,7 @@
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  background: var(--bg-card, #ffffff);
+  background: #7dd3fc;
 }
 
 .vv-3d-viewport {
@@ -17,76 +17,36 @@
   cursor: grab;
   user-select: none;
   overflow: hidden;
-  perspective: 1200px;
 }
 
 .vv-3d-viewport.dragging {
   cursor: grabbing;
 }
 
-.vv-3d-scene-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 16 / 9;
-  display: block;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-.vv-3d-base-layer {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 14px;
-  pointer-events: none;
-}
-
-/* 3D Dynamic Glare Reflection */
-.vv-3d-glare {
+.vv-3d-mount {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  border-radius: 14px;
-  z-index: 5;
-  mix-blend-mode: overlay;
-  transition: opacity 0.3s ease;
+  width: 100%;
+  height: 100%;
 }
 
-/* 3D Badge Indicator */
-.vv-3d-badge {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  z-index: 25;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(2, 132, 199, 0.3);
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #0369a1;
-  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.15);
-  pointer-events: none;
+.vv-3d-mount canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
 }
 
-/* 3D Floating Pins (Elevated in 3D Space) */
+/* 3D Floating Pins */
 .vv-hotspot-pin.vv-3d-pin {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-  transform-style: preserve-3d;
 }
 
 .vv-hotspot-pin.vv-3d-pin:hover .vv-pin-dot,
-.vv-hotspot-pin.vv-3d-pin.active .vv-pin-dot {
+.vv-hotspot-pin.vv-3d-pin.active .vv-pin-dot,
+.vv-hotspot-pin.vv-3d-pin.hovered .vv-pin-dot {
   transform: scale(1.35);
   box-shadow: 0 0 0 6px rgba(2, 132, 199, 0.45), 0 4px 14px rgba(0, 0, 0, 0.4);
 }
@@ -100,11 +60,130 @@
   color: #ffffff !important;
 }
 
+/* =========================================================================
+   Instant 3D Hover Info Card (Hover vào thì hiện thông tin luôn)
+   ========================================================================= */
+.vv-3d-hover-card {
+  position: absolute;
+  z-index: 100;
+  width: 256px;
+  background: var(--bg-card, #ffffff);
+  border: 1.5px solid var(--primary, #3b82f6);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
+  pointer-events: auto;
+  animation: vvPopIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vv-3d-hover-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+}
+
+@keyframes vvPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.vv-3d-hover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.vv-3d-hover-word-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vv-3d-hover-word {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.vv-3d-hover-pos {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted, #64748b);
+  background: var(--bg-secondary, #f1f5f9);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.btn-vv-hover-audio {
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 6px;
+  padding: 5px 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.btn-vv-hover-audio:hover {
+  background: var(--primary, #3b82f6);
+  border-color: var(--primary, #3b82f6);
+}
+
+.btn-vv-hover-audio:hover svg {
+  stroke: #ffffff !important;
+}
+
+.vv-3d-hover-ipa {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #8b5cf6;
+  margin-bottom: 6px;
+}
+
+.vv-3d-hover-meaning {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.vv-3d-hover-example {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-secondary, #475569);
+  line-height: 1.45;
+  border-left: 2.5px solid var(--primary, #3b82f6);
+  padding-left: 8px;
+  margin-bottom: 6px;
+}
+
+.vv-3d-hover-tip {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
+  text-align: center;
+  margin-top: 6px;
+  border-top: 1px dashed var(--border-color, #e2e8f0);
+  padding-top: 6px;
+}
+
 @media (max-width: 640px) {
-  .vv-3d-badge {
-    top: 8px;
-    left: 8px;
-    font-size: 0.72rem;
-    padding: 4px 8px;
+  .vv-3d-hover-card {
+    width: 220px;
+    padding: 10px 12px;
   }
 }

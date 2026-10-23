@@ -158,6 +158,7 @@ export const VisualVocabPage = ({ isActive = true, token = null }) => {
             mode={activeMode}
             quizFeedback={quizFeedback}
             masteredIds={masteredIds}
+            currentLang={currentLang}
           />
         ) : (
           <VisualVocabCanvas

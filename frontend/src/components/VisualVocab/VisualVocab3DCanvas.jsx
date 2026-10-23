@@ -1,6 +1,8 @@
-import React, { useState, useRef, useCallback } from "react";
-import { ZoomIn, ZoomOut, RotateCcw, Sparkles } from "../Icons";
-import { getZoomTransformStyle } from "../../utils/visualVocabUtils";
+import React, { useRef, useEffect, useState, useCallback } from "react";
+import * as THREE from "three";
+import { ZoomIn, ZoomOut, RotateCcw, Volume2 } from "../Icons";
+import { playPronunciationAudio } from "../../services/authVocabService";
+import { buildOcean3DScene } from "./ocean3dSceneBuilder";
 import "./VisualVocab3D.css";
 
 export const VisualVocab3DCanvas = ({
@@ -12,202 +14,438 @@ export const VisualVocab3DCanvas = ({
   mode = "EXPLORE",
   quizFeedback = null,
   masteredIds = null,
+  currentLang = "en",
 }) => {
   const isExplore = mode === "EXPLORE";
-  const [scale, setScale] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
-  const panStartRef = useRef({ x: 0, y: 0 });
-
-  // 3D Tilt State
-  const [is3DMode, setIs3DMode] = useState(true);
-  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
   const containerRef = useRef(null);
+  const mountRef = useRef(null);
 
-  const handleZoomIn = () => setScale((s) => Math.min(3, +(s + 0.25).toFixed(2)));
-  const handleZoomOut = () => setScale((s) => Math.max(0.75, +(s - 0.25).toFixed(2)));
-  const handleResetZoom = () => {
-    setScale(1);
-    setPan({ x: 0, y: 0 });
-    setTilt({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
+  // Screen positions of 3D pins: { [id]: { x: number, y: number, visible: boolean } }
+  const [pinScreenCoords, setPinScreenCoords] = useState({});
+  const [isAutoRotate, setIsAutoRotate] = useState(false);
+
+  // Instant Hover Info Popover state
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [hoverPopupPos, setHoverPopupPos] = useState({ x: 0, y: 0 });
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
+  // Three.js and Orbit state refs
+  const cameraRef = useRef(null);
+  const rendererRef = useRef(null);
+  const sceneRef = useRef(null);
+  const sceneHandleRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const prevMouseRef = useRef({ x: 0, y: 0 });
+  const raycasterRef = useRef(new THREE.Raycaster());
+  const mouseNormRef = useRef(new THREE.Vector2());
+
+  // Camera spherical coordinates (azimuth, elevation, distance)
+  const orbitRef = useRef({
+    radius: 36,
+    theta: Math.PI / 4,
+    phi: Math.PI / 3.4,
+    target: new THREE.Vector3(0, 1.2, 2),
+    targetTarget: new THREE.Vector3(0, 1.2, 2),
+    targetRadius: 36,
+  });
+
+  // Camera smooth fly-to when active item changes
+  useEffect(() => {
+    if (!activeItemId || !items) return;
+    const targetItem = items.find((it) => it.id === activeItemId);
+    if (!targetItem || !targetItem.pos3d) return;
+
+    const [px, py, pz] = targetItem.pos3d;
+    orbitRef.current.targetTarget.set(px, py + 0.5, pz);
+    orbitRef.current.targetRadius = 22; // Smooth zoom into focused 3D object
+  }, [activeItemId, items]);
+
+  // Audio pronunciation on hover popup
+  const handlePlayHoverAudio = (e, word) => {
+    e.stopPropagation();
+    if (!word || isPlayingAudio) return;
+    setIsPlayingAudio(true);
+    playPronunciationAudio(word, currentLang || "us")
+      .catch((err) => console.warn("TTS error:", err))
+      .finally(() => setIsPlayingAudio(false));
   };
 
-  // Drag Pan Handlers
-  const handleMouseDown = useCallback((e) => {
-    if (e.button !== 0 || scale <= 1) return;
-    setIsDragging(true);
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
-    panStartRef.current = { ...pan };
-  }, [scale, pan]);
-
-  const handleMouseMove = useCallback((e) => {
-    if (isDragging) {
-      const dx = e.clientX - dragStartRef.current.x;
-      const dy = e.clientY - dragStartRef.current.y;
-      setPan({
-        x: panStartRef.current.x + dx,
-        y: panStartRef.current.y + dy,
-      });
-      return;
-    }
-
-    // 3D Parallax Tilt calculation when not dragging
-    if (!is3DMode || scale > 1.2) return;
+  // Setup Three.js Scene, Camera, Renderer, & Animation Loop
+  useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const rect = container.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const width = container.clientWidth || 800;
+    const height = container.clientHeight || 450;
 
-    const normX = (mouseX / rect.width) * 2 - 1; // -1 to +1
-    const normY = (mouseY / rect.height) * 2 - 1;
+    const scene = new THREE.Scene();
+    sceneRef.current = scene;
 
-    setTilt({
-      rotateX: +(normY * -10).toFixed(2), // Tilt up/down
-      rotateY: +(normX * 12).toFixed(2),  // Tilt left/right
-      glareX: +((mouseX / rect.width) * 100).toFixed(1),
-      glareY: +((mouseY / rect.height) * 100).toFixed(1),
-    });
-  }, [isDragging, is3DMode, scale]);
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.5, 180);
+    cameraRef.current = camera;
 
-  const handleMouseLeave = useCallback(() => {
-    setIsDragging(false);
-    // Smooth reset tilt
-    setTilt({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    rendererRef.current = renderer;
+
+    if (mountRef.current) {
+      mountRef.current.innerHTML = "";
+      mountRef.current.appendChild(renderer.domElement);
+    }
+
+    // Build the 3D Ocean ecosystem
+    const sceneHandle = buildOcean3DScene(scene);
+    sceneHandleRef.current = sceneHandle;
+
+    let animationFrameId;
+    let clock = new THREE.Clock();
+
+    const renderLoop = () => {
+      animationFrameId = requestAnimationFrame(renderLoop);
+      const elapsed = clock.getElapsedTime();
+
+      // Update animated 3D elements (waves, lighthouse beam, dolphins, whale spout, etc.)
+      sceneHandle.update(elapsed);
+
+      // Auto-rotation when enabled
+      if (isAutoRotate && !isDraggingRef.current) {
+        orbitRef.current.theta += 0.0025;
+      }
+
+      // Smooth camera interpolation (lerp)
+      const orbit = orbitRef.current;
+      orbit.radius += (orbit.targetRadius - orbit.radius) * 0.08;
+      orbit.target.lerp(orbit.targetTarget, 0.08);
+
+      const sinPhi = Math.sin(orbit.phi);
+      camera.position.x = orbit.target.x + orbit.radius * sinPhi * Math.sin(orbit.theta);
+      camera.position.y = orbit.target.y + orbit.radius * Math.cos(orbit.phi);
+      camera.position.z = orbit.target.z + orbit.radius * sinPhi * Math.cos(orbit.theta);
+      camera.lookAt(orbit.target);
+
+      renderer.render(scene, camera);
+
+      // Project 3D item coordinates to 2D screen positions for DOM pins
+      const coords = {};
+      const tempVec = new THREE.Vector3();
+      const rect = container.getBoundingClientRect();
+
+      for (const it of items) {
+        if (!it.pos3d) continue;
+        tempVec.set(it.pos3d[0], it.pos3d[1] + 0.8, it.pos3d[2]);
+        tempVec.project(camera);
+
+        const isVisible = tempVec.z < 1.0;
+        const screenX = ((tempVec.x + 1) * rect.width) / 2;
+        const screenY = ((-tempVec.y + 1) * rect.height) / 2;
+
+        coords[it.id] = {
+          x: Math.round(screenX),
+          y: Math.round(screenY),
+          visible: isVisible,
+        };
+      }
+      setPinScreenCoords(coords);
+    };
+
+    renderLoop();
+
+    // Resize Handler
+    const handleResize = () => {
+      if (!container || !camera || !renderer) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", handleResize);
+      sceneHandle.dispose();
+      renderer.dispose();
+      if (mountRef.current) {
+        mountRef.current.innerHTML = "";
+      }
+    };
+  }, [isAutoRotate, items]);
+
+  const clearHoverTimeoutRef = useRef(null);
+
+  // Mouse & Touch Orbit Controls (Smooth drag to view from any angle)
+  const handleMouseDown = useCallback((e) => {
+    if (e.button !== 0) return;
+    isDraggingRef.current = true;
+    prevMouseRef.current = { x: e.clientX, y: e.clientY };
+    if (containerRef.current) {
+      containerRef.current.style.cursor = "grabbing";
+    }
   }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Raycast on 3D meshes when hovering to detect 3D object directly
+    if (!isDraggingRef.current && isExplore && cameraRef.current && sceneHandleRef.current) {
+      const rect = container.getBoundingClientRect();
+      const normX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const normY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      mouseNormRef.current.set(normX, normY);
+
+      raycasterRef.current.setFromCamera(mouseNormRef.current, cameraRef.current);
+      const hits = raycasterRef.current.intersectObjects(sceneHandleRef.current.interactiveMeshes, true);
+
+      let foundId = null;
+      if (hits.length > 0) {
+        for (const hit of hits) {
+          let curr = hit.object;
+          while (curr && !foundId) {
+            if (curr.userData?.itemId) {
+              foundId = curr.userData.itemId;
+            }
+            curr = curr.parent;
+          }
+          if (foundId) break;
+        }
+      }
+
+      if (foundId) {
+        if (clearHoverTimeoutRef.current) {
+          clearTimeout(clearHoverTimeoutRef.current);
+          clearHoverTimeoutRef.current = null;
+        }
+        const match = items.find((it) => it.id === foundId);
+        if (match) {
+          setHoveredItem(match);
+          setHoverPopupPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+          container.style.cursor = "pointer";
+        }
+      } else {
+        container.style.cursor = "grab";
+        if (!clearHoverTimeoutRef.current) {
+          clearHoverTimeoutRef.current = setTimeout(() => {
+            setHoveredItem(null);
+            clearHoverTimeoutRef.current = null;
+          }, 180);
+        }
+      }
+    }
+
+    if (!isDraggingRef.current) return;
+    const deltaX = e.clientX - prevMouseRef.current.x;
+    const deltaY = e.clientY - prevMouseRef.current.y;
+    prevMouseRef.current = { x: e.clientX, y: e.clientY };
+
+    const orbit = orbitRef.current;
+    orbit.theta -= deltaX * 0.007;
+    orbit.phi = Math.max(0.18, Math.min(Math.PI / 2.05, orbit.phi - deltaY * 0.007));
+  }, [isExplore, items]);
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
+    isDraggingRef.current = false;
+    if (containerRef.current) {
+      containerRef.current.style.cursor = "grab";
+    }
   }, []);
 
-  // Base pan/zoom transform
-  const baseTransform = getZoomTransformStyle(scale, pan.x, pan.y);
+  const handleMouseLeave = useCallback(() => {
+    isDraggingRef.current = false;
+    if (clearHoverTimeoutRef.current) {
+      clearTimeout(clearHoverTimeoutRef.current);
+      clearHoverTimeoutRef.current = null;
+    }
+    setHoveredItem(null);
+    if (containerRef.current) {
+      containerRef.current.style.cursor = "grab";
+    }
+  }, []);
 
-  // 3D perspective transform
-  const perspective3DStyle = is3DMode
-    ? {
-        transform: `${baseTransform.transform} perspective(1200px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
-        transformStyle: "preserve-3d",
-        transition: isDragging ? "none" : "transform 0.16s ease-out",
-      }
-    : baseTransform;
+  // Wheel Zoom
+  const handleWheel = useCallback((e) => {
+    e.preventDefault();
+    const orbit = orbitRef.current;
+    const zoomDelta = e.deltaY * 0.03;
+    orbit.targetRadius = Math.max(14, Math.min(65, orbit.targetRadius + zoomDelta));
+  }, []);
+
+  const handleZoomIn = () => {
+    const orbit = orbitRef.current;
+    orbit.targetRadius = Math.max(14, orbit.targetRadius - 6);
+  };
+
+  const handleZoomOut = () => {
+    const orbit = orbitRef.current;
+    orbit.targetRadius = Math.min(65, orbit.targetRadius + 6);
+  };
+
+  const handleResetCamera = () => {
+    const orbit = orbitRef.current;
+    orbit.targetRadius = 36;
+    orbit.targetTarget.set(0, 1.2, 2);
+    orbit.theta = Math.PI / 4;
+    orbit.phi = Math.PI / 3.4;
+  };
 
   return (
     <div className="vv-canvas-wrapper vv-3d-wrapper">
       <div
         ref={containerRef}
-        className={`vv-canvas-viewport vv-3d-viewport ${isDragging ? "dragging" : ""} ${is3DMode ? "mode-3d-active" : ""}`}
+        className={`vv-canvas-viewport vv-3d-viewport ${isDraggingRef.current ? "dragging" : ""}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
+        onWheel={handleWheel}
       >
-        <div className="vv-image-layer-container vv-3d-scene-container" style={perspective3DStyle}>
-          {/* Main 3D Illustrated Ocean Map (100% Solid & High-Fidelity) */}
-          <img
-            src={topic.image || "/images/visual_vocab/ocean_marine_map.jpg"}
-            alt={topic.title}
-            className="vv-diagram-image vv-3d-base-layer"
-            draggable={false}
-          />
+        {/* Three.js Canvas Mount */}
+        <div ref={mountRef} className="vv-3d-mount" />
 
-          {/* Dynamic 3D Glare Light overlay */}
-          {is3DMode && (
-            <div
-              className="vv-3d-glare"
-              style={{
-                background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 65%)`,
-              }}
-            />
-          )}
+        {/* 3D Floating Word Hotspot Pins projected to 2D screen */}
+        {items.map((item, idx) => {
+          const coords = pinScreenCoords[item.id];
+          if (!coords || !coords.visible) return null;
 
-          {/* Hotspot Pins Layer (Elevated in 3D Space) */}
-          {items.map((item, idx) => {
-            const isActive = item.id === activeItemId;
-            const isMastered = masteredIds
-              ? masteredIds.has
-                ? masteredIds.has(item.id)
-                : masteredIds.includes(item.id)
-              : false;
+          const isActive = item.id === activeItemId;
+          const isHovered = hoveredItem?.id === item.id;
+          const isMastered = masteredIds
+            ? masteredIds.has
+              ? masteredIds.has(item.id)
+              : masteredIds.includes(item.id)
+            : false;
 
-            let feedbackClass = "";
-            let dotContent = idx + 1;
+          let feedbackClass = "";
+          let dotContent = idx + 1;
 
-            if (isMastered) {
-              feedbackClass += " mastered";
-              dotContent = "✓";
-            }
+          if (isMastered) {
+            feedbackClass += " mastered";
+            dotContent = "✓";
+          }
 
-            if (quizFeedback) {
-              if (quizFeedback.clickedId === item.id) {
-                if (quizFeedback.isCorrect) {
-                  feedbackClass += " correct";
-                  dotContent = "✓";
-                } else {
-                  feedbackClass += " wrong";
-                  dotContent = "✕";
-                }
-              } else if (!quizFeedback.isCorrect && quizFeedback.correctId === item.id) {
-                feedbackClass += " hint-pulse";
+          if (quizFeedback) {
+            if (quizFeedback.clickedId === item.id) {
+              if (quizFeedback.isCorrect) {
+                feedbackClass += " correct";
+                dotContent = "✓";
+              } else {
+                feedbackClass += " wrong";
+                dotContent = "✕";
               }
+            } else if (!quizFeedback.isCorrect && quizFeedback.correctId === item.id) {
+              feedbackClass += " hint-pulse";
             }
+          }
 
-            return (
-              <div
-                key={item.id}
-                className={`vv-hotspot-pin vv-3d-pin ${isActive ? "active" : ""} ${feedbackClass.trim()}`}
-                style={{
-                  left: `${item.x}%`,
-                  top: `${item.y}%`,
-                  transform: `translate(-50%, -50%) translateZ(${isActive ? "45px" : "25px"})`,
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectHotspot(item);
-                }}
-                title={isExplore ? `${item.word} (${item.meaning})` : `Điểm ghim #${idx + 1}`}
-              >
-                <div className="vv-pin-dot">{dotContent}</div>
+          return (
+            <div
+              key={item.id}
+              className={`vv-hotspot-pin vv-3d-pin ${isActive ? "active" : ""} ${isHovered ? "hovered" : ""} ${feedbackClass.trim()}`}
+              style={{
+                left: `${coords.x}px`,
+                top: `${coords.y}px`,
+                transform: "translate(-50%, -100%)",
+              }}
+              onMouseEnter={(e) => {
+                const container = containerRef.current;
+                if (!container) return;
+                const rect = container.getBoundingClientRect();
+                setHoveredItem(item);
+                setHoverPopupPos({ x: coords.x, y: coords.y - 12 });
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectHotspot(item);
+              }}
+              title={isExplore ? `${item.word} (${item.meaning})` : `Điểm 3D #${idx + 1}`}
+            >
+              <div className="vv-pin-dot">{dotContent}</div>
 
-                {/* Floating Word Label - ONLY in Explore mode */}
-                {isExplore && (showLabels || isActive) && (
-                  <div className="vv-hotspot-label vv-3d-label">
-                    <span>{item.word}</span>
-                    {item.ipa && <span className="vv-ipa">{item.ipa}</span>}
-                  </div>
-                )}
+              {/* Floating Word Label - in Explore mode */}
+              {isExplore && (showLabels || isActive || isHovered) && (
+                <div className="vv-hotspot-label vv-3d-label">
+                  <span>{item.word}</span>
+                  {item.ipa && <span className="vv-ipa">{item.ipa}</span>}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {/* INSTANT 3D HOVER INFO CARD (Hover vào thì hiện thông tin luôn) */}
+        {isExplore && hoveredItem && (
+          <div
+            className="vv-3d-hover-card"
+            style={{
+              left: `${Math.min(Math.max(16, hoverPopupPos.x), (containerRef.current?.clientWidth || 600) - 270)}px`,
+              top: `${Math.max(16, hoverPopupPos.y - 150)}px`,
+            }}
+            onMouseEnter={() => {
+              if (clearHoverTimeoutRef.current) {
+                clearTimeout(clearHoverTimeoutRef.current);
+                clearHoverTimeoutRef.current = null;
+              }
+              setHoveredItem(hoveredItem);
+            }}
+            onMouseLeave={() => setHoveredItem(null)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectHotspot(hoveredItem);
+            }}
+          >
+            <div className="vv-3d-hover-header">
+              <div className="vv-3d-hover-word-box">
+                <h4 className="vv-3d-hover-word">{hoveredItem.word}</h4>
+                {hoveredItem.pos && <span className="vv-3d-hover-pos">{hoveredItem.pos}</span>}
               </div>
-            );
-          })}
-        </div>
+              <button
+                type="button"
+                className="btn-vv-hover-audio"
+                onClick={(e) => handlePlayHoverAudio(e, hoveredItem.word)}
+                title="Nghe phát âm chuẩn"
+              >
+                <Volume2 size={15} color="var(--primary)" />
+              </button>
+            </div>
 
-        {/* 3D Mode Badge Indicator */}
-        <div className="vv-3d-badge">
-          <Sparkles size={14} color="#0284c7" />
-          <span>Sa bàn 3D Phối Cảnh</span>
-        </div>
+            {hoveredItem.ipa && (
+              <div className="vv-3d-hover-ipa">
+                <span>{hoveredItem.pinyin || hoveredItem.ipa}</span>
+              </div>
+            )}
+
+            {hoveredItem.meaning && (
+              <div className="vv-3d-hover-meaning">{hoveredItem.meaning}</div>
+            )}
+
+            {hoveredItem.example && (
+              <div className="vv-3d-hover-example">"{hoveredItem.example}"</div>
+            )}
+
+            <div className="vv-3d-hover-tip">💡 Click để chọn &amp; lưu vào sổ từ vựng</div>
+          </div>
+        )}
 
         {/* Floating Controls at bottom-right of canvas */}
         <div className="vv-canvas-floating-controls">
           <button type="button" onClick={handleZoomOut} title="Thu nhỏ">
             <ZoomOut size={16} />
           </button>
-          <span className="vv-zoom-indicator">{Math.round(scale * 100)}%</span>
           <button type="button" onClick={handleZoomIn} title="Phóng to">
             <ZoomIn size={16} />
           </button>
           <button
             type="button"
-            className={is3DMode ? "active-3d-btn" : ""}
-            onClick={() => setIs3DMode((v) => !v)}
-            title={is3DMode ? "Tắt phối cảnh 3D" : "Bật phối cảnh 3D"}
+            className={isAutoRotate ? "active-3d-btn" : ""}
+            onClick={() => setIsAutoRotate((v) => !v)}
+            title={isAutoRotate ? "Tắt tự xoay 360" : "Bật tự xoay 360"}
           >
-            <span style={{ fontSize: "0.72rem", fontWeight: 800 }}>3D</span>
-          </button>
-          <button type="button" onClick={handleResetZoom} title="Mặc định">
             <RotateCcw size={15} />
+          </button>
+          <button type="button" onClick={handleResetCamera} title="Đặt lại góc nhìn">
+            <span style={{ fontSize: "0.72rem", fontWeight: 700 }}>Reset</span>
           </button>
         </div>
       </div>
