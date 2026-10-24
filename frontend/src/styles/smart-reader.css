@@ -964,6 +964,22 @@
   gap: 8px;
 }
 
+.reader-mobile-settings-btn {
+  display: none;
+}
+
+.reader-sidebar-more-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reader-player-extra-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* Sidebar Stats & Chips Card */
 .reader-sidebar-stats-card {
   background: var(--bg-secondary);
@@ -1365,14 +1381,54 @@
 
 /* Responsive breakpoint: Tablets & Mobile (< 1024px) */
 @media (max-width: 1024px) {
+  .smart-reader-container {
+    padding: 8px 6px 28px !important;
+  }
   .smart-reader-container.reader-split-mode {
+    padding: 4px 4px 28px !important;
     height: auto;
     max-height: none;
     overflow: visible;
   }
 
+  /* Compact Paste & Editor Card */
+  .reader-editor-card {
+    padding: 12px 10px !important;
+    gap: 10px !important;
+    border-radius: 10px !important;
+  }
+  .reader-source-tabs-header {
+    gap: 6px !important;
+    margin-bottom: 4px !important;
+  }
+  .reader-source-tab {
+    padding: 5px 9px !important;
+    font-size: 0.78rem !important;
+  }
+  .reader-editor-title {
+    font-size: 0.95rem !important;
+  }
+  .reader-editor-box {
+    min-height: 160px !important;
+    max-height: 340px !important;
+    padding: 10px 12px !important;
+    font-size: 0.92rem !important;
+    line-height: 1.55 !important;
+    border-radius: 8px !important;
+  }
+  .reader-editor-actions {
+    margin-top: 4px !important;
+    padding-top: 6px !important;
+  }
+  .reader-editor-actions .btn {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Compact Reading Split Layout & Sidebar on Mobile */
   .reader-split-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
     height: auto;
     max-height: none;
     overflow: visible;
@@ -1382,9 +1438,50 @@
     height: auto;
     max-height: none;
     overflow-y: visible;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
   }
 
+  .reader-sidebar-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+  }
+
+  .reader-mobile-settings-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 3px 8px !important;
+    font-size: 0.72rem !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+  }
+  .reader-mobile-settings-btn.active {
+    background: var(--primary, #6366f1) !important;
+    color: #ffffff !important;
+    border-color: var(--primary, #6366f1) !important;
+  }
+
+  /* Collapsible settings on mobile: hidden by default so article is immediately visible */
+  .reader-sidebar-more-settings {
+    display: none !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    margin-top: 4px !important;
+    padding-top: 8px !important;
+    border-top: 1px dashed var(--border-color) !important;
+  }
+  .reader-sidebar-more-settings.open {
+    display: flex !important;
+    animation: fadeIn 0.2s ease;
+  }
+
+  /* Article Reading Card on Mobile (Chỗ đọc bài báo) */
   .reader-content-panel {
+    width: 100% !important;
     height: auto;
     max-height: none;
     overflow: visible;
@@ -1394,7 +1491,18 @@
     height: auto;
     max-height: none;
     overflow: visible;
-    padding: 24px 18px 40px;
+    padding: 14px 12px 36px !important;
+    border-radius: 10px !important;
+    min-height: auto !important;
+  }
+  .reader-shortcut-tip-bar {
+    padding: 6px 10px !important;
+    font-size: 0.74rem !important;
+    margin-bottom: 12px !important;
+  }
+  .reader-article-body {
+    font-size: 1rem !important;
+    line-height: 1.65 !important;
   }
 }
 

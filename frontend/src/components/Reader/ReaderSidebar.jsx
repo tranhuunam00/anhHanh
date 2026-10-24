@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ArrowLeft,
   Trash2,
@@ -7,6 +7,7 @@ import {
   Play,
   Pause,
   RotateCcw,
+  Settings,
 } from "../Icons";
 import { formatTime } from "../../utils/readerUtils";
 import { ReaderVoiceSelector } from "./ReaderVoiceSelector";
@@ -49,9 +50,11 @@ export function ReaderSidebar({
   readerTheme,
   setReaderTheme,
 }) {
+  const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false);
+
   return (
     <aside className="reader-sidebar-panel">
-      {/* Top row: Nút Quay lại & Xóa bài */}
+      {/* Top row: Nút Quay lại, Cài đặt trên mobile & Xóa bài */}
       <div className="reader-sidebar-nav">
         <button
           className="btn btn-secondary btn-with-icon"
@@ -63,6 +66,16 @@ export function ReaderSidebar({
         </button>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <button
+            type="button"
+            className={`btn btn-secondary btn-with-icon reader-mobile-settings-btn ${isMobileSettingsOpen ? "active" : ""}`}
+            onClick={() => setIsMobileSettingsOpen((prev) => !prev)}
+            title="Tùy chỉnh giọng đọc, cỡ chữ & giao diện"
+          >
+            <Settings size={14} />
+            <span>{isMobileSettingsOpen ? "Thu gọn" : "Cài đặt & Giọng"}</span>
+          </button>
+
           <span className="reader-badge-sparkle">Đọc & Ôn từ</span>
 
           <button
@@ -162,48 +175,52 @@ export function ReaderSidebar({
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Bộ chọn Accent & Giọng đọc Web Speech */}
-        <ReaderVoiceSelector
-          voices={voices}
-          selectedVoiceUri={selectedVoiceUri}
-          onSelectVoiceUri={onSelectVoiceUri}
-          selectedAccent={selectedAccent}
-          onSelectAccent={onSelectAccent}
-          pitchPreset={pitchPreset}
-          onSelectPitchPreset={onSelectPitchPreset}
-          onTestVoice={onTestVoice}
-        />
+      {/* Collapsible Settings on Mobile (Always open on Desktop) */}
+      <div className={`reader-sidebar-more-settings ${isMobileSettingsOpen ? "open" : ""}`}>
+        <div className="reader-player-extra-section">
+          {/* Bộ chọn Accent & Giọng đọc Web Speech */}
+          <ReaderVoiceSelector
+            voices={voices}
+            selectedVoiceUri={selectedVoiceUri}
+            onSelectVoiceUri={onSelectVoiceUri}
+            selectedAccent={selectedAccent}
+            onSelectAccent={onSelectAccent}
+            pitchPreset={pitchPreset}
+            onSelectPitchPreset={onSelectPitchPreset}
+            onTestVoice={onTestVoice}
+          />
 
-        {/* Row 3: Timeline Scrubber Bar */}
-        <div className="reader-scrubber-row">
-          <span className="reader-time-badge current-time">{formatTime(elapsedSeconds)}</span>
+          {/* Row 3: Timeline Scrubber Bar */}
+          <div className="reader-scrubber-row">
+            <span className="reader-time-badge current-time">{formatTime(elapsedSeconds)}</span>
 
-          <div className="reader-range-wrap">
-            <input
-              type="range"
-              className="reader-seek-range"
-              min="0"
-              max={Math.max(1, totalDuration)}
-              step="0.5"
-              value={elapsedSeconds}
-              onChange={onSeekChange}
-              style={{
-                "--progress-percent": `${totalDuration > 0 ? Math.min(100, (elapsedSeconds / totalDuration) * 100) : 0}%`,
-              }}
-              title="Kéo hoặc nhấp vào thanh để tua thời gian bài đọc"
-              aria-label="Thanh tua thời gian bài đọc"
-            />
+            <div className="reader-range-wrap">
+              <input
+                type="range"
+                className="reader-seek-range"
+                min="0"
+                max={Math.max(1, totalDuration)}
+                step="0.5"
+                value={elapsedSeconds}
+                onChange={onSeekChange}
+                style={{
+                  "--progress-percent": `${totalDuration > 0 ? Math.min(100, (elapsedSeconds / totalDuration) * 100) : 0}%`,
+                }}
+                title="Kéo hoặc nhấp vào thanh để tua thời gian bài đọc"
+                aria-label="Thanh tua thời gian bài đọc"
+              />
+            </div>
+
+            <span className="reader-time-badge total-time">{formatTime(totalDuration)}</span>
           </div>
 
-          <span className="reader-time-badge total-time">{formatTime(totalDuration)}</span>
+          {/* Row 4: Scrubber helper hint */}
+          <div className="reader-scrubber-hint">
+            <span>Kéo thanh tua hoặc giữ <kbd className="reader-ctrl-kbd">Ctrl</kbd> + <strong>Click vào câu</strong> để nghe</span>
+          </div>
         </div>
-
-        {/* Row 4: Scrubber helper hint */}
-        <div className="reader-scrubber-hint">
-          <span>Kéo thanh tua hoặc giữ <kbd className="reader-ctrl-kbd">Ctrl</kbd> + <strong>Click vào câu</strong> để nghe</span>
-        </div>
-      </div>
 
       {/* Thống kê bài viết & Danh sách từ vựng cần ôn */}
       <div className="reader-sidebar-stats-card">
@@ -363,6 +380,7 @@ export function ReaderSidebar({
           </div>
         </div>
       </div>
-    </aside>
+    </div>
+  </aside>
   );
 }

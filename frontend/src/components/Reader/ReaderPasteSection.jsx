@@ -64,15 +64,10 @@ export function ReaderPasteSection({
       {/* TAB 1: PASTE TEXT & HTML */}
       {activeTab === "paste" && (
         <>
-          <div className="reader-editor-header" style={{ paddingTop: 6 }}>
-            <div>
-              <div className="reader-editor-title">
-                <Newspaper size={20} style={{ color: "#10b981" }} />
-                <span>Dán bài báo / Tài liệu tiếng Anh mới</span>
-              </div>
-              <p className="reader-editor-desc">
-                Nhấp chuột vào ô bên dưới rồi nhấn <strong>Ctrl + V</strong> (hoặc Cmd + V). Hệ thống hỗ trợ dán đầy đủ cả văn bản lẫn hình ảnh!
-              </p>
+          <div className="reader-editor-header" style={{ paddingTop: 4 }}>
+            <div className="reader-editor-title">
+              <Newspaper size={18} style={{ color: "#10b981" }} />
+              <span>Dán bài báo / Tài liệu tiếng Anh mới</span>
             </div>
           </div>
 
