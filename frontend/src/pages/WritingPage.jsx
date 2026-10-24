@@ -39,6 +39,7 @@ import { IeltsPromptLibraryModal } from "../components/Writing/IeltsPromptLibrar
 import { PromptKeywordsBar } from "../components/Writing/PromptKeywordsBar";
 import { HighlightedVocabSentence } from "../components/Vocab/HighlightedVocabSentence";
 import "../styles/writing.css";
+import "../styles/writing-mobile.css";
 
 export const LANGUAGES = [
   { id: "en", label: "Tiếng Anh", native: "English", flag: "🇬🇧", system: "IELTS 0-9", unit: "từ" },

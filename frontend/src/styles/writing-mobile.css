@@ -1,0 +1,443 @@
+/* ==========================================================================
+   AI Writing Studio - Mobile Responsive Optimization (< 500 Lines)
+   Ultra-compact padding, minimal margins, maximized typing area
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* 1. Main Container & Studio Layout */
+  .writing-studio-container {
+    padding: 4px 6px 20px !important;
+  }
+  .writing-studio-layout {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+  .writing-editor-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
+    gap: 6px !important;
+  }
+  .writing-split-divider {
+    display: none !important;
+  }
+  .writing-feedback-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
+    height: auto !important;
+    max-height: none !important;
+    margin-top: 4px !important;
+    border-radius: 10px !important;
+  }
+
+  /* 2. Top Header - Ultra-compact single/double slim line */
+  .writing-header {
+    margin-bottom: 6px !important;
+    padding: 2px 4px !important;
+    gap: 6px !important;
+    align-items: center !important;
+  }
+  .writing-header-left {
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+  .writing-badge-icon,
+  .writing-subtitle {
+    display: none !important;
+  }
+  .writing-title {
+    font-size: 0.95rem !important;
+    line-height: 1.25 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .writing-header-right {
+    gap: 5px !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+  .language-selector-badge {
+    height: 28px !important;
+    padding: 2px 6px !important;
+    font-size: 0.72rem !important;
+  }
+  .language-select-dropdown {
+    font-size: 0.72rem !important;
+    padding: 0 2px !important;
+  }
+  .writing-auth-tag {
+    height: 26px !important;
+    padding: 2px 7px !important;
+    font-size: 0.68rem !important;
+  }
+  .writing-auth-tag span {
+    max-width: 130px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* 3. Genre Selector & Subtype Bar - Horizontal Swipeable Ribbons */
+  .genre-nav-bar,
+  .subtype-pills-list {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 4px !important;
+    scrollbar-width: none !important;
+  }
+  .genre-nav-bar::-webkit-scrollbar,
+  .subtype-pills-list::-webkit-scrollbar {
+    display: none !important;
+  }
+  .genre-nav-bar {
+    padding: 2px 3px !important;
+    border-radius: 8px !important;
+  }
+  .genre-btn {
+    flex: 0 0 auto !important;
+    min-width: auto !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+  }
+  .genre-btn-label {
+    font-size: 0.74rem !important;
+    white-space: nowrap !important;
+  }
+  .genre-btn-sub {
+    font-size: 0.64rem !important;
+    white-space: nowrap !important;
+  }
+  .writing-subtype-bar {
+    padding: 3px 6px !important;
+    gap: 4px !important;
+    border-radius: 8px !important;
+  }
+  .subtype-bar-label {
+    font-size: 0.68rem !important;
+    white-space: nowrap !important;
+  }
+  .subtype-pill-btn {
+    flex: 0 0 auto !important;
+    padding: 3px 7px !important;
+    font-size: 0.7rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* 4. Prompt Card & Tools */
+  .writing-prompt-card {
+    padding: 6px 8px !important;
+    border-radius: 8px !important;
+    gap: 6px !important;
+  }
+  .prompt-card-header,
+  .prompt-tag-group,
+  .prompt-action-group {
+    gap: 4px !important;
+  }
+  .prompt-action-group {
+    flex-wrap: wrap !important;
+  }
+  .prompt-type-badge,
+  .prompt-target-pill {
+    padding: 2px 6px !important;
+    font-size: 0.68rem !important;
+  }
+  .btn-prompt-action {
+    padding: 3px 6px !important;
+    font-size: 0.7rem !important;
+    min-height: 26px !important;
+    border-radius: 5px !important;
+  }
+  .ai-topic-prompt-wrapper {
+    margin: 0 !important;
+  }
+  .ai-topic-prompt-input {
+    width: 105px !important;
+    height: 26px !important;
+    font-size: 0.68rem !important;
+    padding: 0 18px 0 6px !important;
+  }
+  .ai-topic-prompt-input:focus {
+    width: 135px !important;
+  }
+  .prompt-text {
+    font-size: 0.82rem !important;
+    line-height: 1.4 !important;
+    padding: 6px 8px !important;
+  }
+  .ielts-exam-prompt-box {
+    padding: 6px 8px !important;
+    gap: 6px !important;
+    border-radius: 6px !important;
+  }
+  .exam-meta-hint {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+  }
+  .exam-question-text {
+    font-size: 0.84rem !important;
+    line-height: 1.45 !important;
+  }
+  .exam-question-text.bold {
+    font-size: 0.86rem !important;
+    line-height: 1.4 !important;
+  }
+  .exam-closing-req,
+  .exam-min-words {
+    font-size: 0.74rem !important;
+  }
+  .custom-prompt-container {
+    padding: 6px 8px !important;
+    gap: 6px !important;
+  }
+  .custom-prompt-textarea {
+    padding: 6px 8px !important;
+    font-size: 0.82rem !important;
+  }
+  .custom-prompt-toolbar {
+    gap: 6px !important;
+  }
+  .custom-prompt-tip {
+    display: none !important;
+  }
+
+  /* 5. Keywords Dual Columns Bar - Ultra-compact on mobile */
+  .prompt-keywords-bar-v2 {
+    margin-top: 4px !important;
+    padding: 5px 6px !important;
+    gap: 5px !important;
+    border-radius: 8px !important;
+  }
+  .prompt-keywords-bar-v2.dual-columns-layout {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+  .keywords-dual-column {
+    height: auto !important;
+    max-height: 185px !important;
+    padding: 5px 6px !important;
+    gap: 5px !important;
+    border-radius: 6px !important;
+  }
+  .keywords-list-v2 {
+    gap: 4px !important;
+    max-height: 135px !important;
+    overflow-y: auto !important;
+  }
+  .keyword-chip-v2 {
+    padding: 3px 6px !important;
+    font-size: 0.72rem !important;
+    gap: 4px !important;
+  }
+  .chip-word-text {
+    font-size: 0.72rem !important;
+  }
+  .chip-weight-score {
+    font-size: 0.65rem !important;
+    padding: 1px 4px !important;
+  }
+  .column-title-text {
+    font-size: 0.72rem !important;
+  }
+  .column-sort-box {
+    padding: 1px 3px !important;
+  }
+  .column-sort-select {
+    font-size: 0.68rem !important;
+  }
+  .btn-gen-more {
+    padding: 2px 6px !important;
+    font-size: 0.68rem !important;
+  }
+
+  /* 6. Writing Workspace & Textarea - Maximize Typing Focus */
+  .writing-workspace {
+    border-radius: 10px !important;
+  }
+  .workspace-toolbar {
+    padding: 5px 8px !important;
+    gap: 5px !important;
+  }
+  .workspace-stats-row {
+    gap: 4px !important;
+    justify-content: space-between !important;
+  }
+  .workspace-stats {
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+  }
+  .stat-pill {
+    padding: 2px 6px !important;
+    font-size: 0.7rem !important;
+    height: 24px !important;
+  }
+  .save-status-indicator {
+    font-size: 0.7rem !important;
+  }
+  .workspace-options {
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+  }
+  .target-band-select-wrapper {
+    gap: 3px !important;
+  }
+  .band-select-label {
+    font-size: 0.7rem !important;
+  }
+  .band-select {
+    padding: 2px 5px !important;
+    font-size: 0.72rem !important;
+    height: 24px !important;
+  }
+  .btn-workspace-start {
+    padding: 2px 8px !important;
+    font-size: 0.72rem !important;
+    height: 24px !important;
+  }
+  .workspace-actions-row {
+    padding-top: 4px !important;
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+  }
+  .btn-workspace-structures,
+  .btn-workspace-ai-suggest,
+  .btn-workspace-save {
+    padding: 4px 8px !important;
+    font-size: 0.72rem !important;
+    min-height: 28px !important;
+    border-radius: 6px !important;
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+  }
+  .writing-textarea {
+    min-height: 260px !important;
+    padding: 8px 10px !important;
+    font-size: 0.94rem !important;
+    line-height: 1.6 !important;
+  }
+  .workspace-footer {
+    padding: 6px 8px !important;
+    gap: 6px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .footer-guide {
+    font-size: 0.74rem !important;
+    text-align: center !important;
+  }
+  .btn-submit-essay {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 8px 14px !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* 7. Feedback Panel (AI Results / Outline / History) */
+  .feedback-nav-tabs {
+    padding: 0 4px !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none !important;
+  }
+  .feedback-nav-tabs::-webkit-scrollbar {
+    display: none !important;
+  }
+  .feedback-nav-btn {
+    padding: 8px 10px !important;
+    font-size: 0.76rem !important;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+  }
+  .feedback-body {
+    padding: 10px 8px !important;
+  }
+  .score-hero-card {
+    padding: 10px 12px !important;
+    gap: 10px !important;
+    flex-direction: row !important;
+  }
+  .score-circle-wrapper {
+    width: 58px !important;
+    height: 58px !important;
+    flex-shrink: 0 !important;
+  }
+  .score-band-number {
+    font-size: 1.45rem !important;
+  }
+  .score-band-sub {
+    font-size: 0.62rem !important;
+  }
+  .score-summary-title {
+    font-size: 0.85rem !important;
+    margin-bottom: 2px !important;
+  }
+  .score-summary-desc {
+    font-size: 0.78rem !important;
+    line-height: 1.4 !important;
+  }
+  .criteria-grid {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+  .criteria-card {
+    padding: 8px 10px !important;
+    gap: 4px !important;
+  }
+  .criteria-head {
+    font-size: 0.78rem !important;
+  }
+  .criteria-score {
+    font-size: 0.75rem !important;
+    padding: 1px 6px !important;
+  }
+  .criteria-feedback {
+    font-size: 0.74rem !important;
+    line-height: 1.4 !important;
+  }
+  .section-block {
+    gap: 6px !important;
+  }
+  .section-title {
+    font-size: 0.85rem !important;
+  }
+  .corrections-list {
+    gap: 6px !important;
+  }
+  .correction-card {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .writing-studio-container {
+    padding: 2px 4px 16px !important;
+  }
+  .writing-header {
+    margin-bottom: 4px !important;
+    padding: 2px !important;
+  }
+  .writing-title {
+    font-size: 0.88rem !important;
+  }
+  .btn-workspace-structures,
+  .btn-workspace-ai-suggest,
+  .btn-workspace-save {
+    font-size: 0.68rem !important;
+    padding: 3px 6px !important;
+  }
+  .writing-textarea {
+    min-height: 240px !important;
+    padding: 6px 8px !important;
+    font-size: 0.92rem !important;
+  }
+}
