@@ -3,7 +3,45 @@
    Ultra-compact padding, minimal margins, maximized typing area
    ========================================================================== */
 
+/* Tab: Keywords & Sentence Frames in Right Panel */
+.tab-keywords-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+.tab-keywords-content .prompt-keywords-bar-v2 {
+  margin-top: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.tab-keywords-content .prompt-keywords-bar-v2.dual-columns-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.tab-keywords-content .keywords-dual-column {
+  height: 100%;
+  min-height: 420px;
+  box-shadow: none;
+}
+
 @media (max-width: 768px) {
+  .tab-keywords-content .prompt-keywords-bar-v2.dual-columns-layout {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .tab-keywords-content .keywords-dual-column {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 220px !important;
+  }
   /* 1. Main Container & Studio Layout */
   .writing-studio-container {
     padding: 4px 6px 20px !important;

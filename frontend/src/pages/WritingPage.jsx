@@ -143,7 +143,7 @@ export const WritingPage = ({ isActive = false }) => {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState(null);
-  const [activeRightTab, setActiveRightTab] = useState("outline"); // "outline" | "feedback" | "history"
+  const [activeRightTab, setActiveRightTab] = useState("keywords"); // "keywords" | "outline" | "feedback" | "history"
   const [feedbackViewTab, setFeedbackViewTab] = useState("sentences"); // "sentences" | "criteria"
   const [sentenceFilter, setSentenceFilter] = useState("all"); // "all" | "error" | "upgrade" | "correct"
 
@@ -985,6 +985,20 @@ export const WritingPage = ({ isActive = false }) => {
                   <IconRotate size={13} />
                   <span>Đổi ngẫu nhiên</span>
                 </button>
+                <button
+                  type="button"
+                  className={`btn-prompt-action ${activeRightTab === "keywords" ? "active" : ""}`}
+                  onClick={() => {
+                    setActiveRightTab("keywords");
+                    if (window.innerWidth <= 768) {
+                      document.querySelector(".writing-feedback-panel")?.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }}
+                  title="Mở tab Gợi ý Từ & Cụm từ, Dạng câu theo chủ đề ở panel bên phải"
+                >
+                  <IconLightbulb size={13} />
+                  <span>Gợi ý Từ & Câu</span>
+                </button>
                 {/* Input nhập prompt chủ đề gợi ý (không bắt buộc) */}
                 <div className="ai-topic-prompt-wrapper" title="Nhập chủ đề gợi ý (vd: xe điện, biến đổi khí hậu, AI...) rồi bấm 'AI Tạo đề mới' (không bắt buộc nhập)">
                   <input
@@ -1154,22 +1168,6 @@ export const WritingPage = ({ isActive = false }) => {
                       <div className={`prompt-text ${isPromptCollapsed ? "collapsed" : ""}`}>
                         "{cleanPromptText(currentPrompt?.prompt) || "Vui lòng chọn hoặc tạo đề bài..."}"
                       </div>
-                    )}
-
-                    {!isPromptCollapsed && (
-                      <PromptKeywordsBar
-                        currentPrompt={currentPrompt}
-                        essayText={content}
-                        savedVocabMap={savedVocabMap}
-                        onInsertKeyword={handleInsertPhrase}
-                        onAddVocab={handleAddVocabToNotebook}
-                        showToast={showToast}
-                        token={token}
-                        language={selectedLanguage}
-                        targetBand={targetBand}
-                        genre={selectedGenre}
-                        isAuthorized={isAuthorized}
-                      />
                     )}
                   </>
                 )}
@@ -1367,6 +1365,13 @@ export const WritingPage = ({ isActive = false }) => {
           {/* Tab selector */}
           <div className="feedback-nav-tabs">
             <button
+              className={`feedback-nav-btn ${activeRightTab === "keywords" ? "active" : ""}`}
+              onClick={() => setActiveRightTab("keywords")}
+            >
+              <IconLightbulb size={15} />
+              <span>Gợi ý Từ & Câu</span>
+            </button>
+            <button
               className={`feedback-nav-btn ${activeRightTab === "outline" ? "active" : ""}`}
               onClick={() => setActiveRightTab("outline")}
             >
@@ -1393,7 +1398,23 @@ export const WritingPage = ({ isActive = false }) => {
           </div>
 
           <div className="feedback-body">
-            {activeRightTab === "outline" ? (
+            {activeRightTab === "keywords" ? (
+              <div className="tab-keywords-content">
+                <PromptKeywordsBar
+                  currentPrompt={currentPrompt}
+                  essayText={content}
+                  savedVocabMap={savedVocabMap}
+                  onInsertKeyword={handleInsertPhrase}
+                  onAddVocab={handleAddVocabToNotebook}
+                  showToast={showToast}
+                  token={token}
+                  language={selectedLanguage}
+                  targetBand={targetBand}
+                  genre={selectedGenre}
+                  isAuthorized={isAuthorized}
+                />
+              </div>
+            ) : activeRightTab === "outline" ? (
               <WritingOutlineTab
                 genre={selectedGenre}
                 subType={selectedSubType}
