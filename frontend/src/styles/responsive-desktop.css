@@ -1,0 +1,86 @@
+/* ShotLang Desktop & Tablet Responsive Design System */
+/* Excludes Admin Portal (.admin-*) */
+
+/* 🖥️ Large Desktop / Widescreen (min-width: 1400px) */
+@media (min-width: 1400px) {
+  .main-container {
+    max-width: 1560px;
+    padding: 0 24px;
+  }
+  .player-card {
+    position: sticky;
+    top: 68px;
+    align-self: start;
+    z-index: 10;
+  }
+  .presets-cards-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* 💻 Medium Desktop & Laptops (1025px - 1399px) */
+@media (min-width: 1025px) and (max-width: 1399px) {
+  .main-container {
+    max-width: 1280px;
+    padding: 0 20px;
+  }
+  .player-card {
+    position: sticky;
+    top: 68px;
+    align-self: start;
+    z-index: 10;
+  }
+  .presets-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+    gap: 12px;
+  }
+}
+
+/* 📱 Tablet & Medium Screens (769px - 1024px) */
+@media (max-width: 1024px) {
+  .main-container {
+    padding: 0 16px;
+    margin: 12px auto;
+  }
+
+  /* Exercise Split View: Stack vertically on tablet */
+  .exercise-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .exercise-split-container {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .exercise-pane-left,
+  .exercise-pane-right {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .split-divider {
+    display: none !important;
+  }
+  .player-card {
+    position: static !important;
+  }
+
+  /* Bottom Presets on Tablet */
+  .presets-level-overview {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+  .presets-level-stepper {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    padding-bottom: 4px;
+  }
+  .presets-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+  }
+}

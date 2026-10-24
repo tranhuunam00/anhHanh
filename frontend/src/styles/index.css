@@ -1,8 +1,12 @@
 /* Master stylesheet importing modular styles */
 @import url("./base.css");
 @import url("./dictation.css");
+@import url("./split-pane.css");
 @import url("./components.css");
 @import url("./modal.css");
+@import url("./guide-modal.css");
+@import url("./responsive-desktop.css");
 @import url("./responsive.css");
+@import url("./responsive-mobile.css");
 @import url("./auth-and-vocab.css");
 @import url("./vocab-responsive.css");

@@ -69,23 +69,59 @@
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border-color);
 }
+.challenge-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.challenge-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
 .challenge-title {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-primary);
+  margin: 0;
+}
+.challenge-title-total {
+  font-weight: 500;
+  color: var(--text-muted);
 }
 .challenge-time {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-weight: 600;
   font-family: var(--font-mono);
-  margin-top: 1px;
 }
-.challenge-nav-buttons {
+.challenge-secondary-actions {
   display: flex;
-  gap: 5px;
+  gap: 6px;
   align-items: center;
 }
+.btn-compact-action {
+  padding: 4px 8px;
+  font-size: 0.76rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+}
+.btn-compact-action.btn-restart { color: #ef4444; border-color: #fecaca; }
+.btn-compact-action.btn-sync { color: var(--primary, #3b82f6); border-color: var(--border, #cbd5e1); }
+.challenge-nav-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.challenge-nav-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.btn-label-mobile { display: none; }
+.btn-label-desktop { display: inline; }
 
 .progress-bar-container {
   width: 100%;
@@ -397,100 +433,4 @@
   line-height: 1.4;
 }
 
-/* ==========================================================================
-   Resizable Split-Pane Container (Video & Dictation Studio)
-   ========================================================================== */
-.exercise-split-container {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  width: 100%;
-  position: relative;
-  gap: 0;
-}
 
-.exercise-pane {
-  min-width: 0;
-  box-sizing: border-box;
-}
-
-.exercise-pane-left {
-  min-width: 320px;
-}
-
-.exercise-pane-right {
-  min-width: 320px;
-}
-
-.split-divider {
-  width: 18px;
-  margin: 0 3px;
-  cursor: col-resize;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: stretch;
-  position: relative;
-  z-index: 10;
-  transition: all 0.15s ease;
-}
-
-.split-divider-line {
-  width: 4px;
-  height: 100%;
-  min-height: 380px;
-  background: var(--border-color, #e2e8f0);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, width 0.2s, box-shadow 0.2s;
-}
-
-.split-divider:hover .split-divider-line,
-.split-divider.active .split-divider-line {
-  background: var(--primary, #3b82f6);
-  width: 6px;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.45);
-}
-
-.split-divider-handle {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 8px 1px;
-  background: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #cbd5e1);
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  pointer-events: none;
-}
-
-.split-divider-handle span {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--text-muted, #94a3b8);
-}
-
-.split-divider:hover .split-divider-handle,
-.split-divider.active .split-divider-handle {
-  border-color: var(--primary, #3b82f6);
-}
-
-.split-divider:hover .split-divider-handle span,
-.split-divider.active .split-divider-handle span {
-  background: var(--primary, #3b82f6);
-}
-
-.split-drag-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 99999;
-  cursor: col-resize;
-  user-select: none;
-}

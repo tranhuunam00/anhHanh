@@ -227,70 +227,78 @@ export const DictationStudio = React.memo(({
   return (
     <section className="card dictation-card">
       <div className="challenge-header">
-        <div>
-          <h2 className="challenge-title">
-            Câu {currentIndex + 1} / {totalChallenges || "..."}
-          </h2>
-          <div className="challenge-time">
-            [{currentChallenge ? formatTime(currentChallenge.time_start) : "00:00"} -{" "}
-            {currentChallenge ? formatTime(currentChallenge.time_end) : "00:00"}]
+        <div className="challenge-meta">
+          <div className="challenge-title-row">
+            <h2 className="challenge-title">
+              Câu {currentIndex + 1} <span className="challenge-title-total">/ {totalChallenges || "..."}</span>
+            </h2>
+            <div className="challenge-time">
+              [{currentChallenge ? formatTime(currentChallenge.time_start) : "00:00"} -{" "}
+              {currentChallenge ? formatTime(currentChallenge.time_end) : "00:00"}]
+            </div>
           </div>
+
+          {(onRestartLesson || onReloadSubtitles) && (
+            <div className="challenge-secondary-actions">
+              {onRestartLesson && (
+                <button
+                  className="btn btn-secondary btn-compact-action btn-restart"
+                  title="Làm lại bài này từ câu số 1"
+                  onClick={onRestartLesson}
+                >
+                  <RefreshCw size={13} strokeWidth={2.2} />
+                  <span className="btn-label-desktop">Làm lại bài này</span>
+                  <span className="btn-label-mobile">Làm lại</span>
+                </button>
+              )}
+              {onReloadSubtitles && (
+                <button
+                  className="btn btn-secondary btn-compact-action btn-sync"
+                  title="Tải và đồng bộ lại phụ đề mới nhất từ YouTube (xóa cache)"
+                  onClick={onReloadSubtitles}
+                >
+                  <RefreshCw size={13} strokeWidth={2.2} />
+                  <span className="btn-label-desktop">Đồng bộ phụ đề</span>
+                  <span className="btn-label-mobile">Đồng bộ</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="challenge-nav-buttons">
-          <button className="btn btn-secondary btn-icon" title="Câu trước (Alt+←)" onClick={onPrev} disabled={currentIndex === 0}>
-            <ChevronLeft size={18} strokeWidth={2.2} />
-          </button>
-
-          <button className="btn btn-secondary btn-icon" title={isPlaying ? "Tạm dừng (Space / Shift+Space)" : "Phát / Tiếp tục (Space / Shift+Space)"} onClick={onPlayPause}>
-            {isPlaying ? (
-              <Pause size={17} fill="currentColor" />
-            ) : (
-              <Play size={17} fill="currentColor" style={{ marginLeft: "2px" }} />
-            )}
-          </button>
-
-          <button className="btn btn-secondary btn-icon" title="Phát lại câu hiện tại (Ctrl)" onClick={onReplay}>
-            <RotateCcw size={16} strokeWidth={2.2} />
-          </button>
-
-          <button
-            className="btn btn-secondary btn-icon"
-            title={isLastChallenge ? (isCompleted ? "Hoàn thành bài học" : "Đã đến câu cuối cùng") : "Câu sau (Alt+→)"}
-            onClick={isLastChallenge ? (isCompleted ? (onCompleteLesson || onNextChallenge) : undefined) : onNext}
-            disabled={isLastChallenge && !isCompleted}
-          >
-            <ChevronRight size={18} strokeWidth={2.2} />
-          </button>
-
-          <button className="btn btn-secondary btn-with-icon" title="Danh sách tất cả các câu" onClick={onOpenDrawer}>
-            <ListFilter size={16} strokeWidth={2} />
-            <span>Danh sách câu</span>
-          </button>
-
-          {onRestartLesson && (
-            <button
-              className="btn btn-secondary btn-with-icon"
-              title="Làm lại bài này từ câu số 1"
-              onClick={onRestartLesson}
-              style={{ color: "#ef4444", borderColor: "#fecaca" }}
-            >
-              <RefreshCw size={14} strokeWidth={2} />
-              <span>Làm lại bài này</span>
+          <div className="challenge-nav-group">
+            <button className="btn btn-secondary btn-icon" title="Câu trước (Alt+←)" onClick={onPrev} disabled={currentIndex === 0}>
+              <ChevronLeft size={16} strokeWidth={2.2} />
             </button>
-          )}
 
-          {onReloadSubtitles && (
-            <button
-              className="btn btn-secondary btn-with-icon"
-              title="Tải và đồng bộ lại phụ đề mới nhất từ YouTube (xóa cache)"
-              onClick={onReloadSubtitles}
-              style={{ color: "var(--primary, #3b82f6)", borderColor: "var(--border, #cbd5e1)" }}
-            >
-              <RefreshCw size={14} strokeWidth={2} />
-              <span>Đồng bộ phụ đề</span>
+            <button className="btn btn-secondary btn-icon" title={isPlaying ? "Tạm dừng (Space / Shift+Space)" : "Phát / Tiếp tục (Space / Shift+Space)"} onClick={onPlayPause}>
+              {isPlaying ? (
+                <Pause size={15} fill="currentColor" />
+              ) : (
+                <Play size={15} fill="currentColor" style={{ marginLeft: "2px" }} />
+              )}
             </button>
-          )}
+
+            <button className="btn btn-secondary btn-icon" title="Phát lại câu hiện tại (Ctrl)" onClick={onReplay}>
+              <RotateCcw size={15} strokeWidth={2.2} />
+            </button>
+
+            <button
+              className="btn btn-secondary btn-icon"
+              title={isLastChallenge ? (isCompleted ? "Hoàn thành bài học" : "Đã đến câu cuối cùng") : "Câu sau (Alt+→)"}
+              onClick={isLastChallenge ? (isCompleted ? (onCompleteLesson || onNextChallenge) : undefined) : onNext}
+              disabled={isLastChallenge && !isCompleted}
+            >
+              <ChevronRight size={16} strokeWidth={2.2} />
+            </button>
+          </div>
+
+          <button className="btn btn-secondary btn-with-icon btn-drawer-toggle" title="Danh sách tất cả các câu" onClick={onOpenDrawer}>
+            <ListFilter size={15} strokeWidth={2} />
+            <span className="btn-label-desktop">Danh sách câu</span>
+            <span className="btn-label-mobile">Danh sách</span>
+          </button>
         </div>
       </div>
 

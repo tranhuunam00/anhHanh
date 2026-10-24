@@ -92,210 +92,8 @@
   border-color: var(--primary);
 }
 
-/* ==========================================================================
-   Guide & Shortcuts Modal Styles (Modern, Tabbed Navigation)
-   ========================================================================== */
-.guide-modal {
-  width: 680px;
-  max-width: 95vw;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
+/* Guide & Shortcuts modal styles extracted into guide-modal.css */
 
-.guide-modal-body {
-  padding: 18px 22px;
-  overflow-y: auto;
-  max-height: calc(90vh - 120px);
-}
-
-.guide-tabs-bar {
-  display: flex;
-  gap: 8px;
-  padding: 0 22px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--bg-card);
-}
-
-.guide-tab-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.guide-tab-btn:hover {
-  color: var(--primary);
-}
-
-.guide-tab-btn.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  font-weight: 700;
-}
-
-/* Guide Tab 1: Vocab Steps */
-.guide-hero-card {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(59, 130, 246, 0.06));
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 18px;
-}
-
-.guide-hero-title {
-  margin: 0 0 6px 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.guide-hero-desc {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.45;
-}
-
-.guide-step-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.guide-step-item {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-}
-
-.guide-step-num {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--primary, #2563eb);
-  color: #fff;
-  font-weight: 800;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.guide-step-text h4 {
-  margin: 0 0 4px 0;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.guide-step-text p {
-  margin: 0;
-  font-size: 0.84rem;
-  line-height: 1.45;
-  color: var(--text-secondary);
-}
-
-.guide-demo-card {
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px dashed rgba(245, 158, 11, 0.4);
-  font-size: 0.86rem;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* Guide Tab 2: Categorized Shortcuts */
-.shortcuts-category-group {
-  margin-bottom: 20px;
-}
-
-.shortcuts-category-title {
-  font-size: 0.88rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.shortcuts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 8px;
-}
-
-.shortcut-row-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 9px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-}
-
-.shortcut-row-action {
-  font-size: 0.85rem;
-  color: var(--text-primary);
-}
-
-/* Guide Tab 3: Pro Tips */
-.tips-container {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.tip-card {
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-}
-
-.tip-card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-}
-
-.tip-card-body {
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: var(--text-secondary);
-  margin: 0;
-}
 
 /* ==========================================================================
    Edit Vocabulary Modal & Mobile Responsive Optimization
@@ -323,41 +121,112 @@
   color: var(--text-primary);
 }
 
-.edit-vocab-word-input {
-  width: 100%;
-  padding: 9px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  font-size: 1rem;
-  font-weight: 600;
-  box-sizing: border-box;
+.edit-vocab-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 6px;
 }
 
-.edit-vocab-input {
+.edit-vocab-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.edit-vocab-btn-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.edit-vocab-btn-listen { color: var(--primary, #6366f1); }
+.edit-vocab-btn-enrich {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary, #6366f1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 2px 8px;
+}
+.edit-vocab-btn-listen-mini { color: var(--primary, #2563eb); }
+
+.edit-vocab-word-input {
   width: 100%;
-  padding: 8px 11px;
+  padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text-primary);
-  font-size: 0.86rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.edit-vocab-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 10px;
+}
+
+.edit-vocab-input {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  box-sizing: border-box;
+}
+
+.edit-vocab-phonetic-input { font-family: var(--font-mono, monospace); }
+.edit-vocab-meaning-input { color: #16a34a; font-weight: 600; }
+
+.edit-vocab-pos-wrapper { margin-top: 2px; }
+.edit-vocab-pos-chips { display: flex; gap: 3px; flex-wrap: wrap; }
+.edit-vocab-pos-btn {
+  font-size: 0.64rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  line-height: 1.2;
+}
+.edit-vocab-pos-btn.active {
+  border-color: var(--primary, #6366f1);
+  background: var(--primary, #6366f1);
+  color: #fff;
+  font-weight: 600;
+}
+.edit-vocab-pos-input {
+  width: 100%;
+  height: 30px;
+  font-size: 0.8rem;
   box-sizing: border-box;
 }
 
 .edit-vocab-context-textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 11px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 0.86rem;
-  line-height: 1.55;
+  font-size: 0.84rem;
+  line-height: 1.5;
   box-sizing: border-box;
   resize: vertical;
-  min-height: 76px;
+  min-height: 68px;
   font-family: inherit;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -374,7 +243,7 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 4px;
-  padding-top: 10px;
+  padding-top: 8px;
   border-top: 1px solid var(--border-color);
 }
 
@@ -383,56 +252,113 @@
     width: 96vw !important;
     max-width: 96vw !important;
     max-height: 94vh !important;
-    border-radius: 14px !important;
+    border-radius: 12px !important;
   }
 
   .edit-vocab-modal .modal-header {
-    padding: 12px 14px !important;
+    padding: 10px 12px !important;
   }
 
   .edit-vocab-title {
-    font-size: 0.95rem !important;
+    font-size: 0.92rem !important;
   }
 
   .edit-vocab-subtitle {
-    font-size: 0.7rem !important;
-    line-height: 1.35 !important;
+    font-size: 0.68rem !important;
+    line-height: 1.25 !important;
   }
 
   .edit-vocab-form {
-    padding: 12px 14px !important;
-    gap: 10px !important;
+    padding: 10px 12px !important;
+    gap: 7px !important;
+  }
+
+  .edit-vocab-field-header {
+    margin-bottom: 2px !important;
+    gap: 4px !important;
   }
 
   .edit-vocab-label {
-    font-size: 0.76rem !important;
+    font-size: 0.73rem !important;
+    font-weight: 700 !important;
+  }
+
+  .edit-vocab-actions-group {
+    gap: 4px !important;
+  }
+
+  .edit-vocab-btn-action {
+    font-size: 0.68rem !important;
+    padding: 1px 5px !important;
+    gap: 3px !important;
+  }
+
+  .edit-vocab-btn-enrich {
+    padding: 1px 6px !important;
+    font-size: 0.68rem !important;
   }
 
   .edit-vocab-word-input {
-    font-size: 0.92rem !important;
-    padding: 7px 10px !important;
+    font-size: 0.88rem !important;
+    height: 32px !important;
+    padding: 4px 9px !important;
+    border-radius: 6px !important;
+  }
+
+  .edit-vocab-grid-2col {
+    gap: 7px !important;
   }
 
   .edit-vocab-input {
-    font-size: 0.8rem !important;
-    padding: 6px 9px !important;
+    font-size: 0.78rem !important;
+    height: 30px !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+  }
+
+  .edit-vocab-pos-wrapper {
+    margin-top: 0 !important;
+  }
+
+  .edit-vocab-pos-header {
+    margin-bottom: 2px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .edit-vocab-pos-chips {
+    gap: 2px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .edit-vocab-pos-btn {
+    font-size: 0.6rem !important;
+    padding: 1px 4px !important;
+    border-radius: 3px !important;
+    white-space: nowrap !important;
+  }
+
+  .edit-vocab-pos-input {
+    height: 27px !important;
+    padding: 2px 7px !important;
+    font-size: 0.74rem !important;
+    border-radius: 5px !important;
   }
 
   .edit-vocab-context-textarea {
-    font-size: 0.82rem !important;
-    line-height: 1.5 !important;
-    padding: 8px 10px !important;
-    min-height: 72px !important;
+    font-size: 0.8rem !important;
+    line-height: 1.45 !important;
+    padding: 6px 9px !important;
+    min-height: 60px !important;
   }
 
   .edit-vocab-footer {
-    padding-top: 8px !important;
+    padding-top: 6px !important;
     gap: 8px !important;
   }
 
   .edit-vocab-footer .btn {
-    padding: 7px 14px !important;
-    font-size: 0.8rem !important;
+    padding: 6px 12px !important;
+    font-size: 0.78rem !important;
   }
 }
 

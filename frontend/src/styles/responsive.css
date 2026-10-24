@@ -1,89 +1,6 @@
-/* ShotLang Comprehensive Responsive Design System (Mobile, Tablet, Desktop) */
-/* Excludes Admin Portal (.admin-*) */
+/* ShotLang Comprehensive Responsive Design System (Mobile <= 768px) */
+/* Desktop & Tablet styles are in responsive-desktop.css */
 
-/* 🖥️ Large Desktop / Widescreen (min-width: 1400px) */
-@media (min-width: 1400px) {
-  .main-container {
-    max-width: 1560px;
-    padding: 0 24px;
-  }
-  .player-card {
-    position: sticky;
-    top: 68px;
-    align-self: start;
-    z-index: 10;
-  }
-  .presets-cards-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-
-/* 💻 Medium Desktop & Laptops (1025px - 1399px) */
-@media (min-width: 1025px) and (max-width: 1399px) {
-  .main-container {
-    max-width: 1280px;
-    padding: 0 20px;
-  }
-  .player-card {
-    position: sticky;
-    top: 68px;
-    align-self: start;
-    z-index: 10;
-  }
-  .presets-cards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
-    gap: 12px;
-  }
-}
-
-/* 📱 Tablet & Medium Screens (769px - 1024px) */
-@media (max-width: 1024px) {
-  .main-container {
-    padding: 0 16px;
-    margin: 12px auto;
-  }
-
-  /* Exercise Split View: Stack vertically on tablet */
-  .exercise-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  .exercise-split-container {
-    flex-direction: column !important;
-    gap: 16px !important;
-  }
-  .exercise-pane-left,
-  .exercise-pane-right {
-    flex: 1 1 100% !important;
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-  .split-divider {
-    display: none !important;
-  }
-  .player-card {
-    position: static !important;
-  }
-
-  /* Bottom Presets on Tablet */
-  .presets-level-overview {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    padding: 10px 14px;
-  }
-  .presets-level-stepper {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    padding-bottom: 4px;
-  }
-  .presets-cards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 12px;
-  }
-}
 
 /* 📱 Mobile Devices (max-width: 768px) */
 @media (max-width: 768px) {
@@ -237,22 +154,39 @@
     flex-shrink: 0;
   }
 
-  /* Challenge Header & Nav Buttons */
+  /* Challenge Header & Nav Buttons (Compact Tablet/Mobile Layout) */
   .challenge-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+  }
+  .challenge-meta {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  .challenge-title-row {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 6px !important;
+  }
+  .challenge-secondary-actions {
+    display: flex !important;
+    gap: 4px !important;
+    align-items: center !important;
   }
   .challenge-nav-buttons {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 4px;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 4px !important;
   }
-  .challenge-nav-buttons .btn {
-    padding: 5px 8px;
-    font-size: 0.76rem;
+  .challenge-nav-group {
+    display: flex !important;
+    gap: 4px !important;
+    align-items: center !important;
   }
 
   /* Dictation Textarea (16px font-size prevents iOS Safari zoom) */
@@ -515,142 +449,3 @@
   }
 }
 
-/* 📱 Small Mobile Devices (max-width: 480px) */
-@media (max-width: 480px) {
-  .header-actions {
-    gap: 4px;
-  }
-  .header-actions .btn {
-    padding: 5px 6px !important;
-  }
-  /* Hide text label on compact header action buttons, retain icon & badges */
-  .btn-feedback > span:not([class*="badge"]),
-  .header-actions .btn-secondary > span:not([class*="badge"]) {
-    display: none;
-  }
-  /* Compact Action Buttons for mobile (Image 3) */
-  .dictation-actions {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 5px !important;
-    margin-bottom: 10px !important;
-  }
-  .dictation-actions .btn {
-    width: 100% !important;
-    justify-content: center !important;
-    padding: 6px 3px !important;
-    font-size: 0.74rem !important;
-    min-height: 33px !important;
-    border-radius: 7px !important;
-    gap: 3px !important;
-  }
-  .dictation-actions .btn svg {
-    width: 13px !important;
-    height: 13px !important;
-    flex-shrink: 0;
-  }
-
-  /* Compact Video & Playback Controls for mobile (Image 2) */
-  .player-card {
-    padding: 8px 10px !important;
-    border-radius: 10px !important;
-  }
-  .video-wrapper {
-    margin-bottom: 6px !important;
-    border-radius: 8px !important;
-  }
-  .playback-controls {
-    gap: 4px !important;
-  }
-  .controls-row {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-wrap: nowrap !important;
-    gap: 4px !important;
-    width: 100% !important;
-  }
-  .controls-row .btn-icon {
-    padding: 4px 6px !important;
-    min-width: 32px !important;
-    height: 32px !important;
-    border-radius: 6px !important;
-  }
-  .speed-group {
-    margin-left: 2px !important;
-    margin-top: 0 !important;
-    width: auto !important;
-    flex-shrink: 0 !important;
-    display: inline-flex !important;
-  }
-  .speed-btn {
-    padding: 4px 5px !important;
-    font-size: 0.72rem !important;
-  }
-
-  /* 1 Column for Cards on narrow phones */
-  .presets-cards-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  .preset-card {
-    min-height: 160px;
-    padding: 12px 14px;
-  }
-  .preset-card-title {
-    font-size: 0.88rem;
-  }
-  .preset-card-summary {
-    font-size: 0.75rem;
-  }
-
-  /* Modals on small phones */
-  .modal-card,
-  .feedback-modal-card,
-  .feedback-modal-content,
-  .preview-card-modal,
-  .preview-card-content,
-  .preview-modal-dialog,
-  .settings-modal,
-  .guide-modal {
-    width: 100% !important;
-    max-width: 95vw !important;
-    max-height: 94vh !important;
-    margin: 8px auto !important;
-  }
-  .feedback-modal-card {
-    padding: 0 !important;
-  }
-  .feedback-modal-header {
-    padding: 12px 14px !important;
-  }
-  .feedback-modal-body {
-    padding: 12px 14px !important;
-  }
-  .preview-card-body {
-    padding: 14px 16px !important;
-  }
-  .preview-actions {
-    flex-direction: column !important;
-    gap: 8px !important;
-  }
-  .preview-btn-start,
-  .preview-btn-cancel {
-    width: 100% !important;
-    justify-content: center;
-  }
-  .preview-meta-row {
-    flex-direction: column;
-    gap: 6px;
-    align-items: flex-start;
-  }
-
-  /* Input fields: prevent iOS Safari auto-zoom */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  textarea,
-  select {
-    font-size: 16px !important;
-  }
-}

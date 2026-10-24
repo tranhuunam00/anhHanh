@@ -159,53 +159,32 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
         <form onSubmit={handleSubmit} className="edit-vocab-form">
           {/* Row 1: Word & Auto Enrich Button */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+            <div className="edit-vocab-field-header">
               <label className="edit-vocab-label">
                 Từ vựng <span style={{ color: "#ef4444" }}>*</span>
               </label>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div className="edit-vocab-actions-group">
                 <button
                   type="button"
                   onClick={() => handleTestPronounce(word)}
                   disabled={!word.trim()}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--primary, #6366f1)",
-                    cursor: "pointer",
-                    padding: "2px 6px",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    fontSize: "0.74rem",
-                    fontWeight: 600,
-                  }}
+                  className="edit-vocab-btn-action edit-vocab-btn-listen"
                   title="Nghe phát âm từ vựng"
                 >
                   <Volume2 size={13} />
-                  <span>Nghe từ</span>
+                  <span className="btn-label-desktop">Nghe từ</span>
+                  <span className="btn-label-mobile">Nghe</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleAutoEnrich}
                   disabled={isAutoEnriching || !word.trim()}
-                  style={{
-                    background: "rgba(99, 102, 241, 0.1)",
-                    color: "var(--primary, #6366f1)",
-                    border: "1px solid rgba(99, 102, 241, 0.25)",
-                    borderRadius: "6px",
-                    padding: "2px 8px",
-                    fontSize: "0.74rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "4px",
-                  }}
+                  className="edit-vocab-btn-action edit-vocab-btn-enrich"
                   title="Tự động tra cứu phiên âm IPA, dịch nghĩa và tìm ảnh"
                 >
                   {isAutoEnriching ? <Loader2 size={12} className="spinning" /> : <Zap size={12} />}
-                  <span>{isAutoEnriching ? "Đang tra..." : "Tra cứu tự động cả 3"}</span>
+                  <span className="btn-label-desktop">{isAutoEnriching ? "Đang tra..." : "Tra cứu tự động cả 3"}</span>
+                  <span className="btn-label-mobile">{isAutoEnriching ? "Tra..." : "Tra cứu 3-in-1"}</span>
                 </button>
               </div>
             </div>
@@ -220,35 +199,24 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
           </div>
 
           {/* Row 2: Phonetic IPA & Meaning (2 Columns) */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "10px" }}>
+          <div className="edit-vocab-grid-2col">
             {/* Phonetic */}
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <div className="edit-vocab-field-header">
                 <label className="edit-vocab-label">Phiên âm IPA</label>
                 <button
                   type="button"
                   onClick={() => handleTestPronounce(word)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--primary, #2563eb)",
-                    cursor: "pointer",
-                    padding: "2px 4px",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "3px",
-                    fontSize: "0.72rem",
-                  }}
+                  className="edit-vocab-btn-action edit-vocab-btn-listen-mini"
                   title="Nghe thử phát âm Web Speech"
                 >
-                  <Volume2 size={13} />
-                  <span>Nghe thử</span>
+                  <Volume2 size={12} />
+                  <span className="btn-label-desktop">Nghe thử</span>
                 </button>
               </div>
               <input
                 type="text"
-                className="dict-input edit-vocab-input"
-                style={{ fontFamily: "monospace" }}
+                className="dict-input edit-vocab-input edit-vocab-phonetic-input"
                 value={phonetic}
                 onChange={(e) => setPhonetic(e.target.value)}
                 placeholder="/ˈflʌr.ɪ.ʃɪŋ/"
@@ -257,15 +225,14 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
 
             {/* Meaning */}
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+              <div className="edit-vocab-field-header">
                 <label className="edit-vocab-label">
                   Nghĩa tiếng Việt <span style={{ color: "#ef4444" }}>*</span>
                 </label>
               </div>
               <input
                 type="text"
-                className="dict-input edit-vocab-input"
-                style={{ color: "#16a34a", fontWeight: 600 }}
+                className="dict-input edit-vocab-input edit-vocab-meaning-input"
                 value={meaning}
                 onChange={(e) => setMeaning(e.target.value)}
                 placeholder="Nghĩa tiếng Việt..."
