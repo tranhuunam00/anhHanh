@@ -823,6 +823,15 @@ export const Maximize2 = (props) => (
   </BaseIcon>
 );
 
+export const Minimize2 = (props) => (
+  <BaseIcon {...props}>
+    <polyline points="4 14 10 14 10 20" />
+    <polyline points="20 10 14 10 14 4" />
+    <line x1="14" y1="10" x2="21" y2="3" />
+    <line x1="3" y1="21" x2="10" y2="14" />
+  </BaseIcon>
+);
+
 export const MessageCircle = (props) => (
   <BaseIcon {...props}>
     <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />

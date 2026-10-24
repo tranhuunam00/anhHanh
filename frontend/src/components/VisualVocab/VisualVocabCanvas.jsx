@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from "react";
-import { ZoomIn, ZoomOut, RotateCcw } from "../Icons";
+import { ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2 } from "../Icons";
 import { getZoomTransformStyle } from "../../utils/visualVocabUtils";
 
 export const VisualVocabCanvas = ({
@@ -17,6 +17,7 @@ export const VisualVocabCanvas = ({
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const panStartRef = useRef({ x: 0, y: 0 });
 
@@ -28,11 +29,11 @@ export const VisualVocabCanvas = ({
   };
 
   const handleMouseDown = useCallback((e) => {
-    if (e.button !== 0 || scale <= 1) return;
+    if (e.button !== 0) return;
     setIsDragging(true);
     dragStartRef.current = { x: e.clientX, y: e.clientY };
     panStartRef.current = { ...pan };
-  }, [scale, pan]);
+  }, [pan]);
 
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
@@ -49,12 +50,12 @@ export const VisualVocabCanvas = ({
   }, []);
 
   const handleTouchStart = useCallback((e) => {
-    if (e.touches.length !== 1 || scale <= 1) return;
+    if (e.touches.length !== 1) return;
     const touch = e.touches[0];
     setIsDragging(true);
     dragStartRef.current = { x: touch.clientX, y: touch.clientY };
     panStartRef.current = { ...pan };
-  }, [scale, pan]);
+  }, [pan]);
 
   const handleTouchMove = useCallback((e) => {
     if (!isDragging || e.touches.length !== 1) return;
@@ -74,7 +75,7 @@ export const VisualVocabCanvas = ({
   const transformStyle = getZoomTransformStyle(scale, pan.x, pan.y);
 
   return (
-    <div className="vv-canvas-wrapper">
+    <div className={`vv-canvas-wrapper ${isFullscreen ? "is-fullscreen" : ""}`}>
       <div
         className={`vv-canvas-viewport ${isDragging ? "dragging" : ""}`}
         onMouseDown={handleMouseDown}
@@ -159,6 +160,19 @@ export const VisualVocabCanvas = ({
           </button>
           <button type="button" onClick={handleResetZoom} title="Mặc định">
             <RotateCcw size={15} />
+          </button>
+          <button
+            type="button"
+            className="vv-btn-fullscreen"
+            onClick={() => {
+              setIsFullscreen((f) => !f);
+              if (!isFullscreen && scale <= 1) {
+                setScale(1.25);
+              }
+            }}
+            title={isFullscreen ? "Thu nhỏ lại" : "Phóng to toàn màn hình"}
+          >
+            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </button>
         </div>
       </div>

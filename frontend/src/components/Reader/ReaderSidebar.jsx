@@ -54,18 +54,40 @@ export function ReaderSidebar({
 
   return (
     <aside className="reader-sidebar-panel">
-      {/* Top row: Nút Quay lại, Cài đặt trên mobile & Xóa bài */}
+      {/* Top row: Nút Quay lại, Cỡ chữ nhanh, Cài đặt trên mobile & Xóa bài */}
       <div className="reader-sidebar-nav">
         <button
-          className="btn btn-secondary btn-with-icon"
+          className="btn btn-secondary btn-with-icon btn-reader-back"
           onClick={onSwitchToPaste}
           title="Dán bài báo khác hoặc bài mới"
         >
-          <ArrowLeft size={16} strokeWidth={2.2} />
-          <span>Dán bài khác</span>
+          <ArrowLeft size={15} strokeWidth={2.2} />
+          <span className="btn-label-desktop">Dán bài khác</span>
+          <span className="btn-label-mobile">Dán bài</span>
         </button>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+        {/* Quick font size controls for instant adjustment without opening settings */}
+        <div className="reader-quick-font-group" title="Chỉnh cỡ chữ bài đọc">
+          <button
+            type="button"
+            className="btn btn-secondary btn-font-pill"
+            onClick={() => setFontSize((s) => Math.max(14, s - 1))}
+            title="Giảm cỡ chữ"
+          >
+            A-
+          </button>
+          <span className="reader-font-val">{fontSize}px</span>
+          <button
+            type="button"
+            className="btn btn-secondary btn-font-pill"
+            onClick={() => setFontSize((s) => Math.min(32, s + 1))}
+            title="Tăng cỡ chữ"
+          >
+            A+
+          </button>
+        </div>
+
+        <div className="reader-sidebar-nav-actions" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
           <button
             type="button"
             className={`btn btn-secondary btn-with-icon reader-mobile-settings-btn ${isMobileSettingsOpen ? "active" : ""}`}
@@ -73,18 +95,19 @@ export function ReaderSidebar({
             title="Tùy chỉnh giọng đọc, cỡ chữ & giao diện"
           >
             <Settings size={14} />
-            <span>{isMobileSettingsOpen ? "Thu gọn" : "Cài đặt & Giọng"}</span>
+            <span className="btn-label-desktop">{isMobileSettingsOpen ? "Thu gọn" : "Cài đặt & Giọng"}</span>
+            <span className="btn-label-mobile">{isMobileSettingsOpen ? "Đóng" : "Cài đặt"}</span>
           </button>
 
-          <span className="reader-badge-sparkle">Đọc & Ôn từ</span>
+          <span className="reader-badge-sparkle btn-label-desktop">Đọc & Ôn từ</span>
 
           <button
-            className="btn btn-secondary btn-icon"
+            className="btn btn-secondary btn-icon btn-reader-delete"
             onClick={onDeleteArticle}
             title="Xóa bài viết này"
             style={{ color: "#ef4444" }}
           >
-            <Trash2 size={15} />
+            <Trash2 size={14} />
           </button>
         </div>
       </div>

@@ -256,10 +256,10 @@
 
   /* Smart Reader Small Phone (< 480px) Padding Optimization */
   .smart-reader-container {
-    padding: 4px 2px 24px !important;
+    padding: 2px 2px 20px !important;
   }
   .smart-reader-container.reader-split-mode {
-    padding: 2px 2px 24px !important;
+    padding: 0 0 20px !important;
   }
   .reader-editor-card {
     padding: 8px 8px !important;
@@ -269,9 +269,99 @@
     padding: 8px 10px !important;
   }
   .reader-sidebar-panel {
-    padding: 6px 8px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+    padding: 3px 5px !important;
+    gap: 3px !important;
+    border-radius: 0 0 8px 8px !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
   }
   .reader-content-panel .reader-article-card {
-    padding: 10px 10px 28px !important;
+    padding: 6px 8px 24px !important;
+  }
+
+  /* Destination B2 Workbook Mobile Responsive (< 480px) */
+  .b2-container {
+    padding: 4px 6px 28px !important;
+    gap: 8px !important;
+  }
+  .b2-header-card {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+    border-radius: 10px !important;
+  }
+  .b2-title {
+    font-size: 1.12rem !important;
+    margin: 4px 0 2px !important;
+  }
+  .b2-subtitle {
+    font-size: 0.78rem !important;
+  }
+  .b2-sidebar {
+    padding: 8px 8px !important;
+    gap: 6px !important;
+    border-radius: 10px !important;
+  }
+  .b2-exercise-pill-list {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 4px !important;
+    padding-bottom: 4px !important;
+    scrollbar-width: none !important;
+  }
+  .b2-exercise-pill-list::-webkit-scrollbar {
+    display: none !important;
+  }
+  .b2-exercise-nav-item {
+    flex-shrink: 0 !important;
+    padding: 4px 8px !important;
+    font-size: 0.74rem !important;
+  }
+  .b2-exercise-card,
+  .b2-theory-card {
+    padding: 8px 8px !important;
+    border-radius: 10px !important;
+    gap: 8px !important;
+  }
+  .b2-instruction-box {
+    padding: 6px 8px !important;
+    font-size: 0.82rem !important;
+    margin-bottom: 8px !important;
+  }
+  .b2-question-list {
+    gap: 6px !important;
+  }
+  .b2-question-item {
+    padding: 6px 8px !important;
+    border-radius: 8px !important;
+    font-size: 0.86rem !important;
+  }
+  .b2-choice-options {
+    gap: 4px !important;
+  }
+  .b2-option-btn {
+    padding: 5px 8px !important;
+    font-size: 0.82rem !important;
+    border-radius: 6px !important;
+  }
+  .b2-input-fill {
+    min-width: 80px !important;
+    padding: 2px 6px !important;
+    font-size: 0.86rem !important;
+  }
+  .b2-wb-box-header {
+    padding: 6px 8px !important;
+    gap: 4px 8px !important;
+    margin-bottom: 8px !important;
+  }
+  .b2-actions-bar {
+    padding-top: 8px !important;
+    gap: 6px !important;
+  }
+  .b2-score-banner {
+    padding: 4px 8px !important;
+    font-size: 0.82rem !important;
   }
 }

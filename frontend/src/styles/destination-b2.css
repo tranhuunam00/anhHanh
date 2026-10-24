@@ -112,9 +112,29 @@
 }
 
 @media (max-width: 860px) {
-  .b2-layout-grid {
-    grid-template-columns: 1fr;
-  }
+  .b2-container { padding: 4px 6px 28px !important; gap: 8px !important; }
+  .b2-header-card { padding: 8px 10px !important; gap: 6px !important; border-radius: 10px !important; }
+  .b2-badge-tag { padding: 2px 8px !important; font-size: 0.72rem !important; }
+  .b2-title { font-size: 1.15rem !important; margin: 4px 0 2px !important; }
+  .b2-subtitle { font-size: 0.78rem !important; line-height: 1.4 !important; }
+  .b2-unit-switcher { width: 100% !important; display: flex !important; gap: 4px !important; }
+  .b2-unit-tab-btn { flex: 1 !important; padding: 6px 8px !important; font-size: 0.76rem !important; justify-content: center !important; }
+  .b2-layout-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
+  .b2-sidebar { padding: 8px 8px !important; gap: 6px !important; border-radius: 10px !important; }
+  .b2-nav-mode-btn { padding: 6px 10px !important; font-size: 0.8rem !important; }
+  .b2-exercise-pill-list { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; gap: 4px !important; padding: 2px 0 4px !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; }
+  .b2-exercise-pill-list::-webkit-scrollbar { display: none !important; }
+  .b2-exercise-nav-item { flex-shrink: 0 !important; padding: 4px 8px !important; font-size: 0.74rem !important; }
+  .b2-exercise-card, .b2-theory-card { padding: 8px 8px !important; border-radius: 10px !important; gap: 8px !important; }
+  .b2-instruction-box { padding: 6px 8px !important; font-size: 0.82rem !important; margin-bottom: 8px !important; }
+  .b2-question-list { gap: 6px !important; }
+  .b2-question-item { padding: 6px 8px !important; border-radius: 8px !important; font-size: 0.86rem !important; }
+  .b2-choice-options { gap: 4px !important; }
+  .b2-option-btn { padding: 5px 8px !important; font-size: 0.82rem !important; border-radius: 6px !important; }
+  .b2-input-fill { min-width: 80px !important; padding: 2px 6px !important; font-size: 0.86rem !important; }
+  .b2-theory-table th, .b2-theory-table td { padding: 5px 6px !important; font-size: 0.8rem !important; }
+  .b2-actions-bar { padding-top: 8px !important; gap: 6px !important; }
+  .b2-score-banner { padding: 4px 8px !important; font-size: 0.82rem !important; }
 }
 
 /* Sidebar Exercise List */
