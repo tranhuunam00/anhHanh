@@ -87,6 +87,14 @@ def main():
     print(f"📘 Bản đặc tả yêu cầu BRD:      http://localhost:{port}/tai-lieu")
     print("====================================================================\n")
 
+    if os.name != "nt":
+        try:
+            # Free port if held by an orphaned/zombie process from previous runs
+            subprocess.run(["fuser", "-k", f"{port}/tcp"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            time.sleep(0.5)
+        except Exception:
+            pass
+
     uvicorn.run(app, host=host, port=port)
 
 if __name__ == "__main__":
