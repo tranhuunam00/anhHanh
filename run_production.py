@@ -35,11 +35,16 @@ def main():
 
     dist_dir = os.path.join(frontend_dir, "dist")
     if build_proc.returncode != 0:
-        if not os.path.exists(dist_dir):
-            print("❌ Frontend build failed. Please run 'cd frontend && npm install && npm run build' manually.")
-            sys.exit(1)
-        else:
-            print("⚠️ Warning: Build returned non-zero code, but dist folder exists. Continuing with existing dist...")
+        print("⚠️ Build failed, running 'npm install' to ensure newly added packages are installed...")
+        subprocess.run([npm_cmd, "install"], cwd=frontend_dir, shell=(os.name == "nt"))
+        print("Retrying frontend build (npm run build)...")
+        build_proc = subprocess.run([npm_cmd, "run", "build"], cwd=frontend_dir, shell=(os.name == "nt"))
+        if build_proc.returncode != 0:
+            if not os.path.exists(dist_dir):
+                print("❌ Frontend build failed. Please run 'cd frontend && npm install && npm run build' manually.")
+                sys.exit(1)
+            else:
+                print("⚠️ Warning: Build returned non-zero code, but dist folder exists. Continuing with existing dist...")
 
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", 5100))
@@ -51,6 +56,7 @@ def main():
     try:
         import uvicorn
         import fastapi
+        import slowapi
     except ImportError:
         print("📦 Installing Python dependencies (pip install -r requirements.txt)...")
         req_file = os.path.join(root_dir, "requirements.txt")
