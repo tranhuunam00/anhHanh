@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   IconBook,
   IconSparkles,
@@ -15,6 +15,7 @@ import {
   formatOutlineAsDraftTemplate,
 } from "../../utils/writingOutlineUtils";
 import { generateWritingOutline } from "../../services/writingService";
+import { shouldResetAiOutline } from "../../utils/writingTabPersistenceUtils";
 
 export const WritingOutlineTab = ({
   genre = "ielts_task2",
@@ -31,6 +32,18 @@ export const WritingOutlineTab = ({
   const [aiOutline, setAiOutline] = useState(null);
   const [isLoadingAiOutline, setIsLoadingAiOutline] = useState(false);
   const [copiedState, setCopiedState] = useState(false);
+
+  // Chỉ reset dàn ý AI khi đề bài hoặc thể loại thực sự thay đổi (giữ nguyên khi chuyển tab)
+  const lastConfigRef = useRef({ topic: effectivePromptText, genre, subType, language });
+
+  useEffect(() => {
+    const curConfig = { topic: effectivePromptText, genre, subType, language };
+    if (shouldResetAiOutline(curConfig, lastConfigRef.current)) {
+      lastConfigRef.current = curConfig;
+      setAiOutline(null);
+      setActiveOutlineMode("standard");
+    }
+  }, [effectivePromptText, genre, subType, language]);
 
   // Dàn bài chuẩn mặc định (100% Tiếng Việt)
   const standardOutline = useMemo(() => {

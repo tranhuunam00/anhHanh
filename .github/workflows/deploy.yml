@@ -1,0 +1,41 @@
+name: Deploy on Commit
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Cho phép bấm nút "Run workflow" thủ công trên GitHub
+
+jobs:
+  deploy:
+    name: Auto Deploy to Production Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script_stop: true
+          script: |
+            echo "🚀 [CI/CD] Bắt đầu tự động cập nhật code mới lên Server..."
+            
+            # Di chuyển vào thư mục dự án trên Server
+            cd ${{ secrets.SERVER_PATH || '/var/www/anhHanh' }}
+            
+            # Kéo code mới nhất từ nhánh main
+            git pull origin main
+            
+            # Build lại image và cập nhật containers
+            docker compose up -d --build
+            
+            # Chạy migration database (dùng cờ -T để tránh lỗi TTY trong môi trường CI/CD)
+            docker compose exec -T web python -m app.infrastructure.database.migrate
+            
+            # Dọn dẹp images cũ không còn dùng để giải phóng ổ cứng VPS
+            docker image prune -f
+            
+            echo "✅ [CI/CD] Deploy và cập nhật Database hoàn tất thành công!"

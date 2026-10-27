@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Sparkles, BookOpen, Layers, ArrowUpDown } from "../Icons";
 import {
   rankKeywordsByNewWordWeight,
@@ -14,6 +14,11 @@ import {
 } from "../../utils/writingDefaultStructures";
 import { formatBandLabel } from "../../utils/bandVocabularyUtils";
 import { suggestWritingStructures } from "../../services/writingService";
+import {
+  computePromptKey,
+  shouldResetTabItems,
+  getEffectiveTopicText,
+} from "../../utils/writingTabPersistenceUtils";
 import { KeywordChipItem } from "./KeywordChipItem";
 import { SentenceFrameChipItem } from "./SentenceFrameChipItem";
 
@@ -27,6 +32,7 @@ import { SentenceFrameChipItem } from "./SentenceFrameChipItem";
  */
 export function PromptKeywordsBar({
   currentPrompt,
+  effectivePromptText = "",
   essayText = "",
   savedVocabMap = {},
   onInsertKeyword,
@@ -53,12 +59,18 @@ export function PromptKeywordsBar({
   const [customSentences, setCustomSentences] = useState([]);
   const [isGeneratingSentences, setIsGeneratingSentences] = useState(false);
 
-  // Reset extra items khi đổi đề bài
+  // Reset extra items chỉ khi thực sự đổi đề bài (giữ nguyên khi chuyển tab)
+  const currentKey = computePromptKey(currentPrompt, effectivePromptText);
+  const lastPromptKeyRef = useRef(currentKey);
+
   useEffect(() => {
-    setExtraKeywords([]);
-    setCustomSentences([]);
-    setActiveTooltipId(null);
-  }, [currentPrompt?.prompt, currentPrompt?.id]);
+    if (shouldResetTabItems(currentKey, lastPromptKeyRef.current)) {
+      lastPromptKeyRef.current = currentKey;
+      setExtraKeywords([]);
+      setCustomSentences([]);
+      setActiveTooltipId(null);
+    }
+  }, [currentKey]);
 
   // Đóng tooltip khi click ra ngoài
   useEffect(() => {
@@ -129,7 +141,7 @@ export function PromptKeywordsBar({
 
   // Handler: Sinh thêm Từ / Cụm từ theo chủ đề
   const handleGenerateMoreKeywords = async () => {
-    const topicText = currentPrompt?.prompt || currentPrompt?.topic || currentPrompt?.title || "IELTS Essay Writing";
+    const topicText = getEffectiveTopicText(effectivePromptText, currentPrompt);
     setIsGeneratingKeywords(true);
     const existing = rankedKeywords.map((k) => k.word);
 
@@ -188,7 +200,7 @@ export function PromptKeywordsBar({
 
   // Handler: Sinh thêm Dạng câu theo chủ đề
   const handleGenerateMoreSentences = async () => {
-    const topicText = currentPrompt?.prompt || currentPrompt?.topic || currentPrompt?.title || "IELTS Essay Writing";
+    const topicText = getEffectiveTopicText(effectivePromptText, currentPrompt);
     setIsGeneratingSentences(true);
     const existing = sentenceList.map((s) => s.phrase);
 

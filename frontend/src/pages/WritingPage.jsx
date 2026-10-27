@@ -38,6 +38,7 @@ import { Task1Visualizer } from "../components/Writing/Task1Visualizer";
 import { IeltsPromptLibraryModal } from "../components/Writing/IeltsPromptLibraryModal";
 import { PromptKeywordsBar } from "../components/Writing/PromptKeywordsBar";
 import { HighlightedVocabSentence } from "../components/Vocab/HighlightedVocabSentence";
+import { getTabPaneStyle } from "../utils/writingTabPersistenceUtils";
 import "../styles/writing.css";
 import "../styles/writing-mobile.css";
 
@@ -1398,23 +1399,32 @@ export const WritingPage = ({ isActive = false }) => {
           </div>
 
           <div className="feedback-body">
-            {activeRightTab === "keywords" ? (
-              <div className="tab-keywords-content">
-                <PromptKeywordsBar
-                  currentPrompt={currentPrompt}
-                  essayText={content}
-                  savedVocabMap={savedVocabMap}
-                  onInsertKeyword={handleInsertPhrase}
-                  onAddVocab={handleAddVocabToNotebook}
-                  showToast={showToast}
-                  token={token}
-                  language={selectedLanguage}
-                  targetBand={targetBand}
-                  genre={selectedGenre}
-                  isAuthorized={isAuthorized}
-                />
-              </div>
-            ) : activeRightTab === "outline" ? (
+            {/* Tab 1: Gợi ý Từ & Câu (Giữ nguyên component mounted để không mất từ/câu đã gen) */}
+            <div
+              className="tab-keywords-content"
+              style={getTabPaneStyle(activeRightTab, "keywords", "flex")}
+            >
+              <PromptKeywordsBar
+                currentPrompt={currentPrompt}
+                effectivePromptText={effectivePromptText}
+                essayText={content}
+                savedVocabMap={savedVocabMap}
+                onInsertKeyword={handleInsertPhrase}
+                onAddVocab={handleAddVocabToNotebook}
+                showToast={showToast}
+                token={token}
+                language={selectedLanguage}
+                targetBand={targetBand}
+                genre={selectedGenre}
+                isAuthorized={isAuthorized}
+              />
+            </div>
+
+            {/* Tab 2: Dàn bài chi tiết (Giữ nguyên component mounted để không mất dàn ý AI đã gen) */}
+            <div
+              className="tab-outline-content"
+              style={getTabPaneStyle(activeRightTab, "outline", "flex")}
+            >
               <WritingOutlineTab
                 genre={selectedGenre}
                 subType={selectedSubType}
@@ -1430,8 +1440,13 @@ export const WritingPage = ({ isActive = false }) => {
                 }}
                 showToast={showToast}
               />
-            ) : activeRightTab === "history" ? (
-              <div className="history-tab-content">
+            </div>
+
+            {/* Tab 3: Lịch sử bài viết */}
+            <div
+              className="history-tab-content"
+              style={getTabPaneStyle(activeRightTab, "history", "flex")}
+            >
                 {isLoadingHistory ? (
                   <div className="history-loading">
                     <span className="spinner-sm"></span>
@@ -1502,7 +1517,13 @@ export const WritingPage = ({ isActive = false }) => {
                   </div>
                 )}
               </div>
-            ) : isEvaluating ? (
+
+            {/* Tab 4: Kết quả chấm điểm AI */}
+            <div
+              className="tab-feedback-content"
+              style={getTabPaneStyle(activeRightTab, "feedback", "flex")}
+            >
+              {isEvaluating ? (
               <div className="evaluating-state">
                 <div className="evaluating-animation-card">
                   <div className="pulse-circle">
@@ -1928,6 +1949,7 @@ export const WritingPage = ({ isActive = false }) => {
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>

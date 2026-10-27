@@ -143,23 +143,22 @@ export const StructuresModal = ({
           </div>
         </div>
 
-        {structuresTab === "outline" ? (
-          <div style={{ maxHeight: "calc(88vh - 140px)", overflowY: "auto" }}>
-            <WritingOutlineTab
-              genre={genre}
-              subType={subType}
-              language={language}
-              targetBand={targetBand}
-              effectivePromptText={effectivePromptText}
-              token={token}
-              isAuthorized={isAuthorized}
-              onInsertTemplate={onInsert}
-              showToast={showToast}
-            />
-          </div>
-        ) : structuresTab === "ai_topic" ? (
-          <>
-            {/* Sub-header toolbar: Topic info, filter pills & action buttons */}
+        <div style={{ display: structuresTab === "outline" ? "block" : "none", maxHeight: "calc(88vh - 140px)", overflowY: "auto" }}>
+          <WritingOutlineTab
+            genre={genre}
+            subType={subType}
+            language={language}
+            targetBand={targetBand}
+            effectivePromptText={effectivePromptText}
+            token={token}
+            isAuthorized={isAuthorized}
+            onInsertTemplate={onInsert}
+            showToast={showToast}
+          />
+        </div>
+
+        <div style={{ display: structuresTab === "ai_topic" ? "block" : "none" }}>
+          {/* Sub-header toolbar: Topic info, filter pills & action buttons */}
             <div className="structures-compact-toolbar">
               <div className="structures-topic-chip">
                 <span className="topic-chip-label">Đề:</span>
@@ -344,9 +343,9 @@ export const StructuresModal = ({
                 })
               )}
             </div>
-          </>
-        ) : (
-          <>
+          </div>
+
+          <div style={{ display: structuresTab === "general" ? "block" : "none" }}>
             <div className="structures-modal-toolbar">
               <div className="structures-search-box">
                 <IconSearch size={15} color="var(--text-muted)" />
@@ -452,8 +451,7 @@ export const StructuresModal = ({
                 ))
               )}
             </div>
-          </>
-        )}
+          </div>
       </div>
     </div>
   );
