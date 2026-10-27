@@ -23,8 +23,29 @@ jobs:
           script: |
             echo "🚀 [CI/CD] Bắt đầu tự động cập nhật code mới lên Server..."
             
-            # Di chuyển vào thư mục dự án trên Server
-            cd ${{ secrets.SERVER_PATH || '/var/www/anhHanh' }}
+            # Tự động nhận diện thư mục dự án trên VPS (hỗ trợ cả /root/anhHanh, ~/anhHanh, SERVER_PATH)
+            USER_INPUT_PATH="${{ secrets.SERVER_PATH || vars.SERVER_PATH }}"
+            
+            if [ -n "$USER_INPUT_PATH" ] && [ -d "$USER_INPUT_PATH" ]; then
+              cd "$USER_INPUT_PATH"
+            elif [ -d "/root/anhHanh" ]; then
+              cd /root/anhHanh
+            elif [ -d "$HOME/anhHanh" ]; then
+              cd "$HOME/anhHanh"
+            elif [ -d "/var/www/anhHanh" ]; then
+              cd /var/www/anhHanh
+            else
+              DETECTED_DIR=$(find /root /home /var/www -maxdepth 2 -name "anhHanh" -type d 2>/dev/null | head -n 1)
+              if [ -n "$DETECTED_DIR" ]; then
+                cd "$DETECTED_DIR"
+              else
+                echo "❌ Lỗi: Không tìm thấy thư mục anhHanh trên VPS!"
+                echo "Thư mục hiện tại: $(pwd)"
+                exit 1
+              fi
+            fi
+            
+            echo "📂 Đang làm việc tại thư mục: $(pwd)"
             
             # Kéo code mới nhất từ nhánh main
             git pull origin main
