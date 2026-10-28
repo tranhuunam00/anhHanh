@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight, Sparkles, RefreshCw } from "../Icons";
 import { ROOT_CATEGORIES } from "../../data/rootWords";
 
@@ -18,6 +18,17 @@ export const RootWordsHeader = ({
   currentRootIndex,
   totalRootsCount,
 }) => {
+  const activePillRef = useRef(null);
+
+  useEffect(() => {
+    if (activePillRef.current) {
+      activePillRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [activeCategory]);
   return (
     <div className="root-words-header-container">
       {/* Top Banner: Tiêu đề & Tiến độ tổng thể */}
@@ -113,23 +124,26 @@ export const RootWordsHeader = ({
       </div>
 
       {/* Category Filter Pills Bar */}
-      <div className="root-categories-scroll-bar">
-        {ROOT_CATEGORIES.map((cat) => {
-          const isActive = activeCategory === cat.id;
-          const count = cat.id === "all" ? 100 : (categoryStats[cat.id] || 0);
+      <div className="root-categories-wrapper">
+        <div className="root-categories-scroll-bar">
+          {ROOT_CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat.id;
+            const count = cat.id === "all" ? 100 : (categoryStats[cat.id] || 0);
 
-          return (
-            <button
-              key={cat.id}
-              className={`cat-pill-btn ${isActive ? "active" : ""}`}
-              onClick={() => onSelectCategory(cat.id)}
-              type="button"
-            >
-              <span>{cat.label}</span>
-              <span className="cat-count-badge">{count}</span>
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={cat.id}
+                ref={isActive ? activePillRef : null}
+                className={`cat-pill-btn ${isActive ? "active" : ""}`}
+                onClick={() => onSelectCategory(cat.id)}
+                type="button"
+              >
+                <span>{cat.label}</span>
+                <span className="cat-count-badge">{count}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

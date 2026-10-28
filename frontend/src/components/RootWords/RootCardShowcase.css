@@ -1,0 +1,335 @@
+/* ==========================================================================
+   FLASHCARD SHOWCASE (CHUẨN 1:1 THEO MẪU ẢNH)
+   Tuân thủ quy tắc file < 500 dòng (Rule 4)
+   ========================================================================== */
+
+.root-card-showcase-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.root-word-pills-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.root-family-label {
+  font-size: 0.82rem;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 600;
+}
+
+.root-word-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.root-word-pill {
+  padding: 5px 12px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.root-word-pill:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.root-word-pill.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+/* Thẻ Flashcard chính */
+.root-flashcard {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 24px;
+  padding: 32px 28px 24px 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+/* Header badge e.g. "02 · NHÌN LẠI, COI TRỌNG" */
+.root-card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.root-card-badge {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #2563eb;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.btn-mastered-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--bg-secondary, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-mastered-toggle:hover {
+  color: #10b981;
+  border-color: #10b981;
+}
+
+.btn-mastered-toggle.mastered {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-color: #10b981;
+}
+
+/* Hàng tiêu đề từ vựng */
+.root-word-hero-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.root-main-word {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* Phối màu 1:1 theo mẫu ảnh: re (xanh dương), spect (hồng đỏ) */
+.word-part-prefix {
+  color: #2563eb;
+}
+
+.word-part-root {
+  color: #db2777;
+}
+
+.word-part-suffix {
+  color: #7c3aed;
+}
+
+.btn-root-audio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.08);
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-root-audio:hover {
+  background: #2563eb;
+  color: #ffffff;
+  transform: scale(1.06);
+}
+
+.btn-root-audio.playing {
+  animation: pulseAudio 1s infinite;
+}
+
+@keyframes pulseAudio {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* IPA metadata */
+.root-ipa-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.root-ipa-text {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.root-pos-badge {
+  font-size: 0.72rem;
+  background: var(--bg-secondary, #f1f5f9);
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--text-secondary, #64748b);
+  font-weight: 600;
+}
+
+/* Công thức phân tích morphology e.g. "re- = quay lại + spect = nhìn" */
+.root-formula-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+
+.formula-prefix {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+
+.formula-plus {
+  color: var(--text-muted, #94a3b8);
+  font-weight: 400;
+}
+
+.formula-root {
+  color: #db2777;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+
+.formula-suffix {
+  color: #7c3aed;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+
+/* Vùng minh họa Doodle */
+.root-doodle-wrapper {
+  margin: 20px 0 12px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.root-doodle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 220px;
+  height: 180px;
+}
+
+.root-doodle-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.root-doodle-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+/* Đường kẻ phân cách tinh tế */
+.root-card-divider {
+  width: 80%;
+  height: 2px;
+  background: var(--border-color, #e2e8f0);
+  border-radius: 2px;
+  margin: 16px 0 20px 0;
+}
+
+/* Phương trình định nghĩa e.g. "respect = tôn trọng" */
+.root-meaning-equation {
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.eq-word {
+  color: #2563eb;
+}
+
+.eq-sign {
+  color: var(--text-muted, #94a3b8);
+}
+
+.eq-meaning {
+  color: #db2777;
+}
+
+/* Câu ví dụ minh họa */
+.root-example-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.root-example-en {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.root-example-vi {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary, #64748b);
+}
+
+/* Origin tip */
+.root-origin-tip {
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #64748b);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sparkle-icon {
+  color: #eab308;
+  flex-shrink: 0;
+}

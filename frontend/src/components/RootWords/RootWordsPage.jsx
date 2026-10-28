@@ -34,7 +34,19 @@ export const RootWordsPage = ({ isActive }) => {
 
   const [selectedWordIndex, setSelectedWordIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState(() => {
+    try {
+      const saved = localStorage.getItem("shotlang:last_root_id");
+      if (saved) {
+        const id = parseInt(saved, 10);
+        const found = ROOT_WORDS_DATA.find((r) => r.id === id);
+        if (found && found.category) return found.category;
+      }
+    } catch {
+      // Ignore
+    }
+    return "perception"; // Mặc định Cụm 1: Nhìn & Cảm nhận
+  });
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Danh sách các gốc từ đã đánh dấu hoàn thành
@@ -89,6 +101,52 @@ export const RootWordsPage = ({ isActive }) => {
     return list;
   }, [activeCategory, searchQuery]);
 
+  // Tự động đồng bộ currentRootId vào danh sách đã lọc (tránh hiển thị sai gốc từ giữa các tab)
+  useEffect(() => {
+    if (filteredRoots.length > 0 && !filteredRoots.some((r) => r.id === currentRootId)) {
+      setCurrentRootId(filteredRoots[0].id);
+      setSelectedWordIndex(0);
+    }
+  }, [filteredRoots, currentRootId]);
+
+  // Xử lý khi người dùng bấm vào danh mục thể loại -> Nhảy ngay đến gốc đầu tiên của thể loại đó
+  const handleSelectCategory = useCallback(
+    (catId) => {
+      setActiveCategory(catId);
+      let list = ROOT_WORDS_DATA;
+      if (catId !== "all") {
+        list = filterRootsByCategory(ROOT_WORDS_DATA, catId);
+      }
+      if (searchQuery.trim()) {
+        list = searchRoots(list, searchQuery);
+      }
+      if (list.length > 0) {
+        setCurrentRootId(list[0].id);
+        setSelectedWordIndex(0);
+      }
+    },
+    [searchQuery]
+  );
+
+  // Xử lý khi thay đổi từ khóa tìm kiếm
+  const handleSearchChange = useCallback(
+    (query) => {
+      setSearchQuery(query);
+      let list = ROOT_WORDS_DATA;
+      if (activeCategory !== "all") {
+        list = filterRootsByCategory(list, activeCategory);
+      }
+      if (query.trim()) {
+        list = searchRoots(list, query);
+      }
+      if (list.length > 0 && !list.some((r) => r.id === currentRootId)) {
+        setCurrentRootId(list[0].id);
+        setSelectedWordIndex(0);
+      }
+    },
+    [activeCategory, currentRootId]
+  );
+
   // Thống kê số lượng mỗi thể loại
   const categoryStats = useMemo(() => {
     return getRootCategoryStats(ROOT_WORDS_DATA);
@@ -99,48 +157,64 @@ export const RootWordsPage = ({ isActive }) => {
     return calculateRootProgress(masteredIds, ROOT_WORDS_DATA.length);
   }, [masteredIds]);
 
-  // Đối tượng gốc từ đang được chọn
+  // Đối tượng gốc từ đang được chọn: Ưu tiên tuyệt đối trong filteredRoots
   const currentRoot = useMemo(() => {
+    if (filteredRoots.length > 0) {
+      return filteredRoots.find((r) => r.id === currentRootId) || filteredRoots[0];
+    }
     return (
       ROOT_WORDS_DATA.find((r) => r.id === currentRootId) ||
       ROOT_WORDS_DATA[0]
     );
-  }, [currentRootId]);
+  }, [currentRootId, filteredRoots]);
 
   const currentRootIndexInFiltered = useMemo(() => {
-    return filteredRoots.findIndex((r) => r.id === currentRootId);
-  }, [filteredRoots, currentRootId]);
+    const idx = filteredRoots.findIndex((r) => r.id === currentRoot.id);
+    return idx >= 0 ? idx : 0;
+  }, [filteredRoots, currentRoot.id]);
 
   // Lưu vị trí ID gần nhất
   useEffect(() => {
     try {
-      localStorage.setItem("shotlang:last_root_id", String(currentRootId));
+      localStorage.setItem("shotlang:last_root_id", String(currentRoot.id));
     } catch {
       // Safe ignore
     }
-    setSelectedWordIndex(0);
-  }, [currentRootId]);
+  }, [currentRoot.id]);
 
   // Chuyển tới gốc tiếp theo
   const handleNextRoot = useCallback(() => {
     const list = filteredRoots.length > 0 ? filteredRoots : ROOT_WORDS_DATA;
-    const nextId = getNextRootId(currentRootId, list);
+    const nextId = getNextRootId(currentRoot.id, list);
     setCurrentRootId(nextId);
-  }, [currentRootId, filteredRoots]);
+    setSelectedWordIndex(0);
+  }, [currentRoot.id, filteredRoots]);
 
   // Chuyển về gốc trước
   const handlePrevRoot = useCallback(() => {
     const list = filteredRoots.length > 0 ? filteredRoots : ROOT_WORDS_DATA;
-    const prevId = getPrevRootId(currentRootId, list);
+    const prevId = getPrevRootId(currentRoot.id, list);
     setCurrentRootId(prevId);
-  }, [currentRootId, filteredRoots]);
+    setSelectedWordIndex(0);
+  }, [currentRoot.id, filteredRoots]);
 
   // Chọn ngẫu nhiên 1 gốc từ
   const handleRandomRoot = useCallback(() => {
     const list = filteredRoots.length > 0 ? filteredRoots : ROOT_WORDS_DATA;
     const randomIdx = Math.floor(Math.random() * list.length);
     setCurrentRootId(list[randomIdx].id);
+    setSelectedWordIndex(0);
   }, [filteredRoots]);
+
+  // Chọn gốc trực tiếp từ Drawer
+  const handleSelectRootFromDrawer = useCallback((rootId) => {
+    setCurrentRootId(rootId);
+    setSelectedWordIndex(0);
+    const targetRoot = ROOT_WORDS_DATA.find((r) => r.id === rootId);
+    if (targetRoot && activeCategory !== "all" && targetRoot.category !== activeCategory) {
+      setActiveCategory(targetRoot.category);
+    }
+  }, [activeCategory]);
 
   // Phím tắt bàn phím ArrowLeft / ArrowRight
   useEffect(() => {
@@ -163,20 +237,22 @@ export const RootWordsPage = ({ isActive }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isActive, handleNextRoot, handlePrevRoot]);
 
+  const activeWordObj = currentRoot?.words?.[selectedWordIndex] || currentRoot?.words?.[0];
+
   return (
     <div className="root-words-page-wrapper">
       {/* Header điều hướng & lọc */}
       <RootWordsHeader
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearchChange}
         activeCategory={activeCategory}
-        onSelectCategory={setActiveCategory}
+        onSelectCategory={handleSelectCategory}
         categoryStats={categoryStats}
         progress={progress}
         onPrevRoot={handlePrevRoot}
         onNextRoot={handleNextRoot}
         onRandomRoot={handleRandomRoot}
-        currentRootIndex={currentRootIndexInFiltered >= 0 ? currentRootIndexInFiltered : 0}
+        currentRootIndex={currentRootIndexInFiltered}
         totalRootsCount={filteredRoots.length}
       />
 
@@ -222,6 +298,7 @@ export const RootWordsPage = ({ isActive }) => {
             {/* PHẦN 2: PHẦN BÀI TẬP THỰC HÀNH TÁCH RIÊNG PHÍA DƯỚI */}
             <RootExerciseSection
               currentRoot={currentRoot}
+              selectedWord={activeWordObj}
               onMasteredSuccess={handleMasteredSuccess}
             />
           </>
@@ -231,8 +308,8 @@ export const RootWordsPage = ({ isActive }) => {
       {/* Drawer lưới 100 gốc từ */}
       <RootWordsGridDrawer
         roots={ROOT_WORDS_DATA}
-        currentRootId={currentRootId}
-        onSelectRoot={setCurrentRootId}
+        currentRootId={currentRoot.id}
+        onSelectRoot={handleSelectRootFromDrawer}
         masteredSet={masteredSet}
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}

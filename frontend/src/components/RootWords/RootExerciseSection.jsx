@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { CheckSquare, RefreshCw, Sparkles, BookOpen } from "../Icons";
 import { checkAssemblyAnswer, checkQuizAnswer } from "../../utils/rootWordsUtils";
 
 /**
  * Phần bài tập thực hành được tách riêng biệt ở phía dưới
- * 3 Chế độ: Ghép gốc tạo từ, Điền từ vào câu, Trắc nghiệm ý nghĩa
+ * Tự động đồng bộ và linh hoạt theo từ vựng đang chọn trên thẻ
  */
-export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
+export const RootExerciseSection = ({ currentRoot, selectedWord, onMasteredSuccess }) => {
   const [exerciseMode, setExerciseMode] = useState("assembly"); // assembly | fill_blank | meaning
   const [assemblySelected, setAssemblySelected] = useState([]);
   const [assemblyResult, setAssemblyResult] = useState(null); // 'correct' | 'wrong' | null
@@ -14,31 +14,82 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
   const [quizSelected, setQuizSelected] = useState(null);
   const [quizResult, setQuizResult] = useState(null); // 'correct' | 'wrong' | null
 
-  // Reset exercise states khi chuyển gốc từ hoặc chuyển bài tập
+  // Reset khi đổi gốc từ, đổi từ đang chọn hoặc đổi chế độ bài tập
   useEffect(() => {
     setAssemblySelected([]);
     setAssemblyResult(null);
     setQuizSelected(null);
     setQuizResult(null);
-  }, [currentRoot?.id, exerciseMode]);
+  }, [currentRoot?.id, selectedWord?.word, exerciseMode]);
 
-  const exercises = currentRoot && Array.isArray(currentRoot.exercises) ? currentRoot.exercises : [];
-  const assemblyEx = exercises.find((e) => e.type === "assembly") || exercises[0] || null;
-  const fillBlankEx = exercises.find((e) => e.type === "fill_blank") || exercises[1] || exercises[0] || null;
-  const meaningEx = exercises.find((e) => e.type === "meaning") || exercises[2] || exercises[0] || null;
+  // Bài tập ghép từ đồng bộ theo từ vựng đang chọn
+  const activeAssembly = useMemo(() => {
+    if (!selectedWord) return null;
+    const parts = [];
+    if (selectedWord.prefix) parts.push({ text: selectedWord.prefix, type: "prefix" });
+    if (selectedWord.root) parts.push({ text: selectedWord.root, type: "root" });
+    if (selectedWord.suffix) parts.push({ text: selectedWord.suffix, type: "suffix" });
 
-  // Ghép các thẻ chip cho bài tập Assembly (gồm đáp án đúng + thẻ gây nhiễu)
-  const assemblyChips = React.useMemo(() => {
-    if (!assemblyEx) return [];
-    const correctParts = (assemblyEx.parts || []).map((p) => p.text);
-    const distractors = assemblyEx.distractors || [];
-    const all = [...correctParts, ...distractors];
-    return all.sort();
-  }, [assemblyEx]);
+    const correctPartTexts = parts.map((p) => p.text);
+    const pool = ["in-", "re-", "pro-", "con-", "sub-", "de-", "ex-", "-able", "-tion", "-ive"];
+    const distractors = pool.filter((p) => !correctPartTexts.includes(p)).slice(0, 3);
 
-  if (!currentRoot || exercises.length === 0) {
-    return null;
-  }
+    return {
+      prompt: `Ghép tiền tố và gốc từ để tạo từ: "${selectedWord.word}" (${selectedWord.meaningVi})`,
+      correctWord: selectedWord.word,
+      parts,
+      distractors,
+      explanation: `${selectedWord.breakdownFormula} = ${selectedWord.meaningVi}`,
+    };
+  }, [selectedWord]);
+
+  // Bài tập điền từ theo câu ví dụ của từ đang chọn
+  const activeFillBlank = useMemo(() => {
+    if (!selectedWord || !currentRoot) return null;
+    const safeRegex = new RegExp(`\\b${selectedWord.word}\\b`, "i");
+    const sentence = selectedWord.exampleEn.replace(safeRegex, "______");
+
+    // Lấy 3 từ gây nhiễu trong họ từ của gốc này
+    const siblings = (currentRoot.words || [])
+      .map((w) => w.word)
+      .filter((w) => w.toLowerCase() !== selectedWord.word.toLowerCase());
+
+    const options = [selectedWord.word, ...siblings.slice(0, 3)].sort();
+
+    return {
+      sentence,
+      correctWord: selectedWord.word,
+      options,
+      explanation: `"${selectedWord.word}" có nghĩa là: ${selectedWord.meaningVi}. (${selectedWord.exampleVi})`,
+    };
+  }, [selectedWord, currentRoot]);
+
+  // Bài tập trắc nghiệm ý nghĩa gốc từ
+  const activeMeaning = useMemo(() => {
+    if (!currentRoot) return null;
+    const wordNames = (currentRoot.words || []).slice(0, 3).map((w) => w.word).join(", ");
+    return {
+      question: `Gốc từ "${currentRoot.root}" trong các từ (${wordNames}) có ý nghĩa cốt lõi là gì?`,
+      options: [
+        `${currentRoot.meaningVi} (${currentRoot.meaningEn})`,
+        "Cắt đứt, chia nhỏ",
+        "Di chuyển xa xôi",
+        "Tạo ra lửa nhiệt",
+      ],
+      correctIndex: 0,
+      explanation: `Gốc ${currentRoot.root} bắt nguồn từ ${currentRoot.origin}, nghĩa cốt lõi là: ${currentRoot.meaningVi}.`,
+    };
+  }, [currentRoot]);
+
+  // Ghép các thẻ chip cho bài tập Assembly
+  const assemblyChips = useMemo(() => {
+    if (!activeAssembly) return [];
+    const correctParts = (activeAssembly.parts || []).map((p) => p.text);
+    const distractors = activeAssembly.distractors || [];
+    return [...correctParts, ...distractors].sort();
+  }, [activeAssembly]);
+
+  if (!currentRoot) return null;
 
   // Logic Ghép Gốc Tạo Từ
   const handleChipClick = (partText) => {
@@ -52,8 +103,8 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
   };
 
   const handleCheckAssembly = () => {
-    if (!assemblyEx) return;
-    const isCorrect = checkAssemblyAnswer(assemblySelected, assemblyEx.correctWord);
+    if (!activeAssembly) return;
+    const isCorrect = checkAssemblyAnswer(assemblySelected, activeAssembly.correctWord);
     setAssemblyResult(isCorrect ? "correct" : "wrong");
     if (isCorrect && onMasteredSuccess) {
       onMasteredSuccess();
@@ -83,10 +134,11 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
           <BookOpen size={18} className="exercise-icon" />
           <h2 className="exercise-heading">
             BÀI TẬP THỰC HÀNH GỐC TỪ: <span className="highlight-root">{currentRoot.root}</span>
+            {selectedWord && <span className="highlight-target-word"> ({selectedWord.word})</span>}
           </h2>
         </div>
         <p className="exercise-subtitle">
-          Luyện phản xạ tư duy tiền tố & gốc từ ngay bên dưới để ghi nhớ sâu bản chất từ vựng
+          Luyện phản xạ cấu tạo từ và ứng dụng câu trực tiếp bên dưới thẻ học
         </p>
 
         {/* Tab chuyển đổi dạng bài tập */}
@@ -117,11 +169,10 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
 
       <div className="exercise-body-card">
         {/* DẠNG 1: GHÉP GỐC TẠO TỪ */}
-        {exerciseMode === "assembly" && assemblyEx && (
+        {exerciseMode === "assembly" && activeAssembly && (
           <div className="assembly-exercise-container">
-            <p className="exercise-prompt-text">{assemblyEx.prompt}</p>
+            <p className="exercise-prompt-text">{activeAssembly.prompt}</p>
 
-            {/* Khung lắp ráp từ vựng */}
             <div className="assembly-dropzone">
               <span className="dropzone-label">Các phần đã ghép:</span>
               <div className="assembled-parts-row">
@@ -142,7 +193,6 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
               </div>
             </div>
 
-            {/* Các mảnh ghép để chọn */}
             <div className="assembly-chips-palette">
               <span className="palette-label">Mảnh ghép khả dụng:</span>
               <div className="chips-grid">
@@ -163,7 +213,6 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
               </div>
             </div>
 
-            {/* Nút hành động */}
             <div className="exercise-actions-bar">
               <button
                 className="btn-exercise-check"
@@ -185,19 +234,18 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
               </button>
             </div>
 
-            {/* Thông báo kết quả */}
             {assemblyResult === "correct" && (
               <div className="exercise-feedback success">
                 <Sparkles size={18} className="feedback-icon" />
                 <div>
-                  <strong>Chính xác!</strong> {assemblyEx.explanation}
+                  <strong>Chính xác!</strong> {activeAssembly.explanation}
                 </div>
               </div>
             )}
             {assemblyResult === "wrong" && (
               <div className="exercise-feedback wrong">
                 <div>
-                  <strong>Chưa đúng rồi!</strong> Thử đổi thứ tự hoặc chọn lại các tiền tố/gốc từ khác nhé.
+                  <strong>Chưa đúng rồi!</strong> Thử đổi thứ tự hoặc chọn lại các mảnh ghép nhé.
                 </div>
               </div>
             )}
@@ -205,19 +253,19 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
         )}
 
         {/* DẠNG 2: ĐIỀN TỪ VÀO CÂU */}
-        {exerciseMode === "fill_blank" && fillBlankEx && (
+        {exerciseMode === "fill_blank" && activeFillBlank && (
           <div className="fill-blank-exercise-container">
             <p className="exercise-prompt-text">
               Chọn từ thích hợp chứa gốc <strong>{currentRoot.root}</strong> để hoàn thành câu:
             </p>
             <div className="blank-sentence-box">
               <span className="quote-mark">“</span>
-              {fillBlankEx.sentence}
+              {activeFillBlank.sentence}
               <span className="quote-mark">”</span>
             </div>
 
             <div className="quiz-options-grid">
-              {(fillBlankEx.options || []).map((opt) => {
+              {(activeFillBlank.options || []).map((opt) => {
                 const isSelected = quizSelected === opt;
                 let optClass = "quiz-opt-btn";
                 if (isSelected) {
@@ -227,7 +275,7 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
                   <button
                     key={opt}
                     className={optClass}
-                    onClick={() => handleSelectQuizOption(opt, fillBlankEx.correctWord)}
+                    onClick={() => handleSelectQuizOption(opt, activeFillBlank.correctWord)}
                     type="button"
                   >
                     {opt}
@@ -240,14 +288,14 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
               <div className="exercise-feedback success">
                 <Sparkles size={18} className="feedback-icon" />
                 <div>
-                  <strong>Tuyệt vời!</strong> {fillBlankEx.explanation}
+                  <strong>Tuyệt vời!</strong> {activeFillBlank.explanation}
                 </div>
               </div>
             )}
             {quizResult === "wrong" && (
               <div className="exercise-feedback wrong">
                 <div>
-                  <strong>Chưa chính xác!</strong> Hãy đọc lại ngữ cảnh câu văn và thử lại lựa chọn khác.
+                  <strong>Chưa chính xác!</strong> Hãy đọc lại ngữ cảnh câu văn và thử lại nhé.
                 </div>
               </div>
             )}
@@ -255,11 +303,11 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
         )}
 
         {/* DẠNG 3: TRẮC NGHIỆM Ý NGHĨA GỐC TỪ */}
-        {exerciseMode === "meaning" && meaningEx && (
+        {exerciseMode === "meaning" && activeMeaning && (
           <div className="meaning-exercise-container">
-            <p className="exercise-prompt-text">{meaningEx.question}</p>
+            <p className="exercise-prompt-text">{activeMeaning.question}</p>
             <div className="quiz-options-list">
-              {(meaningEx.options || []).map((opt, idx) => {
+              {(activeMeaning.options || []).map((opt, idx) => {
                 const isSelected = quizSelected === idx;
                 let optClass = "quiz-list-btn";
                 if (isSelected) {
@@ -269,7 +317,7 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
                   <button
                     key={opt}
                     className={optClass}
-                    onClick={() => handleSelectQuizOption(idx, meaningEx.correctIndex)}
+                    onClick={() => handleSelectQuizOption(idx, activeMeaning.correctIndex)}
                     type="button"
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + idx)}.</span>
@@ -283,7 +331,7 @@ export const RootExerciseSection = ({ currentRoot, onMasteredSuccess }) => {
               <div className="exercise-feedback success">
                 <Sparkles size={18} className="feedback-icon" />
                 <div>
-                  <strong>Chính xác!</strong> {meaningEx.explanation}
+                  <strong>Chính xác!</strong> {activeMeaning.explanation}
                 </div>
               </div>
             )}
