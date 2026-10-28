@@ -2,6 +2,7 @@ import test, { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { CLUSTER_PERCEPTION_ROOTS } from "../src/data/rootWords/clusterPerceptionData.js";
 import { CLUSTER_COMMUNICATION_ROOTS } from "../src/data/rootWords/clusterCommunicationData.js";
+import { CLUSTER_ACTION_ROOTS } from "../src/data/rootWords/clusterActionData.js";
 import { ROOT_WORDS_DATA } from "../src/data/rootWords/index.js";
 
 describe("Root Words Clusters & Data Integrity Unit Tests", () => {
@@ -31,20 +32,49 @@ describe("Root Words Clusters & Data Integrity Unit Tests", () => {
   });
 
   describe("Cụm 2: Nói & Viết (Communication Cluster)", () => {
-    it("contains exactly 7 distinct communication roots", () => {
-      assert.equal(CLUSTER_COMMUNICATION_ROOTS.length, 7);
-      const expectedRoots = ["dict", "scrib", "voc", "clam", "lingua", "loqu", "verb"];
+    it("contains exactly 9 distinct communication roots (including phon and graph)", () => {
+      assert.equal(CLUSTER_COMMUNICATION_ROOTS.length, 9);
+      const expectedRoots = [
+        "dict",
+        "scrib",
+        "voc",
+        "clam",
+        "lingua",
+        "loqu",
+        "verb",
+        "phon",
+        "graph",
+      ];
       const actualRoots = CLUSTER_COMMUNICATION_ROOTS.map((r) => r.root);
       assert.deepEqual(actualRoots, expectedRoots);
     });
 
-    it("ensures total word count in Communication is >= 50 words (each root >= 7 words)", () => {
+    it("verifies root 8 (phon) and root 9 (graph) have 8 words each with exercises", () => {
+      const phonRoot = CLUSTER_COMMUNICATION_ROOTS.find((r) => r.root === "phon");
+      assert.ok(phonRoot, "Root phon must exist in Communication");
+      assert.equal(phonRoot.words.length, 8);
+      const phonWords = phonRoot.words.map((w) => w.word);
+      assert.ok(phonWords.includes("telephone"));
+      assert.ok(phonWords.includes("symphony"));
+      assert.ok(phonWords.includes("microphone"));
+      assert.ok(phonWords.includes("cacophony"));
+      assert.ok(phonRoot.exercises.length >= 3);
+
+      const graphRoot = CLUSTER_COMMUNICATION_ROOTS.find((r) => r.root === "graph");
+      assert.ok(graphRoot, "Root graph must exist in Communication");
+      assert.equal(graphRoot.words.length, 8);
+      const graphWords = graphRoot.words.map((w) => w.word);
+      assert.ok(graphWords.includes("biography"));
+      assert.ok(graphWords.includes("autograph"));
+      assert.ok(graphWords.includes("photograph"));
+      assert.ok(graphWords.includes("calligraphy"));
+      assert.ok(graphRoot.exercises.length >= 3);
+    });
+
+    it("ensures total word count in Communication is >= 65 words", () => {
       let totalWords = 0;
       for (const rootObj of CLUSTER_COMMUNICATION_ROOTS) {
-        assert.ok(
-          rootObj.words.length >= 7,
-          `Root ${rootObj.root} must have >= 7 words, found ${rootObj.words.length}`
-        );
+        assert.ok(rootObj.words.length >= 7);
         totalWords += rootObj.words.length;
         for (const w of rootObj.words) {
           assert.ok(w.word && typeof w.word === "string");
@@ -53,38 +83,55 @@ describe("Root Words Clusters & Data Integrity Unit Tests", () => {
           assert.ok(w.doodleKey && typeof w.doodleKey === "string");
         }
       }
-      assert.ok(totalWords >= 50, `Expected total words >= 50, got ${totalWords}`);
+      assert.ok(totalWords >= 65, `Expected total words >= 65, got ${totalWords}`);
     });
   });
 
-  describe("Gốc tract (Hành động & Di chuyển) Expansion", () => {
-    it("has 8 words for tract root in ROOT_WORDS_DATA (no longer only 2)", () => {
-      const tractRoot = ROOT_WORDS_DATA.find((r) => r.root === "tract");
-      assert.ok(tractRoot, "Root tract must exist");
-      assert.equal(tractRoot.words.length, 8);
-      const wordNames = tractRoot.words.map((w) => w.word);
-      assert.ok(wordNames.includes("attract"));
-      assert.ok(wordNames.includes("extract"));
-      assert.ok(wordNames.includes("distract"));
-      assert.ok(wordNames.includes("contract"));
-      assert.ok(wordNames.includes("retract"));
-      assert.ok(wordNames.includes("abstract"));
-      assert.ok(wordNames.includes("subtract"));
-      assert.ok(wordNames.includes("protract"));
+  describe("Cụm 3: Hành động & Di chuyển (Action Cluster)", () => {
+    it("contains exactly 9 distinct action roots", () => {
+      assert.equal(CLUSTER_ACTION_ROOTS.length, 9);
+      const expectedRoots = [
+        "tract",
+        "port",
+        "duc",
+        "mit",
+        "vert",
+        "mot",
+        "ced",
+        "ven",
+        "pel",
+      ];
+      const actualRoots = CLUSTER_ACTION_ROOTS.map((r) => r.root);
+      assert.deepEqual(actualRoots, expectedRoots);
     });
 
-    it("verifies extract word properties and doodleKey in tract root", () => {
-      const tractRoot = ROOT_WORDS_DATA.find((r) => r.root === "tract");
-      const extractWord = tractRoot.words.find((w) => w.word === "extract");
-      assert.ok(extractWord);
-      assert.equal(extractWord.doodleKey, "extract");
-      assert.equal(extractWord.prefix, "ex-");
-      assert.equal(extractWord.root, "tract");
-      assert.ok(extractWord.meaningVi.includes("chiết xuất") || extractWord.meaningVi.includes("rút ra"));
+    it("ensures each root in Action has 8 words and >= 3 exercises with full schema", () => {
+      let totalWords = 0;
+      for (const rootObj of CLUSTER_ACTION_ROOTS) {
+        assert.equal(rootObj.words.length, 8, `Root ${rootObj.root} must have 8 words`);
+        assert.ok(rootObj.exercises.length >= 3, `Root ${rootObj.root} must have >= 3 exercises`);
+        totalWords += rootObj.words.length;
+
+        for (const w of rootObj.words) {
+          assert.ok(w.word && typeof w.word === "string");
+          assert.ok(w.meaningVi && typeof w.meaningVi === "string");
+          assert.ok(w.ipa && typeof w.ipa === "string");
+          assert.ok(w.breakdownFormula && typeof w.breakdownFormula === "string");
+          assert.ok(w.doodleKey && typeof w.doodleKey === "string");
+          assert.ok(w.badge && typeof w.badge === "string");
+        }
+
+        for (const ex of rootObj.exercises) {
+          assert.ok(ex.id && typeof ex.id === "string");
+          assert.ok(ex.type && typeof ex.type === "string");
+          assert.ok(ex.explanation && typeof ex.explanation === "string");
+        }
+      }
+      assert.equal(totalWords, 72);
     });
   });
 
-  describe("ROOT_WORDS_DATA Category Integrity", () => {
+  describe("ROOT_WORDS_DATA Category Integrity & Uniqueness", () => {
     it("ensures all roots have valid category property matching ROOT_CATEGORIES", () => {
       const validCategories = [
         "perception",
@@ -101,6 +148,12 @@ describe("Root Words Clusters & Data Integrity Unit Tests", () => {
           `Root ${r.root} has invalid category: ${r.category}`
         );
       }
+    });
+
+    it("ensures no duplicate roots exist in ROOT_WORDS_DATA", () => {
+      const rootNames = ROOT_WORDS_DATA.map((r) => r.root);
+      const duplicates = rootNames.filter((r, idx) => rootNames.indexOf(r) !== idx);
+      assert.deepEqual(duplicates, [], `Found duplicate roots in ROOT_WORDS_DATA: ${duplicates.join(", ")}`);
     });
   });
 });
