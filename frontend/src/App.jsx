@@ -24,6 +24,7 @@ import { SmartReaderPage } from "./pages/SmartReaderPage";
 import { WritingPage } from "./pages/WritingPage";
 import { DestinationB2Page } from "./components/DestinationB2/DestinationB2Page";
 import { VisualVocabPage } from "./components/VisualVocab";
+import { RootWordsPage } from "./components/RootWords";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -62,6 +63,7 @@ export default function App() {
     if (path === "/writing" || path.startsWith("/writing/")) return "tab-writing";
     if (path === "/destination-b2" || path.startsWith("/destination-b2/")) return "tab-destination-b2";
     if (path === "/visual-vocab" || path.startsWith("/visual-vocab/")) return "tab-visual-vocab";
+    if (path === "/roots" || path.startsWith("/roots/") || path === "/root-words" || path.startsWith("/root-words/")) return "tab-root-words";
     if (path === "/history" || path.startsWith("/history/")) return "tab-history";
     if (path === "/audio-studio" || path.startsWith("/audio-studio/")) return "tab-audio-studio";
     return "tab-dictation";
@@ -72,6 +74,7 @@ export default function App() {
       case "tab-admin": return "/admin";
       case "tab-vocab": return "/vocab";
       case "tab-visual-vocab": return "/visual-vocab";
+      case "tab-root-words": return "/roots";
       case "tab-reader": return "/reader";
       case "tab-writing": return "/writing";
       case "tab-destination-b2": return "/destination-b2";
@@ -904,6 +907,23 @@ export default function App() {
             </button>
 
             <button
+              className={`tab-btn ${activeTab === "tab-root-words" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-root-words")}
+              style={activeTab === "tab-root-words" ? { borderColor: "#2563eb" } : {}}
+              title="100 Gốc Từ Tiếng Anh (Word Roots & Morphemes)"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 3v6m0 6v6M3 12h6m6 0h6" />
+                <circle cx="12" cy="3" r="1" />
+                <circle cx="12" cy="21" r="1" />
+                <circle cx="3" cy="12" r="1" />
+                <circle cx="21" cy="12" r="1" />
+              </svg>
+              <span>100 Gốc từ</span>
+            </button>
+
+            <button
               className={`tab-btn ${activeTab === "tab-history" ? "active" : ""}`}
               onClick={() => setActiveTab("tab-history")}
               title="Lịch sử học tập & tiến độ"
@@ -1144,6 +1164,11 @@ export default function App() {
         {/* TAB 9: Visual Diagram Vocabulary (Mountain & University) */}
         <div style={{ display: activeTab === "tab-visual-vocab" ? "block" : "none" }}>
           <VisualVocabPage isActive={activeTab === "tab-visual-vocab"} token={token} />
+        </div>
+
+        {/* TAB 10: 100 Gốc Từ Tiếng Anh (Word Roots) */}
+        <div style={{ display: activeTab === "tab-root-words" ? "block" : "none" }}>
+          <RootWordsPage isActive={activeTab === "tab-root-words"} />
         </div>
       </main>
 

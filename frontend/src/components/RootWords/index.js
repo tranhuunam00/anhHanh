@@ -1,0 +1,1 @@
+export { RootWordsPage } from "./RootWordsPage";
