@@ -217,7 +217,12 @@ async def submit_vocab_review_result(
     vocab.mastery_score = srs_update["mastery_score"]
     vocab.review_interval_days = srs_update["review_interval_days"]
     vocab.next_review_at = srs_update["next_review_at"]
-    vocab.status = srs_update["status"]
+    if payload.status:
+        vocab.status = payload.status
+        if payload.status == "MASTERED":
+            vocab.mastery_score = max(vocab.mastery_score or 0, 4)
+    else:
+        vocab.status = srs_update["status"]
 
     await db.commit()
     await db.refresh(vocab)

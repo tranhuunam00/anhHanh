@@ -106,7 +106,7 @@ export const VocabExerciseMobileFlip = ({
 
   const handleReview = (isMastered) => {
     if (!currentItem) return;
-    onProceed(isMastered, isMastered ? currentItem.meaning : null);
+    onProceed(isMastered, isMastered ? currentItem.meaning : null, 1, isMastered ? "MASTERED" : "LEARNING");
   };
 
   if (!currentItem) {

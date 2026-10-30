@@ -11,6 +11,8 @@ export const EXERCISE_FORMATS = {
   D4: "FORMAT_D4", // Dạng 4: Nghe phát âm -> Chọn từ vựng (Listening Recall)
   D5_FLIP: "FORMAT_D5_FLIP", // Dạng 5: Thẻ Flashcard di động (Walking / Mobile 1-Tap)
   D6_AI_STORY: "FORMAT_D6_AI_STORY", // Dạng 6: AI Kể chuyện nối từ (AI Storytelling Cloze)
+  D7_STRESS: "FORMAT_D7_STRESS", // Dạng 7: Trọng âm từ vựng (Word Stress Quiz)
+  D8_SHADOWING: "FORMAT_D8_SHADOWING", // Dạng 8: Luyện Shadowing chuẩn ngữ điệu (Shadowing Practice)
 };
 
 export const EXERCISE_CATEGORIES = {

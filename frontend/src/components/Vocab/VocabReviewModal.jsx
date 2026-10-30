@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { submitVocabReviewResult } from "../../services/authVocabService";
+import { submitVocabReviewResult, updateVocabStatus } from "../../services/authVocabService";
 import { splitContextSentence } from "../../utils/textNormalizer";
 import { getVoiceLang } from "../../utils/languageVoices";
 import { formatPosDisplay } from "../../utils/wordLookupUtils";
@@ -136,13 +136,19 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
     );
   }
 
-  const handleNext = async (correctStatus) => {
+  const handleNext = async (correctStatus, explicitStatus = null) => {
     if (submitting) return;
     setSubmitting(true);
 
     try {
       if (token && currentItem) {
-        await submitVocabReviewResult(currentItem.id, correctStatus, token);
+        await submitVocabReviewResult(currentItem.id, correctStatus, token, explicitStatus);
+        if (explicitStatus) {
+          try {
+            await updateVocabStatus(currentItem.id, explicitStatus, token);
+          } catch {}
+          currentItem.status = explicitStatus;
+        }
       }
     } catch (err) {
       console.warn("Could not update review result:", err);
@@ -196,7 +202,7 @@ export default function VocabReviewModal({ dueItems, token, onClose, onFinished 
     setIsAnswered(true);
     setIsCorrect(correct);
     setTimeout(() => {
-      handleNext(correct);
+      handleNext(correct, correct ? "MASTERED" : "LEARNING");
     }, 400);
   };
 

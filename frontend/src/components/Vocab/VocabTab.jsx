@@ -312,6 +312,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
           vocabPool={items}
           token={token}
           user={user}
+          onUpdateWordStatus={handleStatusChange}
           onClose={() => {
             setIsExerciseHubOpen(false);
             loadWords();

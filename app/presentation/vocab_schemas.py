@@ -45,6 +45,7 @@ class UpdateVocabDetailsRequest(BaseModel):
 class ReviewResultRequest(BaseModel):
     vocab_id: str
     is_correct: bool
+    status: Optional[str] = None
 
 
 class AIExtractTextRequest(BaseModel):

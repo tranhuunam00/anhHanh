@@ -243,14 +243,17 @@ export const fetchPracticeSession = async (
   return { items: [] };
 };
 
-export const submitVocabReviewResult = async (vocabId, isCorrect, token) => {
+export const submitVocabReviewResult = async (vocabId, isCorrect, token, status = null) => {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const payload = { vocab_id: vocabId, is_correct: isCorrect };
+  if (status) payload.status = status;
 
   const res = await fetch("/api/vocab/review-result", {
     method: "POST",
     headers,
-    body: JSON.stringify({ vocab_id: vocabId, is_correct: isCorrect }),
+    body: JSON.stringify(payload),
   });
   return await safeParseResponse(res, "Không thể cập nhật kết quả ôn tập");
 };

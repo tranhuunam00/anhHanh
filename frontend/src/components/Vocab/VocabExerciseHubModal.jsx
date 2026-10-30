@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { submitVocabReviewResult, fetchPracticeSession } from "../../services/authVocabService";
+import { submitVocabReviewResult, updateVocabStatus, fetchPracticeSession } from "../../services/authVocabService";
 import { fetchSystemDistractors } from "../../services/systemVocabService";
 import { EXERCISE_FORMATS } from "../../utils/vocabExerciseGenerators";
 import { filterVocabByTimeRange, countVocabByTimeRanges } from "../../utils/vocabTimeFilterUtils";
@@ -8,6 +8,8 @@ import { VocabExercisePractice } from "./Exercise/VocabExercisePractice";
 import { VocabExerciseSummary } from "./Exercise/VocabExerciseSummary";
 import { VocabExerciseMobileFlip } from "./Exercise/VocabExerciseMobileFlip";
 import { VocabExerciseAIStory } from "./Exercise/VocabExerciseAIStory";
+import { VocabExerciseStress } from "./Exercise/VocabExerciseStress";
+import { VocabExerciseShadowing } from "./Exercise/VocabExerciseShadowing";
 import "./VocabExerciseHubModal.css";
 
 export default function VocabExerciseHubModal({
@@ -16,6 +18,7 @@ export default function VocabExerciseHubModal({
   user = null,
   onClose,
   onFinished,
+  onUpdateWordStatus,
 }) {
   // Navigation View: "MENU" (Card selection) | "PRACTICE" (Interactive session) | "SUMMARY" (Results)
   const [viewMode, setViewMode] = useState("MENU");
@@ -155,7 +158,7 @@ export default function VocabExerciseHubModal({
 
   // Handle proceeding after answering a question
   const handleProceed = useCallback(
-    async (correct, selectedOpt) => {
+    async (correct, selectedOpt, step = 1, forceStatus = null) => {
       if (correct) {
         setScore((s) => s + 1);
         setCombo((c) => {
@@ -170,9 +173,22 @@ export default function VocabExerciseHubModal({
       // Sync SRS progress to backend if authenticated
       if (token && currentItem && currentItem.id) {
         try {
-          await submitVocabReviewResult(currentItem.id, correct, token);
+          await submitVocabReviewResult(currentItem.id, correct, token, forceStatus);
+          if (forceStatus) {
+            try {
+              await updateVocabStatus(currentItem.id, forceStatus, token);
+            } catch {}
+          }
         } catch (err) {
           console.debug("SRS result sync skipped:", err);
+        }
+      }
+
+      // Immediate status override in local memory and parent list
+      if (forceStatus && currentItem) {
+        currentItem.status = forceStatus;
+        if (onUpdateWordStatus) {
+          onUpdateWordStatus(currentItem.id, forceStatus);
         }
       }
 
@@ -188,19 +204,22 @@ export default function VocabExerciseHubModal({
             source_lang: currentItem.source_lang,
             isCorrect: correct,
             selectedOption: selectedOpt,
+            status: forceStatus || currentItem.status,
           },
         ]);
       }
 
-      // Move to next word or finish
-      if (currentIndex + 1 < items.length) {
+      // Move to next / previous word or finish
+      if (step < 0 && currentIndex > 0) {
+        setCurrentIndex((i) => i - 1);
+      } else if (currentIndex + 1 < items.length) {
         setCurrentIndex((i) => i + 1);
       } else {
         setViewMode("SUMMARY");
         if (onFinished) onFinished();
       }
     },
-    [currentIndex, currentItem, items.length, onFinished, token]
+    [currentIndex, currentItem, items.length, onFinished, onUpdateWordStatus, token]
   );
 
   // Restart practice session with current items
@@ -285,6 +304,34 @@ export default function VocabExerciseHubModal({
         onBackToMenu={handleBackToMenu}
         onClose={onClose}
         onFinishExercise={() => setViewMode("SUMMARY")}
+      />
+    );
+  }
+
+  if (selectedFormat === EXERCISE_FORMATS.D7_STRESS) {
+    return (
+      <VocabExerciseStress
+        items={items}
+        currentIndex={currentIndex}
+        score={score}
+        combo={combo}
+        onProceed={handleProceed}
+        onBackToMenu={handleBackToMenu}
+        onClose={onClose}
+      />
+    );
+  }
+
+  if (selectedFormat === EXERCISE_FORMATS.D8_SHADOWING) {
+    return (
+      <VocabExerciseShadowing
+        items={items}
+        currentIndex={currentIndex}
+        score={score}
+        combo={combo}
+        onProceed={handleProceed}
+        onBackToMenu={handleBackToMenu}
+        onClose={onClose}
       />
     );
   }

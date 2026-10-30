@@ -159,6 +159,16 @@ def test_vocab_srs_review_session_api():
     assert res_correct.json()["vocab"]["mastery_score"] >= 1
     assert res_correct.json()["vocab"]["review_interval_days"] >= 3
 
+    # Submit review result with explicit status 'MASTERED'
+    res_mastered = client.post(
+        "/api/vocab/review-result",
+        json={"vocab_id": target_id, "is_correct": True, "status": "MASTERED"},
+        headers=headers
+    )
+    assert res_mastered.status_code == 200
+    assert res_mastered.json()["vocab"]["status"] == "MASTERED"
+    assert res_mastered.json()["vocab"]["mastery_score"] >= 4
+
 
 def test_vocab_update_and_lookup_api():
     """Verify comprehensive PATCH /api/vocab/{vocab_id} and lookup endpoints."""
