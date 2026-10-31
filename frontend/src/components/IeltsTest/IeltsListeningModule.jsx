@@ -12,8 +12,8 @@ import {
 /**
  * IELTS Listening Test Module (Exam-Standard UI)
  * Features:
+ * - Top Audio Player: Full-width continuous audio strip at the top (frees left column space)
  * - Single-row Top Navigation & Question Palette: 4 Parts + all 40 questions dàn hàng ngang
- * - Continuous Audio Player: Compact toolbar (no scrub, no pause once started)
  * - Maximum vertical space: Left pane (Map / Overview) & Right pane (Questions)
  * - Glowing answered indicators with instant scroll
  */
@@ -63,16 +63,9 @@ export const IeltsListeningModule = ({
     setLeftPart(2);
   };
 
-  // Left Pane: Compact Audio Player + Contextual info for leftPart
+  // Left Pane: Material context for leftPart (100% free of audio player!)
   const leftPaneContent = (
     <div className="ielts-left-scroll-pane">
-      <div className="ielts-pane-section-compact">
-        <IeltsAudioPlayer
-          audioUrl={listeningData?.audioUrl}
-          fallbackAudioUrl={listeningData?.fallbackAudioUrl}
-        />
-      </div>
-
       {/* Left Pane Part Material Selector */}
       <div className="ielts-left-part-selector compact">
         <span className="ielts-left-nav-label">Tài liệu cột trái:</span>
@@ -91,7 +84,7 @@ export const IeltsListeningModule = ({
         </div>
       </div>
 
-      {/* Dynamic Left Content: Part 2 map is highlighted; others show concise overview */}
+      {/* Dynamic Left Content: Part 2 map gets full screen height; others show concise overview */}
       {leftPart === 1 && (
         <div className="ielts-pane-section ielts-info-card compact">
           <div className="ielts-visual-header">
@@ -182,7 +175,14 @@ export const IeltsListeningModule = ({
 
   return (
     <div className="ielts-module-container">
-      {/* Sleek Single-Row Top Question Palette (Dàn hàng ngang trên đầu) */}
+      {/* Top Bar 1: Continuous Audio Player at the Top */}
+      <IeltsAudioPlayer
+        audioUrl={listeningData?.audioUrl}
+        fallbackAudioUrl={listeningData?.fallbackAudioUrl}
+        className="ielts-listening-top-audio"
+      />
+
+      {/* Top Bar 2: Sleek Single-Row Top Question Palette (Dàn hàng ngang trên đầu) */}
       <IeltsQuestionPalette
         totalQuestions={40}
         answers={answers}

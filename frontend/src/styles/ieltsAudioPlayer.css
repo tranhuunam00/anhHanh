@@ -364,6 +364,22 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
+.ielts-audio-player-card.ielts-listening-top-audio {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  background: var(--bg-card) !important;
+  padding: 4px 14px !important;
+  flex-shrink: 0 !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  box-sizing: border-box !important;
+  box-shadow: none !important;
+}
+
 .ielts-compact-player-bar {
   display: flex;
   align-items: center;
