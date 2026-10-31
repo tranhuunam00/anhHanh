@@ -1,0 +1,231 @@
+/* ==========================================================================
+   IELTS Exam Confirmation, Result Modals & Session Banners
+   Light & Dark Mode Compatible via System CSS Variables
+   ========================================================================== */
+
+/* Header Timer States */
+.ielts-header-timer.warning {
+  color: #d97706 !important;
+  border-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+}
+
+.ielts-header-timer.danger {
+  color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+  animation: ieltsPulseDanger 1.2s infinite;
+}
+
+@keyframes ieltsPulseDanger {
+  0% { opacity: 0.9; }
+  50% { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 0.9; }
+}
+
+.ielts-tab-check {
+  color: #10b981;
+  font-size: 0.75rem;
+  font-weight: 900;
+  margin-left: 4px;
+}
+
+.ielts-skill-tab-btn.completed-tab {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.ielts-submit-test-btn.locked {
+  background: #64748b !important;
+  cursor: not-allowed !important;
+  opacity: 0.85;
+}
+
+.ielts-exam-info-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+}
+
+.ielts-exam-info-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--primary);
+}
+
+/* Locked Skill Notification Banner */
+.ielts-locked-skill-banner {
+  background: rgba(245, 158, 11, 0.12);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  color: #d97706;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Confirmation Modal Dialog */
+.ielts-confirm-modal-dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 640px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10001;
+  position: relative;
+}
+
+.ielts-confirm-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  max-height: 75vh;
+}
+
+.ielts-confirm-test-banner {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.ielts-banner-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.ielts-banner-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 2px 0 0;
+}
+
+/* 4 Skills Grid */
+.ielts-skills-confirm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ielts-skill-confirm-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.ielts-skill-confirm-card.completed {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.ielts-skill-confirm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ielts-skill-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.ielts-skill-time {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+}
+
+.ielts-skill-detail {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.ielts-skill-status-tag {
+  margin-top: 4px;
+}
+
+.ielts-tag-done {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.ielts-tag-running {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.ielts-tag-ready {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Exam Rules Box */
+.ielts-confirm-rules-box {
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.ielts-confirm-rules-box h6 {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+.ielts-confirm-rules-box ul {
+  padding-left: 18px;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.ielts-btn-success {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+}
+
+.ielts-btn-success:hover {
+  background: #059669 !important;
+}
+

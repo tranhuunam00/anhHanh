@@ -47,7 +47,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
               </tr>
               <tr>
                 <td>
-                  <span className="ielts-inline-input-wrapper">
+                  <span className="ielts-inline-input-wrapper" id="ielts-q-1">
                     <span className="ielts-q-pill">1</span>
                     <input
                       type="text"
@@ -65,7 +65,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                 <td>Pigeons</td>
                 <td>
                   when sleeping, pigeons displayed activity in parts of the brain that deal with{" "}
-                  <span className="ielts-inline-input-wrapper">
+                  <span className="ielts-inline-input-wrapper" id="ielts-q-2">
                     <span className="ielts-q-pill">2</span>
                     <input
                       type="text"
@@ -82,7 +82,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                 <td>Whales and dolphins</td>
                 <td>
                   • still have{" "}
-                  <span className="ielts-inline-input-wrapper">
+                  <span className="ielts-inline-input-wrapper" id="ielts-q-3">
                     <span className="ielts-q-pill">3</span>
                     <input
                       type="text"
@@ -94,7 +94,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                   {renderFeedback(evaluation, 3, isReview)} their brain awake when they sleep
                   <br />
                   • don't experience REM sleep, as this could affect their sensitivity to{" "}
-                  <span className="ielts-inline-input-wrapper">
+                  <span className="ielts-inline-input-wrapper" id="ielts-q-4">
                     <span className="ielts-q-pill">4</span>
                     <input
                       type="text"
@@ -107,7 +107,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                 </td>
                 <td>
                   their dreams are probably not very{" "}
-                  <span className="ielts-inline-input-wrapper">
+                  <span className="ielts-inline-input-wrapper" id="ielts-q-5">
                     <span className="ielts-q-pill">5</span>
                     <input
                       type="text"
@@ -225,7 +225,7 @@ export function renderPassage2Questions(groups, answers, onChange, onChooseTwo, 
               {summaryGroup.items.map((it) => (
                 <span key={it.number}>
                   {it.prefix}
-                  <span className="ielts-inline-input-wrapper">
+                  <span className="ielts-inline-input-wrapper" id={`ielts-q-${it.number}`}>
                     <span className="ielts-q-pill">{it.number}</span>
                     <input
                       type="text"
@@ -303,7 +303,7 @@ export function renderPassage3Questions(groups, answers, onChange, evaluation, i
               {boxGroup.items.map((it) => (
                 <span key={it.number}>
                   {it.prefix}
-                  <span className="ielts-inline-input-wrapper">
+                  <span className="ielts-inline-input-wrapper" id={`ielts-q-${it.number}`}>
                     <span className="ielts-q-pill">{it.number}</span>
                     <select
                       value={answers[it.number] || ""}

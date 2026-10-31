@@ -15,7 +15,6 @@ export const IeltsWritingModule = ({
   token = null
 }) => {
   const [activeTask, setActiveTask] = useState(2); // Task 2 loaded first for essay practice
-  const [showGuide, setShowGuide] = useState(true);
 
   const tasks = writingData?.tasks || [];
   const currentTask = tasks.find((t) => t.taskNumber === activeTask) || tasks[0];
@@ -151,70 +150,6 @@ export const IeltsWritingModule = ({
               alt="IELTS Writing Task 1 diagram"
               className="ielts-writing-diagram-img"
             />
-          </div>
-        )}
-      </div>
-
-      {/* Band 7.0+ Structure & Strategy Assistant Card */}
-      <div className="ielts-strategy-card">
-        <div className="ielts-strategy-header" onClick={() => setShowGuide(!showGuide)}>
-          <span className="ielts-strategy-title">
-            💡 {activeTask === 2 ? "Bố cục bài viết Essay 4 đoạn chuẩn Band 7.0+" : "Cấu trúc bài viết Task 1 Report chuẩn"}
-          </span>
-          <span className="ielts-toggle-arrow">{showGuide ? "▲" : "▼"}</span>
-        </div>
-
-        {showGuide && (
-          <div className="ielts-strategy-body">
-            {activeTask === 2 ? (
-              <>
-                <div className="ielts-structure-grid">
-                  <div className="ielts-structure-box">
-                    <span className="ielts-struct-name">1. Introduction (Mở bài)</span>
-                    <p className="ielts-struct-desc">Paraphrase đề bài (1 câu) + Thesis statement nêu rõ quan điểm cá nhân (1 câu).</p>
-                  </div>
-                  <div className="ielts-structure-box">
-                    <span className="ielts-struct-name">2. Body 1 (Quan điểm 1)</span>
-                    <p className="ielts-struct-desc">Thảo luận lý do rạp hát/phim không còn thiết yếu (sự tiện lợi của digital streaming).</p>
-                  </div>
-                  <div className="ielts-structure-box">
-                    <span className="ielts-struct-name">3. Body 2 (Quan điểm 2)</span>
-                    <p className="ielts-struct-desc">Thảo luận giá trị kinh tế & văn hóa cộng đồng không thể thay thế của rạp chiếu phim.</p>
-                  </div>
-                  <div className="ielts-structure-box">
-                    <span className="ielts-struct-name">4. Conclusion (Kết luận)</span>
-                    <p className="ielts-struct-desc">Tóm tắt ngắn gọn 2 khía cạnh + Khẳng định lại lập trường cuối cùng (2 câu).</p>
-                  </div>
-                </div>
-                <div className="ielts-criteria-pills-row">
-                  <span className="ielts-crit-pill">Task Response: Nêu rõ quan điểm</span>
-                  <span className="ielts-crit-pill">Coherence: Từ nối học thuật</span>
-                  <span className="ielts-crit-pill">Lexicon: Từ vựng chuyên sâu</span>
-                  <span className="ielts-crit-pill">Grammar: Câu phức & câu ghép</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="ielts-structure-grid">
-                  <div className="ielts-structure-box">
-                    <span className="ielts-struct-name">1. Introduction</span>
-                    <p className="ielts-struct-desc">Paraphrase câu dẫn mô tả sơ đồ quán cà phê đại học hiện tại và đề xuất.</p>
-                  </div>
-                  <div className="ielts-structure-box">
-                    <span className="ielts-struct-name">2. Overview</span>
-                    <p className="ielts-struct-desc">Chỉ ra các thay đổi nổi bật nhất: mở rộng diện tích, quầy thanh toán mới, bàn tròn.</p>
-                  </div>
-                  <div className="ielts-structure-box">
-                    <span className="ielts-struct-name">3. Details 1</span>
-                    <p className="ielts-struct-desc">Mô tả chi tiết cách bố trí không gian hiện tại (Current layout).</p>
-                  </div>
-                  <div className="ielts-structure-box">
-                    <span className="ielts-struct-name">4. Details 2</span>
-                    <p className="ielts-struct-desc">Mô tả chi tiết các phòng và trang thiết bị mới đề xuất (Proposed changes).</p>
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         )}
       </div>

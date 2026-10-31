@@ -4,6 +4,7 @@ import { CheckCircle, RotateCcw } from "../../constants/icons.js";
 /**
  * Result & Score Modal for IELTS Test
  * Displays IELTS Band Score (1.0 - 9.0), raw score, and feedback summary.
+ * Allows instant review or advancing to the next test skill.
  */
 export const IeltsResultModal = ({
   isOpen,
@@ -12,8 +13,10 @@ export const IeltsResultModal = ({
   rawScore = 0,
   bandScore = 1.0,
   totalQuestions = 40,
+  nextSkill = null,
   onReviewAnswers,
-  onRetakeTest
+  onRetakeTest,
+  onGoToNextSkill
 }) => {
   if (!isOpen) return null;
 
@@ -27,13 +30,20 @@ export const IeltsResultModal = ({
     return "Cần tiếp tục ôn tập và làm quen với cấu trúc bài thi IELTS.";
   };
 
+  const getSkillLabel = (s) => {
+    if (s === "listening") return "Listening";
+    if (s === "reading") return "Reading";
+    if (s === "writing") return "Writing";
+    return "Speaking";
+  };
+
   return (
     <div className="ielts-modal-overlay">
       <div className="ielts-modal-backdrop" onClick={onClose} />
       <div className="ielts-result-modal-dialog">
         <header className="ielts-modal-header">
           <h3 className="ielts-modal-title">
-            Kết Quả Bài Thi IELTS {skill === "listening" ? "Listening" : "Reading"}
+            Kết Quả Bài Thi IELTS {getSkillLabel(skill)}
           </h3>
           <button type="button" className="ielts-modal-close-btn" onClick={onClose}>
             ✕
@@ -71,8 +81,9 @@ export const IeltsResultModal = ({
             className="ielts-btn ielts-btn-outline"
             onClick={onRetakeTest}
           >
-            <RotateCcw className="w-4 h-4 mr-1.5 inline" /> Làm lại bài thi
+            <RotateCcw className="w-4 h-4 mr-1.5 inline" /> Làm lại kỹ năng này
           </button>
+
           <button
             type="button"
             className="ielts-btn ielts-btn-primary"
@@ -80,9 +91,18 @@ export const IeltsResultModal = ({
           >
             <CheckCircle className="w-4 h-4 mr-1.5 inline" /> Xem đáp án chi tiết
           </button>
+
+          {nextSkill && onGoToNextSkill && (
+            <button
+              type="button"
+              className="ielts-btn ielts-btn-success"
+              onClick={onGoToNextSkill}
+            >
+              Tiếp tục thi {getSkillLabel(nextSkill)} ➔
+            </button>
+          )}
         </footer>
       </div>
     </div>
   );
 };
-
