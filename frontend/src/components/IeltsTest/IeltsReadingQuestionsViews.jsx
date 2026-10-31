@@ -47,14 +47,15 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
               </tr>
               <tr>
                 <td>
-                  <span className="ielts-q-anchor" id="ielts-q-1">1.</span>
-                  <input
-                    type="text"
-                    placeholder="Một từ..."
-                    value={answers[1] || ""}
-                    onChange={(e) => onChange(1, e.target.value)}
-                    className={`ielts-text-input ${getFeedbackClass(evaluation, 1)}`}
-                  />
+                  <span className="ielts-inline-input-wrapper">
+                    <span className="ielts-q-pill">1</span>
+                    <input
+                      type="text"
+                      value={answers[1] || ""}
+                      onChange={(e) => onChange(1, e.target.value)}
+                      className={`ielts-real-input ${getFeedbackClass(evaluation, 1)}`}
+                    />
+                  </span>
                   {renderFeedback(evaluation, 1, isReview)}
                 </td>
                 <td>• similar brain patterns were observed when active and sleeping</td>
@@ -64,14 +65,15 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                 <td>Pigeons</td>
                 <td>
                   when sleeping, pigeons displayed activity in parts of the brain that deal with{" "}
-                  <span className="ielts-q-anchor" id="ielts-q-2">2.</span>
-                  <input
-                    type="text"
-                    placeholder="Một từ..."
-                    value={answers[2] || ""}
-                    onChange={(e) => onChange(2, e.target.value)}
-                    className={`ielts-text-input ${getFeedbackClass(evaluation, 2)}`}
-                  />
+                  <span className="ielts-inline-input-wrapper">
+                    <span className="ielts-q-pill">2</span>
+                    <input
+                      type="text"
+                      value={answers[2] || ""}
+                      onChange={(e) => onChange(2, e.target.value)}
+                      className={`ielts-real-input ${getFeedbackClass(evaluation, 2)}`}
+                    />
+                  </span>
                   {renderFeedback(evaluation, 2, isReview)} input
                 </td>
                 <td>may have been dreaming of flying</td>
@@ -79,37 +81,41 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
               <tr>
                 <td>Whales and dolphins</td>
                 <td>
-                  • still have <span className="ielts-q-anchor" id="ielts-q-3">3.</span>
-                  <input
-                    type="text"
-                    placeholder="Một từ..."
-                    value={answers[3] || ""}
-                    onChange={(e) => onChange(3, e.target.value)}
-                    className={`ielts-text-input ${getFeedbackClass(evaluation, 3)}`}
-                  />
+                  • still have{" "}
+                  <span className="ielts-inline-input-wrapper">
+                    <span className="ielts-q-pill">3</span>
+                    <input
+                      type="text"
+                      value={answers[3] || ""}
+                      onChange={(e) => onChange(3, e.target.value)}
+                      className={`ielts-real-input ${getFeedbackClass(evaluation, 3)}`}
+                    />
+                  </span>
                   {renderFeedback(evaluation, 3, isReview)} their brain awake when they sleep
                   <br />
                   • don't experience REM sleep, as this could affect their sensitivity to{" "}
-                  <span className="ielts-q-anchor" id="ielts-q-4">4.</span>
-                  <input
-                    type="text"
-                    placeholder="Một từ..."
-                    value={answers[4] || ""}
-                    onChange={(e) => onChange(4, e.target.value)}
-                    className={`ielts-text-input ${getFeedbackClass(evaluation, 4)}`}
-                  />
+                  <span className="ielts-inline-input-wrapper">
+                    <span className="ielts-q-pill">4</span>
+                    <input
+                      type="text"
+                      value={answers[4] || ""}
+                      onChange={(e) => onChange(4, e.target.value)}
+                      className={`ielts-real-input ${getFeedbackClass(evaluation, 4)}`}
+                    />
+                  </span>
                   {renderFeedback(evaluation, 4, isReview)}
                 </td>
                 <td>
                   their dreams are probably not very{" "}
-                  <span className="ielts-q-anchor" id="ielts-q-5">5.</span>
-                  <input
-                    type="text"
-                    placeholder="Một từ..."
-                    value={answers[5] || ""}
-                    onChange={(e) => onChange(5, e.target.value)}
-                    className={`ielts-text-input ${getFeedbackClass(evaluation, 5)}`}
-                  />
+                  <span className="ielts-inline-input-wrapper">
+                    <span className="ielts-q-pill">5</span>
+                    <input
+                      type="text"
+                      value={answers[5] || ""}
+                      onChange={(e) => onChange(5, e.target.value)}
+                      className={`ielts-real-input ${getFeedbackClass(evaluation, 5)}`}
+                    />
+                  </span>
                   {renderFeedback(evaluation, 5, isReview)}
                 </td>
               </tr>
@@ -126,7 +132,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
             {tfGroup.items.map((item) => (
               <div key={item.number} className="ielts-tf-row" id={`ielts-q-${item.number}`}>
                 <div className="ielts-tf-statement">
-                  <span className="ielts-q-anchor">{item.number}.</span> {item.statement}
+                  <span className="ielts-q-pill mr-2">{item.number}</span> {item.statement}
                 </div>
                 <div className="ielts-tf-options">
                   {["TRUE", "FALSE", "NOT GIVEN"].map((val) => (
@@ -165,16 +171,16 @@ export function renderPassage2Questions(groups, answers, onChange, onChooseTwo, 
             {matchingGroup.items.map((item) => (
               <div key={item.number} className="ielts-matching-row" id={`ielts-q-${item.number}`}>
                 <div className="ielts-matching-statement">
-                  <span className="ielts-q-anchor">{item.number}.</span> {item.statement}
+                  <span className="ielts-q-pill mr-2">{item.number}</span> {item.statement}
                 </div>
                 <select
                   value={answers[item.number] || ""}
                   onChange={(e) => onChange(item.number, e.target.value)}
                   className={`ielts-select-box ${getFeedbackClass(evaluation, item.number)}`}
                 >
-                  <option value="">Chọn A - G...</option>
+                  <option value="">Select (A-G)...</option>
                   {matchingGroup.options.map((opt) => (
-                    <option key={opt} value={opt}>Đoạn {opt}</option>
+                    <option key={opt} value={opt}>Paragraph {opt}</option>
                   ))}
                 </select>
                 {renderFeedback(evaluation, item.number, isReview)}
@@ -219,14 +225,15 @@ export function renderPassage2Questions(groups, answers, onChange, onChooseTwo, 
               {summaryGroup.items.map((it) => (
                 <span key={it.number}>
                   {it.prefix}
-                  <span className="ielts-q-anchor" id={`ielts-q-${it.number}`}>[{it.number}]</span>
-                  <input
-                    type="text"
-                    placeholder="Một từ..."
-                    value={answers[it.number] || ""}
-                    onChange={(e) => onChange(it.number, e.target.value)}
-                    className={`ielts-text-input ielts-inline-input ${getFeedbackClass(evaluation, it.number)}`}
-                  />
+                  <span className="ielts-inline-input-wrapper">
+                    <span className="ielts-q-pill">{it.number}</span>
+                    <input
+                      type="text"
+                      value={answers[it.number] || ""}
+                      onChange={(e) => onChange(it.number, e.target.value)}
+                      className={`ielts-real-input ${getFeedbackClass(evaluation, it.number)}`}
+                    />
+                  </span>
                   {renderFeedback(evaluation, it.number, isReview)}
                   {it.suffix}
                 </span>
@@ -254,7 +261,7 @@ export function renderPassage3Questions(groups, answers, onChange, evaluation, i
           {mcqGroup.items.map((it) => (
             <div key={it.number} className="ielts-mcq-item" id={`ielts-q-${it.number}`}>
               <p className="ielts-mcq-prompt">
-                <span className="ielts-q-anchor">{it.number}.</span> {it.prompt}
+                <span className="ielts-q-pill mr-2">{it.number}</span> {it.prompt}
               </p>
               <div className="ielts-options-list">
                 {it.options.map((opt) => (
@@ -296,17 +303,19 @@ export function renderPassage3Questions(groups, answers, onChange, evaluation, i
               {boxGroup.items.map((it) => (
                 <span key={it.number}>
                   {it.prefix}
-                  <span className="ielts-q-anchor" id={`ielts-q-${it.number}`}>[{it.number}]</span>
-                  <select
-                    value={answers[it.number] || ""}
-                    onChange={(e) => onChange(it.number, e.target.value)}
-                    className={`ielts-select-box ielts-inline-select ${getFeedbackClass(evaluation, it.number)}`}
-                  >
-                    <option value="">A - I...</option>
-                    {boxGroup.boxOptions.map((o) => (
-                      <option key={o.letter} value={o.letter}>{o.letter} ({o.word})</option>
-                    ))}
-                  </select>
+                  <span className="ielts-inline-input-wrapper">
+                    <span className="ielts-q-pill">{it.number}</span>
+                    <select
+                      value={answers[it.number] || ""}
+                      onChange={(e) => onChange(it.number, e.target.value)}
+                      className={`ielts-select-box ielts-inline-select ${getFeedbackClass(evaluation, it.number)}`}
+                    >
+                      <option value="">A - I...</option>
+                      {boxGroup.boxOptions.map((o) => (
+                        <option key={o.letter} value={o.letter}>{o.letter} ({o.word})</option>
+                      ))}
+                    </select>
+                  </span>
                   {renderFeedback(evaluation, it.number, isReview)}
                   {it.suffix}
                 </span>
@@ -324,7 +333,7 @@ export function renderPassage3Questions(groups, answers, onChange, evaluation, i
             {ynGroup.items.map((item) => (
               <div key={item.number} className="ielts-tf-row" id={`ielts-q-${item.number}`}>
                 <div className="ielts-tf-statement">
-                  <span className="ielts-q-anchor">{item.number}.</span> {item.statement}
+                  <span className="ielts-q-pill mr-2">{item.number}</span> {item.statement}
                 </div>
                 <div className="ielts-tf-options">
                   {["YES", "NO", "NOT GIVEN"].map((val) => (
@@ -351,7 +360,7 @@ export function renderPassage3Questions(groups, answers, onChange, evaluation, i
           {q40Group.items.map((it) => (
             <div key={it.number} className="ielts-mcq-item">
               <p className="ielts-mcq-prompt">
-                <span className="ielts-q-anchor">{it.number}.</span> {it.prompt}
+                <span className="ielts-q-pill mr-2">{it.number}</span> {it.prompt}
               </p>
               <div className="ielts-options-list">
                 {it.options.map((opt) => (
@@ -376,4 +385,3 @@ export function renderPassage3Questions(groups, answers, onChange, evaluation, i
     </div>
   );
 }
-

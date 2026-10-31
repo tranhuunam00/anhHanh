@@ -1,26 +1,34 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, RotateCcw, Volume2, FastForward } from "../../constants/icons.js";
+import React, { useState, useRef, useEffect } from "react";
+import { Play, Volume2 } from "../../constants/icons.js";
 
 /**
- * Custom IELTS Audio Player
- * Includes quick part markers, speed controls, skip forward/backward, and source switching.
+ * IELTS Listening Exam Audio Player (Real Test Standard)
+ * Strict exam mode:
+ * - NO scrub/seeking (không cho tua).
+ * - NO pause once started (không cho dừng).
+ * - Plays continuously to simulate authentic computer-delivered IELTS conditions.
+ * - Volume control is adjustable.
  */
 export const IeltsAudioPlayer = ({
   audioUrl = "/audio/Cambridge 21 - Test 2.mp3",
   fallbackAudioUrl = "/audio/Cambridge 21 - Test 1.mp3",
-  onPartJump
+  isExamMode = true
 }) => {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playbackRate, setPlaybackRate] = useState(1);
   const [currentSource, setCurrentSource] = useState(audioUrl);
   const [volume, setVolume] = useState(1);
+  const [isEnded, setIsEnded] = useState(false);
 
-  // Sync source when prop changes
   useEffect(() => {
     setCurrentSource(audioUrl);
+    setHasStarted(false);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setIsEnded(false);
   }, [audioUrl]);
 
   const formatTime = (secs) => {
@@ -30,15 +38,15 @@ export const IeltsAudioPlayer = ({
     return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
-  const togglePlay = () => {
+  const handleStartExam = () => {
     if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch((err) => {
-        console.warn("Audio play prevented:", err);
-      });
-    }
+    audioRef.current.play().then(() => {
+      setIsPlaying(true);
+      setHasStarted(true);
+      setIsEnded(false);
+    }).catch((err) => {
+      console.warn("Audio play prevented:", err);
+    });
   };
 
   const handleTimeUpdate = () => {
@@ -53,38 +61,20 @@ export const IeltsAudioPlayer = ({
     }
   };
 
-  const handleSeek = (e) => {
-    const targetTime = parseFloat(e.target.value);
-    setCurrentTime(targetTime);
+  const handleEnded = () => {
+    setIsPlaying(false);
+    setIsEnded(true);
+  };
+
+  const handleVolumeChange = (e) => {
+    const val = parseFloat(e.target.value);
+    setVolume(val);
     if (audioRef.current) {
-      audioRef.current.currentTime = targetTime;
+      audioRef.current.volume = val;
     }
   };
 
-  const handleSkip = (seconds) => {
-    if (!audioRef.current) return;
-    const nextTime = Math.max(0, Math.min(duration, audioRef.current.currentTime + seconds));
-    audioRef.current.currentTime = nextTime;
-    setCurrentTime(nextTime);
-  };
-
-  const handleSpeedChange = (rate) => {
-    setPlaybackRate(rate);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = rate;
-    }
-  };
-
-  const jumpToTime = useCallback((secs) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = secs;
-      setCurrentTime(secs);
-      if (!isPlaying) {
-        audioRef.current.play().catch(() => {});
-      }
-    }
-    if (onPartJump) onPartJump(secs);
-  }, [isPlaying, onPartJump]);
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div className="ielts-audio-player-card">
@@ -93,102 +83,79 @@ export const IeltsAudioPlayer = ({
         src={currentSource}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={handleEnded}
       />
 
-      {/* Top row: Track Title & Source Selector */}
+      {/* Header Bar */}
       <div className="ielts-player-top">
         <div className="ielts-player-info">
-          <span className="ielts-audio-indicator" />
-          <span className="ielts-player-title">IELTS Listening Audio Track</span>
-        </div>
-        <div className="ielts-player-source-select">
-          <label htmlFor="ielts-audio-source" className="sr-only">Nguồn audio</label>
-          <select
-            id="ielts-audio-source"
-            value={currentSource}
-            onChange={(e) => {
-              setCurrentSource(e.target.value);
-              setIsPlaying(false);
-            }}
-            className="ielts-source-dropdown"
-          >
-            <option value={audioUrl}>Cambridge 21 - Test 2 (Gốc)</option>
-            {fallbackAudioUrl && (
-              <option value={fallbackAudioUrl}>Cambridge 21 - Test 1</option>
-            )}
-          </select>
-        </div>
-      </div>
-
-      {/* Scrubber Timeline */}
-      <div className="ielts-player-scrubber-row">
-        <span className="ielts-time-label">{formatTime(currentTime)}</span>
-        <input
-          type="range"
-          min="0"
-          max={duration || 100}
-          step="0.5"
-          value={currentTime}
-          onChange={handleSeek}
-          className="ielts-scrubber-slider"
-          aria-label="Audio scrubber"
-        />
-        <span className="ielts-time-label">{formatTime(duration)}</span>
-      </div>
-
-      {/* Controls Bar */}
-      <div className="ielts-player-controls-bar">
-        {/* Play/Pause & Skips */}
-        <div className="ielts-playback-btns">
-          <button
-            type="button"
-            className="ielts-ctrl-btn ielts-skip-btn"
-            onClick={() => handleSkip(-5)}
-            title="Lùi 5 giây"
-          >
-            <RotateCcw className="w-4 h-4" />
-            <span>-5s</span>
-          </button>
-
-          <button
-            type="button"
-            className="ielts-ctrl-btn ielts-play-main-btn"
-            onClick={togglePlay}
-            title={isPlaying ? "Tạm dừng" : "Phát audio"}
-          >
-            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-          </button>
-
-          <button
-            type="button"
-            className="ielts-ctrl-btn ielts-skip-btn"
-            onClick={() => handleSkip(5)}
-            title="Tua 5 giây"
-          >
-            <FastForward className="w-4 h-4" />
-            <span>+5s</span>
-          </button>
+          <span className={`ielts-audio-indicator ${isPlaying ? "live-pulse" : ""}`} />
+          <span className="ielts-player-title">Bài thi IELTS Listening</span>
+          <span className="ielts-exam-mode-badge">Chuẩn thi thật</span>
         </div>
 
-        {/* Speed Controls */}
-        <div className="ielts-speed-group">
-          {[0.75, 1, 1.25, 1.5].map((rate) => (
-            <button
-              key={rate}
-              type="button"
-              className={`ielts-speed-btn ${playbackRate === rate ? "active" : ""}`}
-              onClick={() => handleSpeedChange(rate)}
+        {!hasStarted && (
+          <div className="ielts-player-source-select">
+            <select
+              value={currentSource}
+              onChange={(e) => setCurrentSource(e.target.value)}
+              className="ielts-source-dropdown"
+              title="Chọn file audio"
             >
-              {rate}x
-            </button>
-          ))}
-        </div>
+              <option value={audioUrl}>Cambridge 21 - Test 2 (Mặc định)</option>
+              {fallbackAudioUrl && (
+                <option value={fallbackAudioUrl}>Cambridge 21 - Test 1</option>
+              )}
+            </select>
+          </div>
+        )}
+      </div>
 
-        {/* Volume */}
-        <div className="ielts-volume-group">
+      {/* Start Button or Playing Status */}
+      <div className="ielts-player-main-action">
+        {!hasStarted ? (
+          <button
+            type="button"
+            className="ielts-start-audio-btn"
+            onClick={handleStartExam}
+          >
+            <Play className="w-5 h-5 mr-2" />
+            <span>Bắt đầu bài thi nghe (Audio thi thật)</span>
+          </button>
+        ) : (
+          <div className="ielts-playing-status-banner">
+            {isEnded ? (
+              <span className="ielts-status-ended">✓ Bài nghe đã kết thúc</span>
+            ) : (
+              <div className="ielts-status-playing">
+                <span className="ielts-recording-dot" />
+                <span>Đang phát bài thi IELTS (Không thể tạm dừng hoặc tua)</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Read-Only Visual Progress Bar (No Scrubbing) */}
+      <div className="ielts-progress-wrap">
+        <div className="ielts-progress-time-row">
+          <span className="ielts-time-label">{formatTime(currentTime)}</span>
+          <span className="ielts-time-label">{formatTime(duration)}</span>
+        </div>
+        <div
+          className="ielts-exam-progress-bar"
+          title="Thanh tiến trình bài nghe (Không thể tua theo quy chế thi)"
+        >
+          <div
+            className="ielts-exam-progress-fill"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Bottom Controls: Volume */}
+      <div className="ielts-player-footer-bar">
+        <div className="ielts-volume-control">
           <Volume2 className="w-4 h-4 text-muted" />
           <input
             type="range"
@@ -196,36 +163,17 @@ export const IeltsAudioPlayer = ({
             max="1"
             step="0.05"
             value={volume}
-            onChange={(e) => {
-              const val = parseFloat(e.target.value);
-              setVolume(val);
-              if (audioRef.current) audioRef.current.volume = val;
-            }}
+            onChange={handleVolumeChange}
             className="ielts-volume-slider"
-            aria-label="Volume"
+            title="Âm lượng tai nghe"
+            aria-label="Âm lượng tai nghe"
           />
+          <span className="ielts-volume-percent">{Math.round(volume * 100)}%</span>
         </div>
-      </div>
-
-      {/* Quick Jump Markers for Parts */}
-      <div className="ielts-part-jump-bar">
-        <span className="ielts-jump-label">Nhảy tới phần:</span>
-        <div className="ielts-jump-btns">
-          <button type="button" onClick={() => jumpToTime(0)} className="ielts-jump-btn">
-            Part 1 (Q1-10)
-          </button>
-          <button type="button" onClick={() => jumpToTime(390)} className="ielts-jump-btn">
-            Part 2 (Q11-20)
-          </button>
-          <button type="button" onClick={() => jumpToTime(810)} className="ielts-jump-btn">
-            Part 3 (Q21-30)
-          </button>
-          <button type="button" onClick={() => jumpToTime(1260)} className="ielts-jump-btn">
-            Part 4 (Q31-40)
-          </button>
+        <div className="ielts-rule-notice">
+          <span>* Quy chế: Audio thi thật chỉ phát 1 lần liên tục.</span>
         </div>
       </div>
     </div>
   );
 };
-

@@ -5,6 +5,8 @@
    ========================================================================== */
 
 @import "./ieltsLayout.css";
+@import "./ieltsAudioPlayer.css";
 @import "./ieltsListening.css";
 @import "./ieltsReading.css";
-@import "./ieltsWritingSpeaking.css";
+@import "./ieltsWriting.css";
+@import "./ieltsSpeaking.css";

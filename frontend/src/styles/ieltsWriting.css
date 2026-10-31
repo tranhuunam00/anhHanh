@@ -1,0 +1,445 @@
+/* ==========================================================================
+   IELTS Academic Writing Stylesheet (Computer-Delivered UI)
+   Light & Dark Mode Compatible via System CSS Variables
+   ========================================================================== */
+
+/* Top Task Selector Tabs */
+.ielts-writing-task-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.ielts-writing-task-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ielts-writing-task-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--primary);
+}
+
+.ielts-writing-task-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Left Pane: Official Prompt Card */
+.ielts-writing-prompt-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.ielts-writing-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ielts-prompt-tag-badge {
+  background: var(--primary-light, rgba(37, 99, 235, 0.1));
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.76rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  letter-spacing: 0.4px;
+}
+
+.ielts-time-hint {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+}
+
+.ielts-writing-instructions {
+  font-size: 0.98rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.ielts-prompt-quote-box {
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--primary);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  margin: 14px 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+.ielts-prompt-action-text {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 10px;
+}
+
+/* Task 1 Diagram Wrap */
+.ielts-writing-image-wrap {
+  margin-top: 16px;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.ielts-diagram-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.ielts-writing-diagram-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* Strategy & Structure Assistant Card */
+.ielts-strategy-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 18px;
+}
+
+.ielts-strategy-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ielts-strategy-title {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ielts-strategy-body {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.ielts-structure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ielts-structure-box {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-struct-name {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ielts-struct-desc {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.ielts-criteria-pills-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.ielts-crit-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+/* Right Pane: High-End IELTS Word Processor */
+.ielts-writing-editor-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ielts-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px 10px 0 0;
+  border-bottom: none;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ielts-word-counter-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ielts-word-progress-ring {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+
+.ielts-word-progress-ring.met {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.ielts-autosave-tag {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ielts-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ielts-ai-eval-btn {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s ease;
+}
+
+.ielts-ai-eval-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  filter: brightness(1.08);
+}
+
+.ielts-ai-eval-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ielts-ai-restricted-badge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+/* Essay Textarea Container */
+.ielts-editor-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+}
+
+.ielts-essay-textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 420px;
+  padding: 20px 24px;
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  outline: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.ielts-essay-textarea::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.ielts-editor-footer-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 18px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+/* AI Results Dashboard */
+.ielts-ai-result-card {
+  margin-top: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.ielts-ai-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ielts-ai-band-badge {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  padding: 6px 18px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.ielts-ai-evaluated-date {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.ielts-ai-subscores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ielts-subscore-box {
+  background: var(--bg-secondary);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.ielts-subscore-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ielts-subscore-val {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.ielts-ai-feedback-section {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-ai-feedback-section h5 {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.ielts-ai-feedback-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+  white-space: pre-line;
+}
+
+.ielts-ai-corrected-box {
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  white-space: pre-line;
+}
+

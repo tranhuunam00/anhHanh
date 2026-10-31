@@ -1,4 +1,7 @@
-/* IELTS Test Page Layout & Split-Pane Architecture */
+/* ==========================================================================
+   IELTS Test Page Layout & Split-Pane Architecture
+   Light & Dark Mode Compatible via System CSS Variables
+   ========================================================================== */
 
 .ielts-test-page-container {
   display: flex;
@@ -98,130 +101,205 @@
   font-size: 0.95rem;
   font-weight: 700;
   padding: 4px 10px;
-  background: var(--bg-secondary);
   border-radius: 6px;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
 }
 
 .ielts-submit-test-btn {
-  background: var(--primary);
+  background: #2563eb;
   color: #ffffff;
-  border: none;
   padding: 6px 14px;
   border-radius: 6px;
+  border: none;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: opacity 0.15s;
+  transition: background 0.15s;
 }
 
 .ielts-submit-test-btn:hover {
-  opacity: 0.9;
+  background: #1d4ed8;
 }
 
 .ielts-retake-btn {
   background: var(--bg-secondary);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
   padding: 6px 12px;
   border-radius: 6px;
+  border: 1px solid var(--border-color);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
 }
 
-/* Two-column Split Container */
 .ielts-test-content-area {
   flex: 1;
   display: flex;
-  height: calc(100% - 50px);
-  width: 100%;
-  position: relative;
+  flex-direction: column;
   overflow: hidden;
+  position: relative;
 }
 
-.ielts-split-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.ielts-split-pane {
-  height: 100%;
-  min-width: 250px;
-  overflow: hidden;
+/* Module Container for Reading & Listening */
+.ielts-module-container {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
-.ielts-split-left {
-  border-right: 1px solid var(--border-color);
+/* Prominent Top Bar for 3 Parts / 4 Parts */
+.ielts-module-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ielts-module-nav-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ielts-module-parts-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ielts-main-part-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ielts-main-part-btn:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--primary);
+}
+
+.ielts-main-part-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  font-weight: 700;
+}
+
+.ielts-part-badge-tag {
+  background: rgba(0, 0, 0, 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.ielts-main-part-btn.active .ielts-part-badge-tag {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.ielts-part-q-range {
+  font-size: 0.74rem;
+  opacity: 0.85;
+}
+
+.ielts-part-progress-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.ielts-part-progress-pill.complete {
+  background: #10b981;
+  color: #ffffff;
+}
+
+/* Split Pane Layout */
+.ielts-split-pane-wrapper {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.ielts-split-left-pane,
+.ielts-split-right-pane {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .ielts-split-divider {
-  width: 10px;
-  cursor: col-resize;
+  width: 8px;
   background: var(--bg-secondary);
-  position: relative;
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  cursor: col-resize;
   display: flex;
   align-items: center;
   justify-content: center;
-  user-select: none;
+  flex-shrink: 0;
   transition: background 0.15s;
-  z-index: 10;
+  user-select: none;
 }
 
 .ielts-split-divider:hover,
-.ielts-split-divider.active {
+.ielts-split-divider.dragging {
   background: var(--primary);
+  border-color: var(--primary);
 }
 
-.ielts-divider-handle {
-  width: 16px;
-  height: 32px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-}
-
-.ielts-divider-dots {
-  font-size: 14px;
-  line-height: 1;
+.ielts-divider-grip-icon {
   color: var(--text-muted);
 }
 
-.ielts-split-drag-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 999;
-  cursor: col-resize;
+.ielts-split-divider:hover .ielts-divider-grip-icon {
+  color: #ffffff;
 }
 
-/* Independent Scroll Panes with Equal Matching Height */
 .ielts-left-scroll-pane,
 .ielts-right-scroll-pane {
-  flex: 1;
-  height: 100%;
-  overflow-y: auto;
   padding: 16px;
   background: var(--bg-primary);
+  min-height: 100%;
 }
 
-/* Palette Bar */
+/* Question Palette Container (Docked & Clear) */
 .ielts-palette-container {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-top: 16px;
+  border-top: 2px solid var(--border-color);
+  padding: 10px 16px;
+  flex-shrink: 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .ielts-palette-header {
@@ -232,48 +310,138 @@
   font-size: 0.82rem;
 }
 
+.ielts-palette-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ielts-palette-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
 .ielts-palette-title {
   font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ielts-palette-counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.ielts-counter-number {
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+.ielts-palette-mini-progress {
+  width: 60px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-palette-mini-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.ielts-palette-sections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ielts-palette-section-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ielts-palette-section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 130px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.ielts-palette-tag-count {
+  font-size: 0.7rem;
+  color: var(--primary);
 }
 
 .ielts-palette-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 4px;
+  align-items: center;
 }
 
+/* Individual Question Button: Unanswered vs SÁNG LÊN khi ĐÃ ĐIỀN */
 .ielts-palette-badge {
-  width: 28px;
-  height: 28px;
-  display: flex;
+  width: 29px;
+  height: 29px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  font-size: 0.74rem;
+  border-radius: 5px;
+  font-size: 0.76rem;
   font-weight: 700;
   border: 1px solid var(--border-color);
   background: var(--bg-secondary);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
 }
 
-.ielts-palette-badge.answered {
-  background: var(--primary);
-  color: #ffffff;
+.ielts-palette-badge:hover {
   border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* SÁNG RÕ RÀNG KHI ĐÃ ĐIỀN (Glowing Blue Indicator) */
+.ielts-palette-badge.answered,
+.ielts-palette-badge.glowing {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  font-weight: 800 !important;
+}
+
+.ielts-palette-badge.current {
+  outline: 2px solid #f59e0b !important;
+  outline-offset: 1px !important;
 }
 
 .ielts-palette-badge.correct {
-  background: #10b981;
-  color: #ffffff;
-  border-color: #10b981;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5) !important;
 }
 
 .ielts-palette-badge.incorrect {
-  background: #ef4444;
-  color: #ffffff;
-  border-color: #ef4444;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5) !important;
 }
 
 .ielts-empty-state {
@@ -286,4 +454,3 @@
   padding: 24px;
   text-align: center;
 }
-

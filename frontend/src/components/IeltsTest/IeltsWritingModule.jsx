@@ -1,19 +1,22 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
 import { canUseIeltsAiGrading } from "../../utils/ieltsScoring.js";
 import { Sparkles, Clock, CheckCircle } from "../../constants/icons.js";
 
 /**
- * IELTS Writing Test Module
- * Left pane: Prompt, Instructions, Diagram (Task 1)
- * Right pane: Essay editor with live word count, timer, and AI evaluation
+ * IELTS Academic Writing Test Module (Exam-Standard UI)
+ * Features:
+ * - Left Pane: Official Prompt, Diagram (Task 1), and Band 7.0+ Structure & Strategy Guide
+ * - Right Pane: Professional Word Processor, live word counter with progress indicator, and AI Scoring
  */
 export const IeltsWritingModule = ({
   writingData,
   user = null,
   token = null
 }) => {
-  const [activeTask, setActiveTask] = useState(1);
+  const [activeTask, setActiveTask] = useState(2); // Task 2 loaded first for essay practice
+  const [showGuide, setShowGuide] = useState(true);
+
   const tasks = writingData?.tasks || [];
   const currentTask = tasks.find((t) => t.taskNumber === activeTask) || tasks[0];
 
@@ -40,6 +43,8 @@ export const IeltsWritingModule = ({
     if (!trimmed) return 0;
     return trimmed.split(/\s+/).length;
   }, [currentEssay]);
+
+  const charCount = currentEssay.length;
 
   const handleEssayChange = (val) => {
     setEssays((prev) => {
@@ -94,35 +99,50 @@ export const IeltsWritingModule = ({
     }
   };
 
+  // Left Pane: Official Prompt & Structure Strategy Guide
   const leftPaneContent = (
     <div className="ielts-left-scroll-pane ielts-writing-prompt-pane">
+      {/* Task Switcher Tabs */}
       <div className="ielts-writing-task-tabs">
         {tasks.map((t) => (
           <button
             key={t.taskNumber}
             type="button"
-            className={`ielts-part-tab-btn ${activeTask === t.taskNumber ? "active" : ""}`}
+            className={`ielts-writing-task-btn ${activeTask === t.taskNumber ? "active" : ""}`}
             onClick={() => setActiveTask(t.taskNumber)}
           >
-            {t.title}
-            <span className="ielts-tab-subrange">Tối thiểu {t.minWords} từ</span>
+            <span>{t.title}</span>
+            <span className="ielts-tab-subrange">(Tối thiểu {t.minWords} từ)</span>
           </button>
         ))}
       </div>
 
+      {/* Official Exam Prompt Card */}
       <div className="ielts-writing-prompt-card">
         <div className="ielts-writing-prompt-header">
-          <span className="ielts-badge">{currentTask.title}</span>
-          <span className="ielts-time-hint"><Clock className="w-4 h-4 inline mr-1" /> {currentTask.timeSuggestion}</span>
+          <span className="ielts-prompt-tag-badge">IELTS ACADEMIC WRITING • {currentTask.title.toUpperCase()}</span>
+          <span className="ielts-time-hint">
+            <Clock className="w-4 h-4 mr-1 text-primary inline" />
+            {currentTask.timeSuggestion}
+          </span>
         </div>
 
         <div className="ielts-writing-instructions">
-          {currentTask.prompt.split("\n\n").map((para, i) => (
-            <p key={i} className="ielts-prompt-paragraph">{para}</p>
-          ))}
+          {currentTask.prompt.split("\n\n").map((para, i) => {
+            if (i === 0 && activeTask === 2) {
+              return (
+                <div key={i} className="ielts-prompt-quote-box">
+                  {para}
+                </div>
+              );
+            }
+            return (
+              <p key={i} className="ielts-prompt-action-text">{para}</p>
+            );
+          })}
         </div>
 
-        {/* Task 1 Diagram */}
+        {/* Task 1 Diagram Image */}
         {currentTask.image && (
           <div className="ielts-writing-image-wrap">
             <h5 className="ielts-diagram-title">{currentTask.diagramTitle}</h5>
@@ -134,37 +154,108 @@ export const IeltsWritingModule = ({
           </div>
         )}
       </div>
+
+      {/* Band 7.0+ Structure & Strategy Assistant Card */}
+      <div className="ielts-strategy-card">
+        <div className="ielts-strategy-header" onClick={() => setShowGuide(!showGuide)}>
+          <span className="ielts-strategy-title">
+            💡 {activeTask === 2 ? "Bố cục bài viết Essay 4 đoạn chuẩn Band 7.0+" : "Cấu trúc bài viết Task 1 Report chuẩn"}
+          </span>
+          <span className="ielts-toggle-arrow">{showGuide ? "▲" : "▼"}</span>
+        </div>
+
+        {showGuide && (
+          <div className="ielts-strategy-body">
+            {activeTask === 2 ? (
+              <>
+                <div className="ielts-structure-grid">
+                  <div className="ielts-structure-box">
+                    <span className="ielts-struct-name">1. Introduction (Mở bài)</span>
+                    <p className="ielts-struct-desc">Paraphrase đề bài (1 câu) + Thesis statement nêu rõ quan điểm cá nhân (1 câu).</p>
+                  </div>
+                  <div className="ielts-structure-box">
+                    <span className="ielts-struct-name">2. Body 1 (Quan điểm 1)</span>
+                    <p className="ielts-struct-desc">Thảo luận lý do rạp hát/phim không còn thiết yếu (sự tiện lợi của digital streaming).</p>
+                  </div>
+                  <div className="ielts-structure-box">
+                    <span className="ielts-struct-name">3. Body 2 (Quan điểm 2)</span>
+                    <p className="ielts-struct-desc">Thảo luận giá trị kinh tế & văn hóa cộng đồng không thể thay thế của rạp chiếu phim.</p>
+                  </div>
+                  <div className="ielts-structure-box">
+                    <span className="ielts-struct-name">4. Conclusion (Kết luận)</span>
+                    <p className="ielts-struct-desc">Tóm tắt ngắn gọn 2 khía cạnh + Khẳng định lại lập trường cuối cùng (2 câu).</p>
+                  </div>
+                </div>
+                <div className="ielts-criteria-pills-row">
+                  <span className="ielts-crit-pill">Task Response: Nêu rõ quan điểm</span>
+                  <span className="ielts-crit-pill">Coherence: Từ nối học thuật</span>
+                  <span className="ielts-crit-pill">Lexicon: Từ vựng chuyên sâu</span>
+                  <span className="ielts-crit-pill">Grammar: Câu phức & câu ghép</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="ielts-structure-grid">
+                  <div className="ielts-structure-box">
+                    <span className="ielts-struct-name">1. Introduction</span>
+                    <p className="ielts-struct-desc">Paraphrase câu dẫn mô tả sơ đồ quán cà phê đại học hiện tại và đề xuất.</p>
+                  </div>
+                  <div className="ielts-structure-box">
+                    <span className="ielts-struct-name">2. Overview</span>
+                    <p className="ielts-struct-desc">Chỉ ra các thay đổi nổi bật nhất: mở rộng diện tích, quầy thanh toán mới, bàn tròn.</p>
+                  </div>
+                  <div className="ielts-structure-box">
+                    <span className="ielts-struct-name">3. Details 1</span>
+                    <p className="ielts-struct-desc">Mô tả chi tiết cách bố trí không gian hiện tại (Current layout).</p>
+                  </div>
+                  <div className="ielts-structure-box">
+                    <span className="ielts-struct-name">4. Details 2</span>
+                    <p className="ielts-struct-desc">Mô tả chi tiết các phòng và trang thiết bị mới đề xuất (Proposed changes).</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 
+  // Right Pane: Essay Editor & Live Word Processor
   const rightPaneContent = (
     <div className="ielts-right-scroll-pane ielts-writing-editor-pane">
-      <div className="ielts-editor-header">
-        <div className="ielts-word-counter">
+      <div className="ielts-editor-toolbar">
+        <div className="ielts-word-counter-badge">
           <span>Số từ: <strong>{wordCount}</strong> / {currentTask.minWords} từ</span>
-          {wordCount >= currentTask.minWords && (
-            <span className="ielts-word-goal-met">
-              <CheckCircle className="w-4 h-4 inline mr-1 text-success" /> Đạt yêu cầu độ dài
+          <span className={`ielts-word-progress-ring ${wordCount >= currentTask.minWords ? "met" : ""}`}>
+            {wordCount >= currentTask.minWords ? (
+              <span><CheckCircle className="w-3.5 h-3.5 inline mr-1 text-success" /> Đạt yêu cầu độ dài ({wordCount} từ)</span>
+            ) : (
+              <span>Cần thêm {currentTask.minWords - wordCount} từ</span>
+            )}
+          </span>
+        </div>
+
+        <div className="ielts-editor-actions">
+          <span className="ielts-autosave-tag">✓ Đã lưu tự động</span>
+
+          {/* AI Scoring Button */}
+          {isAuthorized ? (
+            <button
+              type="button"
+              className="ielts-ai-eval-btn"
+              onClick={handleEvaluateAi}
+              disabled={isLoadingAi || wordCount < 15}
+            >
+              <Sparkles className="w-4 h-4 mr-1.5" />
+              {isLoadingAi ? "AI đang chấm điểm..." : "Chấm điểm AI"}
+            </button>
+          ) : (
+            <span className="ielts-ai-restricted-badge" title="Tính năng AI chấm điểm dành riêng cho 3 tài khoản được cấp phép">
+              🔒 AI chấm điểm (Cần cấp phép)
             </span>
           )}
         </div>
-
-        {/* AI Scoring Button */}
-        {isAuthorized ? (
-          <button
-            type="button"
-            className="ielts-ai-eval-btn"
-            onClick={handleEvaluateAi}
-            disabled={isLoadingAi || wordCount < 15}
-          >
-            <Sparkles className="w-4 h-4 mr-1.5" />
-            {isLoadingAi ? "AI đang chấm điểm..." : "Chấm điểm AI"}
-          </button>
-        ) : (
-          <span className="ielts-ai-restricted-badge" title="Tính năng AI chấm điểm dành riêng cho 3 tài khoản được cấp phép">
-            🔒 AI chấm điểm (Cần cấp phép)
-          </span>
-        )}
       </div>
 
       {aiError && <div className="ielts-error-banner">{aiError}</div>}
@@ -173,10 +264,14 @@ export const IeltsWritingModule = ({
         <textarea
           value={currentEssay}
           onChange={(e) => handleEssayChange(e.target.value)}
-          placeholder={`Nhập bài viết ${currentTask.title} của bạn tại đây...`}
+          placeholder={`Nhập bài viết ${currentTask.title} của bạn tại đây theo đúng chuẩn thi IELTS...`}
           className="ielts-essay-textarea"
-          rows={16}
+          rows={18}
         />
+        <div className="ielts-editor-footer-status">
+          <span>Độ dài: {wordCount} từ ({charCount} ký tự)</span>
+          <span>Phím tắt: Bài viết được tự động lưu vào trình duyệt liên tục.</span>
+        </div>
       </div>
 
       {/* AI Evaluation Result Card */}
@@ -186,7 +281,7 @@ export const IeltsWritingModule = ({
             <span className="ielts-ai-band-badge">
               IELTS Band: {evalResults[activeTask].overall_band || evalResults[activeTask].band || "N/A"}
             </span>
-            <span className="ielts-ai-evaluated-date">Đã chấm bởi Gemini AI</span>
+            <span className="ielts-ai-evaluated-date">Đã chấm bởi Gemini AI • Chuẩn IELTS 9.0</span>
           </div>
 
           <div className="ielts-ai-subscores-grid">
@@ -237,4 +332,3 @@ export const IeltsWritingModule = ({
     />
   );
 };
-

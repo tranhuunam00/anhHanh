@@ -1,302 +1,262 @@
-/* IELTS Listening Styles */
+/* ==========================================================================
+   IELTS Listening Stylesheet (Clean Exam-Standard UI)
+   Light & Dark Mode Compatible via System CSS Variables
+   ========================================================================== */
 
-.ielts-part-nav-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
+/* Navigation Tabs */
+.ielts-part-nav-tabs,
+.ielts-left-tabs-group {
+  display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+}
+
+.ielts-left-part-selector {
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;
+  padding: 10px 12px; background: var(--bg-card);
+  border: 1px solid var(--border-color); border-radius: 8px;
+}
+
+.ielts-left-nav-label {
+  font-size: 0.76rem; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
 }
 
 .ielts-part-tab-btn {
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  padding: 8px 16px; border-radius: 6px; font-size: 0.86rem; font-weight: 600;
+  border: 1px solid var(--border-color); background: var(--bg-card);
+  color: var(--text-secondary); cursor: pointer; display: inline-flex;
+  align-items: center; gap: 6px; transition: all 0.15s ease;
+}
+
+.ielts-part-tab-btn:hover {
+  background: var(--bg-secondary); color: var(--text-primary); border-color: var(--primary);
 }
 
 .ielts-part-tab-btn.active {
-  background: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
+  background: var(--primary); color: #ffffff; border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25); font-weight: 700;
 }
 
-.ielts-tab-subrange {
-  font-size: 0.72rem;
-  opacity: 0.85;
+.ielts-tab-subrange { font-size: 0.72rem; opacity: 0.85; }
+.ielts-tab-img-tag { font-size: 0.72rem; color: #f59e0b; font-weight: 700; }
+
+/* Instructions Banner */
+.ielts-instructions-banner {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary); border-radius: 8px;
+  padding: 14px 18px; margin-bottom: 16px;
 }
 
-/* Audio Player Card */
-.ielts-audio-player-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 14px;
+.ielts-instructions-banner h4 {
+  font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;
 }
 
-.ielts-player-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+.ielts-instructions-text {
+  font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);
+  white-space: pre-line; margin: 0;
 }
 
-.ielts-player-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-  font-size: 0.88rem;
+/* Part 1 Table Completion */
+.ielts-table-container {
+  overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 8px; margin-bottom: 16px;
 }
 
-.ielts-audio-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
+.ielts-exercise-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
+.ielts-exercise-table th,
+.ielts-exercise-table td {
+  padding: 12px 14px; border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color); text-align: left;
+  vertical-align: top; line-height: 1.7;
 }
 
-.ielts-source-dropdown {
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  font-size: 0.78rem;
+.ielts-exercise-table th {
+  background: var(--bg-secondary); color: var(--text-primary);
+  font-weight: 700; border-bottom: 2px solid var(--border-color);
 }
 
-.ielts-player-scrubber-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+.ielts-exercise-table th:last-child,
+.ielts-exercise-table td:last-child { border-right: none; }
+.ielts-exercise-table tr:last-child td { border-bottom: none; }
+
+/* Part 2 Map & Left Pane Visuals */
+.ielts-visual-card,
+.ielts-info-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 10px; padding: 16px; margin-bottom: 16px;
 }
 
-.ielts-time-label {
-  font-family: monospace;
-  font-size: 0.76rem;
-  color: var(--text-muted);
-}
-
-.ielts-scrubber-slider {
-  flex: 1;
-  accent-color: var(--primary);
-  cursor: pointer;
-}
-
-.ielts-player-controls-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.ielts-playback-btns {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.ielts-ctrl-btn {
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 0.78rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-}
-
-.ielts-play-main-btn {
-  background: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
-  padding: 6px 12px;
-  border-radius: 50%;
-}
-
-.ielts-speed-group {
-  display: flex;
-  gap: 4px;
-}
-
-.ielts-speed-btn {
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.72rem;
-  cursor: pointer;
-}
-
-.ielts-speed-btn.active {
-  background: var(--primary);
-  color: #ffffff;
-}
-
-.ielts-volume-group {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.ielts-volume-slider {
-  width: 60px;
-  accent-color: var(--primary);
-}
-
-.ielts-part-jump-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-color);
-  font-size: 0.76rem;
-  flex-wrap: wrap;
-}
-
-.ielts-jump-label {
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.ielts-jump-btns {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.ielts-jump-btn {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.72rem;
-  cursor: pointer;
-}
-
-/* Visual Map & Diagram Cards */
-.ielts-visual-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 14px;
-}
-
-.ielts-visual-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.ielts-visual-title {
-  font-size: 0.92rem;
-  font-weight: 700;
-}
+.ielts-visual-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ielts-visual-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 
 .ielts-map-image-wrap {
-  width: 100%;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  background: #ffffff;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 8px;
+  width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);
+  background: #ffffff; display: flex; justify-content: center; padding: 6px; margin-bottom: 10px;
 }
 
-.ielts-map-image {
-  max-width: 100%;
-  height: auto;
-  display: block;
+.ielts-map-image { max-width: 100%; height: auto; display: block; border-radius: 4px; }
+.ielts-visual-hint { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+
+.ielts-test-tips-box {
+  background: var(--bg-secondary); border-radius: 8px; padding: 12px 16px; margin-top: 10px;
 }
 
-.ielts-visual-hint {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  line-height: 1.4;
+.ielts-test-tips-box h6 {
+  font-size: 0.84rem; font-weight: 800; margin-bottom: 6px; color: var(--text-primary);
 }
 
-/* Map items grid */
-.ielts-map-items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 8px;
-  margin-top: 8px;
+.ielts-test-tips-box ul {
+  padding-left: 18px; margin: 0; font-size: 0.84rem; line-height: 1.6; color: var(--text-secondary);
 }
 
-.ielts-map-item-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 8px;
-  background: var(--bg-secondary);
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
+/* Part 2 Map Labeling Right Pane Cards */
+.ielts-map-questions-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;
 }
 
-/* Flowchart */
-.ielts-flowchart-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
+.ielts-map-question-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;
 }
 
-.ielts-flowchart-step-card {
-  padding: 8px 12px;
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+.ielts-map-item-label { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); flex: 1; }
+
+.ielts-map-header-row {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
 }
 
-.ielts-flow-step-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+.ielts-quick-map-btn {
+  background: var(--bg-secondary); color: var(--primary); border: 1px solid var(--border-color);
+  padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
 }
 
-.ielts-flow-step-num {
-  font-size: 0.72rem;
-  font-weight: 700;
-  background: var(--primary);
-  color: #ffffff;
-  padding: 1px 6px;
-  border-radius: 3px;
+.ielts-quick-map-btn:hover { background: var(--primary); color: #ffffff; }
+
+/* Part 3 Choose Two & Flowchart */
+.ielts-question-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 10px; padding: 16px; margin-bottom: 16px;
 }
 
-.ielts-flow-stage {
-  font-weight: 600;
-  font-size: 0.82rem;
+.ielts-card-title { font-size: 0.98rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.ielts-prompt-text { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px; }
+.ielts-options-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ielts-radio-label,
+.ielts-checkbox-label {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+  border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card);
+  cursor: pointer; transition: all 0.15s;
 }
+
+.ielts-radio-label:hover,
+.ielts-checkbox-label:hover { background: var(--bg-secondary); border-color: var(--primary); }
+
+.ielts-radio-label.checked,
+.ielts-checkbox-label.checked { background: rgba(37, 99, 235, 0.08); border-color: var(--primary); }
+
+.ielts-opt-letter {
+  display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+  border-radius: 4px; background: var(--bg-secondary); font-weight: 800; font-size: 0.8rem;
+  color: var(--text-primary); flex-shrink: 0;
+}
+
+.ielts-opt-text { font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); }
 
 .ielts-flow-options-box {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 6px;
-  margin-top: 8px;
-  padding: 8px;
-  background: var(--bg-secondary);
-  border-radius: 6px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px;
+  padding: 12px; background: var(--bg-secondary); border-radius: 8px;
+  border: 1px solid var(--border-color); margin-bottom: 16px;
 }
 
-.ielts-flow-option-badge {
-  font-size: 0.78rem;
+.ielts-flow-option-badge { font-size: 0.84rem; color: var(--text-primary); line-height: 1.4; }
+.ielts-flowchart-steps { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+.ielts-flowchart-step-card {
+  width: 100%; max-width: 520px; background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 8px; padding: 12px 16px;
 }
 
+.ielts-flow-step-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.ielts-flow-step-num { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+.ielts-flow-stage { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+.ielts-flow-step-input { display: flex; align-items: center; gap: 8px; }
+.ielts-flow-arrow { text-align: center; font-size: 1.3rem; color: var(--primary); font-weight: 900; }
+
+/* Part 4 Notes Completion (Authentic CD IELTS Standard) */
+.ielts-notes-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: 10px; padding: 22px 24px;
+}
+
+.ielts-notes-section { margin-bottom: 22px; }
+.ielts-notes-section:last-child { margin-bottom: 0; }
+
+.ielts-notes-heading {
+  font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 12px;
+  padding-left: 10px; border-left: 3px solid var(--primary); letter-spacing: 0.2px;
+}
+
+.ielts-notes-items { display: flex; flex-direction: column; gap: 12px; }
+
+.ielts-note-sentence-row {
+  font-size: 0.95rem; line-height: 1.85; color: var(--text-primary);
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; padding-left: 6px;
+}
+
+.ielts-note-bullet {
+  font-size: 1.15rem; color: var(--primary); font-weight: 800;
+  line-height: 1; margin-right: 4px; user-select: none;
+}
+
+.ielts-note-plain-text { font-size: 0.95rem; line-height: 1.85; color: var(--text-secondary); margin: 0; }
+
+/* Integrated Gap Capsule: Number Pill + Input Box */
+.ielts-inline-input-wrapper {
+  display: inline-flex; align-items: center; vertical-align: middle; margin: 0 4px;
+  border-radius: 6px; border: 1.5px solid var(--border-color); background: var(--bg-card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); overflow: hidden; transition: all 0.2s ease;
+}
+
+.ielts-inline-input-wrapper:focus-within {
+  border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.ielts-q-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 28px; height: 30px; padding: 0 8px; background: var(--primary);
+  color: #ffffff; font-weight: 800; font-size: 0.78rem; user-select: none; flex-shrink: 0;
+}
+
+.ielts-real-input {
+  height: 30px; padding: 4px 10px; border: none; background: transparent;
+  color: var(--text-primary); font-size: 0.92rem; font-weight: 600;
+  min-width: 130px; max-width: 180px; outline: none;
+}
+
+.ielts-real-input.ielts-short-input { max-width: 100px; min-width: 80px; }
+
+.ielts-select-box {
+  height: 32px; padding: 4px 10px; border-radius: 6px; border: 1.5px solid var(--border-color);
+  background: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem;
+  font-weight: 600; outline: none; cursor: pointer;
+}
+
+.ielts-select-box:focus { border-color: var(--primary); }
+
+/* Feedback & Review Indicators */
+.ielts-eval-badge {
+  display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px;
+  font-size: 0.76rem; font-weight: 700; margin-left: 6px;
+}
+
+.ielts-eval-badge.correct {
+  background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.ielts-eval-badge.incorrect {
+  background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.input-correct { border-color: #10b981 !important; }
+.input-incorrect { border-color: #ef4444 !important; }

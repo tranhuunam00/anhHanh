@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { BookOpen } from "../../constants/icons.js";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
-import { IeltsQuestionPalette } from "./IeltsQuestionPalette.jsx";
+import { IeltsQuestionPalette, isQuestionAnswered } from "./IeltsQuestionPalette.jsx";
 import {
   renderPassage1Questions,
   renderPassage2Questions,
@@ -9,8 +10,11 @@ import {
 
 /**
  * IELTS Academic Reading Test Module
- * Left pane: Reading Passage text (Passages 1, 2, 3)
- * Right pane: Questions with independent scrolling & synchronized height
+ * Features:
+ * - Prominent Top Navigation Bar: Part 1, Part 2, Part 3 with real-time answered counters
+ * - Resizable 2-Column Split Pane: Left (Passage text), Right (Questions)
+ * - Docked Bottom Question Palette: All 40 questions with bright glowing indicators when answered
+ * - Synchronized navigation when switching parts, with independent scroll containers
  */
 export const IeltsReadingModule = ({
   readingData,
@@ -20,8 +24,18 @@ export const IeltsReadingModule = ({
   isReview = false
 }) => {
   const [activePassage, setActivePassage] = useState(1);
+  const [leftPassage, setLeftPassage] = useState(1);
+  const [rightPassage, setRightPassage] = useState(1);
+
   const passages = readingData?.passages || [];
-  const currentPassage = passages.find((p) => p.passageNumber === activePassage) || passages[0];
+  const currentLeftPassage = passages.find((p) => p.passageNumber === leftPassage) || passages[0];
+  const currentRightPassage = passages.find((p) => p.passageNumber === rightPassage) || passages[0];
+
+  const handleSelectPassage = (num) => {
+    setActivePassage(num);
+    setLeftPassage(num);
+    setRightPassage(num);
+  };
 
   const handleInputChange = (questionNumber, value) => {
     if (onAnswerChange) {
@@ -46,47 +60,37 @@ export const IeltsReadingModule = ({
     handleInputChange(q2, updated[1] || "");
   };
 
-  // Left Pane: Passage Text with Passage Switcher
+  const getAnsweredCountInRange = (start, end) => {
+    let count = 0;
+    for (let i = start; i <= end; i++) {
+      if (isQuestionAnswered(answers, i)) count++;
+    }
+    return count;
+  };
+
+  // Left Pane: Passage Reading Text
   const leftPaneContent = (
     <div className="ielts-left-scroll-pane ielts-reading-text-pane">
-      {/* Passage Selector Tabs */}
-      <div className="ielts-reading-nav-tabs">
-        {passages.map((p) => (
-          <button
-            key={p.passageNumber}
-            type="button"
-            className={`ielts-part-tab-btn ${activePassage === p.passageNumber ? "active" : ""}`}
-            onClick={() => setActivePassage(p.passageNumber)}
-          >
-            Passage {p.passageNumber}
-            <span className="ielts-tab-subrange">Q{p.questionsRange[0]}-{p.questionsRange[1]}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Passage Body */}
-      {currentPassage && (
+      {currentLeftPassage && (
         <article className="ielts-passage-article">
           <header className="ielts-passage-header">
-            <span className="ielts-badge">READING PASSAGE {currentPassage.passageNumber}</span>
-            <h2 className="ielts-passage-title">{currentPassage.title}</h2>
-            {currentPassage.subtitle && (
-              <p className="ielts-passage-subtitle">{currentPassage.subtitle}</p>
+            <span className="ielts-badge">READING PASSAGE {currentLeftPassage.passageNumber} • PART {currentLeftPassage.passageNumber}</span>
+            <h2 className="ielts-passage-title">{currentLeftPassage.title}</h2>
+            {currentLeftPassage.subtitle && (
+              <p className="ielts-passage-subtitle">{currentLeftPassage.subtitle}</p>
             )}
           </header>
 
           <div className="ielts-passage-content">
-            {currentPassage.paragraphs ? (
-              // Structured paragraphs with letters (Passage 2)
-              currentPassage.paragraphs.map((para) => (
+            {currentLeftPassage.paragraphs ? (
+              currentLeftPassage.paragraphs.map((para) => (
                 <div key={para.id} className="ielts-paragraph-block">
                   <span className="ielts-paragraph-label">{para.id}</span>
                   <p className="ielts-paragraph-text">{para.text}</p>
                 </div>
               ))
             ) : (
-              // Continuous text with linebreaks (Passage 1 & 3)
-              currentPassage.text?.split("\n\n").map((para, idx) => (
+              currentLeftPassage.text?.split("\n\n").map((para, idx) => (
                 <p key={idx} className="ielts-paragraph-text">{para}</p>
               ))
             )}
@@ -99,42 +103,71 @@ export const IeltsReadingModule = ({
   // Right Pane: Questions
   const rightPaneContent = (
     <div className="ielts-right-scroll-pane ielts-reading-questions-pane">
-      <div className="ielts-reading-questions-header">
-        <h4 className="ielts-pane-header-title">
-          Câu hỏi Passage {activePassage} (Q{currentPassage?.questionsRange[0]} - Q{currentPassage?.questionsRange[1]})
-        </h4>
-      </div>
-
       <div className="ielts-questions-body">
-        {activePassage === 1 &&
-          renderPassage1Questions(currentPassage.groups, answers, handleInputChange, evaluation, isReview)}
-        {activePassage === 2 &&
-          renderPassage2Questions(currentPassage.groups, answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-        {activePassage === 3 &&
-          renderPassage3Questions(currentPassage.groups, answers, handleInputChange, evaluation, isReview)}
+        {rightPassage === 1 &&
+          renderPassage1Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+        {rightPassage === 2 &&
+          renderPassage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
+        {rightPassage === 3 &&
+          renderPassage3Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
       </div>
-
-      <IeltsQuestionPalette
-        totalQuestions={40}
-        answers={answers}
-        evaluation={evaluation}
-        onSelectQuestion={(num) => {
-          if (num <= 13) setActivePassage(1);
-          else if (num <= 26) setActivePassage(2);
-          else setActivePassage(3);
-        }}
-        className="ielts-reading-palette-footer"
-      />
     </div>
   );
 
   return (
-    <IeltsSplitPane
-      leftPane={leftPaneContent}
-      rightPane={rightPaneContent}
-      storageKey="ielts_split_reading"
-      className="ielts-reading-split"
-    />
+    <div className="ielts-module-container">
+      {/* Prominent Full-Width Top Bar for the 3 Reading Parts */}
+      <div className="ielts-module-top-bar">
+        <div className="ielts-module-nav-title">
+          <BookOpen className="w-4 h-4 text-primary mr-1" />
+          <span>IELTS Reading (3 Parts):</span>
+        </div>
+        <div className="ielts-module-parts-tabs">
+          {passages.map((p) => {
+            const [qStart, qEnd] = p.questionsRange;
+            const totalInPart = qEnd - qStart + 1;
+            const answeredInPart = getAnsweredCountInRange(qStart, qEnd);
+            const isActive = activePassage === p.passageNumber;
+
+            return (
+              <button
+                key={p.passageNumber}
+                type="button"
+                className={`ielts-main-part-btn ${isActive ? "active" : ""}`}
+                onClick={() => handleSelectPassage(p.passageNumber)}
+              >
+                <span className="ielts-part-badge-tag">Part {p.passageNumber}</span>
+                <span>Passage {p.passageNumber}</span>
+                <span className="ielts-part-q-range">(Q{qStart}-{qEnd})</span>
+                <span className={`ielts-part-progress-pill ${answeredInPart === totalInPart ? "complete" : ""}`}>
+                  {answeredInPart}/{totalInPart}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Resizable 2-Column Split Pane */}
+      <IeltsSplitPane
+        leftPane={leftPaneContent}
+        rightPane={rightPaneContent}
+        storageKey="ielts_split_reading"
+        className="ielts-reading-split"
+      />
+
+      {/* Docked Question Palette at Bottom with glowing answered badges */}
+      <IeltsQuestionPalette
+        totalQuestions={40}
+        answers={answers}
+        evaluation={evaluation}
+        skill="reading"
+        onSelectQuestion={(num) => {
+          const targetPassage = num <= 13 ? 1 : num <= 26 ? 2 : 3;
+          handleSelectPassage(targetPassage);
+        }}
+        className="ielts-reading-docked-palette"
+      />
+    </div>
   );
 };
-
