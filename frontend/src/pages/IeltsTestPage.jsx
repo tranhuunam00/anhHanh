@@ -12,7 +12,8 @@ import {
   gradeListeningTest,
   gradeReadingTest,
   saveIeltsSubmission,
-  getIeltsSubmission
+  getIeltsSubmission,
+  clearIeltsSubmission
 } from "../utils/ieltsScoring.js";
 import {
   IELTS_SKILL_ORDER,
@@ -231,6 +232,17 @@ export const IeltsTestPage = ({
   };
 
   const handleResetExam = () => {
+    // Clear all saved submissions from localStorage
+    clearIeltsSubmission(selectedTestId);
+    // Clear writing essays from localStorage
+    try {
+      const prefix = `ielts_essay_${selectedTestId}_`;
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith(prefix)) localStorage.removeItem(key);
+      });
+      // Clear speaking notes
+      localStorage.removeItem("ielts_speaking_notes_cam21_t2");
+    } catch { /* ignore */ }
     const fresh = resetExamSessionState(selectedTestId);
     setExamSession(fresh);
     setListeningAnswers({});
@@ -240,7 +252,7 @@ export const IeltsTestPage = ({
     setIsReviewMode(false);
     setIsModalOpen(false);
     setIsFinalReportOpen(false);
-    setIsConfirmOpen(false);
+    setIsConfirmOpen(true);
     setActiveSkill("listening");
   };
 

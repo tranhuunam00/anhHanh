@@ -196,6 +196,26 @@ export const getIeltsSubmission = (testId, skill) => {
 };
 
 /**
+ * Clears saved IELTS submission for a specific skill or all skills
+ * @param {string} testId
+ * @param {string} [skill] - Optional. If omitted, clears all 4 skills.
+ */
+export const clearIeltsSubmission = (testId, skill) => {
+  try {
+    if (typeof localStorage === "undefined") return;
+    if (skill) {
+      localStorage.removeItem(getIeltsStorageKey(testId, skill));
+    } else {
+      ["listening", "reading", "writing", "speaking"].forEach((s) => {
+        localStorage.removeItem(getIeltsStorageKey(testId, s));
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to clear IELTS submission from localStorage:", err);
+  }
+};
+
+/**
  * Formats seconds into MM:SS format safely handling edge cases (NaN, Infinity, negatives)
  * @param {number} secs
  * @returns {string}

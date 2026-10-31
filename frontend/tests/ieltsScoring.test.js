@@ -9,6 +9,7 @@ import {
   getIeltsStorageKey,
   saveIeltsSubmission,
   getIeltsSubmission,
+  clearIeltsSubmission,
   gradeListeningTest,
   gradeReadingTest
 } from "../src/utils/ieltsScoring.js";
@@ -337,6 +338,32 @@ describe("ieltsScoring - gradeReadingTest", () => {
 
     const emptyRes = gradeReadingTest({ passages: [] }, {});
     assert.equal(emptyRes.correctCount, 0);
+  });
+});
+
+describe("ieltsScoring - clearIeltsSubmission", () => {
+  test("does not throw on non-existent keys", () => {
+    assert.doesNotThrow(() => clearIeltsSubmission("nonexistent"));
+    assert.doesNotThrow(() => clearIeltsSubmission("nonexistent", "listening"));
+  });
+
+  test("does not throw when clearing single skill", () => {
+    assert.doesNotThrow(() => clearIeltsSubmission("test1", "listening"));
+    assert.doesNotThrow(() => clearIeltsSubmission("test1", "reading"));
+    assert.doesNotThrow(() => clearIeltsSubmission("test1", "writing"));
+    assert.doesNotThrow(() => clearIeltsSubmission("test1", "speaking"));
+  });
+
+  test("does not throw when clearing all skills at once", () => {
+    assert.doesNotThrow(() => clearIeltsSubmission("test2"));
+  });
+
+  test("generates correct storage keys for clear operations", () => {
+    // Verify the keys that would be targeted
+    assert.equal(getIeltsStorageKey("cam21", "listening"), "ielts_sub_cam21_listening");
+    assert.equal(getIeltsStorageKey("cam21", "reading"), "ielts_sub_cam21_reading");
+    assert.equal(getIeltsStorageKey("cam21", "writing"), "ielts_sub_cam21_writing");
+    assert.equal(getIeltsStorageKey("cam21", "speaking"), "ielts_sub_cam21_speaking");
   });
 });
 
