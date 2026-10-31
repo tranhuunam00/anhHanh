@@ -244,38 +244,40 @@ export function renderPart2(part, answers, onChange, onChooseTwo, evaluation, is
 
       {mapGroup && (
         <div className="ielts-question-card" id="ielts-q-15">
-          <div className="ielts-map-header-row">
-            <h5 className="ielts-card-title">{mapGroup.title}</h5>
-            {onOpenMap && (
-              <button
-                type="button"
-                className="ielts-quick-map-btn"
-                onClick={onOpenMap}
-                title="Mở sơ đồ ở cột trái để dễ đối chiếu"
-              >
-                🗺️ Xem sơ đồ ở cột trái
-              </button>
-            )}
-          </div>
+          <h5 className="ielts-card-title">{mapGroup.title}</h5>
           <p className="ielts-prompt-text">{mapGroup.prompt}</p>
-          <div className="ielts-map-questions-grid">
-            {mapGroup.items.map((item) => (
-              <div key={item.number} className="ielts-map-question-card" id={`ielts-q-${item.number}`}>
-                <span className="ielts-q-pill">{item.number}</span>
-                <span className="ielts-map-item-label">{item.label}</span>
-                <select
-                  value={answers[item.number] || ""}
-                  onChange={(e) => onChange(item.number, e.target.value)}
-                  className={`ielts-select-box ${getFeedbackClass(evaluation, item.number)}`}
-                >
-                  <option value="">Select (A-I)...</option>
-                  {part.mapLetters.map((l) => (
-                    <option key={l} value={l}>Location {l}</option>
-                  ))}
-                </select>
-                {renderFeedback(evaluation, item.number, isReview)}
-              </div>
-            ))}
+
+          <div className="ielts-map-interactive-wrapper">
+            <div className="ielts-map-image-container">
+              <img
+                src="/images/ielts/cam21_test2_listening_map.png"
+                alt="Melby Coal Mine Site Map"
+                className="ielts-inline-map-image"
+              />
+              <p className="ielts-visual-hint" style={{ marginTop: "10px" }}>
+                Đối chiếu các vị trí chữ cái <strong>A - I</strong> trên sơ đồ mỏ than Melby để chọn địa điểm cho câu hỏi 15 - 20.
+              </p>
+            </div>
+
+            <div className="ielts-map-questions-grid">
+              {mapGroup.items.map((item) => (
+                <div key={item.number} className="ielts-map-question-card" id={`ielts-q-${item.number}`}>
+                  <span className="ielts-q-pill">{item.number}</span>
+                  <span className="ielts-map-item-label">{item.label}</span>
+                  <select
+                    value={answers[item.number] || ""}
+                    onChange={(e) => onChange(item.number, e.target.value)}
+                    className={`ielts-select-box ${getFeedbackClass(evaluation, item.number)}`}
+                  >
+                    <option value="">Select (A-I)...</option>
+                    {part.mapLetters.map((l) => (
+                      <option key={l} value={l}>Location {l}</option>
+                    ))}
+                  </select>
+                  {renderFeedback(evaluation, item.number, isReview)}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

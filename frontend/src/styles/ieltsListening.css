@@ -293,3 +293,58 @@
 
 .input-correct { border-color: #10b981 !important; }
 .input-incorrect { border-color: #ef4444 !important; }
+
+/* ==========================================================================
+   Full-Width Listening Mode (No Left Sidebar - Maximum Space for Questions)
+   ========================================================================== */
+.ielts-listening-full-module {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.ielts-listening-full-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 24px 36px;
+  display: flex;
+  justify-content: center;
+}
+
+.ielts-listening-full-body {
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* Part 2 Inline Map + Questions Layout */
+.ielts-map-interactive-wrapper {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.25fr) minmax(280px, 1fr);
+  gap: 22px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+  .ielts-map-interactive-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ielts-map-image-container {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.ielts-inline-map-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+

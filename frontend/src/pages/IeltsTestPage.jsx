@@ -33,7 +33,10 @@ import {
   PenTool,
   Mic,
   CheckCircle,
-  Clock
+  Clock,
+  Info,
+  Lock,
+  Check
 } from "../constants/icons.js";
 import "../styles/ieltsTest.css";
 
@@ -292,7 +295,7 @@ export const IeltsTestPage = ({
               onClick={() => setIsConfirmOpen(true)}
               title="Xem thông tin đề thi & thời gian"
             >
-              ℹ️
+              <Info className="w-3.5 h-3.5 text-primary" />
             </button>
           </div>
 
@@ -324,8 +327,8 @@ export const IeltsTestPage = ({
                   {sk === "writing" && <PenTool className="w-4 h-4 mr-1 inline" />}
                   {sk === "speaking" && <Mic className="w-4 h-4 mr-1 inline" />}
                   <span className="capitalize">{sk}</span>
-                  {isCompleted && <span className="ielts-tab-check">✓</span>}
-                  {!isAccessible && <span className="ielts-tab-lock-icon">🔒</span>}
+                  {isCompleted && <Check className="w-3.5 h-3.5 inline ml-1 text-success" />}
+                  {!isAccessible && <Lock className="w-3 h-3 inline ml-1 opacity-70" />}
                 </button>
               );
             })}
@@ -377,14 +380,14 @@ export const IeltsTestPage = ({
       {/* Locked Skill Warning Banner */}
       {isCurrentSkillLocked && !isReviewMode && (
         <div className="ielts-locked-skill-banner">
-          <span>🔒 Kỹ năng <strong>{activeSkill.toUpperCase()}</strong> đã nộp bài. Theo quy chế thi thật, bạn không thể quay lại sửa đáp án.</span>
+          <span><Lock className="w-3.5 h-3.5 mr-1.5 inline text-amber-600" /> Kỹ năng <strong>{activeSkill.toUpperCase()}</strong> đã nộp bài. Theo quy chế thi thật, bạn không thể quay lại sửa đáp án.</span>
         </div>
       )}
 
       {/* Review Mode Banner */}
       {isReviewMode && (
         <div className="ielts-locked-skill-banner review-mode">
-          <span>📖 Bạn đang ở chế độ <strong>Xem lại bài làm (Review Mode)</strong>. Bạn có thể tự do xem lại tất cả 4 kỹ năng.</span>
+          <span><BookOpen className="w-3.5 h-3.5 mr-1.5 inline text-primary" /> Bạn đang ở chế độ <strong>Xem lại bài làm (Review Mode)</strong>. Bạn có thể tự do xem lại tất cả 4 kỹ năng.</span>
         </div>
       )}
 
