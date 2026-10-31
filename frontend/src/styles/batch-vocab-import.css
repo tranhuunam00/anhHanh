@@ -3,7 +3,35 @@
    Uses theme variables for Light and Dark mode compliance.
    ========================================================================== */
 
+.batch-vocab-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.batch-vocab-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1;
+  animation: batchBackdropFadeIn 0.2s ease;
+}
+
+@keyframes batchBackdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .batch-vocab-modal-dialog {
+  position: relative;
+  z-index: 2;
   max-width: 960px;
   width: 95vw;
   max-height: 90vh;
@@ -12,7 +40,7 @@
   background: var(--bg-card, #ffffff);
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 16px;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   animation: batchModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }

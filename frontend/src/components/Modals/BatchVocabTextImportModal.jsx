@@ -134,8 +134,8 @@ export const BatchVocabTextImportModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="ielts-modal-overlay">
-      <div className="ielts-modal-backdrop" onClick={onClose} />
+    <div className="batch-vocab-modal-overlay">
+      <div className="batch-vocab-modal-backdrop" onClick={onClose} />
       <div className="batch-vocab-modal-dialog">
         {/* Header */}
         <header className="batch-vocab-modal-header">
