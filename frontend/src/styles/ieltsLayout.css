@@ -1,0 +1,289 @@
+/* IELTS Test Page Layout & Split-Pane Architecture */
+
+.ielts-test-page-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 72px);
+  width: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* Header & Top Bar */
+.ielts-top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.ielts-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ielts-test-selector-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ielts-test-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ielts-test-select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ielts-skill-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-secondary);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-skill-tab-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+}
+
+.ielts-skill-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.ielts-skill-tab-btn.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ielts-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ielts-header-timer {
+  display: flex;
+  align-items: center;
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-submit-test-btn {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s;
+}
+
+.ielts-submit-test-btn:hover {
+  opacity: 0.9;
+}
+
+.ielts-retake-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Two-column Split Container */
+.ielts-test-content-area {
+  flex: 1;
+  display: flex;
+  height: calc(100% - 50px);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.ielts-split-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.ielts-split-pane {
+  height: 100%;
+  min-width: 250px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ielts-split-left {
+  border-right: 1px solid var(--border-color);
+}
+
+.ielts-split-divider {
+  width: 10px;
+  cursor: col-resize;
+  background: var(--bg-secondary);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: background 0.15s;
+  z-index: 10;
+}
+
+.ielts-split-divider:hover,
+.ielts-split-divider.active {
+  background: var(--primary);
+}
+
+.ielts-divider-handle {
+  width: 16px;
+  height: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.ielts-divider-dots {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text-muted);
+}
+
+.ielts-split-drag-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 999;
+  cursor: col-resize;
+}
+
+/* Independent Scroll Panes with Equal Matching Height */
+.ielts-left-scroll-pane,
+.ielts-right-scroll-pane {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--bg-primary);
+}
+
+/* Palette Bar */
+.ielts-palette-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 16px;
+}
+
+.ielts-palette-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+}
+
+.ielts-palette-title {
+  font-weight: 700;
+}
+
+.ielts-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+  gap: 4px;
+}
+
+.ielts-palette-badge {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ielts-palette-badge.answered {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.ielts-palette-badge.correct {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+.ielts-palette-badge.incorrect {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.ielts-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 24px;
+  text-align: center;
+}
+

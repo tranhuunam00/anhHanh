@@ -25,6 +25,8 @@ import { WritingPage } from "./pages/WritingPage";
 import { DestinationB2Page } from "./components/DestinationB2/DestinationB2Page";
 import { VisualVocabPage } from "./components/VisualVocab";
 import { RootWordsPage } from "./components/RootWords";
+import { IeltsTestPage } from "./pages/IeltsTestPage";
+import { GraduationCap } from "./constants/icons";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -66,6 +68,7 @@ export default function App() {
     if (path === "/roots" || path.startsWith("/roots/") || path === "/root-words" || path.startsWith("/root-words/")) return "tab-root-words";
     if (path === "/history" || path.startsWith("/history/")) return "tab-history";
     if (path === "/audio-studio" || path.startsWith("/audio-studio/")) return "tab-audio-studio";
+    if (path === "/ielts" || path.startsWith("/ielts/") || path === "/ielts-test" || path.startsWith("/ielts-test/")) return "tab-ielts-test";
     return "tab-dictation";
   };
 
@@ -81,6 +84,7 @@ export default function App() {
       case "tab-transcript": return "/transcript";
       case "tab-history": return "/history";
       case "tab-audio-studio": return "/audio-studio";
+      case "tab-ielts-test": return "/ielts";
       default: return "/";
     }
   };
@@ -907,6 +911,16 @@ export default function App() {
             </button>
 
             <button
+              className={`tab-btn ${activeTab === "tab-ielts-test" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-ielts-test")}
+              style={activeTab === "tab-ielts-test" ? { borderColor: "#f59e0b" } : {}}
+              title="Đề Thi Thật IELTS (Cambridge IELTS 21 - Test 2)"
+            >
+              <GraduationCap className="tab-btn-icon" />
+              <span>Đề thi thật IELTS</span>
+            </button>
+
+            <button
               className={`tab-btn ${activeTab === "tab-root-words" ? "active" : ""}`}
               onClick={() => setActiveTab("tab-root-words")}
               style={activeTab === "tab-root-words" ? { borderColor: "#2563eb" } : {}}
@@ -1169,6 +1183,16 @@ export default function App() {
         {/* TAB 10: 100 Gốc Từ Tiếng Anh (Word Roots) */}
         <div style={{ display: activeTab === "tab-root-words" ? "block" : "none" }}>
           <RootWordsPage isActive={activeTab === "tab-root-words"} />
+        </div>
+
+        {/* TAB 11: Đề thi thật IELTS (Cambridge Practice Tests) */}
+        <div style={{ display: activeTab === "tab-ielts-test" ? "block" : "none" }}>
+          <IeltsTestPage
+            isActive={activeTab === "tab-ielts-test"}
+            user={user}
+            token={token}
+            onOpenAuth={() => setIsAuthOpen(true)}
+          />
         </div>
       </main>
 

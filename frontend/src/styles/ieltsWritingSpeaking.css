@@ -1,0 +1,448 @@
+/* IELTS Writing & Speaking Styles */
+
+/* Writing Module */
+.ielts-writing-prompt-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.ielts-writing-image-wrap {
+  margin-top: 12px;
+  text-align: center;
+  background: #ffffff;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-writing-diagram-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.ielts-diagram-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 6px;
+}
+
+.ielts-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ielts-word-counter {
+  font-size: 0.85rem;
+}
+
+.ielts-word-goal-met {
+  color: #10b981;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.ielts-ai-eval-btn {
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ielts-ai-restricted-badge {
+  font-size: 0.74rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.ielts-essay-textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.ielts-ai-result-card {
+  margin-top: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.ielts-ai-subscores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.ielts-subscore-box {
+  background: var(--bg-secondary);
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.ielts-subscore-label {
+  font-size: 0.72rem;
+  display: block;
+  color: var(--text-muted);
+}
+
+.ielts-subscore-val {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* Speaking Module */
+.ielts-speaking-card,
+.ielts-recorder-card,
+.ielts-notepad-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.ielts-cue-card {
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--primary);
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin: 12px 0;
+}
+
+.ielts-cue-prompts {
+  padding-left: 20px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.ielts-cue-timers {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ielts-timer-digits {
+  font-size: 1.25rem;
+  font-family: monospace;
+  font-weight: 800;
+}
+
+.ielts-timer-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ielts-timer-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.ielts-record-btn-start {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ielts-record-btn-stop {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ielts-notepad-textarea {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+/* Feedback Badges */
+.ielts-eval-badge {
+  font-size: 0.74rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.ielts-eval-badge.correct {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.ielts-eval-badge.incorrect {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.input-correct {
+  border-color: #10b981 !important;
+}
+
+.input-incorrect {
+  border-color: #ef4444 !important;
+}
+
+/* Result Modal */
+.ielts-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ielts-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.ielts-result-modal-dialog {
+  position: relative;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 520px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.ielts-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.ielts-modal-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.ielts-modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.ielts-band-hero-box {
+  text-align: center;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.ielts-band-hero-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.ielts-band-hero-number {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1.1;
+  margin: 4px 0;
+}
+
+.ielts-band-hero-comment {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.ielts-result-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ielts-stat-card {
+  background: var(--bg-secondary);
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.ielts-stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.ielts-stat-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.ielts-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ielts-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ielts-btn-outline {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.ielts-btn-primary {
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: #ffffff;
+}
+
+/* Auth Gate Component */
+.ielts-auth-gate-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  background: var(--bg-primary);
+}
+
+.ielts-auth-gate-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  max-width: 580px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.ielts-auth-gate-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.ielts-auth-gate-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.ielts-auth-gate-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.ielts-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.ielts-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-secondary);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.ielts-auth-login-btn {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.ielts-auth-login-btn:hover {
+  opacity: 0.9;
+}
+

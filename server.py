@@ -110,6 +110,11 @@ app.include_router(tts_router)
 base_dir = os.path.dirname(__file__)
 react_dist_dir = os.path.join(base_dir, "frontend", "dist")
 
+# Mount static audio files directory
+audio_dir = os.path.join(base_dir, "audio")
+if os.path.exists(audio_dir):
+    app.mount("/audio", StaticFiles(directory=audio_dir), name="audio")
+
 if os.path.exists(react_dist_dir):
     assets_dir = os.path.join(react_dist_dir, "assets")
     if os.path.exists(assets_dir):

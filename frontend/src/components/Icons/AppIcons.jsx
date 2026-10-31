@@ -1104,3 +1104,37 @@ export const Share2 = (props) => (
     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
   </BaseIcon>
 );
+
+export const PenTool = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12 19l7-7 3 3-7 7-3-3z" />
+    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+    <path d="M2 2l7.586 7.586" />
+    <circle cx="11" cy="11" r="2" />
+  </BaseIcon>
+);
+
+export const Edit3 = (props) => (
+  <BaseIcon {...props}>
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+  </BaseIcon>
+);
+
+export const GripVertical = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="9" cy="12" r="1" />
+    <circle cx="9" cy="5" r="1" />
+    <circle cx="9" cy="19" r="1" />
+    <circle cx="15" cy="12" r="1" />
+    <circle cx="15" cy="5" r="1" />
+    <circle cx="15" cy="19" r="1" />
+  </BaseIcon>
+);
+
+export const FastForward = (props) => (
+  <BaseIcon {...props}>
+    <polygon points="13 19 22 12 13 5 13 19" />
+    <polygon points="2 19 11 12 2 5 2 19" />
+  </BaseIcon>
+);
