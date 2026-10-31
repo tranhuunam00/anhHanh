@@ -1,15 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Play, Pause } from "../../constants/icons.js";
-
-/**
- * Helper to format seconds into mm:ss
- */
-export function formatAudioTime(seconds) {
-  if (isNaN(seconds) || seconds < 0 || !isFinite(seconds)) return "00:00";
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
-}
+import { formatAudioTime } from "../../utils/ieltsScoring.js";
 
 /**
  * Custom Audio Player for WebM Voice Recordings

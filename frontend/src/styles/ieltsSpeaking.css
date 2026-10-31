@@ -377,24 +377,6 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 10px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  flex-wrap: wrap;
-}
-
-.ielts-preview-audio {
-  height: 36px;
-  flex: 1;
-  min-width: 220px;
-}
-
-.ielts-download-audio-link {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--primary);
-  text-decoration: underline;
 }
 
 .ielts-speaking-ai-bar {

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Play, Volume2 } from "../../constants/icons.js";
+import { formatAudioTime } from "../../utils/ieltsScoring.js";
 
 /**
  * IELTS Listening Exam Audio Player (Real Test Standard)
@@ -31,12 +32,11 @@ export const IeltsAudioPlayer = ({
     setIsEnded(false);
   }, [audioUrl]);
 
-  const formatTime = (secs) => {
-    if (isNaN(secs) || secs < 0) return "00:00";
-    const m = Math.floor(secs / 60);
-    const s = Math.floor(secs % 60);
-    return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
-  };
+  useEffect(() => {
+    if (audioRef.current && isFinite(audioRef.current.duration) && audioRef.current.duration > 0) {
+      setDuration(audioRef.current.duration);
+    }
+  }, [currentSource]);
 
   const handleStartExam = () => {
     if (!audioRef.current) return;
@@ -81,8 +81,11 @@ export const IeltsAudioPlayer = ({
       <audio
         ref={audioRef}
         src={currentSource}
+        preload="metadata"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onDurationChange={handleLoadedMetadata}
+        onCanPlay={handleLoadedMetadata}
         onEnded={handleEnded}
       />
 
@@ -139,8 +142,8 @@ export const IeltsAudioPlayer = ({
       {/* Read-Only Visual Progress Bar (No Scrubbing) */}
       <div className="ielts-progress-wrap">
         <div className="ielts-progress-time-row">
-          <span className="ielts-time-label">{formatTime(currentTime)}</span>
-          <span className="ielts-time-label">{formatTime(duration)}</span>
+          <span className="ielts-time-label">{formatAudioTime(currentTime)}</span>
+          <span className="ielts-time-label">{formatAudioTime(duration)}</span>
         </div>
         <div
           className="ielts-exam-progress-bar"

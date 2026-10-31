@@ -194,3 +194,19 @@ export const getIeltsSubmission = (testId, skill) => {
     return null;
   }
 };
+
+/**
+ * Formats seconds into MM:SS format safely handling edge cases (NaN, Infinity, negatives)
+ * @param {number} secs
+ * @returns {string}
+ */
+export const formatAudioTime = (secs) => {
+  if (typeof secs !== "number" || isNaN(secs) || !isFinite(secs) || secs < 0) {
+    return "00:00";
+  }
+  const total = Math.floor(secs);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
+};
+

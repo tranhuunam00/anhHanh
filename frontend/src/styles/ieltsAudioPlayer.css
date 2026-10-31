@@ -252,3 +252,102 @@
   font-style: italic;
 }
 
+/* ==========================================================================
+   Speaking Custom Recorded Audio Player (Resolves WebM duration bug)
+   ========================================================================== */
+.ielts-recorded-player-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 14px;
+  background: var(--bg-secondary);
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+}
+
+.ielts-recorded-play-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.ielts-recorded-play-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.ielts-recorded-time-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  min-width: 42px;
+  text-align: center;
+}
+
+.ielts-recorded-time-text.total-time {
+  color: var(--text-muted);
+}
+
+.ielts-recorded-timeline-wrap {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+}
+
+.ielts-recorded-timeline-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--primary);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.ielts-recorded-seek-input {
+  position: absolute;
+  left: 0;
+  top: -8px;
+  width: 100%;
+  height: 22px;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  z-index: 2;
+}
+
+.ielts-recorded-download-btn {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.ielts-recorded-download-btn:hover {
+  border-color: var(--primary);
+  text-decoration: underline;
+}
+

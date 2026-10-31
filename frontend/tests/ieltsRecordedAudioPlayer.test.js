@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { formatAudioTime } from "../src/components/IeltsTest/IeltsRecordedAudioPlayer.jsx";
+import { formatAudioTime } from "../src/utils/ieltsScoring.js";
 
 describe("IeltsRecordedAudioPlayer - formatAudioTime", () => {
   it("formats zero and standard seconds correctly", () => {

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
+import { IeltsRecordedAudioPlayer } from "./IeltsRecordedAudioPlayer.jsx";
 import { canUseIeltsAiGrading } from "../../utils/ieltsScoring.js";
 import { Mic, Pause, RotateCcw, Sparkles, Clock, Volume2 } from "../../constants/icons.js";
 
@@ -38,6 +39,8 @@ export const IeltsSpeakingModule = ({
   const [isRecording, setIsRecording] = useState(false);
   const [recordedAudioUrl, setRecordedAudioUrl] = useState(null);
   const [recordSeconds, setRecordSeconds] = useState(0);
+  const [recordedDuration, setRecordedDuration] = useState(0);
+  const recordSecondsRef = useRef(0);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const recordIntervalRef = useRef(null);
@@ -102,9 +105,15 @@ export const IeltsSpeakingModule = ({
       mediaRecorder.start(250);
       setIsRecording(true);
       setRecordSeconds(0);
+      setRecordedDuration(0);
+      recordSecondsRef.current = 0;
 
       recordIntervalRef.current = setInterval(() => {
-        setRecordSeconds((prev) => prev + 1);
+        setRecordSeconds((prev) => {
+          const next = prev + 1;
+          recordSecondsRef.current = next;
+          return next;
+        });
       }, 1000);
     } catch (err) {
       alert("Không thể truy cập microphone. Vui lòng cấp quyền ghi âm trong trình duyệt.");
@@ -118,6 +127,7 @@ export const IeltsSpeakingModule = ({
       mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
       setIsRecording(false);
       clearInterval(recordIntervalRef.current);
+      setRecordedDuration(recordSecondsRef.current);
     }
   };
 
@@ -286,14 +296,11 @@ export const IeltsSpeakingModule = ({
 
           {recordedAudioUrl && (
             <div className="ielts-playback-bar">
-              <audio src={recordedAudioUrl} controls className="ielts-preview-audio" />
-              <a
-                href={recordedAudioUrl}
-                download={`ielts_speaking_part${activePart}_recording.webm`}
-                className="ielts-download-audio-link"
-              >
-                Tải bản ghi (.webm)
-              </a>
+              <IeltsRecordedAudioPlayer
+                audioUrl={recordedAudioUrl}
+                duration={recordedDuration || recordSeconds}
+                downloadName={`ielts_speaking_part${activePart}_recording.webm`}
+              />
             </div>
           )}
         </div>
