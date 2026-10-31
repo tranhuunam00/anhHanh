@@ -1,0 +1,142 @@
+/* ==========================================================================
+   IELTS Resizable 2-Column Split Pane & Dual Scroll Architecture
+   Light & Dark Mode Compatible via System CSS Variables
+   ========================================================================== */
+
+/* Split Pane Outer Container */
+.ielts-split-container {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  flex: 1 1 0% !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+}
+
+/* Individual Columns (Left and Right) */
+.ielts-split-pane {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+}
+
+.ielts-split-left {
+  /* Width dynamically controlled by inline flex basis */
+}
+
+.ielts-split-right {
+  /* Width dynamically controlled by inline flex basis */
+}
+
+/* Draggable Central Divider */
+.ielts-split-divider {
+  width: 10px !important;
+  background: var(--bg-secondary) !important;
+  border-left: 1px solid var(--border-color) !important;
+  border-right: 1px solid var(--border-color) !important;
+  cursor: col-resize !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  transition: background 0.15s !important;
+  user-select: none !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+.ielts-split-divider:hover,
+.ielts-split-divider.active {
+  background: rgba(37, 99, 235, 0.2) !important;
+  border-color: var(--primary) !important;
+}
+
+.ielts-divider-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: transparent;
+}
+
+.ielts-divider-handle {
+  width: 14px;
+  height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  transition: all 0.15s;
+}
+
+.ielts-split-divider:hover .ielts-divider-handle,
+.ielts-split-divider.active .ielts-divider-handle {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.ielts-divider-dots {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.ielts-split-divider:hover .ielts-divider-dots,
+.ielts-split-divider.active .ielts-divider-dots {
+  color: #ffffff;
+}
+
+/* Drag Overlay Barrier */
+.ielts-split-drag-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  cursor: col-resize;
+}
+
+/* Independent Scrolling for Left and Right Content Panes */
+.ielts-left-scroll-pane,
+.ielts-right-scroll-pane {
+  flex: 1 1 0% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 16px !important;
+  background: var(--bg-primary) !important;
+  box-sizing: border-box !important;
+}
+
+.ielts-left-scroll-pane::-webkit-scrollbar,
+.ielts-right-scroll-pane::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ielts-left-scroll-pane::-webkit-scrollbar-thumb,
+.ielts-right-scroll-pane::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.ielts-left-scroll-pane::-webkit-scrollbar-thumb:hover,
+.ielts-right-scroll-pane::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+

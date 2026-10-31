@@ -100,7 +100,11 @@ export const IeltsSplitPane = ({
       {/* Left Column */}
       <div
         className="ielts-split-pane ielts-split-left"
-        style={{ flex: `0 0 calc(${splitRatio}% - 6px)` }}
+        style={{
+          flex: `0 0 calc(${splitRatio}% - 5px)`,
+          width: `calc(${splitRatio}% - 5px)`,
+          maxWidth: `calc(${splitRatio}% - 5px)`
+        }}
       >
         {leftPane}
       </div>
@@ -121,7 +125,11 @@ export const IeltsSplitPane = ({
       {/* Right Column */}
       <div
         className="ielts-split-pane ielts-split-right"
-        style={{ flex: `0 0 calc(${100 - splitRatio}% - 6px)` }}
+        style={{
+          flex: `0 0 calc(${100 - splitRatio}% - 5px)`,
+          width: `calc(${100 - splitRatio}% - 5px)`,
+          maxWidth: `calc(${100 - splitRatio}% - 5px)`
+        }}
       >
         {rightPane}
       </div>

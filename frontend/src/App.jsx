@@ -1186,7 +1186,13 @@ export default function App() {
         </div>
 
         {/* TAB 11: Đề thi thật IELTS (Cambridge Practice Tests) */}
-        <div style={{ display: activeTab === "tab-ielts-test" ? "block" : "none" }}>
+        <div
+          style={{
+            display: activeTab === "tab-ielts-test" ? "block" : "none",
+            height: activeTab === "tab-ielts-test" ? "calc(100vh - 56px)" : "auto",
+            overflow: "hidden"
+          }}
+        >
           <IeltsTestPage
             isActive={activeTab === "tab-ielts-test"}
             user={user}
@@ -1196,11 +1202,13 @@ export default function App() {
         </div>
       </main>
 
-      {/* Professional ShotLang Footer */}
-      <Footer
-        onOpenShortcuts={() => setIsShortcutsOpen(true)}
-        onOpenFeedback={() => setIsFeedbackOpen(true)}
-      />
+      {/* Professional ShotLang Footer (Hidden during IELTS exam mode to prevent window scroll) */}
+      {activeTab !== "tab-ielts-test" && (
+        <Footer
+          onOpenShortcuts={() => setIsShortcutsOpen(true)}
+          onOpenFeedback={() => setIsFeedbackOpen(true)}
+        />
+      )}
 
       {/* Floating Vocab Selection Saver Tooltip */}
       <FloatingVocabSaver

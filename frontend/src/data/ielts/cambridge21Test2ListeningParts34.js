@@ -186,7 +186,8 @@ export const listeningParts34 = [
             "prefix": "• ",
             "suffix": " is one of the worst problems.",
             "answers": [
-              "pollution"
+              "pollution",
+              "Pollution"
             ]
           },
           {
@@ -231,8 +232,8 @@ export const listeningParts34 = [
           },
           {
             "number": 36,
-            "prefix": "• Cruise companies need to have clearer ",
-            "suffix": " about tips.",
+            "prefix": "• People think there may be too many ",
+            "suffix": " .",
             "answers": [
               "rules"
             ]
@@ -240,41 +241,42 @@ export const listeningParts34 = [
         ]
       },
       {
-        "heading": "Environmental problems",
+        "heading": "Solutions",
         "items": [
           {
+            "text": "Cruise lines are attracting younger customers by:"
+          },
+          {
+            "text": "• becoming more sustainable e.g. using hybrid engines."
+          },
+          {
             "number": 37,
-            "prefix": "• Damage to coral reefs by cruise ship passengers ",
-            "suffix": " in the area.",
+            "prefix": "• having a wide range of activities e.g. boxing, ",
+            "suffix": " and well-being programmes.",
             "answers": [
               "diving"
             ]
-          }
-        ]
-      },
-      {
-        "heading": "Changing demands of passengers",
-        "items": [
+          },
           {
             "number": 38,
-            "prefix": "• Food: increased demand for ",
-            "suffix": " food.",
+            "prefix": "• offering a diverse selection of food including ",
+            "suffix": " options.",
             "answers": [
               "vegan"
             ]
           },
           {
             "number": 39,
-            "prefix": "• Activities: passengers expect high quality ",
-            "suffix": " so they can communicate with home.",
+            "prefix": "• providing reliable ",
+            "suffix": " .",
             "answers": [
               "wifi"
             ]
           },
           {
             "number": 40,
-            "prefix": "• Activities: passengers want to make short ",
-            "suffix": " to put on social media.",
+            "prefix": "• improving marketing on social media with high quality ",
+            "suffix": " .",
             "answers": [
               "videos"
             ]

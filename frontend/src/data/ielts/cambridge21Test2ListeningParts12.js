@@ -244,32 +244,32 @@ export const listeningParts12 = [
         "items": [
           {
             "number": 15,
-            "label": "Engine house",
+            "label": "Exhibition",
             "answer": "F"
           },
           {
             "number": 16,
-            "label": "Exhibition",
+            "label": "Baths",
             "answer": "B"
           },
           {
             "number": 17,
-            "label": "Baths",
+            "label": "Tools",
             "answer": "D"
           },
           {
             "number": 18,
-            "label": "Tools",
+            "label": "Vehicles",
             "answer": "A"
           },
           {
             "number": 19,
-            "label": "Vehicles",
+            "label": "Ponies",
             "answer": "H"
           },
           {
             "number": 20,
-            "label": "Ponies",
+            "label": "Education centre",
             "answer": "E"
           }
         ]
