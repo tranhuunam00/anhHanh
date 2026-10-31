@@ -8,7 +8,9 @@ import {
   canUseIeltsAiGrading,
   getIeltsStorageKey,
   saveIeltsSubmission,
-  getIeltsSubmission
+  getIeltsSubmission,
+  gradeListeningTest,
+  gradeReadingTest
 } from "../src/utils/ieltsScoring.js";
 
 describe("ieltsScoring - normalizeIeltsAnswer", () => {
@@ -162,4 +164,180 @@ describe("ieltsScoring - storage helpers", () => {
     assert.equal(getIeltsSubmission("test", "reading"), null);
   });
 });
+
+describe("ieltsScoring - gradeListeningTest", () => {
+  const mockListeningData = {
+    parts: [
+      {
+        partNumber: 1,
+        items: [
+          { number: 1, answers: ["steven", "stephen"] },
+          { number: 2, answers: ["48 / forty-eight"] }
+        ]
+      },
+      {
+        partNumber: 2,
+        groups: [
+          {
+            groupType: "choose_two",
+            numbers: [11, 12],
+            answers: ["B", "D"]
+          },
+          {
+            groupType: "map_labeling",
+            items: [
+              { number: 13, answer: "E" }
+            ]
+          }
+        ]
+      },
+      {
+        partNumber: 3,
+        groups: [
+          {
+            groupType: "choose_two",
+            numbers: [21, 22],
+            answers: ["A", "C"]
+          },
+          {
+            groupType: "flowchart_completion",
+            items: [
+              { number: 23, answer: "hygiene" }
+            ]
+          }
+        ]
+      },
+      {
+        partNumber: 4,
+        items: [
+          { number: 31, answers: ["agriculture"] }
+        ]
+      }
+    ]
+  };
+
+  test("evaluates correct answers across all question types and converts to band score", () => {
+    const answers = {
+      1: "Steven",
+      2: "48",
+      11: "B",
+      12: "D",
+      13: "E",
+      21: "A",
+      22: "C",
+      23: "hygiene",
+      31: "agriculture"
+    };
+
+    const res = gradeListeningTest(mockListeningData, answers);
+    assert.equal(res.correctCount, 9);
+    assert.equal(res.bandScore, 3.5);
+    assert.equal(res.evalMap[1].isCorrect, true);
+    assert.equal(res.evalMap[11].isCorrect, true);
+    assert.equal(res.evalMap[12].isCorrect, true);
+    assert.equal(res.evalMap[13].isCorrect, true);
+  });
+
+  test("handles choose_two duplicates correctly: same letter cannot count twice", () => {
+    const answers = {
+      11: "B",
+      12: "B" // duplicate should only give 1 point
+    };
+
+    const res = gradeListeningTest(mockListeningData, answers);
+    assert.equal(res.correctCount, 1);
+    assert.equal(res.evalMap[11].isCorrect, true);
+    assert.equal(res.evalMap[12].isCorrect, false);
+  });
+
+  test("boundary & error handling: handles null, undefined, and empty data", () => {
+    const nullRes = gradeListeningTest(null, {});
+    assert.equal(nullRes.correctCount, 0);
+    assert.equal(nullRes.bandScore, 1.0);
+
+    const emptyRes = gradeListeningTest({ parts: [] }, {});
+    assert.equal(emptyRes.correctCount, 0);
+  });
+});
+
+describe("ieltsScoring - gradeReadingTest", () => {
+  const mockReadingData = {
+    passages: [
+      {
+        passageNumber: 1,
+        groups: [
+          {
+            groupType: "table_completion",
+            tableItems: [
+              { number: 1, answers: ["volcano"] },
+              { number: 2, answers: ["caldera"] }
+            ]
+          },
+          {
+            groupType: "true_false_not_given",
+            items: [
+              { number: 6, answer: "TRUE" }
+            ]
+          }
+        ]
+      },
+      {
+        passageNumber: 2,
+        groups: [
+          {
+            groupType: "choose_two",
+            numbers: [19, 20],
+            answers: ["B", "E"]
+          },
+          {
+            groupType: "summary_completion",
+            items: [
+              { number: 21, answers: ["minerals"] }
+            ]
+          }
+        ]
+      },
+      {
+        passageNumber: 3,
+        groups: [
+          {
+            groupType: "matching_views",
+            items: [
+              { number: 27, answer: "C" }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  test("evaluates correct reading answers across passages", () => {
+    const answers = {
+      1: "volcano",
+      2: "caldera",
+      6: "TRUE",
+      19: "B",
+      20: "E",
+      21: "minerals",
+      27: "C"
+    };
+
+    const res = gradeReadingTest(mockReadingData, answers);
+    assert.equal(res.correctCount, 7);
+    assert.equal(res.bandScore, 3.0);
+    assert.equal(res.evalMap[1].isCorrect, true);
+    assert.equal(res.evalMap[6].isCorrect, true);
+    assert.equal(res.evalMap[19].isCorrect, true);
+  });
+
+  test("boundary & error handling: handles null reading data or empty inputs", () => {
+    const nullRes = gradeReadingTest(null, {});
+    assert.equal(nullRes.correctCount, 0);
+    assert.equal(nullRes.bandScore, 1.0);
+
+    const emptyRes = gradeReadingTest({ passages: [] }, {});
+    assert.equal(emptyRes.correctCount, 0);
+  });
+});
+
 

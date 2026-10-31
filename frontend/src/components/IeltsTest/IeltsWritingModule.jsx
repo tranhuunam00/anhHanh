@@ -12,7 +12,8 @@ import { Sparkles, Clock, CheckCircle } from "../../constants/icons.js";
 export const IeltsWritingModule = ({
   writingData,
   user = null,
-  token = null
+  token = null,
+  isLocked = false
 }) => {
   const [activeTask, setActiveTask] = useState(2); // Task 2 loaded first for essay practice
 
@@ -46,6 +47,7 @@ export const IeltsWritingModule = ({
   const charCount = currentEssay.length;
 
   const handleEssayChange = (val) => {
+    if (isLocked) return;
     setEssays((prev) => {
       const next = { ...prev, [activeTask]: val };
       try {
@@ -202,6 +204,7 @@ export const IeltsWritingModule = ({
           placeholder={`Nhập bài viết ${currentTask.title} của bạn tại đây theo đúng chuẩn thi IELTS...`}
           className="ielts-essay-textarea"
           rows={18}
+          readOnly={isLocked}
         />
         <div className="ielts-editor-footer-status">
           <span>Độ dài: {wordCount} từ ({charCount} ký tự)</span>

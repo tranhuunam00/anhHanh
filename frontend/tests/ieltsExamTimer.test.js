@@ -12,7 +12,11 @@ import {
   getSkillRemainingSeconds,
   completeAndLockSkill,
   isSkillCompletedAndLocked,
-  resetExamSessionState
+  resetExamSessionState,
+  canAccessSkill,
+  getNextSkill,
+  isExamFullyCompleted,
+  computeOverallBand
 } from "../src/utils/ieltsExamTimer.js";
 
 // Mock localStorage for node test runner
@@ -157,4 +161,91 @@ describe("ieltsExamTimer - completeAndLockSkill & isSkillCompletedAndLocked", ()
     assert.equal(isSkillCompletedAndLocked({ skills: {} }, "unknown"), false);
   });
 });
+
+describe("ieltsExamTimer - canAccessSkill & getNextSkill", () => {
+  it("Input & Logic: Listening is always accessible initially", () => {
+    const session = createDefaultSession("test_access");
+    assert.equal(canAccessSkill(session, "listening"), true);
+    assert.equal(canAccessSkill(session, "reading"), false);
+    assert.equal(canAccessSkill(session, "writing"), false);
+    assert.equal(canAccessSkill(session, "speaking"), false);
+  });
+
+  it("Sequential progression: unlocks skills one by one as previous complete", () => {
+    const session = createDefaultSession("test_seq");
+    session.skills.listening.status = "completed";
+
+    assert.equal(canAccessSkill(session, "reading"), true);
+    assert.equal(canAccessSkill(session, "writing"), false);
+
+    session.skills.reading.status = "completed";
+    assert.equal(canAccessSkill(session, "writing"), true);
+    assert.equal(canAccessSkill(session, "speaking"), false);
+
+    session.skills.writing.status = "completed";
+    assert.equal(canAccessSkill(session, "speaking"), true);
+  });
+
+  it("Boundary & Error Handling: handles null session, empty object, unknown skills", () => {
+    assert.equal(canAccessSkill(null, "listening"), false);
+    assert.equal(canAccessSkill(undefined, "listening"), false);
+    assert.equal(canAccessSkill({}, "listening"), false);
+    assert.equal(canAccessSkill({ skills: {} }, "invalid_skill"), false);
+  });
+
+  it("getNextSkill returns next sequential skill or null at end", () => {
+    assert.equal(getNextSkill("listening"), "reading");
+    assert.equal(getNextSkill("reading"), "writing");
+    assert.equal(getNextSkill("writing"), "speaking");
+    assert.equal(getNextSkill("speaking"), null);
+    assert.equal(getNextSkill("invalid"), null);
+    assert.equal(getNextSkill(null), null);
+  });
+});
+
+describe("ieltsExamTimer - isExamFullyCompleted & computeOverallBand", () => {
+  it("isExamFullyCompleted returns false until all 4 skills are completed", () => {
+    const session = createDefaultSession("test_done");
+    assert.equal(isExamFullyCompleted(session), false);
+
+    session.skills.listening.status = "completed";
+    session.skills.reading.status = "completed";
+    session.skills.writing.status = "completed";
+    assert.equal(isExamFullyCompleted(session), false);
+
+    session.skills.speaking.status = "completed";
+    assert.equal(isExamFullyCompleted(session), true);
+  });
+
+  it("isExamFullyCompleted boundary checks", () => {
+    assert.equal(isExamFullyCompleted(null), false);
+    assert.equal(isExamFullyCompleted({}), false);
+  });
+
+  it("computeOverallBand averages scores and rounds to nearest 0.5", () => {
+    const session = createDefaultSession("test_band");
+    session.skills.listening.result = { bandScore: 7.5 };
+    session.skills.reading.result = { bandScore: 8.0 };
+    // avg = 7.75 -> round to nearest 0.5 = 8.0
+    assert.equal(computeOverallBand(session), 8.0);
+
+    session.skills.reading.result = { bandScore: 7.0 };
+    // avg = 7.25 -> round to nearest 0.5 = 7.5
+    assert.equal(computeOverallBand(session), 7.5);
+
+    session.skills.reading.result = { bandScore: 6.5 };
+    // avg = 7.0 -> 7.0
+    assert.equal(computeOverallBand(session), 7.0);
+  });
+
+  it("computeOverallBand boundary with single skill or missing results", () => {
+    const session = createDefaultSession("test_single");
+    session.skills.listening.result = { bandScore: 6.5 };
+    assert.equal(computeOverallBand(session), 6.5);
+
+    assert.equal(computeOverallBand(null), 1.0);
+    assert.equal(computeOverallBand({}), 1.0);
+  });
+});
+
 

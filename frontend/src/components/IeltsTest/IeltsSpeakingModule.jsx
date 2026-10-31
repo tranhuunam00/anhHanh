@@ -13,7 +13,8 @@ import { Mic, Pause, RotateCcw, Sparkles, Clock, Volume2 } from "../../constants
  */
 export const IeltsSpeakingModule = ({
   speakingData,
-  user = null
+  user = null,
+  isLocked = false
 }) => {
   const [activePart, setActivePart] = useState(1);
   const parts = speakingData?.parts || [];
@@ -48,6 +49,7 @@ export const IeltsSpeakingModule = ({
   const isAuthorized = canUseIeltsAiGrading(user);
 
   const handleNotesChange = (val) => {
+    if (isLocked) return;
     setNotes((prev) => {
       const next = { ...prev, [activePart]: val };
       try {
@@ -84,6 +86,7 @@ export const IeltsSpeakingModule = ({
 
   // Voice recording handlers
   const startRecording = async () => {
+    if (isLocked) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunksRef.current = [];
@@ -279,9 +282,10 @@ export const IeltsSpeakingModule = ({
               type="button"
               className="ielts-record-btn-start"
               onClick={startRecording}
+              disabled={isLocked}
             >
               <Mic className="w-4 h-4" />
-              <span>Bắt đầu ghi âm câu trả lời</span>
+              <span>{isLocked ? "Đã nộp bài nói (Đã khóa)" : "Bắt đầu ghi âm câu trả lời"}</span>
             </button>
           ) : (
             <button
@@ -336,6 +340,7 @@ export const IeltsSpeakingModule = ({
           placeholder={`Ghi nhanh ý tưởng, từ vựng hoặc dàn ý cho Part ${activePart} tại đây...`}
           className="ielts-notepad-textarea"
           rows={14}
+          readOnly={isLocked}
         />
       </div>
     </div>

@@ -210,3 +210,144 @@ export const formatAudioTime = (secs) => {
   return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
 };
 
+/**
+ * Evaluates Listening answers against test data
+ * @param {object} listeningData 
+ * @param {object} answers { [qNum]: userVal }
+ * @returns {{ correctCount: number, bandScore: number, evalMap: object }}
+ */
+export const gradeListeningTest = (listeningData, answers = {}) => {
+  if (!listeningData || !listeningData.parts) {
+    return { correctCount: 0, bandScore: 1.0, evalMap: {} };
+  }
+  const evalMap = {};
+  let correctCount = 0;
+
+  const checkItem = (qNum, acceptedAnswers) => {
+    if (!qNum) return;
+    const userAns = answers[qNum] || "";
+    const isCorrect = checkIeltsAnswer(userAns, acceptedAnswers);
+    if (isCorrect) correctCount++;
+    evalMap[qNum] = {
+      isCorrect,
+      userAns,
+      accepted: Array.isArray(acceptedAnswers) ? acceptedAnswers : [acceptedAnswers]
+    };
+  };
+
+  // Part 1: Form / Notes Completion
+  listeningData.parts[0]?.items?.forEach((it) => checkItem(it.number, it.answers));
+
+  // Part 2: Choose two & Map labeling
+  listeningData.parts[1]?.groups?.forEach((g) => {
+    if (g.groupType === "choose_two") {
+      const [q1, q2] = g.numbers || [];
+      const accepted = g.answers || [];
+      const u1 = answers[q1];
+      const u2 = answers[q2];
+      const correct1 = accepted.includes(u1);
+      const correct2 = accepted.includes(u2) && u2 !== u1;
+      if (correct1) correctCount++;
+      if (correct2) correctCount++;
+      evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
+      evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
+    } else if (g.groupType === "map_labeling") {
+      g.items?.forEach((it) => checkItem(it.number, [it.answer]));
+    } else if (g.items) {
+      g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    }
+  });
+
+  // Part 3: Choose two & Flow-chart completion
+  listeningData.parts[2]?.groups?.forEach((g) => {
+    if (g.groupType === "choose_two") {
+      const [q1, q2] = g.numbers || [];
+      const accepted = g.answers || [];
+      const u1 = answers[q1];
+      const u2 = answers[q2];
+      const correct1 = accepted.includes(u1);
+      const correct2 = accepted.includes(u2) && u2 !== u1;
+      if (correct1) correctCount++;
+      if (correct2) correctCount++;
+      evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
+      evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
+    } else if (g.groupType === "flowchart_completion") {
+      g.items?.forEach((it) => checkItem(it.number, [it.answer]));
+    } else if (g.items) {
+      g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    }
+  });
+
+  // Part 4: Lecture notes completion
+  listeningData.parts[3]?.items?.forEach((it) => checkItem(it.number, it.answers));
+
+  const bandScore = getListeningBandScore(correctCount);
+  return { correctCount, bandScore, evalMap };
+};
+
+/**
+ * Evaluates Academic Reading answers against test data
+ * @param {object} readingData 
+ * @param {object} answers { [qNum]: userVal }
+ * @returns {{ correctCount: number, bandScore: number, evalMap: object }}
+ */
+export const gradeReadingTest = (readingData, answers = {}) => {
+  if (!readingData || !readingData.passages) {
+    return { correctCount: 0, bandScore: 1.0, evalMap: {} };
+  }
+  const evalMap = {};
+  let correctCount = 0;
+
+  const checkItem = (qNum, acceptedAnswers) => {
+    if (!qNum) return;
+    const userAns = answers[qNum] || "";
+    const isCorrect = checkIeltsAnswer(userAns, acceptedAnswers);
+    if (isCorrect) correctCount++;
+    evalMap[qNum] = {
+      isCorrect,
+      userAns,
+      accepted: Array.isArray(acceptedAnswers) ? acceptedAnswers : [acceptedAnswers]
+    };
+  };
+
+  const p1 = readingData.passages[0];
+  p1?.groups?.forEach((g) => {
+    if (g.groupType === "table_completion") {
+      (g.tableItems || []).forEach((it) => {
+        if (it?.number) checkItem(it.number, it.answers);
+      });
+    } else if (g.items) {
+      g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    }
+  });
+
+  const p2 = readingData.passages[1];
+  p2?.groups?.forEach((g) => {
+    if (g.groupType === "choose_two") {
+      const [q1, q2] = g.numbers || [];
+      const accepted = g.answers || [];
+      const u1 = answers[q1];
+      const u2 = answers[q2];
+      const correct1 = accepted.includes(u1);
+      const correct2 = accepted.includes(u2) && u2 !== u1;
+      if (correct1) correctCount++;
+      if (correct2) correctCount++;
+      evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
+      evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
+    } else if (g.items) {
+      g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    }
+  });
+
+  const p3 = readingData.passages[2];
+  p3?.groups?.forEach((g) => {
+    if (g.items) {
+      g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    }
+  });
+
+  const bandScore = getReadingBandScore(correctCount);
+  return { correctCount, bandScore, evalMap };
+};
+
+

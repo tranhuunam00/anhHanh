@@ -5,12 +5,12 @@ import { IeltsReadingModule } from "../components/IeltsTest/IeltsReadingModule.j
 import { IeltsWritingModule } from "../components/IeltsTest/IeltsWritingModule.jsx";
 import { IeltsSpeakingModule } from "../components/IeltsTest/IeltsSpeakingModule.jsx";
 import { IeltsResultModal } from "../components/IeltsTest/IeltsResultModal.jsx";
+import { IeltsFinalReportModal } from "../components/IeltsTest/IeltsFinalReportModal.jsx";
 import { IeltsAuthGate } from "../components/IeltsTest/IeltsAuthGate.jsx";
 import { IeltsStartConfirmModal } from "../components/IeltsTest/IeltsStartConfirmModal.jsx";
 import {
-  checkIeltsAnswer,
-  getListeningBandScore,
-  getReadingBandScore,
+  gradeListeningTest,
+  gradeReadingTest,
   saveIeltsSubmission,
   getIeltsSubmission
 } from "../utils/ieltsScoring.js";
@@ -22,7 +22,10 @@ import {
   getSkillRemainingSeconds,
   completeAndLockSkill,
   isSkillCompletedAndLocked,
-  resetExamSessionState
+  resetExamSessionState,
+  canAccessSkill,
+  getNextSkill,
+  isExamFullyCompleted
 } from "../utils/ieltsExamTimer.js";
 import {
   Headphones,
@@ -30,15 +33,15 @@ import {
   PenTool,
   Mic,
   CheckCircle,
-  RotateCcw,
   Clock
 } from "../constants/icons.js";
 import "../styles/ieltsTest.css";
 
 /**
  * IELTS Real Test Practice Page
- * Implements real Cambridge tests with 4 skills, 2-column resizable layout,
- * login requirement, strict countdown timer per skill, and auto-submission on timeout.
+ * Features sequential per-skill progression: Listening -> Reading -> Writing -> Speaking.
+ * Per-skill submission, browser localStorage persistence, and auto-submission on timeout.
+ * Prevents returning to completed skills during exam mode.
  */
 export const IeltsTestPage = ({
   isActive = true,
@@ -70,9 +73,10 @@ export const IeltsTestPage = ({
   const [readingEval, setReadingEval] = useState(null);
   const [isReviewMode, setIsReviewMode] = useState(false);
 
-  // Result modal
+  // Result & Final modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ skill: "listening", rawScore: 0, bandScore: 1.0 });
+  const [isFinalReportOpen, setIsFinalReportOpen] = useState(false);
 
   // Load saved answers & session on test change
   useEffect(() => {
@@ -129,149 +133,78 @@ export const IeltsTestPage = ({
   // Grade Listening
   const gradeListening = useCallback(() => {
     if (!testData?.skills?.listening) return;
-    const lData = testData.skills.listening;
-    const evalMap = {};
-    let correctCount = 0;
-
-    const checkItem = (qNum, acceptedAnswers) => {
-      const userAns = listeningAnswers[qNum] || "";
-      const isCorrect = checkIeltsAnswer(userAns, acceptedAnswers);
-      if (isCorrect) correctCount++;
-      evalMap[qNum] = { isCorrect, userAns, accepted: Array.isArray(acceptedAnswers) ? acceptedAnswers : [acceptedAnswers] };
-    };
-
-    lData.parts[0]?.items?.forEach((it) => checkItem(it.number, it.answers));
-
-    lData.parts[1]?.groups?.forEach((g) => {
-      if (g.groupType === "choose_two") {
-        const [q1, q2] = g.numbers;
-        const accepted = g.answers;
-        const u1 = listeningAnswers[q1];
-        const u2 = listeningAnswers[q2];
-        const correct1 = accepted.includes(u1);
-        const correct2 = accepted.includes(u2) && u2 !== u1;
-        if (correct1) correctCount++;
-        if (correct2) correctCount++;
-        evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
-        evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
-      } else if (g.groupType === "map_labeling") {
-        g.items?.forEach((it) => checkItem(it.number, [it.answer]));
-      }
-    });
-
-    lData.parts[2]?.groups?.forEach((g) => {
-      if (g.groupType === "choose_two") {
-        const [q1, q2] = g.numbers;
-        const accepted = g.answers;
-        const u1 = listeningAnswers[q1];
-        const u2 = listeningAnswers[q2];
-        const correct1 = accepted.includes(u1);
-        const correct2 = accepted.includes(u2) && u2 !== u1;
-        if (correct1) correctCount++;
-        if (correct2) correctCount++;
-        evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
-        evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
-      } else if (g.groupType === "flowchart_completion") {
-        g.items?.forEach((it) => checkItem(it.number, [it.answer]));
-      }
-    });
-
-    lData.parts[3]?.items?.forEach((it) => checkItem(it.number, it.answers));
+    const { correctCount, bandScore, evalMap } = gradeListeningTest(
+      testData.skills.listening,
+      listeningAnswers
+    );
 
     setListeningEval(evalMap);
-    const band = getListeningBandScore(correctCount);
-
     saveIeltsSubmission(selectedTestId, "listening", {
       answers: listeningAnswers,
       evalMap,
       rawScore: correctCount,
-      bandScore: band
+      bandScore
     });
 
-    const lockedSession = completeAndLockSkill(examSession, "listening", { rawScore: correctCount, bandScore: band });
+    const lockedSession = completeAndLockSkill(examSession, "listening", {
+      rawScore: correctCount,
+      bandScore
+    });
     setExamSession(lockedSession);
-
-    setModalData({ skill: "listening", rawScore: correctCount, bandScore: band });
+    setModalData({ skill: "listening", rawScore: correctCount, bandScore });
     setIsModalOpen(true);
   }, [testData, listeningAnswers, selectedTestId, examSession]);
 
   // Grade Reading
   const gradeReading = useCallback(() => {
     if (!testData?.skills?.reading) return;
-    const rData = testData.skills.reading;
-    const evalMap = {};
-    let correctCount = 0;
-
-    const checkItem = (qNum, acceptedAnswers) => {
-      const userAns = readingAnswers[qNum] || "";
-      const isCorrect = checkIeltsAnswer(userAns, acceptedAnswers);
-      if (isCorrect) correctCount++;
-      evalMap[qNum] = { isCorrect, userAns, accepted: Array.isArray(acceptedAnswers) ? acceptedAnswers : [acceptedAnswers] };
-    };
-
-    const p1 = rData.passages[0];
-    p1?.groups?.forEach((g) => {
-      if (g.groupType === "table_completion") {
-        [1, 2, 3, 4, 5].forEach((num) => {
-          const it = g.tableItems?.find((x) => x.number === num);
-          if (it) checkItem(num, it.answers);
-        });
-      } else if (g.groupType === "true_false_not_given") {
-        g.items?.forEach((it) => checkItem(it.number, [it.answer]));
-      }
-    });
-
-    const p2 = rData.passages[1];
-    p2?.groups?.forEach((g) => {
-      if (g.groupType === "matching_paragraphs") {
-        g.items?.forEach((it) => checkItem(it.number, [it.answer]));
-      } else if (g.groupType === "choose_two") {
-        const [q1, q2] = g.numbers;
-        const accepted = g.answers;
-        const u1 = readingAnswers[q1];
-        const u2 = readingAnswers[q2];
-        const correct1 = accepted.includes(u1);
-        const correct2 = accepted.includes(u2) && u2 !== u1;
-        if (correct1) correctCount++;
-        if (correct2) correctCount++;
-        evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
-        evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
-      } else if (g.groupType === "summary_completion") {
-        g.items?.forEach((it) => checkItem(it.number, it.answers));
-      }
-    });
-
-    const p3 = rData.passages[2];
-    p3?.groups?.forEach((g) => {
-      g.items?.forEach((it) => checkItem(it.number, [it.answer]));
-    });
+    const { correctCount, bandScore, evalMap } = gradeReadingTest(
+      testData.skills.reading,
+      readingAnswers
+    );
 
     setReadingEval(evalMap);
-    const band = getReadingBandScore(correctCount);
-
     saveIeltsSubmission(selectedTestId, "reading", {
       answers: readingAnswers,
       evalMap,
       rawScore: correctCount,
-      bandScore: band
+      bandScore
     });
 
-    const lockedSession = completeAndLockSkill(examSession, "reading", { rawScore: correctCount, bandScore: band });
+    const lockedSession = completeAndLockSkill(examSession, "reading", {
+      rawScore: correctCount,
+      bandScore
+    });
     setExamSession(lockedSession);
-
-    setModalData({ skill: "reading", rawScore: correctCount, bandScore: band });
+    setModalData({ skill: "reading", rawScore: correctCount, bandScore });
     setIsModalOpen(true);
   }, [testData, readingAnswers, selectedTestId, examSession]);
 
+  // Submit current skill and advance in order: Listening -> Reading -> Writing -> Speaking
   const handleSubmitSkill = useCallback(() => {
     if (activeSkill === "listening") {
       gradeListening();
     } else if (activeSkill === "reading") {
       gradeReading();
-    } else {
-      const locked = completeAndLockSkill(examSession, activeSkill, { submitted: true });
-      setExamSession(locked);
-      alert(`Bài thi ${activeSkill.toUpperCase()} đã được nộp và lưu trên trình duyệt!`);
+    } else if (activeSkill === "writing") {
+      const lockedSession = completeAndLockSkill(examSession, "writing", {
+        submitted: true,
+        savedAt: new Date().toISOString()
+      });
+      setExamSession(lockedSession);
+      const next = getNextSkill("writing");
+      if (next) {
+        setActiveSkill(next);
+        const nextActivated = activateSkillTimer(lockedSession, next);
+        setExamSession(nextActivated);
+      }
+    } else if (activeSkill === "speaking") {
+      const lockedSession = completeAndLockSkill(examSession, "speaking", {
+        submitted: true,
+        savedAt: new Date().toISOString()
+      });
+      setExamSession(lockedSession);
+      setIsFinalReportOpen(true);
     }
   }, [activeSkill, gradeListening, gradeReading, examSession]);
 
@@ -303,20 +236,29 @@ export const IeltsTestPage = ({
     setReadingEval(null);
     setIsReviewMode(false);
     setIsModalOpen(false);
+    setIsFinalReportOpen(false);
     setIsConfirmOpen(false);
+    setActiveSkill("listening");
   };
 
   const nextSkillForModal = useMemo(() => {
-    const idx = IELTS_SKILL_ORDER.indexOf(modalData.skill);
-    return idx >= 0 && idx < IELTS_SKILL_ORDER.length - 1 ? IELTS_SKILL_ORDER[idx + 1] : null;
+    return getNextSkill(modalData.skill);
   }, [modalData.skill]);
 
   const handleGoToNextSkill = () => {
     if (nextSkillForModal) {
       setActiveSkill(nextSkillForModal);
+      const nextActivated = activateSkillTimer(examSession, nextSkillForModal);
+      setExamSession(nextActivated);
       setIsReviewMode(false);
       setIsModalOpen(false);
     }
+  };
+
+  const handleReviewFromFinalReport = () => {
+    setIsReviewMode(true);
+    setIsFinalReportOpen(false);
+    setActiveSkill("listening");
   };
 
   if (!user) {
@@ -354,31 +296,43 @@ export const IeltsTestPage = ({
             </button>
           </div>
 
-          {/* Skill Selector Tabs with Locked/Completed Badges */}
+          {/* Sequential Skill Selector Tabs */}
           <div className="ielts-skill-nav-group">
             {IELTS_SKILL_ORDER.map((sk) => {
-              const isLocked = isSkillCompletedAndLocked(examSession, sk);
+              const isAccessible = canAccessSkill(examSession, sk);
+              const isCompleted = isSkillCompletedAndLocked(examSession, sk);
               const isActiveTab = activeSkill === sk;
+              const canClick = isReviewMode ? true : isAccessible && !isCompleted;
+
               return (
                 <button
                   key={sk}
                   type="button"
-                  className={`ielts-skill-tab-btn ${isActiveTab ? "active" : ""} ${isLocked ? "completed-tab" : ""}`}
-                  onClick={() => setActiveSkill(sk)}
+                  className={`ielts-skill-tab-btn ${isActiveTab ? "active" : ""} ${isCompleted ? "submitted-tab" : ""} ${!isAccessible ? "locked-tab" : ""}`}
+                  onClick={() => canClick && setActiveSkill(sk)}
+                  disabled={!canClick && !isActiveTab}
+                  title={
+                    !isAccessible
+                      ? "Bạn cần hoàn thành và nộp bài kỹ năng trước để mở khóa kỹ năng này"
+                      : isCompleted && !isReviewMode
+                      ? "Đã nộp bài - Quy chế thi thật không cho phép quay lại chỉnh sửa"
+                      : `Chuyển sang phần thi ${sk.toUpperCase()}`
+                  }
                 >
                   {sk === "listening" && <Headphones className="w-4 h-4 mr-1 inline" />}
                   {sk === "reading" && <BookOpen className="w-4 h-4 mr-1 inline" />}
                   {sk === "writing" && <PenTool className="w-4 h-4 mr-1 inline" />}
                   {sk === "speaking" && <Mic className="w-4 h-4 mr-1 inline" />}
                   <span className="capitalize">{sk}</span>
-                  {isLocked && <span className="ielts-tab-check">✓</span>}
+                  {isCompleted && <span className="ielts-tab-check">✓</span>}
+                  {!isAccessible && <span className="ielts-tab-lock-icon">🔒</span>}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Header Right: Real-time Countdown Timer & Submit Action */}
+        {/* Header Right: Countdown Timer & Sequential Submit Action */}
         <div className="ielts-header-right">
           <div
             className={`ielts-header-timer ${remainingSeconds <= 300 ? "warning" : ""} ${remainingSeconds <= 60 ? "danger" : ""}`}
@@ -388,15 +342,16 @@ export const IeltsTestPage = ({
             <span>{formatCountdownTime(remainingSeconds)}</span>
           </div>
 
-          {(activeSkill === "listening" || activeSkill === "reading") && (
+          {!isCurrentSkillLocked && (
             <button
               type="button"
-              className={`ielts-submit-test-btn ${isCurrentSkillLocked ? "locked" : ""}`}
+              className="ielts-submit-test-btn"
               onClick={handleSubmitSkill}
-              disabled={isCurrentSkillLocked}
             >
               <CheckCircle className="w-4 h-4 mr-1.5 inline" />
-              {isCurrentSkillLocked ? "Đã nộp bài" : "Nộp bài & Chấm điểm"}
+              {activeSkill === "speaking"
+                ? "Nộp bài Speaking & Hoàn thành"
+                : `Nộp bài ${activeSkill.toUpperCase()} & Tiếp tục`}
             </button>
           )}
 
@@ -404,19 +359,32 @@ export const IeltsTestPage = ({
             <button
               type="button"
               className="ielts-retake-btn"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                if (isExamFullyCompleted(examSession)) {
+                  setIsFinalReportOpen(true);
+                } else if (activeSkill === "listening" || activeSkill === "reading") {
+                  setIsModalOpen(true);
+                }
+              }}
               title="Xem lại điểm số"
             >
-              Xem điểm
+              {isExamFullyCompleted(examSession) ? "Bảng điểm tổng kết" : "Xem điểm"}
             </button>
           )}
         </div>
       </header>
 
       {/* Locked Skill Warning Banner */}
-      {isCurrentSkillLocked && (
+      {isCurrentSkillLocked && !isReviewMode && (
         <div className="ielts-locked-skill-banner">
-          <span>🔒 Kỹ năng <strong>{activeSkill.toUpperCase()}</strong> đã nộp bài & hết thời gian. Bạn đang ở chế độ xem lại đáp án và không thể sửa bài.</span>
+          <span>🔒 Kỹ năng <strong>{activeSkill.toUpperCase()}</strong> đã nộp bài. Theo quy chế thi thật, bạn không thể quay lại sửa đáp án.</span>
+        </div>
+      )}
+
+      {/* Review Mode Banner */}
+      {isReviewMode && (
+        <div className="ielts-locked-skill-banner review-mode">
+          <span>📖 Bạn đang ở chế độ <strong>Xem lại bài làm (Review Mode)</strong>. Bạn có thể tự do xem lại tất cả 4 kỹ năng.</span>
         </div>
       )}
 
@@ -447,12 +415,14 @@ export const IeltsTestPage = ({
                 writingData={testData.skills.writing}
                 user={user}
                 token={token}
+                isLocked={isCurrentSkillLocked && !isReviewMode}
               />
             )}
             {activeSkill === "speaking" && (
               <IeltsSpeakingModule
                 speakingData={testData.skills.speaking}
                 user={user}
+                isLocked={isCurrentSkillLocked && !isReviewMode}
               />
             )}
           </>
@@ -470,7 +440,7 @@ export const IeltsTestPage = ({
         onClose={() => setIsConfirmOpen(false)}
       />
 
-      {/* Result Modal with Next Skill Trigger */}
+      {/* Skill Result Modal */}
       <IeltsResultModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -485,6 +455,16 @@ export const IeltsTestPage = ({
         }}
         onRetakeTest={handleResetExam}
         onGoToNextSkill={handleGoToNextSkill}
+      />
+
+      {/* Final Overall Exam Completion Report Modal */}
+      <IeltsFinalReportModal
+        isOpen={isFinalReportOpen}
+        onClose={() => setIsFinalReportOpen(false)}
+        testTitle={currentTestMeta.title}
+        session={examSession}
+        onReviewAnswers={handleReviewFromFinalReport}
+        onResetExam={handleResetExam}
       />
     </div>
   );

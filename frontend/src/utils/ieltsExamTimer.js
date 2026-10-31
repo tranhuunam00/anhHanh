@@ -1,6 +1,7 @@
 /**
  * IELTS Exam Timer & Session Persistence Utilities
  * Manages official computer-delivered IELTS countdown timers,
+ * sequential skill unlocking (Listening -> Reading -> Writing -> Speaking),
  * skill auto-submission on timeout, and locking completed skills.
  */
 
@@ -46,6 +47,8 @@ export const createDefaultSession = (testId) => ({
   testId,
   isConfirmed: false,
   confirmedAt: null,
+  isFullyCompleted: false,
+  completedAt: null,
   skills: {
     listening: {
       status: "not_started",
@@ -110,6 +113,60 @@ export const saveExamSessionState = (testId, state) => {
   } catch (err) {
     console.warn("Failed to persist exam session state:", err);
   }
+};
+
+/**
+ * Checks if candidate is allowed to access a skill.
+ * Sequential exam rule: Listening -> Reading -> Writing -> Speaking
+ * A skill is accessible ONLY IF all preceding skills in order are "completed"!
+ */
+export const canAccessSkill = (session, skill) => {
+  if (!session || !session.skills) return false;
+  const idx = IELTS_SKILL_ORDER.indexOf(skill);
+  if (idx === -1) return false;
+  if (idx === 0) return true; // Listening is always accessible initially
+
+  for (let i = 0; i < idx; i++) {
+    const prevSkill = IELTS_SKILL_ORDER[i];
+    if (session.skills[prevSkill]?.status !== "completed") {
+      return false;
+    }
+  }
+  return true;
+};
+
+/**
+ * Gets the next skill in the official order
+ */
+export const getNextSkill = (currentSkill) => {
+  const idx = IELTS_SKILL_ORDER.indexOf(currentSkill);
+  if (idx >= 0 && idx < IELTS_SKILL_ORDER.length - 1) {
+    return IELTS_SKILL_ORDER[idx + 1];
+  }
+  return null;
+};
+
+/**
+ * Checks if the entire IELTS test (all 4 skills) is completed
+ */
+export const isExamFullyCompleted = (session) => {
+  if (!session || !session.skills) return false;
+  return IELTS_SKILL_ORDER.every((sk) => session.skills[sk]?.status === "completed");
+};
+
+/**
+ * Computes overall estimated band score from completed skills
+ */
+export const computeOverallBand = (session) => {
+  if (!session || !session.skills) return 1.0;
+  const lBand = session.skills.listening?.result?.bandScore;
+  const rBand = session.skills.reading?.result?.bandScore;
+  const validBands = [lBand, rBand].filter((b) => typeof b === "number" && b > 0);
+
+  if (validBands.length === 0) return 1.0;
+  const avg = validBands.reduce((a, b) => a + b, 0) / validBands.length;
+  // IELTS overall band rounding: round to nearest 0.5
+  return Math.round(avg * 2) / 2;
 };
 
 /**
@@ -183,8 +240,12 @@ export const completeAndLockSkill = (session, skill, resultData = null) => {
     }
   };
 
+  const isAllDone = IELTS_SKILL_ORDER.every((sk) => sk === skill || updatedSkills[sk]?.status === "completed");
+
   const nextSession = {
     ...session,
+    isFullyCompleted: isAllDone,
+    completedAt: isAllDone ? new Date().toISOString() : session.completedAt,
     skills: updatedSkills
   };
 
@@ -208,4 +269,3 @@ export const resetExamSessionState = (testId) => {
   saveExamSessionState(testId, fresh);
   return fresh;
 };
-
