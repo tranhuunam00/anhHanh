@@ -67,7 +67,7 @@ export const IeltsListeningModule = ({
       <IeltsQuestionPalette
         totalQuestions={40}
         answers={answers}
-        evaluation={evaluation}
+        evaluation={isReview ? evaluation : null}
         skill="listening"
         activePart={activePart}
         onSelectPart={handleSelectPart}

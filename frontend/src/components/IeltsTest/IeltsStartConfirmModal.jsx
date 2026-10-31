@@ -20,7 +20,14 @@ export const IeltsStartConfirmModal = ({
 }) => {
   if (!isOpen) return null;
 
-  const isAlreadyStarted = session && session.isConfirmed;
+  const isAlreadyStarted = Boolean(
+    session && (
+      session.isConfirmed ||
+      Object.values(session.skills || {}).some(
+        (s) => s.status === "completed" || s.status === "in_progress"
+      )
+    )
+  );
 
   const skillsSummary = [
     { key: "listening", name: "Listening", time: "30 phút", detail: "4 Parts • 40 câu hỏi" },

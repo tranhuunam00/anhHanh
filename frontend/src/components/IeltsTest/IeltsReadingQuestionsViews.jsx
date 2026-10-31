@@ -1,8 +1,8 @@
 import React from "react";
 import { CheckCircle } from "../../constants/icons.js";
 
-function getFeedbackClass(evaluation, qNum) {
-  if (!evaluation || !evaluation[qNum]) return "";
+function getFeedbackClass(evaluation, qNum, isReview = false) {
+  if (!isReview || !evaluation || !evaluation[qNum]) return "";
   return evaluation[qNum].isCorrect ? "input-correct" : "input-incorrect";
 }
 
