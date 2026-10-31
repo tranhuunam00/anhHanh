@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { BookOpen } from "../../constants/icons.js";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
-import { IeltsQuestionPalette, isQuestionAnswered } from "./IeltsQuestionPalette.jsx";
+import { IeltsQuestionPalette } from "./IeltsQuestionPalette.jsx";
 import {
   renderPassage1Questions,
   renderPassage2Questions,
@@ -11,10 +10,10 @@ import {
 /**
  * IELTS Academic Reading Test Module
  * Features:
- * - Prominent Top Navigation Bar: Part 1, Part 2, Part 3 with real-time answered counters
+ * - Single-row Top Navigation & Question Palette: 3 Parts + all 40 questions dàn hàng ngang
  * - Resizable 2-Column Split Pane: Left (Passage text), Right (Questions)
- * - Docked Bottom Question Palette: All 40 questions with bright glowing indicators when answered
- * - Synchronized navigation when switching parts, with independent scroll containers
+ * - Maximum vertical reading & answering space with ZERO bottom obstruction
+ * - Glowing answered indicators with instant scroll
  */
 export const IeltsReadingModule = ({
   readingData,
@@ -60,15 +59,7 @@ export const IeltsReadingModule = ({
     handleInputChange(q2, updated[1] || "");
   };
 
-  const getAnsweredCountInRange = (start, end) => {
-    let count = 0;
-    for (let i = start; i <= end; i++) {
-      if (isQuestionAnswered(answers, i)) count++;
-    }
-    return count;
-  };
-
-  // Left Pane: Passage Reading Text
+  // Left Pane: Passage Reading Text (Full vertical height)
   const leftPaneContent = (
     <div className="ielts-left-scroll-pane ielts-reading-text-pane">
       {currentLeftPassage && (
@@ -100,7 +91,7 @@ export const IeltsReadingModule = ({
     </div>
   );
 
-  // Right Pane: Questions
+  // Right Pane: Questions (Full vertical height)
   const rightPaneContent = (
     <div className="ielts-right-scroll-pane ielts-reading-questions-pane">
       <div className="ielts-questions-body">
@@ -116,57 +107,26 @@ export const IeltsReadingModule = ({
 
   return (
     <div className="ielts-module-container">
-      {/* Prominent Full-Width Top Bar for the 3 Reading Parts */}
-      <div className="ielts-module-top-bar">
-        <div className="ielts-module-nav-title">
-          <BookOpen className="w-4 h-4 text-primary mr-1" />
-          <span>IELTS Reading (3 Parts):</span>
-        </div>
-        <div className="ielts-module-parts-tabs">
-          {passages.map((p) => {
-            const [qStart, qEnd] = p.questionsRange;
-            const totalInPart = qEnd - qStart + 1;
-            const answeredInPart = getAnsweredCountInRange(qStart, qEnd);
-            const isActive = activePassage === p.passageNumber;
-
-            return (
-              <button
-                key={p.passageNumber}
-                type="button"
-                className={`ielts-main-part-btn ${isActive ? "active" : ""}`}
-                onClick={() => handleSelectPassage(p.passageNumber)}
-              >
-                <span className="ielts-part-badge-tag">Part {p.passageNumber}</span>
-                <span>Passage {p.passageNumber}</span>
-                <span className="ielts-part-q-range">(Q{qStart}-{qEnd})</span>
-                <span className={`ielts-part-progress-pill ${answeredInPart === totalInPart ? "complete" : ""}`}>
-                  {answeredInPart}/{totalInPart}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Resizable 2-Column Split Pane */}
-      <IeltsSplitPane
-        leftPane={leftPaneContent}
-        rightPane={rightPaneContent}
-        storageKey="ielts_split_reading"
-        className="ielts-reading-split"
-      />
-
-      {/* Docked Question Palette at Bottom with glowing answered badges */}
+      {/* Sleek Single-Row Top Question Palette (Dàn hàng ngang trên đầu) */}
       <IeltsQuestionPalette
         totalQuestions={40}
         answers={answers}
         evaluation={evaluation}
         skill="reading"
+        activePart={activePassage}
+        onSelectPart={handleSelectPassage}
         onSelectQuestion={(num) => {
           const targetPassage = num <= 13 ? 1 : num <= 26 ? 2 : 3;
           handleSelectPassage(targetPassage);
         }}
-        className="ielts-reading-docked-palette"
+      />
+
+      {/* Resizable 2-Column Split Pane - Fills 100% of remaining vertical height */}
+      <IeltsSplitPane
+        leftPane={leftPaneContent}
+        rightPane={rightPaneContent}
+        storageKey="ielts_split_reading"
+        className="ielts-reading-split"
       />
     </div>
   );

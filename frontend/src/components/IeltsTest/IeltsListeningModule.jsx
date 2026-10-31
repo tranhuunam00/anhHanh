@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Headphones } from "../../constants/icons.js";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
 import { IeltsAudioPlayer } from "./IeltsAudioPlayer.jsx";
-import { IeltsQuestionPalette, isQuestionAnswered } from "./IeltsQuestionPalette.jsx";
+import { IeltsQuestionPalette } from "./IeltsQuestionPalette.jsx";
 import {
   renderPart1,
   renderPart2,
@@ -13,10 +12,10 @@ import {
 /**
  * IELTS Listening Test Module (Exam-Standard UI)
  * Features:
- * - Prominent Top Navigation Bar: Parts 1 to 4 with real-time answered counters
- * - Continuous Audio Player: No scrubbing, no pausing once started
- * - Contextual Left Pane: Part 2 map displays ONLY on Part 2; other parts show rules
- * - Docked Question Palette: All 40 questions with bright glowing indicator when answered
+ * - Single-row Top Navigation & Question Palette: 4 Parts + all 40 questions dàn hàng ngang
+ * - Continuous Audio Player: Compact toolbar (no scrub, no pause once started)
+ * - Maximum vertical space: Left pane (Map / Overview) & Right pane (Questions)
+ * - Glowing answered indicators with instant scroll
  */
 export const IeltsListeningModule = ({
   listeningData,
@@ -64,18 +63,10 @@ export const IeltsListeningModule = ({
     setLeftPart(2);
   };
 
-  const getAnsweredCountInRange = (start, end) => {
-    let count = 0;
-    for (let i = start; i <= end; i++) {
-      if (isQuestionAnswered(answers, i)) count++;
-    }
-    return count;
-  };
-
-  // Left Pane: Audio player + Contextual info for leftPart
+  // Left Pane: Compact Audio Player + Contextual info for leftPart
   const leftPaneContent = (
     <div className="ielts-left-scroll-pane">
-      <div className="ielts-pane-section">
+      <div className="ielts-pane-section-compact">
         <IeltsAudioPlayer
           audioUrl={listeningData?.audioUrl}
           fallbackAudioUrl={listeningData?.fallbackAudioUrl}
@@ -83,7 +74,7 @@ export const IeltsListeningModule = ({
       </div>
 
       {/* Left Pane Part Material Selector */}
-      <div className="ielts-left-part-selector">
+      <div className="ielts-left-part-selector compact">
         <span className="ielts-left-nav-label">Tài liệu cột trái:</span>
         <div className="ielts-left-tabs-group">
           {parts.map((p) => (
@@ -100,9 +91,9 @@ export const IeltsListeningModule = ({
         </div>
       </div>
 
-      {/* Dynamic Left Content: Only Part 2 has the map; other parts show clean overview */}
+      {/* Dynamic Left Content: Part 2 map is highlighted; others show concise overview */}
       {leftPart === 1 && (
-        <div className="ielts-pane-section ielts-info-card">
+        <div className="ielts-pane-section ielts-info-card compact">
           <div className="ielts-visual-header">
             <span className="ielts-badge">Part 1</span>
             <h4 className="ielts-visual-title">One-day classes at Steynford College</h4>
@@ -110,7 +101,7 @@ export const IeltsListeningModule = ({
           <p className="ielts-info-desc">
             Cuộc hội thoại giữa nhân viên tư vấn và học viên hỏi về các khóa học một ngày tại Steynford College.
           </p>
-          <div className="ielts-test-tips-box">
+          <div className="ielts-test-tips-box compact">
             <h6>Yêu cầu:</h6>
             <ul>
               <li>Điền vào bảng: <strong>ONE WORD AND/OR A NUMBER</strong> cho mỗi câu trả lời.</li>
@@ -120,7 +111,7 @@ export const IeltsListeningModule = ({
       )}
 
       {leftPart === 2 && (
-        <div className="ielts-pane-section ielts-visual-card">
+        <div className="ielts-pane-section ielts-visual-card full-map">
           <div className="ielts-visual-header">
             <span className="ielts-badge">Sơ đồ Part 2 (Câu 15-20)</span>
             <h4 className="ielts-visual-title">Melby Coal Mine Site Map</h4>
@@ -139,7 +130,7 @@ export const IeltsListeningModule = ({
       )}
 
       {leftPart === 3 && (
-        <div className="ielts-pane-section ielts-info-card">
+        <div className="ielts-pane-section ielts-info-card compact">
           <div className="ielts-visual-header">
             <span className="ielts-badge">Part 3</span>
             <h4 className="ielts-visual-title">Food Safety & New Food Product Project</h4>
@@ -147,7 +138,7 @@ export const IeltsListeningModule = ({
           <p className="ielts-info-desc">
             Hai sinh viên Nadia và Fergus thảo luận về dự án phát triển sản phẩm mới và an toàn thực phẩm.
           </p>
-          <div className="ielts-test-tips-box">
+          <div className="ielts-test-tips-box compact">
             <h6>Cấu trúc:</h6>
             <ul>
               <li>Câu 21-26: Chọn 2 chữ cái A-E cho mỗi nhóm câu hỏi.</li>
@@ -158,7 +149,7 @@ export const IeltsListeningModule = ({
       )}
 
       {leftPart === 4 && (
-        <div className="ielts-pane-section ielts-info-card">
+        <div className="ielts-pane-section ielts-info-card compact">
           <div className="ielts-visual-header">
             <span className="ielts-badge">Part 4</span>
             <h4 className="ielts-visual-title">Challenges facing the cruise ship industry</h4>
@@ -166,7 +157,7 @@ export const IeltsListeningModule = ({
           <p className="ielts-info-desc">
             Bài giảng học thuật về các thách thức ngành du thuyền đang đối mặt (quá tải du lịch, nhận thức, môi trường).
           </p>
-          <div className="ielts-test-tips-box">
+          <div className="ielts-test-tips-box compact">
             <h6>Yêu cầu:</h6>
             <ul>
               <li>Hoàn thành ghi chú: <strong>WRITE ONE WORD ONLY</strong> cho mỗi chỗ trống.</li>
@@ -177,7 +168,7 @@ export const IeltsListeningModule = ({
     </div>
   );
 
-  // Right Pane: Questions
+  // Right Pane: Questions (Full vertical height)
   const rightPaneContent = (
     <div className="ielts-right-scroll-pane">
       <div className="ielts-questions-body">
@@ -191,57 +182,26 @@ export const IeltsListeningModule = ({
 
   return (
     <div className="ielts-module-container">
-      {/* Prominent Full-Width Top Bar for the 4 Listening Parts */}
-      <div className="ielts-module-top-bar">
-        <div className="ielts-module-nav-title">
-          <Headphones className="w-4 h-4 text-primary mr-1" />
-          <span>IELTS Listening (4 Parts):</span>
-        </div>
-        <div className="ielts-module-parts-tabs">
-          {parts.map((p) => {
-            const [qStart, qEnd] = p.questionsRange;
-            const totalInPart = qEnd - qStart + 1;
-            const answeredInPart = getAnsweredCountInRange(qStart, qEnd);
-            const isActive = activePart === p.partNumber;
-
-            return (
-              <button
-                key={p.partNumber}
-                type="button"
-                className={`ielts-main-part-btn ${isActive ? "active" : ""}`}
-                onClick={() => handleSelectPart(p.partNumber)}
-              >
-                <span className="ielts-part-badge-tag">Part {p.partNumber}</span>
-                <span className="ielts-part-q-range">(Q{qStart}-{qEnd})</span>
-                {p.partNumber === 2 && <span className="ielts-part-q-range">🗺️</span>}
-                <span className={`ielts-part-progress-pill ${answeredInPart === totalInPart ? "complete" : ""}`}>
-                  {answeredInPart}/{totalInPart}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Resizable 2-Column Split Pane */}
-      <IeltsSplitPane
-        leftPane={leftPaneContent}
-        rightPane={rightPaneContent}
-        storageKey="ielts_split_listening"
-        className="ielts-listening-split"
-      />
-
-      {/* Docked Question Palette at Bottom with glowing answered badges */}
+      {/* Sleek Single-Row Top Question Palette (Dàn hàng ngang trên đầu) */}
       <IeltsQuestionPalette
         totalQuestions={40}
         answers={answers}
         evaluation={evaluation}
         skill="listening"
+        activePart={activePart}
+        onSelectPart={handleSelectPart}
         onSelectQuestion={(num) => {
           const targetPart = num <= 10 ? 1 : num <= 20 ? 2 : num <= 30 ? 3 : 4;
           handleSelectPart(targetPart);
         }}
-        className="ielts-listening-docked-palette"
+      />
+
+      {/* Resizable 2-Column Split Pane - Fills 100% of remaining vertical height */}
+      <IeltsSplitPane
+        leftPane={leftPaneContent}
+        rightPane={rightPaneContent}
+        storageKey="ielts_split_listening"
+        className="ielts-listening-split"
       />
     </div>
   );

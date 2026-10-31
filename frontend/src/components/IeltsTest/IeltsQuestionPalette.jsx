@@ -13,80 +13,96 @@ export function isQuestionAnswered(answers, qNum) {
 }
 
 /**
- * IELTS Question Palette (Real Exam Navigation)
- * Highlights answered questions brightly with glowing indicator.
- * Displays sections by Part / Passage.
+ * IELTS Question Palette (Top Horizontal Bar Standard)
+ * Laid out in a single streamlined row at the top of the test module.
+ * Combines Part switcher chips with all 40 question numbers arranged horizontally.
+ * Maximizes vertical height for reading passage and question content.
  */
 export const IeltsQuestionPalette = ({
   totalQuestions = 40,
   answers = {},
   evaluation = null,
   activeNumber = null,
+  activePart = 1,
+  onSelectPart = null,
   onSelectQuestion,
   skill = "reading",
   className = ""
 }) => {
   const numbers = Array.from({ length: totalQuestions }, (_, i) => i + 1);
-
   const answeredCount = numbers.filter((n) => isQuestionAnswered(answers, n)).length;
 
-  const handleClick = (n) => {
+  const handleClick = (n, targetPart) => {
+    if (onSelectPart && targetPart && targetPart !== activePart) {
+      onSelectPart(targetPart);
+    }
     if (onSelectQuestion) {
       onSelectQuestion(n);
     }
-    const elem = document.getElementById(`ielts-q-${n}`);
-    if (elem) {
-      elem.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    setTimeout(() => {
+      const elem = document.getElementById(`ielts-q-${n}`);
+      if (elem) {
+        elem.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 50);
   };
 
-  // Groupings by Part / Passage
   const groups =
     skill === "reading"
       ? [
-          { label: "Part 1 (Q1-13)", range: [1, 13] },
-          { label: "Part 2 (Q14-26)", range: [14, 26] },
-          { label: "Part 3 (Q27-40)", range: [27, 40] }
+          { partNumber: 1, label: "Part 1", range: [1, 13] },
+          { partNumber: 2, label: "Part 2", range: [14, 26] },
+          { partNumber: 3, label: "Part 3", range: [27, 40] }
         ]
       : [
-          { label: "Part 1 (Q1-10)", range: [1, 10] },
-          { label: "Part 2 (Q11-20)", range: [11, 20] },
-          { label: "Part 3 (Q21-30)", range: [21, 30] },
-          { label: "Part 4 (Q31-40)", range: [31, 40] }
+          { partNumber: 1, label: "Part 1", range: [1, 10] },
+          { partNumber: 2, label: "Part 2", range: [11, 20], hasMap: true },
+          { partNumber: 3, label: "Part 3", range: [21, 30] },
+          { partNumber: 4, label: "Part 4", range: [31, 40] }
         ];
 
   return (
-    <div className={`ielts-palette-container ${className}`}>
-      <div className="ielts-palette-header">
-        <div className="ielts-palette-title-group">
-          <span className="ielts-palette-dot" />
-          <span className="ielts-palette-title">Bảng câu hỏi ({skill === "reading" ? "Reading 3 Parts" : "Listening 4 Parts"})</span>
-        </div>
-        <div className="ielts-palette-counter">
-          Đã hoàn thành: <strong className="ielts-counter-number">{answeredCount}</strong>/{totalQuestions}
-          <div className="ielts-palette-mini-progress">
-            <div
-              className="ielts-palette-mini-fill"
-              style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
-            />
-          </div>
-        </div>
+    <div className={`ielts-top-palette-bar ${className}`}>
+      {/* Left: Quick Part Switcher Pills */}
+      <div className="ielts-top-palette-parts">
+        {groups.map((grp) => {
+          const isActive = activePart === grp.partNumber;
+          const [start, end] = grp.range;
+          let count = 0;
+          for (let i = start; i <= end; i++) {
+            if (isQuestionAnswered(answers, i)) count++;
+          }
+          const totalInGroup = end - start + 1;
+
+          return (
+            <button
+              key={grp.partNumber}
+              type="button"
+              className={`ielts-top-part-chip ${isActive ? "active" : ""}`}
+              onClick={() => onSelectPart && onSelectPart(grp.partNumber)}
+              title={`Chuyển đến ${grp.label} (Câu ${start}-${end})`}
+            >
+              <span className="ielts-chip-name">{grp.label}</span>
+              {grp.hasMap && <span className="ielts-chip-icon">🗺️</span>}
+              <span className={`ielts-chip-count ${count === totalInGroup ? "done" : ""}`}>
+                {count}/{totalInGroup}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="ielts-palette-sections-list">
-        {groups.map((grp) => {
+      {/* Middle: All 40 questions arranged horizontally */}
+      <div className="ielts-top-palette-strip">
+        {groups.map((grp, gIdx) => {
           const groupNums = numbers.filter(
             (n) => n >= grp.range[0] && n <= grp.range[1]
           );
-          const grpAnswered = groupNums.filter((n) => isQuestionAnswered(answers, n)).length;
 
           return (
-            <div key={grp.label} className="ielts-palette-section-row">
-              <div className="ielts-palette-section-tag">
-                <span className="ielts-palette-tag-text">{grp.label}</span>
-                <span className="ielts-palette-tag-count">({grpAnswered}/{groupNums.length})</span>
-              </div>
-              <div className="ielts-palette-grid">
+            <div key={grp.partNumber} className="ielts-top-palette-group">
+              {gIdx > 0 && <div className="ielts-palette-divider-v" />}
+              <div className="ielts-palette-badges-row">
                 {groupNums.map((n) => {
                   const answered = isQuestionAnswered(answers, n);
                   const isCurrent = activeNumber === n;
@@ -102,9 +118,10 @@ export const IeltsQuestionPalette = ({
                   return (
                     <button
                       key={n}
+                      id={`ielts-badge-${n}`}
                       type="button"
                       className={`ielts-palette-badge ${statusClass} ${isCurrent ? "current" : ""}`}
-                      onClick={() => handleClick(n)}
+                      onClick={() => handleClick(n, grp.partNumber)}
                       title={`Câu ${n}: ${answered ? "Đã điền" : "Chưa điền"}`}
                     >
                       {n}
@@ -115,6 +132,19 @@ export const IeltsQuestionPalette = ({
             </div>
           );
         })}
+      </div>
+
+      {/* Right: Answered Progress Summary */}
+      <div className="ielts-top-palette-summary">
+        <span className="ielts-summary-text">
+          Đã làm: <strong>{answeredCount}</strong>/{totalQuestions}
+        </span>
+        <div className="ielts-summary-progress">
+          <div
+            className="ielts-summary-fill"
+            style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
+          />
+        </div>
       </div>
     </div>
   );

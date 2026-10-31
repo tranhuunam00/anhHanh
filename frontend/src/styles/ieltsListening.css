@@ -86,6 +86,39 @@
   border-radius: 10px; padding: 16px; margin-bottom: 16px;
 }
 
+.ielts-left-part-selector.compact {
+  flex-direction: row; align-items: center; justify-content: space-between;
+  padding: 6px 10px; margin-bottom: 8px;
+}
+
+.ielts-left-part-selector.compact .ielts-left-tabs-group {
+  margin-bottom: 0; gap: 4px;
+}
+
+.ielts-left-part-selector.compact .ielts-part-tab-btn {
+  padding: 3px 8px; font-size: 0.76rem; border-radius: 5px;
+}
+
+.ielts-info-card.compact {
+  padding: 10px 12px; margin-bottom: 8px;
+}
+
+.ielts-test-tips-box.compact {
+  padding: 6px 10px; margin-top: 6px;
+}
+
+.ielts-visual-card.full-map {
+  padding: 10px 12px; margin-bottom: 8px;
+}
+
+.ielts-visual-card.full-map .ielts-map-image-wrap {
+  padding: 4px; margin-bottom: 6px;
+}
+
+.ielts-visual-card.full-map .ielts-map-image {
+  max-height: 440px; width: auto; max-width: 100%; margin: 0 auto;
+}
+
 .ielts-visual-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .ielts-visual-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 
