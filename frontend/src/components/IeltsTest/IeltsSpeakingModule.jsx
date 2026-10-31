@@ -1,34 +1,69 @@
-import React, { useState, useRef, useEffect } from "react";
-import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { IeltsRecordedAudioPlayer } from "./IeltsRecordedAudioPlayer.jsx";
-import { canUseIeltsAiGrading } from "../../utils/ieltsScoring.js";
+import { IeltsSpeakingBottomNav } from "./IeltsSpeakingBottomNav.jsx";
 import {
-  Mic,
-  Pause,
-  RotateCcw,
-  Sparkles,
-  Clock,
+  getPartQuestions,
+  getDefaultQuestionTimeLimit,
+  formatSpeakingTimer
+} from "../../utils/ieltsSpeakingUtils.js";
+import {
+  Eye,
   Volume2,
-  Lock,
+  Mic,
+  Square,
+  RotateCcw,
+  Clock,
   FileText,
-  Check
+  Check,
+  CheckCircle,
+  X
 } from "../../constants/icons.js";
 
 /**
- * IELTS Speaking Test Module (Computer-Delivered UI)
+ * IELTS Academic Speaking Simulator (Computer-Delivered Standard UI)
  * Features:
- * - Prominent Top Part Bar: Part 1 (Interview), Part 2 (Cue Card), Part 3 (Discussion)
- * - Authentic Physical Cue Card styling for Part 2 with 1-min prep & 2-min speaking timers
- * - Right Pane: Speaking Studio with voice recording, audio playback, AI Evaluation, and Candidate Scratchpad
+ * - Hidden question behind "Show question" with Eye icon
+ * - Examiner SpeechSynthesis: reads the question aloud with natural English accent
+ * - Countdown timer starts automatically after the examiner finishes speaking
+ * - Minimalist circular mic recorder for capturing responses
+ * - Segmented Bottom Question Strip with Part 1, Part 2, and Part 3 indicators
+ * - Candidate Scratchpad Notepad for Part 2 prep and ideas
  */
 export const IeltsSpeakingModule = ({
   speakingData,
   user = null,
   isLocked = false
 }) => {
+  const parts = useMemo(() => speakingData?.parts || [], [speakingData]);
   const [activePart, setActivePart] = useState(1);
-  const parts = speakingData?.parts || [];
+  const [activeQuestionIdx, setActiveQuestionIdx] = useState(0);
+
+  // Current Part & Questions
   const currentPart = parts.find((p) => p.partNumber === activePart) || parts[0];
+  const currentQuestions = useMemo(() => getPartQuestions(currentPart), [currentPart]);
+  const currentQuestion = currentQuestions[activeQuestionIdx] || currentQuestions[0];
+  const currentKey = `p${activePart}_q${currentQuestion?.id || 1}`;
+
+  // Revealed Map: which questions have been opened with "Show question"
+  const [revealedMap, setRevealedMap] = useState({});
+
+  // Examiner speaking status
+  const [isExaminerSpeaking, setIsExaminerSpeaking] = useState(false);
+
+  // Time remaining per question { [currentKey]: seconds }
+  const [timeRemainingMap, setTimeRemainingMap] = useState({});
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  // Part 2 prep/speak mode
+  const [cueCardMode, setCueCardMode] = useState("prep"); // "prep" (60s) or "speak" (120s)
+
+  // Audio recording state per question
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
+  const [recordingsMap, setRecordingsMap] = useState({});
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordIntervalRef = useRef(null);
 
   // Candidate prep notes per part
   const [notes, setNotes] = useState(() => {
@@ -39,24 +74,171 @@ export const IeltsSpeakingModule = ({
       return { 1: "", 2: "", 3: "" };
     }
   });
+  const [isNotepadOpen, setIsNotepadOpen] = useState(false);
 
-  // Timers for Part 2
-  const [timerSeconds, setTimerSeconds] = useState(60);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [timerMode, setTimerMode] = useState("prep"); // "prep" (60s) or "speak" (120s)
-  const timerRef = useRef(null);
+  // SpeechSynthesis English Speaker
+  const speakExaminerQuestion = useCallback((text, onEnd) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      if (onEnd) onEnd();
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = 0.95;
 
-  // Audio recording state
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordedAudioUrl, setRecordedAudioUrl] = useState(null);
-  const [recordSeconds, setRecordSeconds] = useState(0);
-  const [recordedDuration, setRecordedDuration] = useState(0);
-  const recordSecondsRef = useRef(0);
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-  const recordIntervalRef = useRef(null);
+    const voices = window.speechSynthesis.getVoices();
+    const enVoice =
+      voices.find((v) => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Daniel") || v.name.includes("Samantha"))) ||
+      voices.find((v) => v.lang.startsWith("en"));
+    if (enVoice) utterance.voice = enVoice;
 
-  const isAuthorized = canUseIeltsAiGrading(user);
+    utterance.onend = () => {
+      setIsExaminerSpeaking(false);
+      if (onEnd) onEnd();
+    };
+    utterance.onerror = () => {
+      setIsExaminerSpeaking(false);
+      if (onEnd) onEnd();
+    };
+
+    setIsExaminerSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
+  // Time limit for current question
+  const currentRemainingTime = useMemo(() => {
+    if (timeRemainingMap[currentKey] !== undefined) {
+      return timeRemainingMap[currentKey];
+    }
+    if (activePart === 2) {
+      return cueCardMode === "prep" ? (currentPart?.prepTimeSeconds || 60) : (currentPart?.speakingTimeSeconds || 120);
+    }
+    return getDefaultQuestionTimeLimit(activePart);
+  }, [timeRemainingMap, currentKey, activePart, cueCardMode, currentPart]);
+
+  // Click "Show question"
+  const handleShowQuestion = () => {
+    if (isLocked) return;
+    setRevealedMap((prev) => ({ ...prev, [currentKey]: true }));
+    setIsTimerRunning(false);
+
+    let textToSpeak = "";
+    if (currentQuestion?.isCueCard) {
+      textToSpeak = `Here is your topic. ${currentQuestion.topic}. You should say: ${currentQuestion.prompts.join(", ")}`;
+    } else {
+      textToSpeak = currentQuestion?.text || "";
+    }
+
+    // Auto-read question aloud, then trigger timer countdown ("xong bắt đầu đồng hồ bấm")
+    speakExaminerQuestion(textToSpeak, () => {
+      setIsTimerRunning(true);
+    });
+  };
+
+  // Re-read examiner question manually
+  const handleReReadQuestion = () => {
+    if (isExaminerSpeaking) return;
+    const textToSpeak = currentQuestion?.isCueCard
+      ? `${currentQuestion.topic}. You should say: ${currentQuestion.prompts.join(", ")}`
+      : currentQuestion?.text || "";
+    speakExaminerQuestion(textToSpeak);
+  };
+
+  // Per-question countdown ticker
+  useEffect(() => {
+    if (!isTimerRunning) return;
+    const interval = setInterval(() => {
+      setTimeRemainingMap((prev) => {
+        const prevSec = prev[currentKey] !== undefined ? prev[currentKey] : currentRemainingTime;
+        if (prevSec <= 1) {
+          clearInterval(interval);
+          setIsTimerRunning(false);
+          // For Part 2: If prep time ends, auto-switch to 2-min speaking mode
+          if (activePart === 2 && cueCardMode === "prep") {
+            setCueCardMode("speak");
+            return { ...prev, [currentKey]: currentPart?.speakingTimeSeconds || 120 };
+          }
+          return { ...prev, [currentKey]: 0 };
+        }
+        return { ...prev, [currentKey]: prevSec - 1 };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isTimerRunning, currentKey, currentRemainingTime, activePart, cueCardMode, currentPart]);
+
+  // Clean Voice Recording Handlers
+  const startRecording = async () => {
+    if (isLocked) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const url = URL.createObjectURL(audioBlob);
+        setRecordingsMap((prev) => ({
+          ...prev,
+          [currentKey]: { url, duration: recordSeconds }
+        }));
+      };
+
+      mediaRecorder.start(250);
+      setIsRecording(true);
+      setRecordSeconds(0);
+
+      recordIntervalRef.current = setInterval(() => {
+        setRecordSeconds((s) => s + 1);
+      }, 1000);
+    } catch {
+      alert("Vui lòng cấp quyền Microphone trên trình duyệt để ghi âm câu trả lời.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (!mediaRecorderRef.current || !isRecording) return;
+    clearInterval(recordIntervalRef.current);
+    mediaRecorderRef.current.stop();
+    mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
+    setIsRecording(false);
+  };
+
+  // Navigation handlers
+  const handleSelectQuestion = (partNum, qIdx) => {
+    if (isExaminerSpeaking && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsExaminerSpeaking(false);
+    }
+    if (isRecording) stopRecording();
+    setActivePart(partNum);
+    setActiveQuestionIdx(qIdx);
+    setIsTimerRunning(false);
+  };
+
+  const handleNextQuestion = () => {
+    if (activeQuestionIdx < currentQuestions.length - 1) {
+      handleSelectQuestion(activePart, activeQuestionIdx + 1);
+    } else if (activePart < 3) {
+      handleSelectQuestion(activePart + 1, 0);
+    }
+  };
+
+  const handlePrevQuestion = () => {
+    if (activeQuestionIdx > 0) {
+      handleSelectQuestion(activePart, activeQuestionIdx - 1);
+    } else if (activePart > 1) {
+      const prevPart = parts.find((p) => p.partNumber === activePart - 1);
+      const prevQs = getPartQuestions(prevPart);
+      handleSelectQuestion(activePart - 1, Math.max(0, prevQs.length - 1));
+    }
+  };
 
   const handleNotesChange = (val) => {
     if (isLocked) return;
@@ -71,337 +253,189 @@ export const IeltsSpeakingModule = ({
     });
   };
 
-  // Timer countdown
-  useEffect(() => {
-    if (isTimerRunning && timerSeconds > 0) {
-      timerRef.current = setTimeout(() => {
-        setTimerSeconds((prev) => prev - 1);
-      }, 1000);
-    } else if (timerSeconds === 0 && isTimerRunning) {
-      setIsTimerRunning(false);
-    }
-    return () => clearTimeout(timerRef.current);
-  }, [isTimerRunning, timerSeconds]);
-
-  const startTimer = (mode) => {
-    setTimerMode(mode);
-    setTimerSeconds(mode === "prep" ? 60 : 120);
-    setIsTimerRunning(true);
-  };
-
-  const resetTimer = () => {
-    setIsTimerRunning(false);
-    setTimerSeconds(timerMode === "prep" ? 60 : 120);
-  };
-
-  // Voice recording handlers
-  const startRecording = async () => {
-    if (isLocked) return;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioChunksRef.current = [];
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        const url = URL.createObjectURL(audioBlob);
-        setRecordedAudioUrl(url);
-      };
-
-      mediaRecorder.start(250);
-      setIsRecording(true);
-      setRecordSeconds(0);
-      setRecordedDuration(0);
-      recordSecondsRef.current = 0;
-
-      recordIntervalRef.current = setInterval(() => {
-        setRecordSeconds((prev) => {
-          const next = prev + 1;
-          recordSecondsRef.current = next;
-          return next;
-        });
-      }, 1000);
-    } catch (err) {
-      alert("Không thể truy cập microphone. Vui lòng cấp quyền ghi âm trong trình duyệt.");
-      console.warn("Microphone error:", err);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
-      setIsRecording(false);
-      clearInterval(recordIntervalRef.current);
-      setRecordedDuration(recordSecondsRef.current);
-    }
-  };
-
-  const formatTimer = (s) => {
-    const mins = Math.floor(s / 60);
-    const secs = s % 60;
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-  };
-
-  // Vocabulary prompts for Part 1 questions
-  const part1IdeaTags = {
-    1: ["bustling metropolis", "historic landmarks", "commercial hub"],
-    2: ["vibrant nightlife", "career opportunities", "public transport"],
-    3: ["air pollution", "cost of living", "traffic congestion"],
-    4: ["broaden horizons", "architectural wonder", "cultural diversity"]
-  };
-
-  // Left Pane: Questions, Cue Card, Timers
-  const leftPaneContent = (
-    <div className="ielts-left-scroll-pane ielts-speaking-cues-pane">
-      <div className="ielts-speaking-card">
-        <div className="ielts-speaking-card-header">
-          <span className="ielts-prompt-tag-badge">IELTS SPEAKING • {currentPart.title.toUpperCase()}</span>
-          <span className="ielts-time-hint">
-            <Clock className="w-4 h-4 mr-1 text-primary inline" />
-            {currentPart.duration}
-          </span>
-        </div>
-        <p className="ielts-speaking-desc">{currentPart.description}</p>
-
-        {/* Part 1: Introduction & Interview */}
-        {activePart === 1 && (
-          <div className="ielts-speaking-questions-list">
-            <div className="ielts-topic-label-bar">
-              <span>Chủ đề phỏng vấn:</span>
-              <strong>{currentPart.topic}</strong>
-            </div>
-
-            {currentPart.questions.map((q) => (
-              <div key={q.id} className="ielts-speaking-question-item">
-                <div className="ielts-speaking-q-header">
-                  <span className="ielts-speaking-q-num">Q{q.id}</span>
-                  <p className="ielts-speaking-q-text">{q.text}</p>
-                </div>
-                {part1IdeaTags[q.id] && (
-                  <div className="ielts-speaking-idea-tags">
-                    {part1IdeaTags[q.id].map((tag, idx) => (
-                      <span key={idx} className="ielts-idea-tag">{tag}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Part 2: Individual Long Turn Cue Card */}
-        {activePart === 2 && currentPart.cueCard && (
-          <div className="ielts-cue-card-container">
-            <div className="ielts-cue-card">
-              <span className="ielts-cue-card-badge">CANDIDATE CUE CARD</span>
-              <h4 className="ielts-cue-topic">{currentPart.cueCard.topic}</h4>
-              <p className="ielts-cue-intro">You should say:</p>
-              <ul className="ielts-cue-prompts">
-                {currentPart.cueCard.prompts.map((p, idx) => (
-                  <li key={idx}>{p}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Timers for Part 2 */}
-            <div className="ielts-cue-timers">
-              <div className="ielts-timer-display">
-                <Clock className="w-5 h-5 text-primary" />
-                <span className="ielts-timer-digits">{formatTimer(timerSeconds)}</span>
-                <span className="ielts-timer-tag">({timerMode === "prep" ? "1 phút chuẩn bị" : "2 phút nói"})</span>
-              </div>
-              <div className="ielts-timer-actions">
-                <button
-                  type="button"
-                  className={`ielts-timer-btn ${timerMode === "prep" && isTimerRunning ? "active" : ""}`}
-                  onClick={() => startTimer("prep")}
-                >
-                  Bắt đầu 1p chuẩn bị
-                </button>
-                <button
-                  type="button"
-                  className={`ielts-timer-btn ${timerMode === "speak" && isTimerRunning ? "active" : ""}`}
-                  onClick={() => startTimer("speak")}
-                >
-                  Bắt đầu 2p nói
-                </button>
-                <button
-                  type="button"
-                  className="ielts-timer-btn-reset"
-                  onClick={resetTimer}
-                  title="Đặt lại bộ đếm"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Part 3: Two-way Discussion */}
-        {activePart === 3 && currentPart.sections && (
-          <div className="ielts-part3-sections">
-            {currentPart.sections.map((sec, sIdx) => (
-              <div key={sIdx} className="ielts-part3-theme-group">
-                <h5 className="ielts-theme-title">Chủ đề thảo luận: {sec.theme}</h5>
-                {sec.questions.map((q) => (
-                  <div key={q.id} className="ielts-speaking-question-item">
-                    <div className="ielts-speaking-q-header">
-                      <span className="ielts-speaking-q-num">Q{q.id}</span>
-                      <p className="ielts-speaking-q-text">{q.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  // Right Pane: Speaking Studio & Candidate Scratchpad
-  const rightPaneContent = (
-    <div className="ielts-right-scroll-pane ielts-speaking-workspace-pane">
-      {/* Speaking Studio Voice Recorder Card */}
-      <div className="ielts-recorder-card">
-        <div className="ielts-recorder-header">
-          <h4 className="ielts-studio-title">
-            <Mic className="w-4 h-4 text-primary mr-1" />
-            Phòng thu âm IELTS Speaking (Studio Recorder)
-          </h4>
-          {isRecording && (
-            <div className="ielts-recording-live-indicator">
-              <span className="ielts-pulse-dot" />
-              <span>Đang ghi âm: {formatTimer(recordSeconds)}</span>
-            </div>
-          )}
-        </div>
-
-        <div className="ielts-recorder-controls">
-          {!isRecording ? (
-            <button
-              type="button"
-              className="ielts-record-btn-start"
-              onClick={startRecording}
-              disabled={isLocked}
-            >
-              <Mic className="w-4 h-4" />
-              <span>{isLocked ? "Đã nộp bài nói (Đã khóa)" : "Bắt đầu ghi âm câu trả lời"}</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="ielts-record-btn-stop"
-              onClick={stopRecording}
-            >
-              <Pause className="w-4 h-4" />
-              <span>Dừng & Lưu bản thu âm</span>
-            </button>
-          )}
-
-          {recordedAudioUrl && (
-            <div className="ielts-playback-bar">
-              <IeltsRecordedAudioPlayer
-                audioUrl={recordedAudioUrl}
-                duration={recordedDuration || recordSeconds}
-                downloadName={`ielts_speaking_part${activePart}_recording.webm`}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* AI Scoring Privilege */}
-        <div className="ielts-speaking-ai-bar">
-          {isAuthorized ? (
-            <button
-              type="button"
-              className="ielts-ai-eval-btn"
-              onClick={() => alert("Tính năng AI phân tích phát âm (Pronunciation & Fluency) đang kết nối Gemini Model.")}
-            >
-              <Sparkles className="w-4 h-4 mr-1.5" />
-              Chấm điểm Speaking AI (Gemini 2.0)
-            </button>
-          ) : (
-            <span className="ielts-ai-restricted-badge">
-              <Lock className="w-3.5 h-3.5 mr-1 inline" />
-              AI chấm Speaking (Dành riêng cho 3 tài khoản được cấp phép)
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Candidate Scratchpad Notepad */}
-      <div className="ielts-notepad-card">
-        <div className="ielts-notepad-header">
-          <h5 className="ielts-studio-title">
-            <FileText className="w-4 h-4 mr-1.5 inline text-primary" />
-            Giấy nháp điện tử (Candidate Scratchpad Part {activePart})
-          </h5>
-          <span className="ielts-notepad-hint">
-            <Check className="w-3 h-3 mr-1 inline text-success" />
-            Tự động lưu vào trình duyệt
-          </span>
-        </div>
-        <textarea
-          value={notes[activePart] || ""}
-          onChange={(e) => handleNotesChange(e.target.value)}
-          placeholder={`Ghi nhanh ý tưởng, từ vựng hoặc dàn ý cho Part ${activePart} tại đây...`}
-          className="ielts-notepad-textarea"
-          rows={14}
-          readOnly={isLocked}
-        />
-      </div>
-    </div>
-  );
+  const isCurrentRevealed = Boolean(revealedMap[currentKey]) || isLocked;
+  const recordedItem = recordingsMap[currentKey];
 
   return (
-    <div className="ielts-module-container">
-      {/* Prominent Full-Width Top Bar for the 3 Speaking Parts */}
-      <div className="ielts-module-top-bar">
-        <div className="ielts-module-nav-title">
-          <Volume2 className="w-4 h-4 text-primary mr-1" />
-          <span>IELTS Speaking (3 Parts):</span>
+    <div className="ielts-speaking-stage-container">
+      {/* Top Header Information */}
+      <header className="ielts-speaking-stage-header">
+        <div className="ielts-speaking-part-title-wrap">
+          <span className="ielts-speaking-pill-badge">Part {activePart}</span>
+          <h3 className="ielts-speaking-main-title">{currentPart?.title}</h3>
+          {currentPart?.topic && (
+            <span className="ielts-speaking-topic-tag">Chủ đề: {currentPart.topic}</span>
+          )}
         </div>
-        <div className="ielts-module-parts-tabs">
-          {parts.map((p) => {
-            const isActive = activePart === p.partNumber;
-            const shortLabel =
-              p.partNumber === 1
-                ? "Interview (4-5 mins)"
-                : p.partNumber === 2
-                ? "Long Turn (3-4 mins)"
-                : "Discussion (4-5 mins)";
 
-            return (
-              <button
-                key={p.partNumber}
-                type="button"
-                className={`ielts-main-part-btn ${isActive ? "active" : ""}`}
-                onClick={() => setActivePart(p.partNumber)}
-              >
-                <span className="ielts-part-badge-tag">Part {p.partNumber}</span>
-                <span>{shortLabel}</span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Scratchpad Toggle Button */}
+        <button
+          type="button"
+          className={`ielts-notepad-toggle-btn ${isNotepadOpen ? "active" : ""}`}
+          onClick={() => setIsNotepadOpen(!isNotepadOpen)}
+          title="Mở giấy nháp điện tử để ghi chú"
+        >
+          <FileText className="w-4 h-4 mr-1.5" />
+          <span>Giấy nháp (Part {activePart})</span>
+        </button>
+      </header>
+
+      {/* Center Speaking Stage */}
+      <div className="ielts-speaking-center-stage">
+        {!isCurrentRevealed ? (
+          /* Initial Screen: Centered "Show question" Button */
+          <div className="ielts-speaking-curtain">
+            <p className="ielts-curtain-hint">
+              Nhấn nút bên dưới để nghe giám khảo đọc câu hỏi và bắt đầu tính giờ trả lời:
+            </p>
+            <button
+              type="button"
+              className="ielts-show-question-btn"
+              onClick={handleShowQuestion}
+            >
+              <Eye className="w-6 h-6 mr-2 text-primary" />
+              <span>Show question</span>
+            </button>
+          </div>
+        ) : (
+          /* Question Revealed Card */
+          <div className="ielts-speaking-card-wrapper">
+            {/* Examiner Speaking Waves Banner */}
+            {isExaminerSpeaking && (
+              <div className="ielts-examiner-speaking-banner">
+                <Volume2 className="w-5 h-5 mr-2 text-primary animate-pulse" />
+                <span>Giám khảo đang đọc câu hỏi... Hãy lắng nghe kỹ!</span>
+              </div>
+            )}
+
+            {/* Question Text / Cue Card */}
+            {currentQuestion?.isCueCard ? (
+              <div className="ielts-cue-card">
+                <span className="ielts-cue-card-badge">CANDIDATE CUE CARD</span>
+                <h4 className="ielts-cue-topic">{currentQuestion.topic}</h4>
+                <p className="ielts-cue-intro">You should say:</p>
+                <ul className="ielts-cue-prompts">
+                  {currentQuestion.prompts.map((p, idx) => (
+                    <li key={idx}>{p}</li>
+                  ))}
+                </ul>
+                <div className="ielts-cue-mode-indicator">
+                  {cueCardMode === "prep" ? (
+                    <span>⏳ Đang trong 1 phút chuẩn bị dàn ý...</span>
+                  ) : (
+                    <span>🎙️ Đang trong 2 phút trình bày bài nói...</span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="ielts-question-text-box">
+                {currentQuestion?.theme && (
+                  <span className="ielts-q-theme-badge">Chủ đề: {currentQuestion.theme}</span>
+                )}
+                <h3 className="ielts-question-prompt-text">{currentQuestion?.text}</h3>
+
+                <button
+                  type="button"
+                  className="ielts-re-read-audio-btn"
+                  onClick={handleReReadQuestion}
+                  title="Nghe lại câu hỏi từ giám khảo"
+                  disabled={isExaminerSpeaking}
+                >
+                  <Volume2 className="w-4 h-4 mr-1 text-primary" />
+                  <span>Nghe lại</span>
+                </button>
+              </div>
+            )}
+
+            {/* Center Time Limit Pill (Soft Red/Orange Pill) */}
+            <div className="ielts-question-time-limit-pill">
+              <span className="ielts-time-limit-dot" />
+              <span>Time limit {formatSpeakingTimer(currentRemainingTime)}</span>
+            </div>
+
+            {/* Minimalist Mic Recording Area */}
+            <div className="ielts-speaking-recorder-row">
+              {!isRecording ? (
+                <button
+                  type="button"
+                  className="ielts-mic-btn"
+                  onClick={startRecording}
+                  disabled={isLocked}
+                  title={isLocked ? "Đã khóa bài nói" : "Bắt đầu ghi âm câu trả lời"}
+                  aria-label="Ghi âm"
+                >
+                  <Mic className="w-5 h-5" />
+                </button>
+              ) : (
+                <div className="ielts-recording-active-wrap">
+                  <button
+                    type="button"
+                    className="ielts-mic-btn recording"
+                    onClick={stopRecording}
+                    title="Dừng ghi âm"
+                    aria-label="Dừng ghi âm"
+                  >
+                    <Square className="w-4 h-4 text-white" />
+                  </button>
+                  <div className="ielts-recording-live-indicator">
+                    <span className="ielts-pulse-dot" />
+                    <span>Đang thu: {formatSpeakingTimer(recordSeconds)}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Audio playback when recorded */}
+              {recordedItem && !isRecording && (
+                <div className="ielts-playback-bar">
+                  <IeltsRecordedAudioPlayer
+                    audioUrl={recordedItem.url}
+                    duration={recordedItem.duration || recordSeconds}
+                    downloadName={`ielts_speaking_${currentKey}.webm`}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Resizable 2-Column Split Pane */}
-      <IeltsSplitPane
-        leftPane={leftPaneContent}
-        rightPane={rightPaneContent}
-        storageKey="ielts_split_speaking"
-        className="ielts-speaking-split"
+      {/* Floating Scratchpad Notepad Drawer */}
+      {isNotepadOpen && (
+        <aside className="ielts-floating-notepad-drawer">
+          <div className="ielts-floating-notepad-header">
+            <h5>
+              <FileText className="w-4 h-4 mr-1 text-primary inline" />
+              Giấy nháp điện tử (Part {activePart})
+            </h5>
+            <button
+              type="button"
+              className="ielts-notepad-close-btn"
+              onClick={() => setIsNotepadOpen(false)}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <textarea
+            value={notes[activePart] || ""}
+            onChange={(e) => handleNotesChange(e.target.value)}
+            placeholder="Ghi chú ý tưởng, từ vựng hoặc dàn bài tại đây (tự động lưu)..."
+            className="ielts-floating-notepad-textarea"
+            rows={10}
+            readOnly={isLocked}
+          />
+        </aside>
+      )}
+
+      {/* Bottom Navigation Strip (Exact Match with user screenshot) */}
+      <IeltsSpeakingBottomNav
+        parts={parts}
+        activePart={activePart}
+        activeQuestionIdx={activeQuestionIdx}
+        answeredMap={recordingsMap}
+        onSelectQuestion={handleSelectQuestion}
+        onPrevQuestion={handlePrevQuestion}
+        onNextQuestion={handleNextQuestion}
+        isLocked={isLocked}
       />
     </div>
   );

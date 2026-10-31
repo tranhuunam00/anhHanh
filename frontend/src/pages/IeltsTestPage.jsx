@@ -293,9 +293,10 @@ export const IeltsTestPage = ({
               type="button"
               className="ielts-exam-info-btn"
               onClick={() => setIsConfirmOpen(true)}
-              title="Xem thông tin đề thi & thời gian"
+              title="Xem thông tin quy chế đề thi & thời gian"
+              aria-label="Xem thông tin đề thi"
             >
-              <Info className="w-3.5 h-3.5 text-primary" />
+              <Info size={15} />
             </button>
           </div>
 
@@ -418,7 +419,8 @@ export const IeltsTestPage = ({
                 writingData={testData.skills.writing}
                 user={user}
                 token={token}
-                isLocked={isCurrentSkillLocked && !isReviewMode}
+                isLocked={isCurrentSkillLocked}
+                isReview={isReviewMode}
               />
             )}
             {activeSkill === "speaking" && (

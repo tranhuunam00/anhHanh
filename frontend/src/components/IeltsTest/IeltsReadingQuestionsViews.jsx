@@ -31,96 +31,98 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
           <h5 className="ielts-card-title">{tableGroup.title}</h5>
           <pre className="ielts-instructions-text">{tableGroup.instructions}</pre>
 
-          <table className="ielts-exercise-table mt-2">
-            <thead>
-              <tr>
-                {tableGroup.columns.map((c, i) => (
-                  <th key={i}>{c}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Humans</td>
-                <td>• humans experience REM sleep and non-REM sleep<br />• in REM sleep, the eyes and muscles move</td>
-                <td>Most dream states happen during REM sleep</td>
-              </tr>
-              <tr>
-                <td>
-                  <span className="ielts-inline-input-wrapper" id="ielts-q-1">
-                    <span className="ielts-q-pill">1</span>
-                    <input
-                      type="text"
-                      value={answers[1] || ""}
-                      onChange={(e) => onChange(1, e.target.value)}
-                      className={`ielts-real-input ${getFeedbackClass(evaluation, 1)}`}
-                    />
-                  </span>
-                  {renderFeedback(evaluation, 1, isReview)}
-                </td>
-                <td>• similar brain patterns were observed when active and sleeping</td>
-                <td>indicative of dreaming</td>
-              </tr>
-              <tr>
-                <td>Pigeons</td>
-                <td>
-                  when sleeping, pigeons displayed activity in parts of the brain that deal with{" "}
-                  <span className="ielts-inline-input-wrapper" id="ielts-q-2">
-                    <span className="ielts-q-pill">2</span>
-                    <input
-                      type="text"
-                      value={answers[2] || ""}
-                      onChange={(e) => onChange(2, e.target.value)}
-                      className={`ielts-real-input ${getFeedbackClass(evaluation, 2)}`}
-                    />
-                  </span>
-                  {renderFeedback(evaluation, 2, isReview)} input
-                </td>
-                <td>may have been dreaming of flying</td>
-              </tr>
-              <tr>
-                <td>Whales and dolphins</td>
-                <td>
-                  • still have{" "}
-                  <span className="ielts-inline-input-wrapper" id="ielts-q-3">
-                    <span className="ielts-q-pill">3</span>
-                    <input
-                      type="text"
-                      value={answers[3] || ""}
-                      onChange={(e) => onChange(3, e.target.value)}
-                      className={`ielts-real-input ${getFeedbackClass(evaluation, 3)}`}
-                    />
-                  </span>
-                  {renderFeedback(evaluation, 3, isReview)} their brain awake when they sleep
-                  <br />
-                  • don't experience REM sleep, as this could affect their sensitivity to{" "}
-                  <span className="ielts-inline-input-wrapper" id="ielts-q-4">
-                    <span className="ielts-q-pill">4</span>
-                    <input
-                      type="text"
-                      value={answers[4] || ""}
-                      onChange={(e) => onChange(4, e.target.value)}
-                      className={`ielts-real-input ${getFeedbackClass(evaluation, 4)}`}
-                    />
-                  </span>
-                  {renderFeedback(evaluation, 4, isReview)}
-                </td>
-                <td>
-                  their dreams are probably not very{" "}
-                  <span className="ielts-inline-input-wrapper" id="ielts-q-5">
-                    <span className="ielts-q-pill">5</span>
-                    <input
-                      type="text"
-                      value={answers[5] || ""}
-                      onChange={(e) => onChange(5, e.target.value)}
-                      className={`ielts-real-input ${getFeedbackClass(evaluation, 5)}`}
-                    />
-                  </span>
-                  {renderFeedback(evaluation, 5, isReview)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="ielts-table-container">
+            <table className="ielts-exercise-table ielts-reading-table mt-2">
+              <thead>
+                <tr>
+                  <th className="col-subject" style={{ width: "20%" }}>Subject</th>
+                  <th className="col-findings" style={{ width: "52%" }}>Research findings</th>
+                  <th className="col-comment" style={{ width: "28%" }}>Comment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="col-subject">Humans</td>
+                  <td className="col-findings">• humans experience REM sleep and non-REM sleep<br />• in REM sleep, the eyes and muscles move</td>
+                  <td className="col-comment">Most dream states happen during REM sleep</td>
+                </tr>
+                <tr>
+                  <td className="col-subject">
+                    <span className="ielts-inline-input-wrapper" id="ielts-q-1">
+                      <span className="ielts-q-pill">1</span>
+                      <input
+                        type="text"
+                        value={answers[1] || ""}
+                        onChange={(e) => onChange(1, e.target.value)}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 1)}`}
+                      />
+                    </span>
+                    {renderFeedback(evaluation, 1, isReview)}
+                  </td>
+                  <td className="col-findings">• similar brain patterns were observed when active and sleeping</td>
+                  <td className="col-comment">indicative of dreaming</td>
+                </tr>
+                <tr>
+                  <td className="col-subject">Pigeons</td>
+                  <td className="col-findings">
+                    when sleeping, pigeons displayed activity in parts of the brain that deal with{" "}
+                    <span className="ielts-inline-input-wrapper" id="ielts-q-2">
+                      <span className="ielts-q-pill">2</span>
+                      <input
+                        type="text"
+                        value={answers[2] || ""}
+                        onChange={(e) => onChange(2, e.target.value)}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 2)}`}
+                      />
+                    </span>
+                    {renderFeedback(evaluation, 2, isReview)} input
+                  </td>
+                  <td className="col-comment">may have been dreaming of flying</td>
+                </tr>
+                <tr>
+                  <td className="col-subject">Whales and dolphins</td>
+                  <td className="col-findings">
+                    • still have{" "}
+                    <span className="ielts-inline-input-wrapper" id="ielts-q-3">
+                      <span className="ielts-q-pill">3</span>
+                      <input
+                        type="text"
+                        value={answers[3] || ""}
+                        onChange={(e) => onChange(3, e.target.value)}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 3)}`}
+                      />
+                    </span>
+                    {renderFeedback(evaluation, 3, isReview)} their brain awake when they sleep
+                    <br />
+                    • don't experience REM sleep, as this could affect their sensitivity to{" "}
+                    <span className="ielts-inline-input-wrapper" id="ielts-q-4">
+                      <span className="ielts-q-pill">4</span>
+                      <input
+                        type="text"
+                        value={answers[4] || ""}
+                        onChange={(e) => onChange(4, e.target.value)}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 4)}`}
+                      />
+                    </span>
+                    {renderFeedback(evaluation, 4, isReview)}
+                  </td>
+                  <td className="col-comment">
+                    their dreams are probably not very{" "}
+                    <span className="ielts-inline-input-wrapper" id="ielts-q-5">
+                      <span className="ielts-q-pill">5</span>
+                      <input
+                        type="text"
+                        value={answers[5] || ""}
+                        onChange={(e) => onChange(5, e.target.value)}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 5)}`}
+                      />
+                    </span>
+                    {renderFeedback(evaluation, 5, isReview)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

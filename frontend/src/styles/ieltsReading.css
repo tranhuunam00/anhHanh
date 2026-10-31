@@ -69,6 +69,33 @@
 }
 
 /* Question Cards, Tables, Inputs */
+.ielts-reading-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.ielts-reading-table th.col-subject,
+.ielts-reading-table td.col-subject {
+  width: 20%;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.ielts-reading-table th.col-findings,
+.ielts-reading-table td.col-findings {
+  width: 52%;
+  vertical-align: top;
+  line-height: 1.7;
+}
+
+.ielts-reading-table th.col-comment,
+.ielts-reading-table td.col-comment {
+  width: 28%;
+  vertical-align: top;
+  line-height: 1.65;
+}
+
 .ielts-question-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);

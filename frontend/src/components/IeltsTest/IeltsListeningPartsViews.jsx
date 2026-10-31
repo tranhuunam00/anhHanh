@@ -33,10 +33,10 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
         <table className="ielts-exercise-table">
           <thead>
             <tr>
-              <th style={{ width: "22%" }}>Class</th>
-              <th style={{ width: "22%" }}>Date & Time</th>
-              <th style={{ width: "16%" }}>Cost</th>
-              <th>Details & Notes</th>
+              <th style={{ width: "18%" }}>Class</th>
+              <th style={{ width: "18%" }}>Date & Time</th>
+              <th style={{ width: "12%" }}>Cost</th>
+              <th style={{ width: "52%" }}>Details & Notes</th>
             </tr>
           </thead>
           <tbody>

@@ -1,0 +1,197 @@
+/* ==========================================================================
+   IELTS Question Palette Stylesheet (Top Bar & Badge Indicators)
+   Light & Dark Mode Compatible via System CSS Variables
+   ========================================================================== */
+
+/* Top Question Palette Bar (Dàn hàng ngang trên đầu) */
+.ielts-top-palette-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 12px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  gap: 10px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.ielts-top-palette-parts {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.ielts-top-part-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ielts-top-part-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--primary);
+}
+
+.ielts-top-part-chip.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.3);
+}
+
+.ielts-chip-name {
+  font-weight: 800;
+}
+
+.ielts-chip-icon {
+  font-size: 0.8rem;
+}
+
+.ielts-chip-count {
+  font-size: 0.7rem;
+  opacity: 0.85;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 5px;
+  border-radius: 999px;
+}
+
+.ielts-top-part-chip.active .ielts-chip-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.ielts-chip-count.done {
+  background: #10b981;
+  color: #ffffff;
+}
+
+/* Horizontal 40 Questions Strip */
+.ielts-top-palette-strip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 2px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ielts-top-palette-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.ielts-top-palette-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ielts-palette-divider-v {
+  width: 1px;
+  height: 16px;
+  background: var(--border-color);
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+.ielts-palette-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Individual Question Badge (Compact 25x25) */
+.ielts-palette-badge {
+  width: 25px;
+  height: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.ielts-palette-badge:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* SÁNG RÕ RÀNG KHI ĐÃ ĐIỀN (Glowing Blue Indicator) */
+.ielts-palette-badge.answered,
+.ielts-palette-badge.glowing {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  font-weight: 800 !important;
+}
+
+.ielts-palette-badge.current {
+  outline: 2px solid #f59e0b !important;
+  outline-offset: 1px !important;
+}
+
+.ielts-palette-badge.correct {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+}
+
+.ielts-palette-badge.incorrect {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+}
+
+/* Palette Right Summary */
+.ielts-top-palette-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.ielts-summary-progress {
+  width: 50px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-summary-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+

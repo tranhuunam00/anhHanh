@@ -5,6 +5,7 @@
    ========================================================================== */
 
 @import "./ieltsLayout.css";
+@import "./ieltsPalette.css";
 @import "./ieltsSplitPane.css";
 @import "./ieltsModal.css";
 @import "./ieltsFinalReport.css";
@@ -13,3 +14,4 @@
 @import "./ieltsReading.css";
 @import "./ieltsWriting.css";
 @import "./ieltsSpeaking.css";
+@import "./ieltsSpeakingNav.css";

@@ -1,19 +1,20 @@
 import React, { useState, useMemo } from "react";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
 import { canUseIeltsAiGrading } from "../../utils/ieltsScoring.js";
-import { Sparkles, Clock, CheckCircle, Check, Lock } from "../../constants/icons.js";
+import { Sparkles, Clock, CheckCircle, Lock } from "../../constants/icons.js";
 
 /**
  * IELTS Academic Writing Test Module (Exam-Standard UI)
  * Features:
  * - Left Pane: Official Prompt, Diagram (Task 1), and Band 7.0+ Structure & Strategy Guide
- * - Right Pane: Professional Word Processor, live word counter with progress indicator, and AI Scoring
+ * - Right Pane: Professional Word Processor, live word counter with progress indicator, and Review AI Scoring
  */
 export const IeltsWritingModule = ({
   writingData,
   user = null,
   token = null,
-  isLocked = false
+  isLocked = false,
+  isReview = false
 }) => {
   const [activeTask, setActiveTask] = useState(2); // Task 2 loaded first for essay practice
 
@@ -173,30 +174,27 @@ export const IeltsWritingModule = ({
           </span>
         </div>
 
-        <div className="ielts-editor-actions">
-          <span className="ielts-autosave-tag">
-            <Check className="w-3 h-3 mr-1 inline text-success" />
-            Đã lưu tự động
-          </span>
-
-          {/* AI Scoring Button */}
-          {isAuthorized ? (
-            <button
-              type="button"
-              className="ielts-ai-eval-btn"
-              onClick={handleEvaluateAi}
-              disabled={isLoadingAi || wordCount < 15}
-            >
-              <Sparkles className="w-4 h-4 mr-1.5" />
-              {isLoadingAi ? "AI đang chấm điểm..." : "Chấm điểm AI"}
-            </button>
-          ) : (
-            <span className="ielts-ai-restricted-badge" title="Tính năng AI chấm điểm dành riêng cho 3 tài khoản được cấp phép">
-              <Lock className="w-3.5 h-3.5 mr-1 inline" />
-              AI chấm điểm (Cần cấp phép)
-            </span>
-          )}
-        </div>
+        {/* AI Scoring Button (Only accessible after finishing the exam in Review Mode) */}
+        {isReview && (
+          <div className="ielts-editor-actions">
+            {isAuthorized ? (
+              <button
+                type="button"
+                className="ielts-ai-eval-btn"
+                onClick={handleEvaluateAi}
+                disabled={isLoadingAi || wordCount < 15}
+              >
+                <Sparkles className="w-4 h-4 mr-1.5" />
+                {isLoadingAi ? "AI đang chấm điểm..." : "Chấm điểm AI"}
+              </button>
+            ) : (
+              <span className="ielts-ai-restricted-badge" title="Tính năng AI chấm điểm dành riêng cho tài khoản được cấp phép">
+                <Lock className="w-3.5 h-3.5 mr-1 inline" />
+                AI chấm điểm (Cần cấp phép)
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {aiError && <div className="ielts-error-banner">{aiError}</div>}

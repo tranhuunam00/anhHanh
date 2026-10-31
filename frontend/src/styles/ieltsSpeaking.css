@@ -1,311 +1,342 @@
 /* ==========================================================================
-   IELTS Speaking Stylesheet (Computer-Delivered UI)
+   IELTS Speaking Stylesheet (Virtual Video-Call Examiner Experience)
    Light & Dark Mode Compatible via System CSS Variables
    ========================================================================== */
 
-/* Left Pane: Questions & Cue Card */
-.ielts-speaking-cues-pane {
+.ielts-speaking-stage-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  height: 100%;
+  width: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.ielts-speaking-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 22px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-}
-
-.ielts-speaking-card-header {
+/* Top Header Bar */
+.ielts-speaking-stage-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
+  padding: 10px 18px;
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.ielts-speaking-desc {
-  font-size: 0.92rem;
-  line-height: 1.65;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-}
-
-.ielts-topic-label-bar {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: 16px;
-}
-
-/* Part 1 Question Cards */
-.ielts-speaking-questions-list {
-  display: flex;
-  flex-direction: column;
+  flex-shrink: 0;
   gap: 12px;
 }
 
-.ielts-speaking-question-item {
+.ielts-speaking-part-title-wrap {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px 16px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  transition: all 0.15s ease;
-}
-
-.ielts-speaking-question-item:hover {
-  background: var(--bg-card);
-  border-color: var(--primary);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-}
-
-.ielts-speaking-q-header {
-  display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.ielts-speaking-q-num {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: #ffffff;
+.ielts-speaking-pill-badge {
   background: var(--primary);
-  padding: 2px 8px;
-  border-radius: 4px;
-  flex-shrink: 0;
+  color: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
 }
 
-.ielts-speaking-q-text {
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.5;
+.ielts-speaking-main-title {
+  font-size: 0.98rem;
+  font-weight: 800;
   color: var(--text-primary);
   margin: 0;
 }
 
-.ielts-speaking-idea-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
-  padding-left: 36px;
-}
-
-.ielts-idea-tag {
-  font-size: 0.74rem;
+.ielts-speaking-topic-tag {
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
-  background: var(--bg-card);
+  background: var(--bg-secondary);
+  padding: 3px 8px;
+  border-radius: 6px;
   border: 1px solid var(--border-color);
-  padding: 2px 8px;
-  border-radius: 4px;
 }
 
-/* Part 2 Cue Card (Authentic British Council Physical Cue Card Style) */
-.ielts-cue-card-container {
+.ielts-notepad-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ielts-notepad-toggle-btn:hover,
+.ielts-notepad-toggle-btn.active {
+  background: var(--bg-card);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Center Speaking Stage */
+.ielts-speaking-center-stage {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
-.ielts-cue-card {
+/* Curtain / Hidden Question State */
+.ielts-speaking-curtain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 540px;
+  gap: 20px;
+}
+
+.ielts-curtain-hint {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ielts-show-question-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--primary, #2563eb);
+  font-size: 1.25rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.ielts-show-question-btn:hover {
+  background: rgba(37, 99, 235, 0.08);
+  transform: scale(1.05);
+}
+
+/* Revealed Question Stage Card */
+.ielts-speaking-card-wrapper {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+}
+
+.ielts-examiner-speaking-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--primary-light, rgba(37, 99, 235, 0.1));
+  color: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-question-text-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 22px 26px;
+  width: 100%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.ielts-q-theme-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
   background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-left: 6px solid var(--primary);
-  border-radius: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.ielts-question-prompt-text {
+  font-size: 1.22rem;
+  font-weight: 800;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 6px 0 14px 0;
+}
+
+.ielts-re-read-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ielts-re-read-audio-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Part 2 Cue Card */
+.ielts-cue-card {
+  background: var(--bg-card);
+  border: 2px dashed #f59e0b;
+  border-radius: 12px;
   padding: 20px 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  color: var(--text-primary);
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+  box-sizing: border-box;
 }
 
 .ielts-cue-card-badge {
+  background: #f59e0b;
+  color: #ffffff;
+  font-weight: 900;
   font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
   letter-spacing: 0.5px;
-  color: var(--primary);
+  display: inline-block;
   margin-bottom: 8px;
-  display: block;
 }
 
 .ielts-cue-topic {
-  font-size: 1.12rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  line-height: 1.5;
   color: var(--text-primary);
-  margin: 0 0 14px 0;
+  margin: 4px 0 8px 0;
 }
 
 .ielts-cue-intro {
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: 0.92rem;
+  font-style: italic;
+  font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .ielts-cue-prompts {
-  padding-left: 20px;
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.8;
+  margin: 0 0 12px 20px;
+  padding: 0;
+  font-size: 0.94rem;
+  line-height: 1.7;
   color: var(--text-primary);
 }
 
-.ielts-cue-prompts li {
-  margin-bottom: 4px;
-}
-
-/* Part 2 Timers */
-.ielts-cue-timers {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.ielts-timer-display {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.ielts-timer-digits {
-  font-size: 1.5rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-weight: 900;
-  color: var(--primary);
-  letter-spacing: 1px;
-}
-
-.ielts-timer-tag {
+.ielts-cue-mode-indicator {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--text-muted);
+  color: #b45309;
+  padding: 4px 10px;
+  background: rgba(245, 158, 11, 0.15);
+  border-radius: 6px;
+  display: inline-block;
 }
 
-.ielts-timer-actions {
-  display: flex;
+/* Question Time Limit Pill (Soft Red/Orange Pill matching user screenshot) */
+.ielts-question-time-limit-pill {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  font-size: 0.92rem;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-.ielts-timer-btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  color: var(--text-primary);
-  transition: all 0.15s ease;
+.ielts-time-limit-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: ieltsPulse 1.4s infinite;
 }
 
-.ielts-timer-btn:hover {
-  background: var(--bg-card);
-  border-color: var(--primary);
+/* Mic Recording Area */
+.ielts-speaking-recorder-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
-.ielts-timer-btn.active {
-  background: var(--primary);
+.ielts-mic-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #ffffff;
-  border-color: var(--primary);
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
-}
-
-.ielts-timer-btn-reset {
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  cursor: pointer;
-  color: var(--text-muted);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-.ielts-timer-btn-reset:hover {
-  color: var(--text-primary);
+.ielts-mic-btn:hover:not(:disabled) {
+  transform: scale(1.06);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.45);
 }
 
-/* Part 3 Themes */
-.ielts-part3-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.ielts-mic-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--border-color);
+  color: var(--text-muted);
+  box-shadow: none;
 }
 
-.ielts-part3-theme-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.ielts-mic-btn.recording {
+  background: #1e293b;
+  animation: ieltsPulse 1.4s infinite;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.ielts-theme-title {
-  font-size: 0.98rem;
-  font-weight: 800;
-  color: var(--primary);
-  padding-left: 8px;
-  border-left: 3px solid var(--primary);
-  margin: 4px 0 6px 0;
-}
-
-/* Right Pane: Speaking Studio & Candidate Scratchpad */
-.ielts-speaking-workspace-pane {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.ielts-recorder-card,
-.ielts-notepad-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 18px 22px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-}
-
-.ielts-recorder-header,
-.ielts-notepad-header {
-  display: flex;
+.ielts-recording-active-wrap {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-color);
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.ielts-studio-title {
-  font-size: 0.94rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
+  gap: 12px;
 }
 
 .ielts-recording-live-indicator {
@@ -316,7 +347,7 @@
   color: #ef4444;
   padding: 4px 12px;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 800;
 }
 
@@ -328,89 +359,64 @@
   animation: ieltsPulse 1.4s infinite;
 }
 
-.ielts-recorder-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-
-.ielts-record-btn-start {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: #ffffff;
-  border: none;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.92rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-  transition: all 0.2s ease;
-}
-
-.ielts-record-btn-start:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
-}
-
-.ielts-record-btn-stop {
-  background: #1e293b;
-  color: #ffffff;
-  border: none;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.92rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
 .ielts-playback-bar {
   display: flex;
   align-items: center;
   gap: 12px;
+  max-width: 420px;
   width: 100%;
 }
 
-.ielts-speaking-ai-bar {
+/* Floating Scratchpad Notepad Drawer */
+.ielts-floating-notepad-drawer {
+  position: absolute;
+  top: 56px;
+  right: 18px;
+  width: 320px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 12px 14px;
+  z-index: 25;
+}
+
+.ielts-floating-notepad-header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-color);
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
-/* Candidate Scratchpad Notepad */
-.ielts-notepad-textarea {
+.ielts-floating-notepad-header h5 {
+  font-size: 0.86rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.ielts-notepad-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 2px;
+}
+
+.ielts-notepad-close-btn:hover { color: var(--text-primary); }
+
+.ielts-floating-notepad-textarea {
   width: 100%;
-  min-height: 220px;
-  padding: 16px 18px;
-  border-radius: 8px;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  border: 1.5px solid var(--border-color);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.8;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 0.85rem;
+  line-height: 1.5;
   resize: vertical;
-  box-sizing: border-box;
   outline: none;
-  transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
-.ielts-notepad-textarea:focus {
-  border-color: var(--primary);
-  background: var(--bg-card);
-}
-
-.ielts-notepad-hint {
-  font-size: 0.76rem;
-  color: var(--text-muted);
-}
+/* (Bottom Question Strip & Step navigation styles extracted to ieltsSpeakingNav.css) */
