@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, RotateCcw } from "../../constants/icons.js";
+import { CheckCircle, RotateCcw, X } from "../../constants/icons.js";
 
 /**
  * Result & Score Modal for IELTS Test
@@ -45,8 +45,8 @@ export const IeltsResultModal = ({
           <h3 className="ielts-modal-title">
             Kết Quả Bài Thi IELTS {getSkillLabel(skill)}
           </h3>
-          <button type="button" className="ielts-modal-close-btn" onClick={onClose}>
-            ✕
+          <button type="button" className="ielts-modal-close-btn" onClick={onClose} title="Đóng">
+            <X className="w-4 h-4" />
           </button>
         </header>
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Play, Volume2 } from "../../constants/icons.js";
+import { Play, Volume2, Check } from "../../constants/icons.js";
 import { formatAudioTime } from "../../utils/ieltsScoring.js";
 
 /**
@@ -103,7 +103,10 @@ export const IeltsAudioPlayer = ({
               <span>Bắt đầu nghe</span>
             </button>
           ) : isEnded ? (
-            <span className="ielts-compact-status-ended">✓ Bài nghe đã kết thúc</span>
+            <span className="ielts-compact-status-ended">
+              <Check className="w-3.5 h-3.5 mr-1 inline text-success" />
+              Bài nghe đã kết thúc
+            </span>
           ) : (
             <div className="ielts-compact-status-playing" title="Đang phát bài thi IELTS - Không tua/dừng">
               <span className="ielts-recording-dot" />

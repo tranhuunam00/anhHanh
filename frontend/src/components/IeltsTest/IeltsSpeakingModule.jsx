@@ -2,7 +2,17 @@ import React, { useState, useRef, useEffect } from "react";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
 import { IeltsRecordedAudioPlayer } from "./IeltsRecordedAudioPlayer.jsx";
 import { canUseIeltsAiGrading } from "../../utils/ieltsScoring.js";
-import { Mic, Pause, RotateCcw, Sparkles, Clock, Volume2 } from "../../constants/icons.js";
+import {
+  Mic,
+  Pause,
+  RotateCcw,
+  Sparkles,
+  Clock,
+  Volume2,
+  Lock,
+  FileText,
+  Check
+} from "../../constants/icons.js";
 
 /**
  * IELTS Speaking Test Module (Computer-Delivered UI)
@@ -322,7 +332,8 @@ export const IeltsSpeakingModule = ({
             </button>
           ) : (
             <span className="ielts-ai-restricted-badge">
-              🔒 AI chấm Speaking (Dành riêng cho 3 tài khoản được cấp phép)
+              <Lock className="w-3.5 h-3.5 mr-1 inline" />
+              AI chấm Speaking (Dành riêng cho 3 tài khoản được cấp phép)
             </span>
           )}
         </div>
@@ -331,8 +342,14 @@ export const IeltsSpeakingModule = ({
       {/* Candidate Scratchpad Notepad */}
       <div className="ielts-notepad-card">
         <div className="ielts-notepad-header">
-          <h5 className="ielts-studio-title">📝 Giấy nháp điện tử (Candidate Scratchpad Part {activePart})</h5>
-          <span className="ielts-notepad-hint">✓ Tự động lưu vào trình duyệt</span>
+          <h5 className="ielts-studio-title">
+            <FileText className="w-4 h-4 mr-1.5 inline text-primary" />
+            Giấy nháp điện tử (Candidate Scratchpad Part {activePart})
+          </h5>
+          <span className="ielts-notepad-hint">
+            <Check className="w-3 h-3 mr-1 inline text-success" />
+            Tự động lưu vào trình duyệt
+          </span>
         </div>
         <textarea
           value={notes[activePart] || ""}

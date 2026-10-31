@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, Clock, RotateCcw, Play } from "../../constants/icons.js";
+import { CheckCircle, Clock, RotateCcw, Play, X, Check } from "../../constants/icons.js";
 import { formatCountdownTime } from "../../utils/ieltsExamTimer.js";
 
 /**
@@ -38,8 +38,8 @@ export const IeltsStartConfirmModal = ({
             <span className="ielts-exam-mode-badge mr-2">Chuẩn phòng thi IDP / BC</span>
             <h3 className="ielts-modal-title mt-1">Xác Nhận Bắt Đầu Làm Bài Thi Thật</h3>
           </div>
-          <button type="button" className="ielts-modal-close-btn" onClick={onClose}>
-            ✕
+          <button type="button" className="ielts-modal-close-btn" onClick={onClose} title="Đóng">
+            <X className="w-4 h-4" />
           </button>
         </header>
 
@@ -69,9 +69,15 @@ export const IeltsStartConfirmModal = ({
                   <p className="ielts-skill-detail">{sk.detail}</p>
                   <div className="ielts-skill-status-tag">
                     {isDone ? (
-                      <span className="ielts-tag-done">✓ Đã nộp bài</span>
+                      <span className="ielts-tag-done">
+                        <Check className="w-3 h-3 inline mr-1" />
+                        Đã nộp bài
+                      </span>
                     ) : isInProgress ? (
-                      <span className="ielts-tag-running">⏳ Còn {formatCountdownTime(rem)}</span>
+                      <span className="ielts-tag-running">
+                        <Clock className="w-3 h-3 inline mr-1" />
+                        Còn {formatCountdownTime(rem)}
+                      </span>
                     ) : (
                       <span className="ielts-tag-ready">Sẵn sàng</span>
                     )}

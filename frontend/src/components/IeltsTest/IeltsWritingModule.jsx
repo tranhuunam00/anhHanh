@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
 import { canUseIeltsAiGrading } from "../../utils/ieltsScoring.js";
-import { Sparkles, Clock, CheckCircle } from "../../constants/icons.js";
+import { Sparkles, Clock, CheckCircle, Check, Lock } from "../../constants/icons.js";
 
 /**
  * IELTS Academic Writing Test Module (Exam-Standard UI)
@@ -174,7 +174,10 @@ export const IeltsWritingModule = ({
         </div>
 
         <div className="ielts-editor-actions">
-          <span className="ielts-autosave-tag">✓ Đã lưu tự động</span>
+          <span className="ielts-autosave-tag">
+            <Check className="w-3 h-3 mr-1 inline text-success" />
+            Đã lưu tự động
+          </span>
 
           {/* AI Scoring Button */}
           {isAuthorized ? (
@@ -189,7 +192,8 @@ export const IeltsWritingModule = ({
             </button>
           ) : (
             <span className="ielts-ai-restricted-badge" title="Tính năng AI chấm điểm dành riêng cho 3 tài khoản được cấp phép">
-              🔒 AI chấm điểm (Cần cấp phép)
+              <Lock className="w-3.5 h-3.5 mr-1 inline" />
+              AI chấm điểm (Cần cấp phép)
             </span>
           )}
         </div>

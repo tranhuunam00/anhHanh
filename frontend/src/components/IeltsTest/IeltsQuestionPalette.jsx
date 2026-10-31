@@ -1,4 +1,5 @@
 import React from "react";
+import { MapPin } from "../../constants/icons.js";
 
 /**
  * Helper to determine if a question has been answered
@@ -83,7 +84,7 @@ export const IeltsQuestionPalette = ({
               title={`Chuyển đến ${grp.label} (Câu ${start}-${end})`}
             >
               <span className="ielts-chip-name">{grp.label}</span>
-              {grp.hasMap && <span className="ielts-chip-icon">🗺️</span>}
+              {grp.hasMap && <MapPin className="w-3 h-3 inline ml-1 text-primary" />}
               <span className={`ielts-chip-count ${count === totalInGroup ? "done" : ""}`}>
                 {count}/{totalInGroup}
               </span>

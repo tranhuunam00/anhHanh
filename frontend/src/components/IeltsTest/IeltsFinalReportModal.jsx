@@ -7,7 +7,9 @@ import {
   PenTool,
   Mic,
   Clock,
-  Sparkles
+  Sparkles,
+  X,
+  Check
 } from "../../constants/icons.js";
 import { computeOverallBand } from "../../utils/ieltsExamTimer.js";
 
@@ -58,7 +60,7 @@ export const IeltsFinalReportModal = ({
             onClick={onClose}
             title="Đóng bảng tổng kết"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </header>
 
@@ -92,7 +94,10 @@ export const IeltsFinalReportModal = ({
                   {lResult.rawScore ?? 0} / 40 câu
                 </span>
               </div>
-              <span className="ielts-final-status-badge success">✓ Đã nộp bài</span>
+              <span className="ielts-final-status-badge success">
+                <Check className="w-3 h-3 inline mr-1" />
+                Đã nộp bài
+              </span>
             </div>
 
             {/* Reading */}
@@ -111,7 +116,10 @@ export const IeltsFinalReportModal = ({
                   {rResult.rawScore ?? 0} / 40 câu
                 </span>
               </div>
-              <span className="ielts-final-status-badge success">✓ Đã nộp bài</span>
+              <span className="ielts-final-status-badge success">
+                <Check className="w-3 h-3 inline mr-1" />
+                Đã nộp bài
+              </span>
             </div>
 
             {/* Writing */}
@@ -126,7 +134,10 @@ export const IeltsFinalReportModal = ({
                 <strong className="ielts-final-band">Task 1 & Task 2</strong>
                 <span className="ielts-final-raw-score">Đã lưu bài viết</span>
               </div>
-              <span className="ielts-final-status-badge success">✓ Đã nộp bài</span>
+              <span className="ielts-final-status-badge success">
+                <Check className="w-3 h-3 inline mr-1" />
+                Đã nộp bài
+              </span>
             </div>
 
             {/* Speaking */}
@@ -141,7 +152,10 @@ export const IeltsFinalReportModal = ({
                 <strong className="ielts-final-band">Part 1, 2, 3</strong>
                 <span className="ielts-final-raw-score">Đã nộp bài nói</span>
               </div>
-              <span className="ielts-final-status-badge success">✓ Đã nộp bài</span>
+              <span className="ielts-final-status-badge success">
+                <Check className="w-3 h-3 inline mr-1" />
+                Đã nộp bài
+              </span>
             </div>
           </div>
         </div>
