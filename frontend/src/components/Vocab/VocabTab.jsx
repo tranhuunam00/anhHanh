@@ -12,6 +12,7 @@ import VocabExerciseHubModal from "./VocabExerciseHubModal";
 import { AddVocabModal } from "../Modals/AddVocabModal";
 import { EditVocabModal } from "../Modals/EditVocabModal";
 import { AIVocabImportModal } from "../Modals/AIVocabImportModal";
+import { BatchVocabTextImportModal } from "../Modals/BatchVocabTextImportModal";
 import { ThemeVocabExplorerModal } from "../Modals/ThemeVocabExplorerModal";
 import { markVocabStudiedToday } from "../../utils/dailyReminderManager";
 import { getVoiceLang } from "../../utils/languageVoices";
@@ -31,6 +32,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [refreshingMeaningId, setRefreshingMeaningId] = useState(null);
   const [isExerciseHubOpen, setIsExerciseHubOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isBatchImportModalOpen, setIsBatchImportModalOpen] = useState(false);
   const [isAIImportModalOpen, setIsAIImportModalOpen] = useState(false);
   const [isThemeExplorerOpen, setIsThemeExplorerOpen] = useState(false);
   const [editingVocab, setEditingVocab] = useState(null);
@@ -299,6 +301,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
         onFilterChange={setFilterStatus}
         onOpenGuide={onOpenGuide}
         onOpenAdd={() => setIsAddModalOpen(true)}
+        onOpenBatchImport={() => setIsBatchImportModalOpen(true)}
         onOpenAIImport={() => setIsAIImportModalOpen(true)}
         onOpenPractice={() => setIsExerciseHubOpen(true)}
         onOpenThemeExplorer={() => setIsThemeExplorerOpen(true)}
@@ -453,6 +456,17 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
       <AIVocabImportModal
         isOpen={isAIImportModalOpen}
         onClose={() => setIsAIImportModalOpen(false)}
+        onSuccess={() => {
+          loadWords();
+          if (refreshStreak) refreshStreak();
+          if (refreshSavedVocab) refreshSavedVocab();
+        }}
+      />
+
+      {/* Bulk / Batch Vocabulary Text Import Modal (Excel/TSV/Text) */}
+      <BatchVocabTextImportModal
+        isOpen={isBatchImportModalOpen}
+        onClose={() => setIsBatchImportModalOpen(false)}
         onSuccess={() => {
           loadWords();
           if (refreshStreak) refreshStreak();

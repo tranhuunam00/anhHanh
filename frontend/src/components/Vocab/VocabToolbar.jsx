@@ -24,6 +24,7 @@ export const VocabToolbar = ({
   onFilterChange,
   onOpenGuide,
   onOpenAdd,
+  onOpenBatchImport,
   onOpenAIImport,
   onOpenPractice,
   onOpenThemeExplorer,
@@ -126,6 +127,19 @@ export const VocabToolbar = ({
             <Plus size={14} strokeWidth={2.5} />
             <span>Thêm từ mới</span>
           </button>
+
+          {/* Batch / Bulk Text Import from Excel/TSV Button */}
+          {onOpenBatchImport && (
+            <button
+              type="button"
+              className="btn btn-primary btn-with-icon vocab-action-btn vocab-batch-import-btn"
+              onClick={onOpenBatchImport}
+              title="Nhập hàng loạt từ vựng dạng bảng (Excel / Google Sheets / TSV)"
+            >
+              <FileSpreadsheet size={14} />
+              <span>Import từ vựng</span>
+            </button>
+          )}
 
           {/* AI Extract & Import Vocabulary Button */}
           <button

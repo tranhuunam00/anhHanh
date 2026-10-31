@@ -1,0 +1,358 @@
+/* ==========================================================================
+   Batch Vocabulary Text Import Modal Styles (Excel/TSV/Text)
+   Uses theme variables for Light and Dark mode compliance.
+   ========================================================================== */
+
+.batch-vocab-modal-dialog {
+  max-width: 960px;
+  width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: batchModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes batchModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.batch-vocab-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-primary, #f8fafc);
+}
+
+.batch-vocab-header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.batch-vocab-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.batch-vocab-modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.batch-vocab-modal-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted, #64748b);
+}
+
+.batch-vocab-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.batch-vocab-close-btn:hover {
+  background: var(--border-color, #e2e8f0);
+  color: var(--text-primary, #0f172a);
+}
+
+.batch-vocab-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+/* Guide banner */
+.batch-vocab-format-guide {
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.batch-vocab-format-guide-text {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #334155);
+  line-height: 1.45;
+}
+
+.batch-vocab-format-guide-text strong {
+  color: var(--primary, #6366f1);
+}
+
+.batch-vocab-sample-btn {
+  white-space: nowrap;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--primary, #6366f1);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.batch-vocab-sample-btn:hover {
+  border-color: var(--primary, #6366f1);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* Textarea input */
+.batch-vocab-textarea-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.batch-vocab-textarea-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.batch-vocab-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  background: var(--bg-primary, #f8fafc);
+  color: var(--text-primary, #0f172a);
+  resize: vertical;
+  min-height: 120px;
+  max-height: 240px;
+  transition: border-color 0.15s ease;
+}
+
+.batch-vocab-textarea:focus {
+  outline: none;
+  border-color: var(--primary, #6366f1);
+  background: var(--bg-card, #ffffff);
+}
+
+/* Statistics and Conflict Bar */
+.batch-vocab-stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-primary, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+}
+
+.batch-vocab-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.batch-vocab-stat-pill {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.batch-vocab-stat-pill.total {
+  background: var(--border-color, #e2e8f0);
+  color: var(--text-primary, #0f172a);
+}
+
+.batch-vocab-stat-pill.new {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.batch-vocab-stat-pill.duplicate {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+
+.batch-vocab-stat-pill.invalid {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+/* Conflict resolution options */
+.batch-vocab-conflict-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #334155);
+}
+
+.batch-vocab-conflict-label {
+  font-weight: 600;
+}
+
+.batch-vocab-radio-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+/* Preview table */
+.batch-vocab-table-container {
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--bg-card, #ffffff);
+}
+
+.batch-vocab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.batch-vocab-table th {
+  background: var(--bg-primary, #f8fafc);
+  color: var(--text-secondary, #334155);
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.batch-vocab-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+  color: var(--text-primary, #0f172a);
+  vertical-align: top;
+}
+
+.batch-vocab-table tr:hover td {
+  background: rgba(99, 102, 241, 0.03);
+}
+
+.batch-vocab-table tr.is-duplicate td {
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.batch-vocab-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.batch-vocab-badge.new {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.batch-vocab-badge.dup {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+
+.batch-vocab-pos-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  background: var(--border-color, #e2e8f0);
+  color: var(--text-secondary, #475569);
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.batch-vocab-row-del-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.batch-vocab-row-del-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Modal footer */
+.batch-vocab-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-primary, #f8fafc);
+}
+
+.batch-vocab-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.batch-vocab-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
