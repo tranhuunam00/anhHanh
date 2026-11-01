@@ -7,6 +7,12 @@ import {
   renderPart3,
   renderPart4
 } from "./IeltsListeningPartsViews.jsx";
+import {
+  renderTest1Part1,
+  renderTest1Part2,
+  renderTest1Part3,
+  renderTest1Part4
+} from "./IeltsListeningTest1PartsViews.jsx";
 
 /**
  * IELTS Listening Test Module (Exam-Standard Full-Width UI)
@@ -80,10 +86,21 @@ export const IeltsListeningModule = ({
       {/* Full-Screen Questions Scroll Area */}
       <div className="ielts-listening-full-scroll">
         <div className="ielts-listening-full-body">
-          {activePart === 1 && renderPart1(parts[0], answers, handleInputChange, evaluation, isReview)}
-          {activePart === 2 && renderPart2(parts[1], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-          {activePart === 3 && renderPart3(parts[2], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-          {activePart === 4 && renderPart4(parts[3], answers, handleInputChange, evaluation, isReview)}
+          {listeningData?.testId === "cambridge-21-test-1" ? (
+            <>
+              {activePart === 1 && renderTest1Part1(parts[0], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 2 && renderTest1Part2(parts[1], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 3 && renderTest1Part3(parts[2], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
+              {activePart === 4 && renderTest1Part4(parts[3], answers, handleInputChange, evaluation, isReview)}
+            </>
+          ) : (
+            <>
+              {activePart === 1 && renderPart1(parts[0], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 2 && renderPart2(parts[1], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
+              {activePart === 3 && renderPart3(parts[2], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
+              {activePart === 4 && renderPart4(parts[3], answers, handleInputChange, evaluation, isReview)}
+            </>
+          )}
         </div>
       </div>
     </div>

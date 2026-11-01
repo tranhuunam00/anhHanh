@@ -20,12 +20,13 @@ export const IeltsWritingModule = ({
 
   const tasks = writingData?.tasks || [];
   const currentTask = tasks.find((t) => t.taskNumber === activeTask) || tasks[0];
+  const testIdKey = writingData?.testId || "cambridge-21-test-2";
 
   // Essays stored per task in state & localStorage
   const [essays, setEssays] = useState(() => {
     try {
-      const saved1 = localStorage.getItem("ielts_essay_cam21_t2_1");
-      const saved2 = localStorage.getItem("ielts_essay_cam21_t2_2");
+      const saved1 = localStorage.getItem(`ielts_essay_${testIdKey}_1`) || (testIdKey === "cambridge-21-test-2" ? localStorage.getItem("ielts_essay_cam21_t2_1") : "");
+      const saved2 = localStorage.getItem(`ielts_essay_${testIdKey}_2`) || (testIdKey === "cambridge-21-test-2" ? localStorage.getItem("ielts_essay_cam21_t2_2") : "");
       return { 1: saved1 || "", 2: saved2 || "" };
     } catch {
       return { 1: "", 2: "" };
@@ -52,7 +53,7 @@ export const IeltsWritingModule = ({
     setEssays((prev) => {
       const next = { ...prev, [activeTask]: val };
       try {
-        localStorage.setItem(`ielts_essay_cam21_t2_${activeTask}`, val);
+        localStorage.setItem(`ielts_essay_${testIdKey}_${activeTask}`, val);
       } catch {
         // ignore
       }

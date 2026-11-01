@@ -6,6 +6,11 @@ import {
   renderPassage2Questions,
   renderPassage3Questions
 } from "./IeltsReadingQuestionsViews.jsx";
+import {
+  renderTest1Passage1Questions,
+  renderTest1Passage2Questions,
+  renderTest1Passage3Questions
+} from "./IeltsReadingTest1QuestionsViews.jsx";
 
 /**
  * IELTS Academic Reading Test Module
@@ -95,12 +100,25 @@ export const IeltsReadingModule = ({
   const rightPaneContent = (
     <div className="ielts-right-scroll-pane ielts-reading-questions-pane">
       <div className="ielts-questions-body">
-        {rightPassage === 1 &&
-          renderPassage1Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
-        {rightPassage === 2 &&
-          renderPassage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-        {rightPassage === 3 &&
-          renderPassage3Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+        {readingData?.testId === "cambridge-21-test-1" ? (
+          <>
+            {rightPassage === 1 &&
+              renderTest1Passage1Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+            {rightPassage === 2 &&
+              renderTest1Passage2Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+            {rightPassage === 3 &&
+              renderTest1Passage3Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+          </>
+        ) : (
+          <>
+            {rightPassage === 1 &&
+              renderPassage1Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+            {rightPassage === 2 &&
+              renderPassage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
+            {rightPassage === 3 &&
+              renderPassage3Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+          </>
+        )}
       </div>
     </div>
   );
