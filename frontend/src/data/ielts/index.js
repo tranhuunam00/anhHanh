@@ -1,5 +1,6 @@
 import { cambridge21Test1 } from "./cambridge21Test1Data.js";
 import { cambridge21Test2 } from "./cambridge21Test2Data.js";
+import { cambridge21Test3 } from "./cambridge21Test3Data.js";
 
 export const IELTS_TESTS = [
   {
@@ -25,12 +26,12 @@ export const IELTS_TESTS = [
   {
     id: "cambridge-21-test-3",
     title: "Cambridge IELTS 21 - Test 3",
-    badge: "Sắp ra mắt",
+    badge: "Đầy đủ 4 kỹ năng",
     book: "Cambridge 21",
     testNumber: 3,
     pages: "Trang 54 - 74",
     audioAvailable: true,
-    data: null
+    data: cambridge21Test3
   },
   {
     id: "cambridge-21-test-4",

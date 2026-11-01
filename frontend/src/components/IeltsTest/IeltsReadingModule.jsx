@@ -11,6 +11,11 @@ import {
   renderTest1Passage2Questions,
   renderTest1Passage3Questions
 } from "./IeltsReadingTest1QuestionsViews.jsx";
+import {
+  renderTest3Passage1Questions,
+  renderTest3Passage2Questions,
+  renderTest3Passage3Questions
+} from "./IeltsReadingTest3QuestionsViews.jsx";
 
 /**
  * IELTS Academic Reading Test Module
@@ -108,6 +113,15 @@ export const IeltsReadingModule = ({
               renderTest1Passage2Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
             {rightPassage === 3 &&
               renderTest1Passage3Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+          </>
+        ) : readingData?.testId === "cambridge-21-test-3" ? (
+          <>
+            {rightPassage === 1 &&
+              renderTest3Passage1Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+            {rightPassage === 2 &&
+              renderTest3Passage2Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
+            {rightPassage === 3 &&
+              renderTest3Passage3Questions(currentRightPassage.groups, answers, handleInputChange, evaluation, isReview)}
           </>
         ) : (
           <>
