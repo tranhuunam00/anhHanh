@@ -19,6 +19,12 @@ import {
   renderTest3Part3,
   renderTest3Part4
 } from "./IeltsListeningTest3PartsViews.jsx";
+import {
+  renderTest4Part1,
+  renderTest4Part2,
+  renderTest4Part3,
+  renderTest4Part4
+} from "./IeltsListeningTest4PartsViews.jsx";
 
 /**
  * IELTS Listening Test Module (Exam-Standard Full-Width UI)
@@ -105,6 +111,13 @@ export const IeltsListeningModule = ({
               {activePart === 2 && renderTest3Part2(parts[1], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
               {activePart === 3 && renderTest3Part3(parts[2], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
               {activePart === 4 && renderTest3Part4(parts[3], answers, handleInputChange, evaluation, isReview)}
+            </>
+          ) : listeningData?.testId === "cambridge-21-test-4" ? (
+            <>
+              {activePart === 1 && renderTest4Part1(parts[0], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 2 && renderTest4Part2(parts[1], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
+              {activePart === 3 && renderTest4Part3(parts[2], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 4 && renderTest4Part4(parts[3], answers, handleInputChange, evaluation, isReview)}
             </>
           ) : (
             <>
