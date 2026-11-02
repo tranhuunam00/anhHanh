@@ -79,6 +79,11 @@ export const checkIeltsAnswer = (userAnswer, acceptedAnswers) => {
       const expanded = expandOptionalParens(opt);
       if (expanded.includes(userClean)) return true;
 
+      // Safe handling of standard IELTS abbreviations (T/F/NG and Y/N)
+      const tfMap = { t: "true", f: "false", ng: "not given", notgiven: "not given", y: "yes", n: "no" };
+      const userAbbr = tfMap[userClean];
+      if (userAbbr && expanded.includes(userAbbr)) return true;
+
       // Currency stripping comparison (e.g., "£48" vs "48", "67.50" vs "67.5")
       const stripCurrency = (str) => str.replace(/^[£$€¥]\s*/, "");
       const cleanUserNoCur = stripCurrency(userClean);

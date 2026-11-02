@@ -70,6 +70,22 @@ describe("ieltsScoring - checkIeltsAnswer", () => {
     assert.equal(checkIeltsAnswer("67.50", ["67.5"]), true);
   });
 
+  test("tfng and ynn abbreviations: accepts T, F, NG, notgiven, Y, N safely without conflicting with MC letters", () => {
+    assert.equal(checkIeltsAnswer("T", ["TRUE"]), true);
+    assert.equal(checkIeltsAnswer("t", ["TRUE"]), true);
+    assert.equal(checkIeltsAnswer("F", ["FALSE"]), true);
+    assert.equal(checkIeltsAnswer("f", ["FALSE"]), true);
+    assert.equal(checkIeltsAnswer("NG", ["NOT GIVEN"]), true);
+    assert.equal(checkIeltsAnswer("ng", ["NOT GIVEN"]), true);
+    assert.equal(checkIeltsAnswer("notgiven", ["NOT GIVEN"]), true);
+    assert.equal(checkIeltsAnswer("Y", ["YES"]), true);
+    assert.equal(checkIeltsAnswer("N", ["NO"]), true);
+    // Preserves single letters when expected is letter F
+    assert.equal(checkIeltsAnswer("F", ["F"]), true);
+    assert.equal(checkIeltsAnswer("f", ["F"]), true);
+    assert.equal(checkIeltsAnswer("FALSE", ["F"]), false);
+  });
+
   test("boundary & bad cases: returns false on wrong, empty, null or undefined input", () => {
     assert.equal(checkIeltsAnswer("", ["pizza"]), false);
     assert.equal(checkIeltsAnswer(null, ["pizza"]), false);

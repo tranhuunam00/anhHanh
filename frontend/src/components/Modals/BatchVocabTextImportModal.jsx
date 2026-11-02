@@ -223,7 +223,10 @@ export const BatchVocabTextImportModal = ({
               {/* Conflict resolution options */}
               <div className="batch-vocab-conflict-group">
                 <span className="batch-vocab-conflict-label">Khi từ đã có:</span>
-                <label className="batch-vocab-radio-item" title="Bỏ qua từ đã có trong sổ tay, chỉ thêm từ mới">
+                <label
+                  className={`batch-vocab-radio-item ${conflictResolution === "skip_existing" ? "active" : ""}`}
+                  title="Bỏ qua từ đã có trong sổ tay, chỉ thêm từ mới"
+                >
                   <input
                     type="radio"
                     name="conflict_res"
@@ -233,7 +236,10 @@ export const BatchVocabTextImportModal = ({
                   />
                   <span>Bỏ qua</span>
                 </label>
-                <label className="batch-vocab-radio-item" title="Cập nhật nghĩa và câu ví dụ mới cho từ trùng">
+                <label
+                  className={`batch-vocab-radio-item ${conflictResolution === "overwrite" ? "active" : ""}`}
+                  title="Cập nhật nghĩa và câu ví dụ mới cho từ trùng"
+                >
                   <input
                     type="radio"
                     name="conflict_res"
@@ -243,7 +249,10 @@ export const BatchVocabTextImportModal = ({
                   />
                   <span>Cập nhật</span>
                 </label>
-                <label className="batch-vocab-radio-item" title="Lưu thêm bản ghi mới độc lập">
+                <label
+                  className={`batch-vocab-radio-item ${conflictResolution === "keep_both" ? "active" : ""}`}
+                  title="Lưu thêm bản ghi mới độc lập"
+                >
                   <input
                     type="radio"
                     name="conflict_res"
@@ -263,7 +272,7 @@ export const BatchVocabTextImportModal = ({
               <table className="batch-vocab-table">
                 <thead>
                   <tr>
-                    <th style={{ width: "36px" }}>
+                    <th style={{ width: "34px", textAlign: "center" }}>
                       <input
                         type="checkbox"
                         checked={allSelected}
@@ -271,12 +280,12 @@ export const BatchVocabTextImportModal = ({
                         title="Chọn/Bỏ chọn tất cả"
                       />
                     </th>
-                    <th>Từ / Cụm từ</th>
-                    <th>Phiên âm</th>
-                    <th>Từ loại</th>
-                    <th>Nghĩa tiếng Việt</th>
-                    <th>Câu ví dụ</th>
-                    <th style={{ width: "80px", textAlign: "center" }}>Trạng thái</th>
+                    <th style={{ width: "18%" }}>Từ / Cụm từ</th>
+                    <th style={{ width: "13%" }}>Phiên âm</th>
+                    <th style={{ width: "10%" }}>Từ loại</th>
+                    <th style={{ width: "25%" }}>Nghĩa tiếng Việt</th>
+                    <th style={{ width: "25%" }}>Câu ví dụ</th>
+                    <th style={{ width: "74px", textAlign: "center" }}>Trạng thái</th>
                   </tr>
                 </thead>
                 <tbody>

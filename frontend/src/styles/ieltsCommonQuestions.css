@@ -248,18 +248,26 @@
 }
 
 .ielts-radio-label.checked,
+.ielts-radio-label.selected,
 .ielts-checkbox-label.checked,
+.ielts-checkbox-label.selected,
 .ielts-checkbox-option.selected,
-.ielts-mc-option.selected {
+.ielts-checkbox-option.checked,
+.ielts-mc-option.selected,
+.ielts-mc-option.checked {
   background: rgba(37, 99, 235, 0.08);
   border-color: var(--primary);
   box-shadow: 0 0 0 1px var(--primary);
 }
 
 .ielts-radio-label.checked .ielts-opt-letter,
+.ielts-radio-label.selected .ielts-opt-letter,
 .ielts-checkbox-label.checked .ielts-opt-letter,
+.ielts-checkbox-label.selected .ielts-opt-letter,
 .ielts-checkbox-option.selected .ielts-opt-letter,
-.ielts-mc-option.selected .ielts-mc-letter {
+.ielts-checkbox-option.checked .ielts-opt-letter,
+.ielts-mc-option.selected .ielts-mc-letter,
+.ielts-mc-option.checked .ielts-mc-letter {
   background: var(--primary);
   border-color: var(--primary);
   color: #ffffff;

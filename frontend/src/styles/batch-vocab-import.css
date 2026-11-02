@@ -60,7 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 24px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
   background: var(--bg-primary, #f8fafc);
 }
@@ -114,11 +114,11 @@
 }
 
 .batch-vocab-modal-body {
-  padding: 20px 24px;
+  padding: 14px 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
 }
 
@@ -255,20 +255,74 @@
 .batch-vocab-conflict-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   font-size: 0.8rem;
   color: var(--text-secondary, #334155);
 }
 
 .batch-vocab-conflict-label {
   font-weight: 600;
+  font-size: 0.78rem;
 }
 
 .batch-vocab-radio-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #ffffff);
+  font-size: 0.78rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.batch-vocab-radio-item:hover {
+  border-color: var(--primary, #6366f1);
+  background: var(--bg-primary, #f8fafc);
+}
+
+.batch-vocab-radio-item.active {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--primary, #6366f1);
+  color: var(--primary, #6366f1);
+  font-weight: 700;
+}
+
+.batch-vocab-radio-item input[type="radio"] {
+  accent-color: var(--primary, #6366f1);
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Custom scrollbars for clean and compact look */
+.batch-vocab-table-container::-webkit-scrollbar,
+.batch-vocab-modal-body::-webkit-scrollbar,
+.batch-vocab-textarea::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.batch-vocab-table-container::-webkit-scrollbar-track,
+.batch-vocab-modal-body::-webkit-scrollbar-track,
+.batch-vocab-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.batch-vocab-table-container::-webkit-scrollbar-thumb,
+.batch-vocab-modal-body::-webkit-scrollbar-thumb,
+.batch-vocab-textarea::-webkit-scrollbar-thumb {
+  background: var(--border-color, #cbd5e1);
+  border-radius: 4px;
+}
+
+.batch-vocab-table-container::-webkit-scrollbar-thumb:hover,
+.batch-vocab-modal-body::-webkit-scrollbar-thumb:hover,
+.batch-vocab-textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted, #94a3b8);
 }
 
 /* Preview table */
@@ -276,8 +330,9 @@
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 10px;
   overflow: hidden;
-  max-height: 280px;
+  max-height: 300px;
   overflow-y: auto;
+  overflow-x: auto;
   background: var(--bg-card, #ffffff);
 }
 
@@ -286,13 +341,14 @@
   border-collapse: collapse;
   font-size: 0.8rem;
   text-align: left;
+  table-layout: fixed;
 }
 
 .batch-vocab-table th {
   background: var(--bg-primary, #f8fafc);
   color: var(--text-secondary, #334155);
   font-weight: 700;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
   position: sticky;
   top: 0;
@@ -301,10 +357,12 @@
 }
 
 .batch-vocab-table td {
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-bottom: 1px solid var(--border-color, #f1f5f9);
   color: var(--text-primary, #0f172a);
-  vertical-align: top;
+  vertical-align: middle;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .batch-vocab-table tr:hover td {
@@ -367,7 +425,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 24px;
+  padding: 10px 20px;
   border-top: 1px solid var(--border-color, #e2e8f0);
   background: var(--bg-primary, #f8fafc);
 }
