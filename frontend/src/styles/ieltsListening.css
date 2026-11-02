@@ -165,6 +165,115 @@
 
 .ielts-quick-map-btn:hover { background: var(--primary); color: #ffffff; }
 
+/* Part 2 / General Multiple Choice & Subheading (Standardized Compact & Sleek) */
+.ielts-subheading {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 6px 0;
+}
+
+.ielts-mc-section {
+  margin-bottom: 24px;
+}
+
+.ielts-mc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ielts-mc-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.ielts-mc-question {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.55;
+  color: var(--text-primary);
+  margin: 0 0 10px 0;
+}
+
+.ielts-mc-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ielts-mc-option {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.ielts-mc-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.ielts-mc-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.ielts-mc-text {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.ielts-mc-option:hover {
+  background: var(--bg-card);
+  border-color: var(--primary);
+}
+
+.ielts-mc-option:hover .ielts-mc-letter {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.ielts-mc-option.selected {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.ielts-mc-option.selected .ielts-mc-letter {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
 /* Part 3 Choose Two & Flowchart */
 .ielts-question-card {
   background: var(--bg-card); border: 1px solid var(--border-color);

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { isSingleLetterLabel } from "./ieltsFeedbackHelpers.jsx";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
 import { IeltsQuestionPalette } from "./IeltsQuestionPalette.jsx";
 import {
@@ -89,12 +90,20 @@ export const IeltsReadingModule = ({
 
           <div className="ielts-passage-content">
             {currentLeftPassage.paragraphs ? (
-              currentLeftPassage.paragraphs.map((para) => (
-                <div key={para.id} className="ielts-paragraph-block">
-                  <span className="ielts-paragraph-label">{para.id}</span>
-                  <p className="ielts-paragraph-text">{para.text}</p>
-                </div>
-              ))
+              currentLeftPassage.paragraphs.map((para) => {
+                const isSingleLetter = isSingleLetterLabel(para.id);
+                return (
+                  <div
+                    key={para.id}
+                    className={`ielts-paragraph-block ${isSingleLetter ? "has-letter-label" : "has-heading-label"}`}
+                  >
+                    <span className={`ielts-paragraph-label ${isSingleLetter ? "is-letter" : "is-heading"}`}>
+                      {para.id}
+                    </span>
+                    <p className="ielts-paragraph-text">{para.text}</p>
+                  </div>
+                );
+              })
             ) : (
               currentLeftPassage.text?.split("\n\n").map((para, idx) => (
                 <p key={idx} className="ielts-paragraph-text">{para}</p>

@@ -1,0 +1,99 @@
+/* ==========================================================================
+   IELTS Academic Reading - Question Types & Reading-Specific Styles
+   Light & Dark Mode Compatible via System CSS Variables (<= 500 lines)
+   ========================================================================== */
+
+@import "./ieltsCommonQuestions.css";
+
+/* Reading Tables */
+.ielts-reading-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.ielts-reading-table th.col-subject,
+.ielts-reading-table td.col-subject {
+  width: 20%;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.ielts-reading-table th.col-findings,
+.ielts-reading-table td.col-findings {
+  width: 52%;
+  vertical-align: top;
+  line-height: 1.7;
+}
+
+.ielts-reading-table th.col-comment,
+.ielts-reading-table td.col-comment {
+  width: 28%;
+  vertical-align: top;
+  line-height: 1.65;
+}
+
+/* Summary Completion Box (Test 1 Passage 2 & Test 2) */
+.ielts-word-bank-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  background: var(--bg-secondary);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 12px;
+}
+
+.ielts-word-bank-item {
+  font-size: 0.86rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.ielts-word-bank-item strong {
+  color: var(--primary);
+  margin-right: 4px;
+}
+
+.ielts-summary-passage-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-top: 10px;
+}
+
+.ielts-summary-passage-box h6 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.ielts-summary-content {
+  font-size: 0.95rem;
+  line-height: 2.1;
+  color: var(--text-primary);
+}
+
+/* Legacy MCQ item fallback */
+.ielts-mcq-item {
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.ielts-mcq-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ielts-mcq-prompt {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  line-height: 1.6;
+}

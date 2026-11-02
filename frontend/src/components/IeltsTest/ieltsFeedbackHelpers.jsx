@@ -1,17 +1,6 @@
 import React from "react";
 import { CheckCircle } from "../../constants/icons.js";
-
-/**
- * Returns CSS class for input element based on review mode and evaluation state.
- * @param {object|null|undefined} evaluation
- * @param {number|string} qNum
- * @param {boolean} isReview
- * @returns {string}
- */
-export function getFeedbackClass(evaluation, qNum, isReview = false) {
-  if (!isReview || !evaluation || !evaluation[qNum]) return "";
-  return evaluation[qNum].isCorrect ? "input-correct" : "input-incorrect";
-}
+export { isSingleLetterLabel, getFeedbackClass } from "../../utils/ieltsFeedbackUtils.js";
 
 /**
  * Renders feedback badge (correct / answer display) for review mode.
@@ -33,4 +22,3 @@ export function renderFeedback(evaluation, qNum, isReview) {
     </span>
   );
 }
-
