@@ -165,13 +165,21 @@ export const canUseIeltsAiGrading = (user) => {
   }
   const email = (user.email || "").toLowerCase().trim();
   const handle = email.split("@")[0];
-  
-  return (
-    handle === "tranhuunam23022000" ||
-    handle === "vuthiquynhtrang" ||
-    handle === "vuthiquynhtrangbl6d" ||
-    email === "itdaogroup@gmail.com"
-  );
+
+  const allowedEmails = [
+    "itdaogroup@gmail.com",
+    "tranhuunam23022000@gmail.com",
+    "vuthiquynhtrangbl6d@gmail.com",
+    "vuthiquynhtrang@gmail.com"
+  ];
+  const allowedHandles = [
+    "itdaogroup",
+    "tranhuunam23022000",
+    "vuthiquynhtrang",
+    "vuthiquynhtrangbl6d"
+  ];
+
+  return allowedEmails.includes(email) || allowedHandles.includes(handle);
 };
 
 /**

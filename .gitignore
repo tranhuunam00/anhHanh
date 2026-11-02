@@ -16,8 +16,8 @@ skill_agent_namth/
 cookies.txt
 *cookies*.txt
 data/uploads/
-# Cambridge IELTS 20 Academic & raw audio sources
-*Cambridge IELTS 20 Academic*
-audio/
+# Cambridge IELTS 20 Academic raw sources & PDF
+*Cambridge IELTS 20 Academic*.pdf
+audio/cambridge20/
 frontend/public/audio/cambridge20/
 

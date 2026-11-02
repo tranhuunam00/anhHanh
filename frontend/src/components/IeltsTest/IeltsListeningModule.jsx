@@ -113,7 +113,7 @@ export const IeltsListeningModule = ({
     <div className="ielts-module-container ielts-listening-full-module">
       {/* Top Bar 1: Continuous Audio Player at the Top */}
       <IeltsAudioPlayer
-        audioUrl={listeningData?.audioUrl}
+        audioUrl={listeningData?.audioUrl || listeningData?.audioSrc}
         fallbackAudioUrl={listeningData?.fallbackAudioUrl}
         className="ielts-listening-top-audio"
       />

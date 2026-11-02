@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Play, Volume2, Check } from "../../constants/icons.js";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Play, Volume2, Check, AlertCircle } from "../../constants/icons.js";
 import { formatAudioTime } from "../../utils/ieltsScoring.js";
 
 /**
- * IELTS Listening Exam Audio Player (Compact Standard UI)
+ * IELTS Listening Exam Audio Player (Exam-Standard Compact UI)
  * Strict exam mode:
  * - NO scrub/seeking (không cho tua).
  * - NO pause once started (không cho dừng).
@@ -11,8 +11,8 @@ import { formatAudioTime } from "../../utils/ieltsScoring.js";
  * - Compact toolbar height to give maximum screen space for questions and maps.
  */
 export const IeltsAudioPlayer = ({
-  audioUrl = "/audio/Cambridge 21 - Test 2.mp3",
-  fallbackAudioUrl = "/audio/Cambridge 21 - Test 1.mp3",
+  audioUrl = "",
+  fallbackAudioUrl = "",
   className = ""
 }) => {
   const audioRef = useRef(null);
@@ -20,44 +20,85 @@ export const IeltsAudioPlayer = ({
   const [hasStarted, setHasStarted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [currentSource, setCurrentSource] = useState(audioUrl);
+  const [currentSource, setCurrentSource] = useState(audioUrl || "");
   const [volume, setVolume] = useState(1);
   const [isEnded, setIsEnded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    setCurrentSource(audioUrl);
+    const src = audioUrl || "";
+    setCurrentSource(src);
     setHasStarted(false);
     setIsPlaying(false);
     setCurrentTime(0);
+    setDuration(0);
     setIsEnded(false);
+    setLoadError(false);
+
+    if (audioRef.current) {
+      audioRef.current.load();
+    }
   }, [audioUrl]);
 
-  useEffect(() => {
-    if (audioRef.current && isFinite(audioRef.current.duration) && audioRef.current.duration > 0) {
-      setDuration(audioRef.current.duration);
+  const updateDuration = useCallback(() => {
+    if (audioRef.current) {
+      const d = audioRef.current.duration;
+      if (isFinite(d) && d > 0) {
+        setDuration(d);
+        setLoadError(false);
+      }
     }
-  }, [currentSource]);
+  }, []);
+
+  const handleAudioError = () => {
+    if (fallbackAudioUrl && currentSource !== fallbackAudioUrl) {
+      console.warn("Primary audio failed to load, trying fallback:", fallbackAudioUrl);
+      setCurrentSource(fallbackAudioUrl);
+      if (audioRef.current) {
+        audioRef.current.load();
+      }
+    } else {
+      console.warn("Audio file could not be loaded:", currentSource);
+      setLoadError(true);
+    }
+  };
 
   const handleStartExam = () => {
     if (!audioRef.current) return;
-    audioRef.current.play().then(() => {
-      setIsPlaying(true);
-      setHasStarted(true);
-      setIsEnded(false);
-    }).catch((err) => {
-      console.warn("Audio play prevented:", err);
-    });
+    audioRef.current
+      .play()
+      .then(() => {
+        setIsPlaying(true);
+        setHasStarted(true);
+        setIsEnded(false);
+        setLoadError(false);
+      })
+      .catch((err) => {
+        console.warn("Audio play prevented:", err);
+        if (fallbackAudioUrl && currentSource !== fallbackAudioUrl) {
+          setCurrentSource(fallbackAudioUrl);
+          if (audioRef.current) {
+            audioRef.current.load();
+            audioRef.current
+              .play()
+              .then(() => {
+                setIsPlaying(true);
+                setHasStarted(true);
+              })
+              .catch(() => setLoadError(true));
+          }
+        } else {
+          setLoadError(true);
+        }
+      });
   };
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration || 0);
+      if (duration === 0) {
+        updateDuration();
+      }
     }
   };
 
@@ -81,11 +122,13 @@ export const IeltsAudioPlayer = ({
       <audio
         ref={audioRef}
         src={currentSource}
-        preload="metadata"
+        preload="auto"
         onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onDurationChange={handleLoadedMetadata}
-        onCanPlay={handleLoadedMetadata}
+        onLoadedMetadata={updateDuration}
+        onDurationChange={updateDuration}
+        onCanPlay={updateDuration}
+        onCanPlayThrough={updateDuration}
+        onError={handleAudioError}
         onEnded={handleEnded}
       />
 
@@ -121,10 +164,12 @@ export const IeltsAudioPlayer = ({
           <div className="ielts-exam-progress-bar compact" title="Không thể tua theo quy chế thi">
             <div className="ielts-exam-progress-fill" style={{ width: `${progressPercent}%` }} />
           </div>
-          <span className="ielts-compact-time">{formatAudioTime(duration)}</span>
+          <span className="ielts-compact-time">
+            {duration > 0 ? formatAudioTime(duration) : loadError ? "--:--" : "..."}
+          </span>
         </div>
 
-        {/* Volume & Audio Source */}
+        {/* Volume Controls */}
         <div className="ielts-compact-controls">
           <div className="ielts-compact-volume" title="Âm lượng tai nghe">
             <Volume2 className="w-3.5 h-3.5 text-muted" />
@@ -142,16 +187,11 @@ export const IeltsAudioPlayer = ({
             <span className="ielts-volume-percent compact">{Math.round(volume * 100)}%</span>
           </div>
 
-          {!hasStarted && fallbackAudioUrl && (
-            <select
-              value={currentSource}
-              onChange={(e) => setCurrentSource(e.target.value)}
-              className="ielts-source-dropdown compact"
-              title="Chọn file audio"
-            >
-              <option value={audioUrl}>Cam 21 Test 2</option>
-              <option value={fallbackAudioUrl}>Cam 21 Test 1</option>
-            </select>
+          {loadError && (
+            <span className="ielts-audio-error-pill text-xs text-danger flex items-center" title="Không tìm thấy file audio">
+              <AlertCircle className="w-3 h-3 mr-1 inline" />
+              Lỗi audio
+            </span>
           )}
         </div>
       </div>
