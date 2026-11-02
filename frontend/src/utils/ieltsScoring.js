@@ -257,6 +257,11 @@ export const gradeListeningTest = (listeningData, answers = {}) => {
 
   listeningData.parts.forEach((part) => {
     part?.items?.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    part?.sections?.forEach((sec) => {
+      sec?.items?.forEach((it) => {
+        if (it?.number) checkItem(it.number, it.answers || [it.answer]);
+      });
+    });
     part?.groups?.forEach((g) => {
       if (g.groupType === "choose_two") {
         const [q1, q2] = g.numbers || [];
@@ -269,8 +274,16 @@ export const gradeListeningTest = (listeningData, answers = {}) => {
         if (correct2) correctCount++;
         evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
         evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
-      } else if (g.groupType === "map_labeling" || g.groupType === "flowchart_completion") {
-        g.items?.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+      } else if (g.groupType === "map_labeling" || g.groupType === "flowchart_completion" || g.groupType === "flow_chart") {
+        (g.steps || g.items || []).forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+      } else if (g.steps) {
+        g.steps.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+      } else if (g.sections) {
+        g.sections.forEach((sec) => {
+          sec?.items?.forEach((it) => {
+            if (it?.number) checkItem(it.number, it.answers || [it.answer]);
+          });
+        });
       } else if (g.items) {
         g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
       }
@@ -308,6 +321,11 @@ export const gradeReadingTest = (readingData, answers = {}) => {
 
   readingData.passages.forEach((p) => {
     p?.items?.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    p?.sections?.forEach((sec) => {
+      sec?.items?.forEach((it) => {
+        if (it?.number) checkItem(it.number, it.answers || [it.answer]);
+      });
+    });
     p?.groups?.forEach((g) => {
       if (g.groupType === "choose_two") {
         const [q1, q2] = g.numbers || [];
@@ -323,6 +341,22 @@ export const gradeReadingTest = (readingData, answers = {}) => {
       } else if (g.groupType === "table_completion") {
         (g.tableItems || g.items || []).forEach((it) => {
           if (it?.number) checkItem(it.number, it.answers || [it.answer]);
+        });
+        g.rows?.forEach((row) => {
+          if (row.subjectQuestion) checkItem(row.subjectQuestion, row.answers || [row.answer]);
+          if (row.questionNumber) checkItem(row.questionNumber, row.answers || [row.answer]);
+          if (row.number) checkItem(row.number, row.answers || [row.answer]);
+          row.questions?.forEach((q) => {
+            if (q.number) checkItem(q.number, q.answers || [q.answer]);
+          });
+        });
+      } else if (g.steps) {
+        g.steps.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+      } else if (g.sections) {
+        g.sections.forEach((sec) => {
+          sec?.items?.forEach((it) => {
+            if (it?.number) checkItem(it.number, it.answers || [it.answer]);
+          });
         });
       } else if (g.items) {
         g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));

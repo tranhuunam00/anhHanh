@@ -1,8 +1,8 @@
 import React from "react";
 import { CheckCircle } from "../../constants/icons.js";
 
-export function getFeedbackClass(evaluation, qNum, isReview = false) {
-  if (!isReview || !evaluation || !evaluation[qNum]) return "";
+export function getFeedbackClass(evaluation, qNum, isReview = true) {
+  if (!evaluation || !evaluation[qNum] || isReview === false) return "";
   return evaluation[qNum].isCorrect ? "input-correct" : "input-incorrect";
 }
 
@@ -49,7 +49,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[1] || ""}
                     onChange={(e) => onChange(1, e.target.value)}
-                    className={`ielts-real-input ${getFeedbackClass(evaluation, 1)}`}
+                    className={`ielts-real-input ${getFeedbackClass(evaluation, 1, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 1, isReview)}
@@ -68,7 +68,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[2] || ""}
                     onChange={(e) => onChange(2, e.target.value)}
-                    className={`ielts-real-input ielts-short-input ${getFeedbackClass(evaluation, 2)}`}
+                    className={`ielts-real-input ielts-short-input ${getFeedbackClass(evaluation, 2, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 2, isReview)}
@@ -81,7 +81,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[3] || ""}
                     onChange={(e) => onChange(3, e.target.value)}
-                    className={`ielts-real-input ${getFeedbackClass(evaluation, 3)}`}
+                    className={`ielts-real-input ${getFeedbackClass(evaluation, 3, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 3, isReview)}
@@ -99,7 +99,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[4] || ""}
                     onChange={(e) => onChange(4, e.target.value)}
-                    className={`ielts-real-input ${getFeedbackClass(evaluation, 4)}`}
+                    className={`ielts-real-input ${getFeedbackClass(evaluation, 4, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 4, isReview)}
@@ -111,7 +111,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[5] || ""}
                     onChange={(e) => onChange(5, e.target.value)}
-                    className={`ielts-real-input ${getFeedbackClass(evaluation, 5)}`}
+                    className={`ielts-real-input ${getFeedbackClass(evaluation, 5, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 5, isReview)}
@@ -126,7 +126,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[6] || ""}
                     onChange={(e) => onChange(6, e.target.value)}
-                    className={`ielts-real-input ${getFeedbackClass(evaluation, 6)}`}
+                    className={`ielts-real-input ${getFeedbackClass(evaluation, 6, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 6, isReview)}
@@ -140,7 +140,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[7] || ""}
                     onChange={(e) => onChange(7, e.target.value)}
-                    className={`ielts-real-input ${getFeedbackClass(evaluation, 7)}`}
+                    className={`ielts-real-input ${getFeedbackClass(evaluation, 7, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 7, isReview)} ingredients are used. The candles can be used as presents.
@@ -157,7 +157,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[8] || ""}
                     onChange={(e) => onChange(8, e.target.value)}
-                    className={`ielts-real-input ielts-short-input ${getFeedbackClass(evaluation, 8)}`}
+                    className={`ielts-real-input ielts-short-input ${getFeedbackClass(evaluation, 8, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 8, isReview)}
@@ -170,7 +170,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[9] || ""}
                     onChange={(e) => onChange(9, e.target.value)}
-                    className={`ielts-real-input ${getFeedbackClass(evaluation, 9)}`}
+                    className={`ielts-real-input ${getFeedbackClass(evaluation, 9, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 9, isReview)}
@@ -190,7 +190,7 @@ export function renderPart1(part, answers, onChange, evaluation, isReview) {
                     type="text"
                     value={answers[10] || ""}
                     onChange={(e) => onChange(10, e.target.value)}
-                    className={`ielts-real-input ${getFeedbackClass(evaluation, 10)}`}
+                    className={`ielts-real-input ${getFeedbackClass(evaluation, 10, isReview)}`}
                   />
                 </span>
                 {renderFeedback(evaluation, 10, isReview)}
@@ -267,7 +267,7 @@ export function renderPart2(part, answers, onChange, onChooseTwo, evaluation, is
                   <select
                     value={answers[item.number] || ""}
                     onChange={(e) => onChange(item.number, e.target.value)}
-                    className={`ielts-select-box ${getFeedbackClass(evaluation, item.number)}`}
+                    className={`ielts-select-box ${getFeedbackClass(evaluation, item.number, isReview)}`}
                   >
                     <option value="">Select (A-I)...</option>
                     {part.mapLetters.map((l) => (
@@ -348,7 +348,7 @@ export function renderPart3(part, answers, onChange, onChooseTwo, evaluation, is
                     <select
                       value={answers[step.number] || ""}
                       onChange={(e) => onChange(step.number, e.target.value)}
-                      className={`ielts-select-box ${getFeedbackClass(evaluation, step.number)}`}
+                      className={`ielts-select-box ${getFeedbackClass(evaluation, step.number, isReview)}`}
                     >
                       <option value="">Select (A-F)...</option>
                       {flowGroup.boxOptions.map((o) => (
@@ -406,7 +406,7 @@ export function renderPart4(part, answers, onChange, evaluation, isReview) {
                         type="text"
                         value={answers[it.number] || ""}
                         onChange={(e) => onChange(it.number, e.target.value)}
-                        className={`ielts-real-input ${getFeedbackClass(evaluation, it.number)}`}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, it.number, isReview)}`}
                       />
                     </span>
                     {it.suffix && <span className="ielts-note-suffix">{it.suffix}</span>}
