@@ -32,6 +32,12 @@ import {
   renderCam20Test1Part3,
   renderCam20Test1Part4
 } from "./IeltsListeningCam20Test1PartsViews.jsx";
+import {
+  renderCam20Test2Part1,
+  renderCam20Test2Part2,
+  renderCam20Test2Part3,
+  renderCam20Test2Part4
+} from "./IeltsListeningCam20Test2PartsViews.jsx";
 
 /**
  * IELTS Listening Test Module (Exam-Standard Full-Width UI)
@@ -123,6 +129,13 @@ export const IeltsListeningModule = ({
               {activePart === 2 && renderCam20Test1Part2(parts[1], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
               {activePart === 3 && renderCam20Test1Part3(parts[2], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
               {activePart === 4 && renderCam20Test1Part4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
+            </>
+          ) : listeningData?.testId === "cambridge-20-test-2" ? (
+            <>
+              {activePart === 1 && renderCam20Test2Part1(parts[0], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 2 && renderCam20Test2Part2(parts[1], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 3 && renderCam20Test2Part3(parts[2], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 4 && renderCam20Test2Part4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
             </>
           ) : listeningData?.testId === "cambridge-21-test-1" ? (
             <>
