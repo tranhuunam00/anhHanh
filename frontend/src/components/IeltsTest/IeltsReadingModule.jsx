@@ -33,6 +33,16 @@ import {
   renderCam20Test2Passage2Questions,
   renderCam20Test2Passage3Questions
 } from "./IeltsReadingCam20Test2QuestionsViews.jsx";
+import {
+  renderCam20Test3Passage1Questions,
+  renderCam20Test3Passage2Questions,
+  renderCam20Test3Passage3Questions
+} from "./IeltsReadingCam20Test3QuestionsViews.jsx";
+import {
+  renderCam20Test4Passage1Questions,
+  renderCam20Test4Passage2Questions,
+  renderCam20Test4Passage3Questions
+} from "./IeltsReadingCam20Test4QuestionsViews.jsx";
 
 /**
  * IELTS Academic Reading Test Module
@@ -158,6 +168,24 @@ export const IeltsReadingModule = ({
               renderCam20Test2Passage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
             {rightPassage === 3 &&
               renderCam20Test2Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+          </>
+        ) : readingData?.testId === "cambridge-20-test-3" ? (
+          <>
+            {rightPassage === 1 &&
+              renderCam20Test3Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+            {rightPassage === 2 &&
+              renderCam20Test3Passage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+            {rightPassage === 3 &&
+              renderCam20Test3Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+          </>
+        ) : readingData?.testId === "cambridge-20-test-4" ? (
+          <>
+            {rightPassage === 1 &&
+              renderCam20Test4Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+            {rightPassage === 2 &&
+              renderCam20Test4Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+            {rightPassage === 3 &&
+              renderCam20Test4Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
           </>
         ) : readingData?.testId === "cambridge-21-test-1" ? (
           <>

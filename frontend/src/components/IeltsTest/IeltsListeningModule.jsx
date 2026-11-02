@@ -38,6 +38,18 @@ import {
   renderCam20Test2Part3,
   renderCam20Test2Part4
 } from "./IeltsListeningCam20Test2PartsViews.jsx";
+import {
+  renderCam20Test3Part1,
+  renderCam20Test3Part2,
+  renderCam20Test3Part3,
+  renderCam20Test3Part4
+} from "./IeltsListeningCam20Test3PartsViews.jsx";
+import {
+  renderCam20Test4Part1,
+  renderCam20Test4Part2,
+  renderCam20Test4Part3,
+  renderCam20Test4Part4
+} from "./IeltsListeningCam20Test4PartsViews.jsx";
 
 /**
  * IELTS Listening Test Module (Exam-Standard Full-Width UI)
@@ -136,6 +148,20 @@ export const IeltsListeningModule = ({
               {activePart === 2 && renderCam20Test2Part2(parts[1], answers, handleInputChange, effectiveEval, isReview)}
               {activePart === 3 && renderCam20Test2Part3(parts[2], answers, handleInputChange, effectiveEval, isReview)}
               {activePart === 4 && renderCam20Test2Part4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
+            </>
+          ) : listeningData?.testId === "cambridge-20-test-3" ? (
+            <>
+              {activePart === 1 && renderCam20Test3Part1(parts[0], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 2 && renderCam20Test3Part2(parts[1], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 3 && renderCam20Test3Part3(parts[2], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 4 && renderCam20Test3Part4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
+            </>
+          ) : listeningData?.testId === "cambridge-20-test-4" ? (
+            <>
+              {activePart === 1 && renderCam20Test4Part1(parts[0], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 2 && renderCam20Test4Part2(parts[1], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              {activePart === 3 && renderCam20Test4Part3(parts[2], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              {activePart === 4 && renderCam20Test4Part4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
             </>
           ) : listeningData?.testId === "cambridge-21-test-1" ? (
             <>

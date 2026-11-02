@@ -1,5 +1,7 @@
 import { cambridge20Test1 } from "./cambridge20Test1Data.js";
 import { cambridge20Test2 } from "./cambridge20Test2Data.js";
+import { cambridge20Test3 } from "./cambridge20Test3Data.js";
+import { cambridge20Test4 } from "./cambridge20Test4Data.js";
 import { cambridge21Test1 } from "./cambridge21Test1Data.js";
 import { cambridge21Test2 } from "./cambridge21Test2Data.js";
 import { cambridge21Test3 } from "./cambridge21Test3Data.js";
@@ -25,6 +27,26 @@ export const IELTS_TESTS = [
     pages: "Trang 34 - 58",
     audioAvailable: true,
     data: cambridge20Test2
+  },
+  {
+    id: "cambridge-20-test-3",
+    title: "Cambridge IELTS 20 - Test 3",
+    badge: "Đầy đủ 4 kỹ năng",
+    book: "Cambridge 20",
+    testNumber: 3,
+    pages: "Trang 79 - 110",
+    audioAvailable: true,
+    data: cambridge20Test3
+  },
+  {
+    id: "cambridge-20-test-4",
+    title: "Cambridge IELTS 20 - Test 4",
+    badge: "Đầy đủ 4 kỹ năng",
+    book: "Cambridge 20",
+    testNumber: 4,
+    pages: "Trang 116 - 145",
+    audioAvailable: true,
+    data: cambridge20Test4
   },
   {
     id: "cambridge-21-test-1",
