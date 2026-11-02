@@ -1,7 +1,7 @@
 import React from "react";
 import { CheckCircle } from "../../constants/icons.js";
 
-function getFeedbackClass(evaluation, qNum, isReview = false) {
+export function getFeedbackClass(evaluation, qNum, isReview = true) {
   if (!isReview || !evaluation || !evaluation[qNum]) return "";
   return evaluation[qNum].isCorrect ? "input-correct" : "input-incorrect";
 }
@@ -54,7 +54,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                         type="text"
                         value={answers[1] || ""}
                         onChange={(e) => onChange(1, e.target.value)}
-                        className={`ielts-real-input ${getFeedbackClass(evaluation, 1)}`}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 1, isReview)}`}
                       />
                     </span>
                     {renderFeedback(evaluation, 1, isReview)}
@@ -72,7 +72,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                         type="text"
                         value={answers[2] || ""}
                         onChange={(e) => onChange(2, e.target.value)}
-                        className={`ielts-real-input ${getFeedbackClass(evaluation, 2)}`}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 2, isReview)}`}
                       />
                     </span>
                     {renderFeedback(evaluation, 2, isReview)} input
@@ -89,7 +89,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                         type="text"
                         value={answers[3] || ""}
                         onChange={(e) => onChange(3, e.target.value)}
-                        className={`ielts-real-input ${getFeedbackClass(evaluation, 3)}`}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 3, isReview)}`}
                       />
                     </span>
                     {renderFeedback(evaluation, 3, isReview)} their brain awake when they sleep
@@ -101,7 +101,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                         type="text"
                         value={answers[4] || ""}
                         onChange={(e) => onChange(4, e.target.value)}
-                        className={`ielts-real-input ${getFeedbackClass(evaluation, 4)}`}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 4, isReview)}`}
                       />
                     </span>
                     {renderFeedback(evaluation, 4, isReview)}
@@ -114,7 +114,7 @@ export function renderPassage1Questions(groups, answers, onChange, evaluation, i
                         type="text"
                         value={answers[5] || ""}
                         onChange={(e) => onChange(5, e.target.value)}
-                        className={`ielts-real-input ${getFeedbackClass(evaluation, 5)}`}
+                        className={`ielts-real-input ${getFeedbackClass(evaluation, 5, isReview)}`}
                       />
                     </span>
                     {renderFeedback(evaluation, 5, isReview)}
@@ -233,7 +233,7 @@ export function renderPassage2Questions(groups, answers, onChange, onChooseTwo, 
                       type="text"
                       value={answers[it.number] || ""}
                       onChange={(e) => onChange(it.number, e.target.value)}
-                      className={`ielts-real-input ${getFeedbackClass(evaluation, it.number)}`}
+                      className={`ielts-real-input ${getFeedbackClass(evaluation, it.number, isReview)}`}
                     />
                   </span>
                   {renderFeedback(evaluation, it.number, isReview)}
@@ -310,7 +310,7 @@ export function renderPassage3Questions(groups, answers, onChange, evaluation, i
                     <select
                       value={answers[it.number] || ""}
                       onChange={(e) => onChange(it.number, e.target.value)}
-                      className={`ielts-select-box ielts-inline-select ${getFeedbackClass(evaluation, it.number)}`}
+                      className={`ielts-select-box ielts-inline-select ${getFeedbackClass(evaluation, it.number, isReview)}`}
                     >
                       <option value="">A - I...</option>
                       {boxGroup.boxOptions.map((o) => (
@@ -342,7 +342,7 @@ export function renderPassage3Questions(groups, answers, onChange, evaluation, i
                     <button
                       key={val}
                       type="button"
-                      className={`ielts-tf-btn ${answers[item.number] === val ? "selected" : ""} ${getFeedbackClass(evaluation, item.number)}`}
+                      className={`ielts-tf-btn ${answers[item.number] === val ? "selected" : ""} ${getFeedbackClass(evaluation, item.number, isReview)}`}
                       onClick={() => onChange(item.number, val)}
                     >
                       {val}

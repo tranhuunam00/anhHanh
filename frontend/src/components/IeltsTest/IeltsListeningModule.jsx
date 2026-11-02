@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import { gradeListeningTest } from "../../utils/ieltsScoring.js";
 import { IeltsAudioPlayer } from "./IeltsAudioPlayer.jsx";
 import { IeltsQuestionPalette } from "./IeltsQuestionPalette.jsx";
 import {
@@ -43,6 +44,18 @@ export const IeltsListeningModule = ({
   isReview = false
 }) => {
   const [activePart, setActivePart] = useState(1);
+
+  // Live evaluation resolution: heals stale localStorage cache dynamically
+  const effectiveEval = useMemo(() => {
+    if (!isReview || !listeningData) return evaluation;
+    try {
+      const { evalMap } = gradeListeningTest(listeningData, answers);
+      return evalMap;
+    } catch {
+      return evaluation;
+    }
+  }, [isReview, listeningData, answers, evaluation]);
+
   const parts = listeningData?.parts || [];
 
   const handleSelectPart = (num) => {
@@ -85,7 +98,7 @@ export const IeltsListeningModule = ({
       <IeltsQuestionPalette
         totalQuestions={40}
         answers={answers}
-        evaluation={isReview ? evaluation : null}
+        evaluation={isReview ? effectiveEval : null}
         skill="listening"
         activePart={activePart}
         onSelectPart={handleSelectPart}
@@ -100,31 +113,31 @@ export const IeltsListeningModule = ({
         <div className="ielts-listening-full-body">
           {listeningData?.testId === "cambridge-21-test-1" ? (
             <>
-              {activePart === 1 && renderTest1Part1(parts[0], answers, handleInputChange, evaluation, isReview)}
-              {activePart === 2 && renderTest1Part2(parts[1], answers, handleInputChange, evaluation, isReview)}
-              {activePart === 3 && renderTest1Part3(parts[2], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-              {activePart === 4 && renderTest1Part4(parts[3], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 1 && renderTest1Part1(parts[0], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 2 && renderTest1Part2(parts[1], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 3 && renderTest1Part3(parts[2], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              {activePart === 4 && renderTest1Part4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
             </>
           ) : listeningData?.testId === "cambridge-21-test-3" ? (
             <>
-              {activePart === 1 && renderTest3Part1(parts[0], answers, handleInputChange, evaluation, isReview)}
-              {activePart === 2 && renderTest3Part2(parts[1], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-              {activePart === 3 && renderTest3Part3(parts[2], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-              {activePart === 4 && renderTest3Part4(parts[3], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 1 && renderTest3Part1(parts[0], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 2 && renderTest3Part2(parts[1], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              {activePart === 3 && renderTest3Part3(parts[2], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              {activePart === 4 && renderTest3Part4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
             </>
           ) : listeningData?.testId === "cambridge-21-test-4" ? (
             <>
-              {activePart === 1 && renderTest4Part1(parts[0], answers, handleInputChange, evaluation, isReview)}
-              {activePart === 2 && renderTest4Part2(parts[1], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-              {activePart === 3 && renderTest4Part3(parts[2], answers, handleInputChange, evaluation, isReview)}
-              {activePart === 4 && renderTest4Part4(parts[3], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 1 && renderTest4Part1(parts[0], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 2 && renderTest4Part2(parts[1], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              {activePart === 3 && renderTest4Part3(parts[2], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 4 && renderTest4Part4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
             </>
           ) : (
             <>
-              {activePart === 1 && renderPart1(parts[0], answers, handleInputChange, evaluation, isReview)}
-              {activePart === 2 && renderPart2(parts[1], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-              {activePart === 3 && renderPart3(parts[2], answers, handleInputChange, handleChooseTwoToggle, evaluation, isReview)}
-              {activePart === 4 && renderPart4(parts[3], answers, handleInputChange, evaluation, isReview)}
+              {activePart === 1 && renderPart1(parts[0], answers, handleInputChange, effectiveEval, isReview)}
+              {activePart === 2 && renderPart2(parts[1], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              {activePart === 3 && renderPart3(parts[2], answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              {activePart === 4 && renderPart4(parts[3], answers, handleInputChange, effectiveEval, isReview)}
             </>
           )}
         </div>
