@@ -1,7 +1,7 @@
 """AI Writing Studio API Endpoints.
 Provides prompt library, prompt generation, comprehensive AI essay evaluation,
 and submission history tracking.
-Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrangbl6d.
+Strictly restricted to 3 authorized accounts: itdaogroup, tranhuunam23022000 & vuthiquynhtrangbl6d.
 """
 import json
 import logging
@@ -154,7 +154,7 @@ async def generate_custom_prompt(
     current_user: User = Depends(require_ai_writing_permission)
 ):
     """Generate a dynamic writing prompt using AI.
-    Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrangbl6d.
+    Strictly restricted to 3 authorized accounts: itdaogroup, tranhuunam23022000 & vuthiquynhtrangbl6d.
     """
     try:
         prompt_data = await AIWritingService.generate_prompt(
@@ -237,7 +237,7 @@ async def evaluate_writing_submission(
     db: AsyncSession = Depends(get_db)
 ):
     """Thoroughly evaluate, grade (IELTS Band 0-9), fix errors, and suggest vocabulary upgrades using Gemini AI.
-    Strictly restricted to authorized accounts: tranhuunam23022000 & vuthiquynhtrangbl6d.
+    Strictly restricted to 3 authorized accounts: itdaogroup, tranhuunam23022000 & vuthiquynhtrangbl6d.
     """
     words = body.content.strip().split()
     word_count = len(words)

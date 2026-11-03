@@ -8,6 +8,7 @@ import base64
 import logging
 from typing import List, Dict, Any, Optional
 import httpx
+from app.infrastructure.gemini_model_helper import get_candidate_gemini_models
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
@@ -303,7 +304,6 @@ VĂN BẢN ĐẦU VÀO ({lang_name}):
         if not api_key:
             raise RuntimeError("GEMINI_API_KEY chưa được cấu hình trên máy chủ.")
 
-        models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
         last_error = None
 
         # Build multimodal contents parts
@@ -331,6 +331,7 @@ VĂN BẢN ĐẦU VÀO ({lang_name}):
         }
 
         async with httpx.AsyncClient(timeout=300.0) as client:
+            models_to_try = await get_candidate_gemini_models(api_key, client)
             for model_name in models_to_try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
                 headers = {"x-goog-api-key": api_key}

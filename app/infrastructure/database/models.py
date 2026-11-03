@@ -48,9 +48,11 @@ class User(Base):
             return False
         em = self.email.strip().lower()
         handle = em.split('@')[0]
-        # Strictly allow only 2 designated accounts (tranhuunam23022000 & vuthiquynhtrangbl6d/vuthiquynhtrang)
-        # Never match against self.name to prevent display name auth bypass
-        allowed_handles = {'tranhuunam23022000', 'vuthiquynhtrang', 'vuthiquynhtrangbl6d'}
+        # Strictly allow only 3 designated accounts:
+        # 1. itdaogroup@gmail.com
+        # 2. tranhuunam23022000@gmail.com
+        # 3. vuthiquynhtrangbl6d@gmail.com (and alias vuthiquynhtrang@gmail.com)
+        allowed_handles = {'itdaogroup', 'tranhuunam23022000', 'vuthiquynhtrang', 'vuthiquynhtrangbl6d'}
         return handle in allowed_handles
 
 

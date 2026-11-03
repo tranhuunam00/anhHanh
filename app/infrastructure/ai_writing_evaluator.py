@@ -4,6 +4,7 @@ import json
 import logging
 from typing import List, Dict, Any, Optional
 import httpx
+from app.infrastructure.gemini_model_helper import get_candidate_gemini_models
 from app.infrastructure.writing_prompts_catalog import LANGUAGES_CONFIG
 
 logger = logging.getLogger(__name__)
@@ -239,41 +240,48 @@ LƯU Ý ĐẶC BIỆT VỀ HÌNH ẢNH ĐỀ BÀI ĐÍNH KÈM:
                 except Exception as parse_ex:
                     logger.warning(f"Failed to parse base64 image part: {parse_ex}")
 
-    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
     last_error = None
 
     async with httpx.AsyncClient(timeout=300.0) as client:
+        models_to_try = await get_candidate_gemini_models(api_key, client)
         for model_name in models_to_try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-            headers = {"x-goog-api-key": api_key}
-            payload = {
-                "contents": [{"parts": content_parts}],
-                "generationConfig": {
-                    "responseMimeType": "application/json",
-                    "temperature": 0.2
+            for api_version in ["v1beta", "v1"]:
+                url = f"https://generativelanguage.googleapis.com/{api_version}/models/{model_name}:generateContent"
+                headers = {"x-goog-api-key": api_key}
+                payload = {
+                    "contents": [{"parts": content_parts}],
+                    "generationConfig": {
+                        "responseMimeType": "application/json",
+                        "temperature": 0.2
+                    }
                 }
-            }
-            try:
-                logger.info(f"Submitting essay evaluation ({word_count} words) to {model_name}...")
-                response = await client.post(url, json=payload, headers=headers)
-                if response.status_code == 200:
-                    data = response.json()
-                    raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-                    raw_text = re.sub(r"^```json\s*", "", raw_text)
-                    raw_text = re.sub(r"\s*```$", "", raw_text)
+                try:
+                    logger.info(f"Submitting essay evaluation ({word_count} words) to {model_name} ({api_version})...")
+                    response = await client.post(url, json=payload, headers=headers)
+                    if response.status_code == 200:
+                        data = response.json()
+                        raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                        raw_text = re.sub(r"^```json\s*", "", raw_text)
+                        raw_text = re.sub(r"\s*```$", "", raw_text)
 
-                    parsed = json.loads(raw_text)
-                    if "sentence_breakdown" not in parsed or not isinstance(parsed["sentence_breakdown"], list):
-                        parsed["sentence_breakdown"] = generate_fallback_sentence_breakdown(content, parsed.get("corrections", []))
-                    parsed["vocab_upgrades"] = normalize_vocab_upgrades(parsed.get("vocab_upgrades", []))
+                        parsed = json.loads(raw_text)
+                        if "sentence_breakdown" not in parsed or not isinstance(parsed["sentence_breakdown"], list):
+                            parsed["sentence_breakdown"] = generate_fallback_sentence_breakdown(content, parsed.get("corrections", []))
+                        parsed["vocab_upgrades"] = normalize_vocab_upgrades(parsed.get("vocab_upgrades", []))
 
-                    logger.info(f"Essay successfully evaluated by {model_name}.")
-                    return parsed
-                else:
-                    logger.warning(f"Model {model_name} returned HTTP {response.status_code}: {response.text[:200]}")
-                    last_error = f"HTTP {response.status_code}: {response.text[:200]}"
-            except Exception as e:
-                logger.warning(f"Error evaluating essay with {model_name}: {e}")
-                last_error = str(e)
+                        logger.info(f"Essay successfully evaluated by {model_name} ({api_version}).")
+                        return parsed
+                    elif response.status_code == 404:
+                        logger.warning(f"Model {model_name} on {api_version} returned HTTP 404: {response.text[:150]}")
+                        last_error = f"HTTP {response.status_code}: {response.text[:200]}"
+                        continue
+                    else:
+                        logger.warning(f"Model {model_name} on {api_version} returned HTTP {response.status_code}: {response.text[:200]}")
+                        last_error = f"HTTP {response.status_code}: {response.text[:200]}"
+                        break
+                except Exception as e:
+                    logger.warning(f"Error evaluating essay with {model_name} ({api_version}): {e}")
+                    last_error = str(e)
+                    break
 
     raise RuntimeError(f"Không thể kết nối hoặc xử lý kết quả với Gemini AI: {last_error}")

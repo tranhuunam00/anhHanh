@@ -117,6 +117,11 @@ def test_user_permissions_logic():
     assert user_authorized_2.can_use_ai_import is True
     assert user_authorized_2.can_use_ai_writing is True
 
+    # Authorized super admin account
+    user_authorized_admin = User(email="itdaogroup@gmail.com", name="IT Dao Group", role="USER")
+    assert user_authorized_admin.can_use_ai_import is True
+    assert user_authorized_admin.can_use_ai_writing is True
+
     # Unauthorized when matched only by name (security guard against display name bypass)
     user_authorized_3 = User(email="random@domain.com", name="tranhuunam23022000 user", role="USER")
     assert user_authorized_3.can_use_ai_import is False

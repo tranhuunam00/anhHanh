@@ -7,6 +7,7 @@ import logging
 import re
 from typing import Any, Dict, List, Optional
 import httpx
+from app.infrastructure.gemini_model_helper import get_candidate_gemini_models
 
 from app.infrastructure.ai_writing_evaluator import LANGUAGES_CONFIG
 
@@ -226,10 +227,10 @@ async def generate_outline_impl(
         target_band=target_band
     )
 
-    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
     last_error = None
 
     async with httpx.AsyncClient(timeout=120.0) as client:
+        models_to_try = await get_candidate_gemini_models(api_key, client)
         for model_name in models_to_try:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
             headers = {"x-goog-api-key": api_key}

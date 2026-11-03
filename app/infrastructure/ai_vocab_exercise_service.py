@@ -7,6 +7,7 @@ import json
 import logging
 from typing import List, Dict, Any, Optional
 import httpx
+from app.infrastructure.gemini_model_helper import get_candidate_gemini_models
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
@@ -143,7 +144,6 @@ Lưu ý quan trọng:
             logger.warning("GEMINI_API_KEY missing. Falling back to local story generator.")
             return build_fallback_story(valid_words)
 
-        models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
         last_error = None
 
         payload = {
@@ -155,6 +155,7 @@ Lưu ý quan trọng:
         }
 
         async with httpx.AsyncClient(timeout=60.0) as client:
+            models_to_try = await get_candidate_gemini_models(api_key, client)
             for model_name in models_to_try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
                 headers = {"x-goog-api-key": api_key}
