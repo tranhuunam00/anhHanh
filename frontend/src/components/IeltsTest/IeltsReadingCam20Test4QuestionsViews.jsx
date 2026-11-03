@@ -6,7 +6,7 @@ export function renderCam20Test4Passage1Questions(groups, answers, onChange, eva
   const tfGroup = groups?.find((g) => g.groupType === "true_false_not_given");
 
   const renderNoteInput = (num) => (
-    <span className="ielts-inline-input-wrapper">
+    <span id={`ielts-q-${num}`} className="ielts-inline-input-wrapper">
       <span className="ielts-q-pill">{num}</span>
       <input
         type="text"
@@ -51,7 +51,7 @@ export function renderCam20Test4Passage1Questions(groups, answers, onChange, eva
           <p className="ielts-instructions-text">{tfGroup.instructions}</p>
           <div className="ielts-tf-list">
             {tfGroup.items?.map((it) => (
-              <div key={it.number} className="ielts-tf-item" style={{ marginBottom: "16px" }}>
+              <div key={it.number} id={`ielts-q-${it.number}`} className="ielts-tf-item" style={{ marginBottom: "16px" }}>
                 <p className="ielts-tf-statement">
                   <span className="ielts-q-pill">{it.number}</span> {it.statement}
                 </p>
@@ -96,7 +96,7 @@ export function renderCam20Test4Passage2Questions(groups, answers, onChange, eva
           <p className="ielts-instructions-text">{matchInfoGroup.instructions}</p>
           <div className="ielts-match-info-list">
             {matchInfoGroup.items?.map((it) => (
-              <div key={it.number} className="ielts-match-info-item" style={{ marginBottom: "14px" }}>
+              <div key={it.number} id={`ielts-q-${it.number}`} className="ielts-match-info-item" style={{ marginBottom: "14px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <span className="ielts-q-pill">{it.number}</span>
                   <span style={{ flex: 1, fontSize: "0.95rem" }}>{it.statement}</span>
@@ -129,7 +129,7 @@ export function renderCam20Test4Passage2Questions(groups, answers, onChange, eva
               {sentenceGroup.items?.map((it) => (
                 <li key={it.number}>
                   {it.prefix}
-                  <span className="ielts-inline-input-wrapper">
+                  <span id={`ielts-q-${it.number}`} className="ielts-inline-input-wrapper">
                     <span className="ielts-q-pill">{it.number}</span>
                     <input
                       type="text"
@@ -165,7 +165,7 @@ export function renderCam20Test4Passage2Questions(groups, answers, onChange, eva
 
           <div className="ielts-match-list">
             {peopleGroup.items?.map((it) => (
-              <div key={it.number} className="ielts-match-item" style={{ marginBottom: "14px" }}>
+              <div key={it.number} id={`ielts-q-${it.number}`} className="ielts-match-item" style={{ marginBottom: "14px" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
                   <span className="ielts-q-pill">{it.number}</span>
                   <span style={{ flex: 1, fontSize: "0.95rem" }}>{it.statement}</span>
@@ -204,7 +204,7 @@ export function renderCam20Test4Passage3Questions(groups, answers, onChange, eva
           <p className="ielts-instructions-text">{matchInfoGroup.instructions}</p>
           <div className="ielts-match-info-list">
             {matchInfoGroup.items?.map((it) => (
-              <div key={it.number} className="ielts-match-info-item" style={{ marginBottom: "14px" }}>
+              <div key={it.number} id={`ielts-q-${it.number}`} className="ielts-match-info-item" style={{ marginBottom: "14px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <span className="ielts-q-pill">{it.number}</span>
                   <span style={{ flex: 1, fontSize: "0.95rem" }}>{it.statement}</span>
@@ -245,7 +245,7 @@ export function renderCam20Test4Passage3Questions(groups, answers, onChange, eva
 
           <div className="ielts-match-list">
             {peopleGroup.items?.map((it) => (
-              <div key={it.number} className="ielts-match-item" style={{ marginBottom: "14px" }}>
+              <div key={it.number} id={`ielts-q-${it.number}`} className="ielts-match-item" style={{ marginBottom: "14px" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
                   <span className="ielts-q-pill">{it.number}</span>
                   <span style={{ flex: 1, fontSize: "0.95rem" }}>{it.statement}</span>
@@ -278,7 +278,7 @@ export function renderCam20Test4Passage3Questions(groups, answers, onChange, eva
               {summaryGroup.items?.map((it) => (
                 <span key={it.number}>
                   {it.prefix}
-                  <span className="ielts-inline-input-wrapper">
+                  <span id={`ielts-q-${it.number}`} className="ielts-inline-input-wrapper">
                     <span className="ielts-q-pill">{it.number}</span>
                     <input
                       type="text"

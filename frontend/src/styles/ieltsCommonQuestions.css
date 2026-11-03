@@ -333,7 +333,7 @@
   flex: 1;
 }
 
-/* Choose Two Box */
+/* Choose Two Box & Lists */
 .ielts-choose-two-box {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -350,10 +350,68 @@
   margin: 6px 0 10px 0;
 }
 
+.ielts-choose-two-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .ielts-choose-two-options {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.ielts-group-instructions {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-muted);
+  margin: 4px 0 12px 0;
+  line-height: 1.5;
+}
+
+/* Exam Table Completion */
+.ielts-exam-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-exam-table th,
+.ielts-exam-table td {
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.ielts-exam-table th {
+  background: var(--bg-secondary);
+  font-weight: 700;
+  text-align: left;
+}
+
+/* Notes Completion Section */
+.ielts-notes-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.ielts-notes-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 14px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .ielts-part-content {

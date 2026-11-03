@@ -227,7 +227,8 @@
 }
 
 .ielts-tf-btn,
-.ielts-tf-option {
+.ielts-tf-option,
+.ielts-tf-label {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -244,7 +245,8 @@
   user-select: none;
 }
 
-.ielts-tf-option input[type="radio"] {
+.ielts-tf-option input[type="radio"],
+.ielts-tf-label input[type="radio"] {
   position: absolute;
   opacity: 0;
   pointer-events: none;
@@ -253,16 +255,40 @@
 }
 
 .ielts-tf-btn:hover,
-.ielts-tf-option:hover {
+.ielts-tf-option:hover,
+.ielts-tf-label:hover {
   background: var(--bg-secondary);
   color: var(--text-primary);
   border-color: var(--primary);
 }
 
 .ielts-tf-btn.selected,
-.ielts-tf-option.selected {
+.ielts-tf-option.selected,
+.ielts-tf-label.selected {
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
   box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
+}
+
+/* Matching Lists (Questions with Select / Letters) */
+.ielts-match-list,
+.ielts-match-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ielts-match-item,
+.ielts-match-info-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: all 0.15s ease;
+}
+
+.ielts-match-item:hover,
+.ielts-match-info-item:hover {
+  border-color: var(--primary);
 }

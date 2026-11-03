@@ -25,7 +25,7 @@ export function renderCam20Test4Part1(part, answers, onChange, evaluation, isRev
               {sec.items?.map((item) => (
                 <li key={item.number} style={{ margin: "8px 0" }}>
                   {item.prefix}
-                  <span className="ielts-inline-input-wrapper">
+                  <span id={`ielts-q-${item.number}`} className="ielts-inline-input-wrapper">
                     <span className="ielts-q-pill">{item.number}</span>
                     <input
                       type="text"
@@ -63,7 +63,7 @@ export function renderCam20Test4Part2(part, answers, onChange, onChooseTwoToggle
       </div>
 
       {chooseTwo1 && (
-        <div className="ielts-question-group" style={{ marginBottom: "24px" }}>
+        <div id="ielts-q-11" className="ielts-question-group" style={{ marginBottom: "24px" }}>
           <h5>Questions 11 and 12</h5>
           <p className="ielts-group-instructions">{chooseTwo1.instructions}</p>
           <div className="ielts-choose-two-list">
@@ -93,7 +93,7 @@ export function renderCam20Test4Part2(part, answers, onChange, onChooseTwoToggle
       )}
 
       {chooseTwo2 && (
-        <div className="ielts-question-group" style={{ marginBottom: "28px" }}>
+        <div id="ielts-q-13" className="ielts-question-group" style={{ marginBottom: "28px" }}>
           <h5>Questions 13 and 14</h5>
           <p className="ielts-group-instructions">{chooseTwo2.instructions}</p>
           <div className="ielts-choose-two-list">
@@ -140,7 +140,7 @@ export function renderCam20Test4Part2(part, answers, onChange, onChooseTwoToggle
 
           <div className="ielts-match-list">
             {matchGroup.items?.map((it) => (
-              <div key={it.number} className="ielts-match-item" style={{ marginBottom: "14px" }}>
+              <div key={it.number} id={`ielts-q-${it.number}`} className="ielts-match-item" style={{ marginBottom: "14px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <span className="ielts-q-pill">{it.number}</span>
                   <span style={{ flex: 1, fontSize: "0.95rem", fontWeight: "600" }}>{it.year}</span>
