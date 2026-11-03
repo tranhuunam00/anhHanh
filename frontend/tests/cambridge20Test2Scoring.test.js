@@ -16,6 +16,7 @@ describe("Cambridge IELTS 20 Test 2 - Data & Scoring Integrity", () => {
     assert.equal(cambridge20Test2.skills.listening.parts.length, 4);
     assert.equal(cambridge20Test2.skills.reading.passages.length, 3);
     assert.equal(cambridge20Test2.skills.writing.tasks.length, 2);
+    assert.equal(cambridge20Test2.skills.writing.tasks[0].image, "/images/ielts/cam20_test2_writing_task1.png");
     assert.equal(cambridge20Test2.skills.speaking.parts.length, 3);
   });
 

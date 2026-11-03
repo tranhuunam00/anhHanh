@@ -146,11 +146,11 @@ export const IeltsWritingModule = ({
         </div>
 
         {/* Task 1 Diagram Image */}
-        {currentTask.image && (
+        {(currentTask.image || currentTask.imageSrc) && (
           <div className="ielts-writing-image-wrap">
-            <h5 className="ielts-diagram-title">{currentTask.diagramTitle}</h5>
+            {currentTask.diagramTitle && <h5 className="ielts-diagram-title">{currentTask.diagramTitle}</h5>}
             <img
-              src={currentTask.image}
+              src={currentTask.image || currentTask.imageSrc}
               alt="IELTS Writing Task 1 diagram"
               className="ielts-writing-diagram-img"
             />

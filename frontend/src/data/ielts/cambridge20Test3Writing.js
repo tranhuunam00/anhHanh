@@ -7,7 +7,9 @@ export const cambridge20Test3Writing = {
       title: "Task 1: Report on Charts",
       timeSuggestion: "20 minutes",
       minWords: 150,
+      image: "/images/ielts/cam20_test3_writing_task1.png",
       imageSrc: "/images/ielts/cam20_test3_writing_task1.png",
+      diagramTitle: "Little Chalfont Public Library: Borrowers by Age and Categories of Borrowed Books",
       prompt: "You should spend about 20 minutes on this task.\n\nThe charts below give information about a public library in a town called Little Chalfont.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.\n\nWrite at least 150 words."
     },
     {

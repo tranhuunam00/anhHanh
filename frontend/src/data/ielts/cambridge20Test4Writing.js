@@ -7,7 +7,9 @@ export const cambridge20Test4Writing = {
       title: "Task 1: Process Diagram",
       timeSuggestion: "20 minutes",
       minWords: 150,
+      image: "/images/ielts/cam20_test4_writing_task1.png",
       imageSrc: "/images/ielts/cam20_test4_writing_task1.png",
+      diagramTitle: "How bamboo fabric is made",
       prompt: "You should spend about 20 minutes on this task.\n\nThe diagram below shows how fabric is manufactured from bamboo.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.\n\nWrite at least 150 words."
     },
     {
