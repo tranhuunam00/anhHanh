@@ -36,6 +36,7 @@ class EvaluateWritingRequest(BaseModel):
     language: Optional[str] = Field(default="en", description="Ngôn ngữ bài viết (en, ja, zh, ko, fr, de)")
     sub_type: Optional[str] = Field(default=None, description="Dạng bài chi tiết (line_graph, bar_chart, map, opinion, discussion...)")
     images: Optional[List[str]] = Field(default=[], max_length=5, description="Danh sách ảnh đề bài đính kèm (base64 data URL hoặc URL)")
+    scoring_only: Optional[bool] = Field(default=False, description="Chỉ chấm điểm và nhận xét ngắn gọn chuẩn thi IELTS, không cần chữa bài chi tiết")
 
 
 class SaveWritingRequest(BaseModel):
@@ -260,7 +261,8 @@ async def evaluate_writing_submission(
             genre=body.genre or "ielts_task2",
             target_band=body.target_band or 7.0,
             language=body.language or "en",
-            images=body.images
+            images=body.images,
+            scoring_only=bool(body.scoring_only)
         )
 
         overall_score = evaluation.get("overall_score")
@@ -321,6 +323,12 @@ async def evaluate_writing_submission(
             "submission_id": submission.id,
             "word_count": word_count,
             "evaluation": evaluation,
+            "overall_band": overall_score,
+            "task_response_score": tr_score,
+            "coherence_cohesion_score": cc_score,
+            "lexical_resource_score": lr_score,
+            "grammatical_accuracy_score": gr_score,
+            "detailed_feedback": evaluation.get("overall_feedback") or evaluation.get("detailed_feedback"),
             "created_at": submission.created_at.isoformat() if submission.created_at else None
         }
 

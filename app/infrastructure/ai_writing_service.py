@@ -96,7 +96,8 @@ class AIWritingService:
         genre: str = "ielts_task2",
         target_band: float = 7.0,
         language: str = "en",
-        images: Optional[List[str]] = None
+        images: Optional[List[str]] = None,
+        scoring_only: bool = False
     ) -> Dict[str, Any]:
         """Grade and thoroughly evaluate a student's writing submission using Gemini AI."""
         api_key = get_gemini_api_key()
@@ -108,6 +109,7 @@ class AIWritingService:
             language=language,
             images=images,
             api_key=api_key,
+            scoring_only=scoring_only,
         )
 
 

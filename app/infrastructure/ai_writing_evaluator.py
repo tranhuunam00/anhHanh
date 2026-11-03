@@ -126,7 +126,8 @@ async def evaluate_writing_impl(
     target_band: float = 7.0,
     language: str = "en",
     images: Optional[List[str]] = None,
-    api_key: Optional[str] = None
+    api_key: Optional[str] = None,
+    scoring_only: bool = False
 ) -> Dict[str, Any]:
     """Grade and thoroughly evaluate a student's writing submission using Gemini AI."""
     if not content or len(content.strip().split()) < 15:
@@ -142,7 +143,47 @@ async def evaluate_writing_impl(
     system_scale = cfg["system"]
     upgrade_target = min(9.0, round((float(target_band) + 0.5) * 2) / 2)
 
-    eval_prompt = f"""Bạn là {examiner}.
+    if scoring_only:
+        task_label = "Task 1 (Task Achievement)" if genre == "ielts_task1" else "Task 2 (Task Response)"
+        eval_prompt = f"""Bạn là {examiner}.
+Nhiệm vụ của bạn là CHẤM ĐIỂM BÀI THI IELTS WRITING ({task_label}) của học viên theo đúng thang điểm chuẩn Cambridge IELTS 0.0 - 9.0 (làm tròn 0.5).
+LƯU Ý ĐẶC BIỆT: Đây là chế độ THI THỬ (EXAM TEST MODE). Bạn CHỈ CẦN CHẤM ĐIỂM và đưa ra NHẬN XÉT ĐÁNH GIÁ TỔNG QUAN, TUYỆT ĐỐI KHÔNG CẦN CHỮA TỪNG CÂU VÀ KHÔNG CẦN VIẾT LẠI BÀI VĂN MẪU.
+
+ĐỀ BÀI (PROMPT):
+\"\"\"{topic}\"\"\"
+
+THỂ LOẠI (GENRE): {genre}
+ĐỘ DÀI: {word_count} từ
+
+BÀI VIẾT CỦA HỌC VIÊN:
+\"\"\"
+{content}
+\"\"\"
+
+YÊU CẦU CHẤM ĐIỂM (BẮT BUỘC ĐỦ 4 TIÊU CHÍ CHUẨN IELTS 9.0):
+1. task_response (hoặc task_achievement đối với Task 1): Chấm điểm 0.0 - 9.0 (làm tròn 0.5) và nhận xét ngắn gọn 1-2 câu.
+2. coherence_cohesion: Chấm điểm 0.0 - 9.0 (làm tròn 0.5) và nhận xét ngắn gọn 1-2 câu.
+3. lexical_resource: Chấm điểm 0.0 - 9.0 (làm tròn 0.5) và nhận xét ngắn gọn 1-2 câu.
+4. grammatical_range_accuracy: Chấm điểm 0.0 - 9.0 (làm tròn 0.5) và nhận xét ngắn gọn 1-2 câu.
+5. overall_score: Điểm tổng kết IELTS Writing (trung bình cộng 4 tiêu chí, làm tròn theo quy tắc IELTS: ví dụ 6.25 -> 6.5, 6.75 -> 7.0).
+6. overall_feedback: Nhận xét tổng quan 2-3 câu ngắn gọn giải thích lý do đạt mức điểm này.
+
+ĐỊNH DẠNG TRẢ VỀ:
+BẮT BUỘC là JSON duy nhất:
+{{
+  "overall_score": 6.5,
+  "max_score": 9.0,
+  "overall_feedback": "Nhận xét tổng quan...",
+  "criteria_scores": {{
+    "task_response": {{"score": 6.5, "feedback": "Nhận xét tiêu chí..."}},
+    "coherence_cohesion": {{"score": 6.5, "feedback": "Nhận xét tiêu chí..."}},
+    "lexical_resource": {{"score": 6.5, "feedback": "Nhận xét tiêu chí..."}},
+    "grammatical_range_accuracy": {{"score": 6.0, "feedback": "Nhận xét tiêu chí..."}}
+  }}
+}}
+"""
+    else:
+        eval_prompt = f"""Bạn là {examiner}.
 Nhiệm vụ của bạn là đánh giá, chấm điểm cực kỳ khách quan, tỉ mỉ và đưa ra nhận xét sửa lỗi chi tiết cho bài viết bằng {lang_name} của học viên dưới đây theo thang điểm {system_scale}.
 
 ĐỀ BÀI (PROMPT):
@@ -265,9 +306,14 @@ LƯU Ý ĐẶC BIỆT VỀ HÌNH ẢNH ĐỀ BÀI ĐÍNH KÈM:
                         raw_text = re.sub(r"\s*```$", "", raw_text)
 
                         parsed = json.loads(raw_text)
-                        if "sentence_breakdown" not in parsed or not isinstance(parsed["sentence_breakdown"], list):
-                            parsed["sentence_breakdown"] = generate_fallback_sentence_breakdown(content, parsed.get("corrections", []))
-                        parsed["vocab_upgrades"] = normalize_vocab_upgrades(parsed.get("vocab_upgrades", []))
+                        if scoring_only:
+                            parsed.setdefault("sentence_breakdown", [])
+                            parsed.setdefault("corrections", [])
+                            parsed.setdefault("vocab_upgrades", [])
+                        else:
+                            if "sentence_breakdown" not in parsed or not isinstance(parsed["sentence_breakdown"], list):
+                                parsed["sentence_breakdown"] = generate_fallback_sentence_breakdown(content, parsed.get("corrections", []))
+                            parsed["vocab_upgrades"] = normalize_vocab_upgrades(parsed.get("vocab_upgrades", []))
 
                         logger.info(f"Essay successfully evaluated by {model_name} ({api_version}).")
                         return parsed

@@ -33,8 +33,20 @@ export const IeltsWritingModule = ({
     }
   });
 
-  // AI Evaluation results & loading
-  const [evalResults, setEvalResults] = useState({});
+  // AI Evaluation results & loading with persistent storage
+  const [evalResults, setEvalResults] = useState(() => {
+    try {
+      const e1 = localStorage.getItem(`ielts_writing_eval_${testIdKey}_1`);
+      const e2 = localStorage.getItem(`ielts_writing_eval_${testIdKey}_2`);
+      return {
+        1: e1 ? JSON.parse(e1) : null,
+        2: e2 ? JSON.parse(e2) : null
+      };
+    } catch {
+      return { 1: null, 2: null };
+    }
+  });
+
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [aiError, setAiError] = useState("");
 
@@ -84,7 +96,8 @@ export const IeltsWritingModule = ({
           content: currentEssay,
           target_band: 7.5,
           genre: activeTask === 1 ? "ielts_task1" : "ielts_task2",
-          language: "en"
+          language: "en",
+          scoring_only: true // Exam test mode: fast band scoring without rewriting model essay
         })
       });
 
@@ -94,13 +107,53 @@ export const IeltsWritingModule = ({
       }
 
       const data = await res.json();
-      setEvalResults((prev) => ({ ...prev, [activeTask]: data }));
+      setEvalResults((prev) => {
+        const next = { ...prev, [activeTask]: data };
+        try {
+          localStorage.setItem(`ielts_writing_eval_${testIdKey}_${activeTask}`, JSON.stringify(data));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
     } catch (err) {
       setAiError(err.message || "Lỗi khi chấm điểm bài viết.");
     } finally {
       setIsLoadingAi(false);
     }
   };
+
+  // Extract criteria scores safely from top-level or nested evaluation object
+  const evalData = evalResults[activeTask];
+  const overallBand = evalData
+    ? evalData.overall_band || evalData.band || evalData.evaluation?.overall_score || "N/A"
+    : null;
+
+  const rawCriteria = evalData?.evaluation?.criteria_scores || evalData?.criteria_scores || {};
+  const trScore =
+    evalData?.task_response_score ||
+    rawCriteria.task_response?.score ||
+    rawCriteria.task_achievement?.score ||
+    "-";
+  const ccScore =
+    evalData?.coherence_cohesion_score ||
+    rawCriteria.coherence_cohesion?.score ||
+    "-";
+  const lrScore =
+    evalData?.lexical_resource_score ||
+    rawCriteria.lexical_resource?.score ||
+    "-";
+  const grScore =
+    evalData?.grammatical_accuracy_score ||
+    rawCriteria.grammatical_range_accuracy?.score ||
+    rawCriteria.grammar_accuracy?.score ||
+    "-";
+
+  const feedbackText =
+    evalData?.detailed_feedback ||
+    evalData?.evaluation?.overall_feedback ||
+    evalData?.evaluation?.detailed_feedback ||
+    "";
 
   // Left Pane: Official Prompt & Structure Strategy Guide
   const leftPaneContent = (
@@ -131,12 +184,15 @@ export const IeltsWritingModule = ({
         </div>
 
         <div className="ielts-writing-instructions">
-          {currentTask.prompt.split("\n\n").map((para, i) => {
-            if (i === 0 && activeTask === 2) {
+          {currentTask.instructions?.map((para, i) => {
+            if (para.startsWith("You should spend")) {
               return (
-                <div key={i} className="ielts-prompt-quote-box">
-                  {para}
-                </div>
+                <p key={i} className="ielts-prompt-meta-time"><strong>{para}</strong></p>
+              );
+            }
+            if (para.startsWith("Write at least")) {
+              return (
+                <p key={i} className="ielts-prompt-meta-length"><strong>{para}</strong></p>
               );
             }
             return (
@@ -215,48 +271,41 @@ export const IeltsWritingModule = ({
         </div>
       </div>
 
-      {/* AI Evaluation Result Card */}
-      {evalResults[activeTask] && (
+      {/* AI Evaluation Result Card (Chỉ chấm điểm 4 tiêu chí chuẩn IELTS và nhận xét mức điểm) */}
+      {evalData && (
         <div className="ielts-ai-result-card">
           <div className="ielts-ai-result-header">
             <span className="ielts-ai-band-badge">
-              IELTS Band: {evalResults[activeTask].overall_band || evalResults[activeTask].band || "N/A"}
+              IELTS Band: {overallBand}
             </span>
             <span className="ielts-ai-evaluated-date">Đã chấm bởi Gemini AI • Chuẩn IELTS 9.0</span>
           </div>
 
           <div className="ielts-ai-subscores-grid">
             <div className="ielts-subscore-box">
-              <span className="ielts-subscore-label">Task Response</span>
-              <span className="ielts-subscore-val">{evalResults[activeTask].task_response_score || "-"}</span>
+              <span className="ielts-subscore-label">
+                {activeTask === 1 ? "Task Achievement" : "Task Response"}
+              </span>
+              <span className="ielts-subscore-val">{trScore}</span>
             </div>
             <div className="ielts-subscore-box">
               <span className="ielts-subscore-label">Coherence & Cohesion</span>
-              <span className="ielts-subscore-val">{evalResults[activeTask].coherence_cohesion_score || "-"}</span>
+              <span className="ielts-subscore-val">{ccScore}</span>
             </div>
             <div className="ielts-subscore-box">
               <span className="ielts-subscore-label">Lexical Resource</span>
-              <span className="ielts-subscore-val">{evalResults[activeTask].lexical_resource_score || "-"}</span>
+              <span className="ielts-subscore-val">{lrScore}</span>
             </div>
             <div className="ielts-subscore-box">
               <span className="ielts-subscore-label">Grammar & Accuracy</span>
-              <span className="ielts-subscore-val">{evalResults[activeTask].grammatical_accuracy_score || "-"}</span>
+              <span className="ielts-subscore-val">{grScore}</span>
             </div>
           </div>
 
-          {evalResults[activeTask].detailed_feedback && (
+          {feedbackText && (
             <div className="ielts-ai-feedback-section">
-              <h5>Nhận xét chi tiết & Lộ trình nâng band:</h5>
-              <p className="ielts-ai-feedback-text">{evalResults[activeTask].detailed_feedback}</p>
-            </div>
-          )}
-
-          {evalResults[activeTask].corrected_version && (
-            <div className="ielts-ai-feedback-section">
-              <h5>Phiên bản bài viết mẫu đã sửa lỗi (Band 8.0+):</h5>
-              <div className="ielts-ai-corrected-box">
-                {evalResults[activeTask].corrected_version}
-              </div>
+              <h5>Nhận xét đánh giá theo tiêu chuẩn IELTS:</h5>
+              <p className="ielts-ai-feedback-text">{feedbackText}</p>
             </div>
           )}
         </div>
