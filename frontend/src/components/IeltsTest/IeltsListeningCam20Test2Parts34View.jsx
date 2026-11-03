@@ -62,7 +62,7 @@ export function renderCam20Test2Part3(part, answers, onChange, evaluation, isRev
           <p className="ielts-group-instructions">{mcGroup.instructions}</p>
           <div className="ielts-mc-list">
             {mcGroup.items?.map((item) => (
-              <div key={item.number} className="ielts-mc-item">
+              <div key={item.number} id={`ielts-q-${item.number}`} className="ielts-mc-item">
                 <div className="ielts-mc-question-row">
                   <span className="ielts-q-pill">{item.number}</span>
                   <p className="ielts-mc-question-text">{item.question}</p>

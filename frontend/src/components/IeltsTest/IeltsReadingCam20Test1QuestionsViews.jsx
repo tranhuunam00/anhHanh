@@ -208,7 +208,7 @@ export function renderCam20Test1Passage3Questions(groups, answers, onChange, eva
           <p className="ielts-instructions-text">{mcGroup.instructions}</p>
           <div className="ielts-mc-list">
             {mcGroup.items?.map((item) => (
-              <div key={item.number} className="ielts-mc-item" style={{ marginBottom: "18px" }}>
+              <div key={item.number} id={`ielts-q-${item.number}`} className="ielts-mc-item" style={{ marginBottom: "18px" }}>
                 <div className="ielts-mc-question-row">
                   <span className="ielts-q-pill">{item.number}</span>
                   <p className="ielts-mc-question-text">{item.question}</p>

@@ -30,7 +30,7 @@ export const IeltsStartConfirmModal = ({
   );
 
   const skillsSummary = [
-    { key: "listening", name: "Listening", time: "30 phút", detail: "4 Parts • 40 câu hỏi" },
+    { key: "listening", name: "Listening", time: "33 phút", detail: "4 Parts • 40 câu hỏi" },
     { key: "reading", name: "Reading", time: "60 phút", detail: "3 Passages • 40 câu hỏi" },
     { key: "writing", name: "Writing", time: "60 phút", detail: "Task 1 (150 từ) & Task 2 (250 từ)" },
     { key: "speaking", name: "Speaking", time: "14 phút", detail: "Part 1, 2, 3 • Thu âm trực tiếp" }

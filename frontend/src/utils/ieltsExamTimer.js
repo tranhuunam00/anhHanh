@@ -7,7 +7,7 @@
 
 // Official IELTS Skill Durations in Seconds
 export const IELTS_SKILL_DURATIONS = {
-  listening: 30 * 60, // 30 minutes = 1800s
+  listening: 33 * 60, // 33 minutes = 1980s (accommodating full continuous audio ~30-33 mins)
   reading: 60 * 60,   // 60 minutes = 3600s
   writing: 60 * 60,   // 60 minutes = 3600s
   speaking: 14 * 60   // 14 minutes = 840s

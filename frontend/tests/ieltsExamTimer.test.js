@@ -42,7 +42,7 @@ globalThis.localStorage = new MockStorage();
 
 describe("ieltsExamTimer - Constants & Key Generators", () => {
   it("Input & Output: verifies official skill durations", () => {
-    assert.equal(IELTS_SKILL_DURATIONS.listening, 1800);
+    assert.equal(IELTS_SKILL_DURATIONS.listening, 1980);
     assert.equal(IELTS_SKILL_DURATIONS.reading, 3600);
     assert.equal(IELTS_SKILL_DURATIONS.writing, 3600);
     assert.equal(IELTS_SKILL_DURATIONS.speaking, 840);
@@ -56,6 +56,7 @@ describe("ieltsExamTimer - Constants & Key Generators", () => {
 
 describe("ieltsExamTimer - formatCountdownTime", () => {
   it("Input Coverage & Output: handles happy path standard MM:SS", () => {
+    assert.equal(formatCountdownTime(1980), "33:00");
     assert.equal(formatCountdownTime(1800), "30:00");
     assert.equal(formatCountdownTime(65), "01:05");
     assert.equal(formatCountdownTime(9), "00:09");
@@ -82,7 +83,7 @@ describe("ieltsExamTimer - Session State Management", () => {
     assert.equal(s.testId, "test_1");
     assert.equal(s.isConfirmed, false);
     assert.equal(s.skills.listening.status, "not_started");
-    assert.equal(s.skills.listening.remainingSeconds, 1800);
+    assert.equal(s.skills.listening.remainingSeconds, 1980);
     assert.equal(s.skills.reading.remainingSeconds, 3600);
     assert.equal(s.skills.writing.remainingSeconds, 3600);
     assert.equal(s.skills.speaking.remainingSeconds, 840);
@@ -127,7 +128,7 @@ describe("ieltsExamTimer - activateSkillTimer & getSkillRemainingSeconds", () =>
     assert.ok(activated.skills.listening.targetEndTime > Date.now());
 
     const remaining = getSkillRemainingSeconds(activated, "listening");
-    assert.ok(remaining > 1795 && remaining <= 1800);
+    assert.ok(remaining > 1975 && remaining <= 1980);
   });
 
   it("activateSkillTimer does not overwrite if already completed", () => {
