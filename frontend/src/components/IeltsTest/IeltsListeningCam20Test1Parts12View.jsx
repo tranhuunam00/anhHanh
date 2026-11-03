@@ -248,7 +248,7 @@ export function renderCam20Test1Part2(part, answers, onChange, onChooseTwoToggle
       )}
 
       {chooseTwo1 && (
-        <div className="ielts-question-group" style={{ marginTop: "24px" }}>
+        <div id={`ielts-q-${chooseTwo1.numbers?.[0] || 17}`} className="ielts-question-group" style={{ marginTop: "24px" }}>
           <h5>Questions 17 and 18</h5>
           <p className="ielts-group-instructions">{chooseTwo1.instructions}</p>
           <p className="ielts-choose-two-question">
@@ -281,7 +281,7 @@ export function renderCam20Test1Part2(part, answers, onChange, onChooseTwoToggle
       )}
 
       {chooseTwo2 && (
-        <div className="ielts-question-group" style={{ marginTop: "24px" }}>
+        <div id={`ielts-q-${chooseTwo2.numbers?.[0] || 19}`} className="ielts-question-group" style={{ marginTop: "24px" }}>
           <h5>Questions 19 and 20</h5>
           <p className="ielts-group-instructions">{chooseTwo2.instructions}</p>
           <p className="ielts-choose-two-question">
