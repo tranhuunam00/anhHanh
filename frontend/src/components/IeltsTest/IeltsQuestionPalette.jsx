@@ -1,23 +1,21 @@
-import React from "react";
-import { MapPin } from "../../constants/icons.js";
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import { ChevronLeft, ChevronRight, MapPin } from "../../constants/icons.js";
+import {
+  isQuestionAnswered,
+  calculateScrollBounds,
+  calculateCenteredScrollPosition,
+  calculateDragScroll,
+  shouldPreventClickAfterDrag,
+  calculateStepScroll
+} from "../../utils/ieltsPaletteUtils.js";
 
-/**
- * Helper to determine if a question has been answered
- */
-export function isQuestionAnswered(answers, qNum) {
-  if (!answers) return false;
-  const val = answers[qNum] !== undefined ? answers[qNum] : answers[String(qNum)];
-  if (val === undefined || val === null) return false;
-  if (typeof val === "string") return val.trim().length > 0;
-  if (Array.isArray(val)) return val.length > 0;
-  return Boolean(val);
-}
+export { isQuestionAnswered };
 
 /**
  * IELTS Question Palette (Top Horizontal Bar Standard)
  * Laid out in a single streamlined row at the top of the test module.
  * Combines Part switcher chips with all 40 question numbers arranged horizontally.
- * Maximizes vertical height for reading passage and question content.
+ * Supports smooth horizontal drag-to-scroll, wheel scrolling, step navigation, and active centering.
  */
 export const IeltsQuestionPalette = ({
   totalQuestions = 40,
@@ -33,7 +31,151 @@ export const IeltsQuestionPalette = ({
   const numbers = Array.from({ length: totalQuestions }, (_, i) => i + 1);
   const answeredCount = numbers.filter((n) => isQuestionAnswered(answers, n)).length;
 
+  const stripRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const hasDraggedRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [scrollState, setScrollState] = useState({
+    canScrollLeft: false,
+    canScrollRight: false,
+    hasOverflow: false
+  });
+
+  const updateScrollState = useCallback(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    const bounds = calculateScrollBounds(el.scrollLeft, el.scrollWidth, el.clientWidth);
+    setScrollState((prev) => {
+      if (
+        prev.canScrollLeft === bounds.canScrollLeft &&
+        prev.canScrollRight === bounds.canScrollRight &&
+        prev.hasOverflow === bounds.hasOverflow
+      ) {
+        return prev;
+      }
+      return bounds;
+    });
+  }, []);
+
+  // Sync scroll bounds on resize, scroll, and content changes
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+
+    updateScrollState();
+    el.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState, { passive: true });
+
+    let ro = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => updateScrollState());
+      ro.observe(el);
+    }
+
+    return () => {
+      el.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+      if (ro) ro.disconnect();
+    };
+  }, [updateScrollState]);
+
+  // Support mouse wheel horizontal scrolling
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+
+    const handleWheel = (e) => {
+      if (Math.abs(e.deltaY) >= Math.abs(e.deltaX) && e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
+  // Auto-center the active question badge in view
+  useEffect(() => {
+    if (activeNumber === null || activeNumber === undefined || !stripRef.current) return;
+    const el = stripRef.current;
+    const badge = el.querySelector(`#ielts-badge-${activeNumber}`);
+    if (badge) {
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      const target = calculateCenteredScrollPosition(badge.offsetLeft, badge.offsetWidth, el.clientWidth, maxScroll);
+      el.scrollTo({ left: target, behavior: "smooth" });
+    }
+  }, [activeNumber]);
+
+  // Handle pointer drag-to-scroll
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return;
+    const el = stripRef.current;
+    if (!el) return;
+
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+    startXRef.current = e.pageX;
+    scrollLeftRef.current = el.scrollLeft;
+    setIsDragging(true);
+
+    const handleMouseMove = (moveEvent) => {
+      if (!isDraggingRef.current) return;
+      const distance = moveEvent.pageX - startXRef.current;
+      if (shouldPreventClickAfterDrag(distance, 5)) {
+        hasDraggedRef.current = true;
+      }
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      el.scrollLeft = calculateDragScroll(scrollLeftRef.current, startXRef.current, moveEvent.pageX, maxScroll);
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      setTimeout(() => {
+        hasDraggedRef.current = false;
+      }, 60);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleScrollStep = (direction) => {
+    const el = stripRef.current;
+    if (!el) return;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    const target = calculateStepScroll(el.scrollLeft, direction, 180, maxScroll);
+    el.scrollTo({ left: target, behavior: "smooth" });
+  };
+
+  const handlePartClick = (grp) => {
+    if (onSelectPart) {
+      onSelectPart(grp.partNumber);
+    }
+    const el = stripRef.current;
+    if (el) {
+      const firstNum = grp.range[0];
+      const badge = el.querySelector(`#ielts-badge-${firstNum}`);
+      if (badge) {
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        const target = calculateCenteredScrollPosition(badge.offsetLeft, badge.offsetWidth, el.clientWidth, maxScroll);
+        el.scrollTo({ left: target, behavior: "smooth" });
+      }
+    }
+  };
+
   const handleClick = (n, targetPart) => {
+    if (hasDraggedRef.current) {
+      return;
+    }
     if (onSelectPart && targetPart && targetPart !== activePart) {
       onSelectPart(targetPart);
     }
@@ -80,7 +222,7 @@ export const IeltsQuestionPalette = ({
               key={grp.partNumber}
               type="button"
               className={`ielts-top-part-chip ${isActive ? "active" : ""}`}
-              onClick={() => onSelectPart && onSelectPart(grp.partNumber)}
+              onClick={() => handlePartClick(grp)}
               title={`Chuyển đến ${grp.label} (Câu ${start}-${end})`}
             >
               <span className="ielts-chip-name">{grp.label}</span>
@@ -93,46 +235,78 @@ export const IeltsQuestionPalette = ({
         })}
       </div>
 
-      {/* Middle: All 40 questions arranged horizontally */}
-      <div className="ielts-top-palette-strip">
-        {groups.map((grp, gIdx) => {
-          const groupNums = numbers.filter(
-            (n) => n >= grp.range[0] && n <= grp.range[1]
-          );
+      {/* Middle: Draggable Question Strip with Step Navigation Buttons */}
+      <div className="ielts-top-palette-strip-wrapper">
+        {scrollState.hasOverflow && (
+          <button
+            type="button"
+            className="ielts-palette-scroll-btn left"
+            onClick={() => handleScrollStep("left")}
+            disabled={!scrollState.canScrollLeft}
+            title="Cuộn sang trái"
+            aria-label="Cuộn sang trái"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+        )}
 
-          return (
-            <div key={grp.partNumber} className="ielts-top-palette-group">
-              {gIdx > 0 && <div className="ielts-palette-divider-v" />}
-              <div className="ielts-palette-badges-row">
-                {groupNums.map((n) => {
-                  const answered = isQuestionAnswered(answers, n);
-                  const isCurrent = activeNumber === n;
-                  const evalResult = evaluation ? evaluation[n] : null;
+        <div
+          ref={stripRef}
+          className={`ielts-top-palette-strip ${isDragging ? "is-dragging" : ""}`}
+          onMouseDown={handleMouseDown}
+        >
+          {groups.map((grp, gIdx) => {
+            const groupNums = numbers.filter(
+              (n) => n >= grp.range[0] && n <= grp.range[1]
+            );
 
-                  let statusClass = "unanswered";
-                  if (evaluation) {
-                    statusClass = evalResult?.isCorrect ? "correct" : "incorrect";
-                  } else if (answered) {
-                    statusClass = "answered glowing";
-                  }
+            return (
+              <div key={grp.partNumber} className="ielts-top-palette-group">
+                {gIdx > 0 && <div className="ielts-palette-divider-v" />}
+                <div className="ielts-palette-badges-row">
+                  {groupNums.map((n) => {
+                    const answered = isQuestionAnswered(answers, n);
+                    const isCurrent = activeNumber === n;
+                    const evalResult = evaluation ? evaluation[n] : null;
 
-                  return (
-                    <button
-                      key={n}
-                      id={`ielts-badge-${n}`}
-                      type="button"
-                      className={`ielts-palette-badge ${statusClass} ${isCurrent ? "current" : ""}`}
-                      onClick={() => handleClick(n, grp.partNumber)}
-                      title={`Câu ${n}: ${answered ? "Đã điền" : "Chưa điền"}`}
-                    >
-                      {n}
-                    </button>
-                  );
-                })}
+                    let statusClass = "unanswered";
+                    if (evaluation) {
+                      statusClass = evalResult?.isCorrect ? "correct" : "incorrect";
+                    } else if (answered) {
+                      statusClass = "answered glowing";
+                    }
+
+                    return (
+                      <button
+                        key={n}
+                        id={`ielts-badge-${n}`}
+                        type="button"
+                        className={`ielts-palette-badge ${statusClass} ${isCurrent ? "current" : ""}`}
+                        onClick={() => handleClick(n, grp.partNumber)}
+                        title={`Câu ${n}: ${answered ? "Đã điền" : "Chưa điền"}`}
+                      >
+                        {n}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        {scrollState.hasOverflow && (
+          <button
+            type="button"
+            className="ielts-palette-scroll-btn right"
+            onClick={() => handleScrollStep("right")}
+            disabled={!scrollState.canScrollRight}
+            title="Cuộn sang phải"
+            aria-label="Cuộn sang phải"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Right: Answered Progress Summary */}
