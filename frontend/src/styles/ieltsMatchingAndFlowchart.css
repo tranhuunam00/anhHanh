@@ -129,7 +129,7 @@
   margin: 0;
   padding-left: 20px;
   font-size: 0.9rem;
-  line-height: 2.1;
+  line-height: 1.8;
   color: var(--text-primary);
 }
 
@@ -145,7 +145,7 @@
 
 .ielts-summary-text-block {
   font-size: 0.94rem;
-  line-height: 2.1;
+  line-height: 1.8;
   color: var(--text-primary);
   margin-bottom: 12px;
 }
