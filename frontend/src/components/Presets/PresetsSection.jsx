@@ -35,10 +35,7 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
     <section className="bottom-presets-section">
       <div className="presets-section-header">
         <div className="presets-header-title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <polygon points="10 8 16 12 10 16 10 8" />
-          </svg>
+          <PlayCircle size={22} style={{ verticalAlign: "middle", marginRight: 6 }} />
           <span>Thử ngay – Luyện đa ngôn ngữ</span>
           <span className="presets-header-badge">5 Cấp độ Dễ ➔ Khó</span>
         </div>

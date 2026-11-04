@@ -6,7 +6,17 @@ import {
   filterIeltsLessons
 } from "../../constants/ieltsCambridgePresets";
 import { extractYouTubeId } from "../../utils/textNormalizer";
-import { Headphones, Edit3, Clock, BookOpen, Sparkles, Layers } from "../Icons";
+import {
+  Headphones,
+  Edit3,
+  Clock,
+  BookOpen,
+  Sparkles,
+  Layers,
+  Info,
+  Check,
+  Zap
+} from "../Icons";
 
 /**
  * Specialized IELTS Cambridge Presets View
@@ -14,6 +24,7 @@ import { Headphones, Edit3, Clock, BookOpen, Sparkles, Layers } from "../Icons";
  * - Cambridge 20: 16 individual split parts (Test 1..4 x Task 1..4)
  * - Cambridge 21: 4 full combined test lessons (Test 1..4 x Full 4 Tasks)
  * - Dual-action buttons: [ 🎧 Nghe cả bài ] (Transcript) & [ ✍️ Chép chính tả ] (Dictation)
+ * - 100% Internal Icon System (BaseIcon from ../Icons)
  */
 export const IeltsPresetsView = React.memo(({
   onSelectPreset,
@@ -158,7 +169,8 @@ export const IeltsPresetsView = React.memo(({
           })}
         </div>
         <div className="ielts-task-desc-bar">
-          ℹ️ {activeTaskTab.desc}
+          <Info size={13} style={{ verticalAlign: "middle", marginRight: 4 }} />
+          <span>{activeTaskTab.desc}</span>
         </div>
       </div>
 
@@ -169,7 +181,10 @@ export const IeltsPresetsView = React.memo(({
             <div className="ielts-book-group-title">
               <BookOpen size={16} color="var(--primary)" />
               <span>Cambridge IELTS 20</span>
-              <span className="ielts-book-badge split">✓ Đã tách riêng 4 Task</span>
+              <span className="ielts-book-badge split">
+                <Check size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
+                Đã tách riêng 4 Task
+              </span>
             </div>
             <span className="text-xs text-muted">
               {filteredCam20.length} bài luyện tập
@@ -190,7 +205,8 @@ export const IeltsPresetsView = React.memo(({
               <BookOpen size={16} color="var(--primary)" />
               <span>Cambridge IELTS 21</span>
               <span className="ielts-book-badge merged">
-                ⚡ Gộp 4 phần trong 1 test (Full 30 phút)
+                <Zap size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
+                Gộp 4 phần trong 1 test (Full 30 phút)
               </span>
             </div>
             <span className="text-xs text-muted">
