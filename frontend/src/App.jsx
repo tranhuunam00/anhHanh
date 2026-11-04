@@ -1104,8 +1104,13 @@ export default function App() {
           <PresetsSection
             activeUrl={urlInput}
             isLoading={isLoading}
-            onSelectPreset={(preset) => {
+            onSelectPreset={(preset, mode = "dictation") => {
               handleRequestPreview(preset.url, preset.sourceLang, preset.targetLang);
+              if (mode === "transcript") {
+                setActiveTab("tab-transcript");
+              } else {
+                setActiveTab("tab-dictation");
+              }
             }}
           />
         </div>

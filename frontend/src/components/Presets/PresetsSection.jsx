@@ -2,6 +2,8 @@ import React, { useState, useMemo } from "react";
 import { PRESET_LANGUAGES, PRESET_LESSONS_BY_CATEGORY } from "../../constants/presets";
 import { extractYouTubeId } from "../../utils/textNormalizer";
 import { Lightbulb, Clock, PlayCircle } from "../Icons";
+import { IeltsPresetsView } from "./IeltsPresetsView";
+import "../../styles/ieltsPresets.css";
 
 export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading }) => {
   const [selectedLang, setSelectedLang] = useState("en");
@@ -87,102 +89,115 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
         </div>
       )}
 
-      {/* Category Overview & Level Steps */}
-      <div className="presets-level-overview">
-        <div className="presets-category-info">
-          <span className="presets-category-icon">{currentCategoryData.icon}</span>
-          <span className="presets-category-desc">{currentCategoryData.desc}</span>
-        </div>
-        <div className="presets-level-stepper">
-          <span className="step-tag step-1">1. Rất dễ</span>
-          <span className="step-arrow">➔</span>
-          <span className="step-tag step-2">2. Dễ</span>
-          <span className="step-arrow">➔</span>
-          <span className="step-tag step-3">3. Trung cấp</span>
-          <span className="step-arrow">➔</span>
-          <span className="step-tag step-4">4. Nâng cao</span>
-          <span className="step-arrow">➔</span>
-          <span className="step-tag step-5">5. Chuyên sâu</span>
-        </div>
-      </div>
-
-      {/* Cards Grid: 5 lessons ranked from easy to hard */}
-      <div className="presets-cards-grid">
-        {currentCategoryData.lessons.map((lesson) => {
-          const cardId = extractYouTubeId(lesson.url);
-          const isActive = Boolean(activeId && cardId && activeId === cardId);
-
-          return (
-            <div
-              key={lesson.id}
-              className={`preset-card ${isActive ? "active" : ""}`}
-              onClick={() => {
-                if (!isLoading) {
-                  onSelectPreset(lesson);
-                }
-              }}
-              style={{
-                pointerEvents: isLoading ? "none" : "",
-                opacity: isLoading ? 0.6 : 1,
-              }}
-            >
-              {/* Level indicator chip */}
-              <div className="preset-card-topbar">
-                <div
-                  className="preset-level-pill"
-                  title={`Cấp ${lesson.levelNumber}: ${lesson.badge}`}
-                  style={{
-                    backgroundColor: `${lesson.diffColor}18`,
-                    color: lesson.diffColor,
-                    borderColor: `${lesson.diffColor}45`,
-                  }}
-                >
-                  <span
-                    className="preset-level-dot"
-                    style={{ backgroundColor: lesson.diffColor }}
-                  />
-                  <span className="preset-level-text">Cấp {lesson.levelNumber}</span>
-                </div>
-                <span className="preset-card-duration">
-                  <Clock size={12} style={{ verticalAlign: "middle", marginRight: 4 }} />
-                  {lesson.duration}
-                </span>
-              </div>
-
-              {/* Title & summary */}
-              <div className="preset-card-body">
-                <div className="preset-card-title" title={lesson.title}>
-                  {lesson.title}
-                </div>
-                <div className="preset-card-summary">
-                  {lesson.summary}
-                </div>
-              </div>
-
-              {/* Card footer */}
-              <div className="preset-card-footer">
-                <div className="preset-card-meta-left">
-                  <span className="preset-card-channel">
-                    <PlayCircle size={12} style={{ verticalAlign: "middle", marginRight: 4 }} />
-                    {lesson.author}
-                  </span>
-                  <span className="preset-card-lang-target">{lesson.langLabel}</span>
-                </div>
-                <button
-                  className={`preset-card-action-btn ${isActive ? "btn-active" : ""}`}
-                  disabled={isLoading}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectPreset(lesson);
-                  }}
-                >
-                  {isActive ? "Đang học" : "Luyện ngay"}
-                </button>
-              </div>
+      {/* Render dedicated IELTS Cambridge view ONLY for en_ielts without affecting any other tab */}
+      {activeCategoryKey === "en_ielts" ? (
+        <IeltsPresetsView
+          onSelectPreset={onSelectPreset}
+          isLoading={isLoading}
+          activeUrl={activeUrl}
+        />
+      ) : (
+        <>
+          {/* Category Overview & Level Steps */}
+          <div className="presets-level-overview">
+            <div className="presets-category-info">
+              <span className="presets-category-icon">{currentCategoryData.icon}</span>
+              <span className="presets-category-desc">{currentCategoryData.desc}</span>
             </div>
-          );
-        })}
-      </div>
+            <div className="presets-level-stepper">
+              <span className="step-tag step-1">1. Rất dễ</span>
+              <span className="step-arrow">➔</span>
+              <span className="step-tag step-2">2. Dễ</span>
+              <span className="step-arrow">➔</span>
+              <span className="step-tag step-3">3. Trung cấp</span>
+              <span className="step-arrow">➔</span>
+              <span className="step-tag step-4">4. Nâng cao</span>
+              <span className="step-arrow">➔</span>
+              <span className="step-tag step-5">5. Chuyên sâu</span>
+            </div>
+          </div>
+
+          {/* Cards Grid: 5 lessons ranked from easy to hard */}
+          <div className="presets-cards-grid">
+            {currentCategoryData.lessons.map((lesson) => {
+              const cardId = extractYouTubeId(lesson.url);
+              const isActive = Boolean(activeId && cardId && activeId === cardId);
+
+              return (
+                <div
+                  key={lesson.id}
+                  className={`preset-card ${isActive ? "active" : ""}`}
+                  onClick={() => {
+                    if (!isLoading) {
+                      onSelectPreset(lesson);
+                    }
+                  }}
+                  style={{
+                    pointerEvents: isLoading ? "none" : "",
+                    opacity: isLoading ? 0.6 : 1,
+                  }}
+                >
+                  {/* Level indicator chip */}
+                  <div className="preset-card-topbar">
+                    <div
+                      className="preset-level-pill"
+                      title={`Cấp ${lesson.levelNumber}: ${lesson.badge}`}
+                      style={{
+                        backgroundColor: `${lesson.diffColor}18`,
+                        color: lesson.diffColor,
+                        borderColor: `${lesson.diffColor}45`,
+                      }}
+                    >
+                      <span
+                        className="preset-level-dot"
+                        style={{ backgroundColor: lesson.diffColor }}
+                      />
+                      <span className="preset-level-text">Cấp {lesson.levelNumber}</span>
+                    </div>
+                    <span className="preset-card-duration">
+                      <Clock size={12} style={{ verticalAlign: "middle", marginRight: 4 }} />
+                      {lesson.duration}
+                    </span>
+                  </div>
+
+                  {/* Title & summary */}
+                  <div className="preset-card-body">
+                    <div className="preset-card-title" title={lesson.title}>
+                      {lesson.title}
+                    </div>
+                    <div className="preset-card-summary">
+                      {lesson.summary}
+                    </div>
+                  </div>
+
+                  {/* Card footer */}
+                  <div className="preset-card-footer">
+                    <div className="preset-card-meta-left">
+                      <span className="preset-card-channel">
+                        <PlayCircle size={12} style={{ verticalAlign: "middle", marginRight: 4 }} />
+                        {lesson.author}
+                      </span>
+                      <span className="preset-card-lang-target">{lesson.langLabel}</span>
+                    </div>
+                    <button
+                      className={`preset-card-action-btn ${isActive ? "btn-active" : ""}`}
+                      disabled={isLoading}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectPreset(lesson);
+                      }}
+                    >
+                      {isActive ? "Đang học" : "Luyện ngay"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </section>
   );
 });
+
+PresetsSection.displayName = "PresetsSection";
