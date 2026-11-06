@@ -41,7 +41,8 @@ import {
   startLessonSession,
   updateLessonProgress,
 } from "./services/authVocabService";
-import { YouTubePlayerController } from "./services/youtubePlayer";
+import { UnifiedPlayerController } from "./services/unifiedPlayerController";
+import { buildIeltsAudioLesson } from "./utils/ieltsDictationChallengeBuilder";
 import { SpeechRecognitionService } from "./services/speechRecognition";
 
 import { evaluateMasked, getNextLetterHint, getNextWordHint } from "./utils/diffCalculator";
@@ -238,7 +239,7 @@ export default function App() {
   const speechRef = useRef(null);
 
   if (!playerRef.current) {
-    playerRef.current = new YouTubePlayerController("youtube-player");
+    playerRef.current = new UnifiedPlayerController("youtube-player");
   }
   const playerController = playerRef.current;
 
@@ -340,6 +341,16 @@ export default function App() {
     setIsLoading(true);
 
     const cleanUrl = cleanYouTubeUrl(urlOrId);
+    if (cleanUrl.startsWith("/audio/") || cleanUrl.includes(".mp3") || cleanUrl.includes(".m4a")) {
+      handleSelectLocalAudioPreset({
+        id: cleanUrl,
+        url: cleanUrl,
+        audioUrl: cleanUrl,
+        title: "Cambridge IELTS Authentic Audio",
+        duration: "05:00"
+      }, "dictation");
+      return;
+    }
     const sLang = reqSourceLang !== undefined ? reqSourceLang : sourceLang;
     const tLang = reqTargetLang !== undefined ? reqTargetLang : targetLang;
 
@@ -376,6 +387,16 @@ export default function App() {
     setIsEmbedRestricted(false);
 
     const cleanUrl = cleanYouTubeUrl(urlOrId);
+    if (cleanUrl.startsWith("/audio/") || cleanUrl.includes(".mp3") || cleanUrl.includes(".m4a")) {
+      handleSelectLocalAudioPreset({
+        id: cleanUrl,
+        url: cleanUrl,
+        audioUrl: cleanUrl,
+        title: "Cambridge IELTS Authentic Audio",
+        duration: "05:00"
+      }, "dictation");
+      return;
+    }
     const sLang = reqSourceLang !== undefined ? reqSourceLang : sourceLang;
     const tLang = reqTargetLang !== undefined ? reqTargetLang : targetLang;
 
@@ -477,6 +498,49 @@ export default function App() {
       prevC ? prevC.time_end : null,
       nextC ? nextC.time_start : null
     );
+  };
+
+  const handleSelectLocalAudioPreset = (preset, mode = "dictation") => {
+    const lesson = buildIeltsAudioLesson(preset);
+    if (!lesson) return;
+
+    setIsLoading(false);
+    setIsEmbedRestricted(false);
+    setCurrentLesson(lesson);
+    setUrlInput(lesson.audioUrl);
+    setStorageItem("lastUrl", lesson.audioUrl);
+
+    const sLang = lesson.sourceLang || "en";
+    const tLang = lesson.targetLang || "vi";
+    setSourceLang(sLang);
+    setTargetLang(tLang);
+
+    const prog = loadLessonProgress(lesson.video_id, sLang, tLang);
+    setProgressMap(prog || { challenges: {}, lastPosition: 1 });
+    setMaxReachedIndex(0);
+    setCurrentIndex(0);
+    userInputRef.current = "";
+    setUserInput("");
+    setIsCompleted(false);
+
+    playerController.setSourceLang(sLang);
+    if (speechRef.current) {
+      const langCode = SPEECH_LANG_MAP[sLang.toLowerCase()] || "en-US";
+      speechRef.current.setLang(langCode);
+    }
+
+    const firstStartTime = lesson.challenges?.[0]?.time_start || 0;
+    const isDictation = mode === "dictation";
+    playerController.load(lesson.audioUrl, firstStartTime, isDictation);
+
+    if (isDictation) {
+      setActiveTab("tab-dictation");
+      playChallengeAtIndex(lesson, 0);
+    } else {
+      setActiveTab("tab-transcript");
+      cueChallengeAtIndex(lesson, 0);
+      playerController.pause();
+    }
   };
 
   // Play segment for challenge at specific index
@@ -1105,11 +1169,18 @@ export default function App() {
             activeUrl={urlInput}
             isLoading={isLoading}
             onSelectPreset={(preset, mode = "dictation") => {
-              handleRequestPreview(preset.url, preset.sourceLang, preset.targetLang);
-              if (mode === "transcript") {
-                setActiveTab("tab-transcript");
+              if (
+                preset.audioUrl ||
+                (preset.url && (preset.url.startsWith("/audio/") || preset.url.includes(".mp3") || preset.url.includes(".m4a")))
+              ) {
+                handleSelectLocalAudioPreset(preset, mode);
               } else {
-                setActiveTab("tab-dictation");
+                handleRequestPreview(preset.url, preset.sourceLang, preset.targetLang);
+                if (mode === "transcript") {
+                  setActiveTab("tab-transcript");
+                } else {
+                  setActiveTab("tab-dictation");
+                }
               }
             }}
           />

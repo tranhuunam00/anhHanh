@@ -43,6 +43,7 @@ import {
   renderCam20Test4Passage2Questions,
   renderCam20Test4Passage3Questions
 } from "./IeltsReadingCam20Test4QuestionsViews.jsx";
+import { renderCam19ReadingPassageQuestions } from "./IeltsReadingCam19QuestionsView.jsx";
 
 /**
  * IELTS Academic Reading Test Module
@@ -151,7 +152,16 @@ export const IeltsReadingModule = ({
   const rightPaneContent = (
     <div className="ielts-right-scroll-pane ielts-reading-questions-pane">
       <div className="ielts-questions-body">
-        {readingData?.testId === "cambridge-20-test-1" ? (
+        {readingData?.testId?.startsWith("cambridge-19-") ? (
+          renderCam19ReadingPassageQuestions(
+            currentRightPassage.groups,
+            answers,
+            handleInputChange,
+            handleChooseTwoToggle,
+            effectiveEval,
+            isReview
+          )
+        ) : readingData?.testId === "cambridge-20-test-1" ? (
           <>
             {rightPassage === 1 &&
               renderCam20Test1Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}

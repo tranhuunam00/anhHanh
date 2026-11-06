@@ -8,6 +8,7 @@ import {
   Play,
   Pause,
   Repeat,
+  Headphones,
 } from "../Icons";
 
 export const PlayerCard = React.memo(({
@@ -31,18 +32,23 @@ export const PlayerCard = React.memo(({
     }
   };
 
+  const isAudio = Boolean(
+    playerController?.isAudioMode ||
+    (videoUrl && (videoUrl.startsWith("/audio/") || videoUrl.includes(".mp3") || videoUrl.includes(".m4a")))
+  );
+
   const youtubeTimestampUrl = React.useMemo(() => {
-    if (!videoUrl) return "#";
+    if (!videoUrl || isAudio) return "#";
     const sec = Math.floor(playerController?.currentLoopStart || 0);
     const cleanUrl = videoUrl.replace(/[?&]t=\d+s?/, "");
     const sep = cleanUrl.includes("?") ? "&" : "?";
     return `${cleanUrl}${sep}t=${sec}s`;
-  }, [videoUrl, playerController?.currentLoopStart]);
+  }, [videoUrl, isAudio, playerController?.currentLoopStart]);
 
   return (
     <section className="card player-card">
       {/* Embed Warning Banner (YouTube Error 150/101) */}
-      {isEmbedRestricted && (
+      {!isAudio && isEmbedRestricted && (
         <div style={{ background: "var(--warning-bg)", border: "1px solid var(--warning)", borderRadius: "8px", padding: "12px", marginBottom: "14px" }}>
           <div style={{ fontWeight: 600, color: "var(--warning)", display: "flex", alignItems: "center", gap: "8px" }}>
             <AlertTriangle size={18} strokeWidth={2.2} />
@@ -61,8 +67,50 @@ export const PlayerCard = React.memo(({
         </div>
       )}
 
-      {/* Video Container */}
-      <div className="video-wrapper">
+      {/* Local Authentic Audio Player Visual Card */}
+      {isAudio && (
+        <div
+          className="ielts-audio-player-display"
+          style={{
+            padding: "24px 20px",
+            background: "var(--bg-secondary)",
+            borderRadius: "12px",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "10px",
+            border: "1px solid var(--border-color)",
+            marginBottom: "12px"
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+              background: "rgba(37, 99, 235, 0.1)",
+              color: "var(--primary)",
+              fontSize: "0.82rem",
+              fontWeight: 600
+            }}
+          >
+            <Headphones size={15} />
+            <span>Cambridge IELTS Authentic Audio</span>
+          </div>
+          <div style={{ fontSize: "1.05rem", fontWeight: 600, color: "var(--text-primary)" }}>
+            File âm thanh gốc chuẩn Cambridge University Press
+          </div>
+          <div style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
+            Luyện chép chính tả mượt mà • Lặp lại từng câu tự động
+          </div>
+        </div>
+      )}
+
+      {/* Video Container (hidden when local audio) */}
+      <div className="video-wrapper" style={{ display: isAudio ? "none" : "block" }}>
         <div id="youtube-player"></div>
       </div>
 
