@@ -6,6 +6,16 @@ export const cambridge19Test4ListeningPart3 = {
   title: "Part 3: Books & Bookshop Work Placement",
   instructions: "Questions 21–25: Choose the correct letter, A, B or C.\nQuestions 26–30: Choose FIVE answers from the box and write the correct letter, A–G, next to Questions 26–30.",
   questionsRange: [21, 30],
+  boxTitle: "Bookshop Placement Locations (Questions 26–30)",
+  boxOptions: [
+    "A near the entrance",
+    "B in the attic",
+    "C at the back of the shop",
+    "D on a high shelf",
+    "E near the stairs",
+    "F in a specially designed space",
+    "G within the café"
+  ],
   items: [
     {
       number: 21,
@@ -65,31 +75,76 @@ export const cambridge19Test4ListeningPart3 = {
     {
       number: 26,
       type: "matching",
-      question: "rare books (Location: A. near entrance, B. in attic, C. back of shop, D. high shelf, E. near stairs, F. specially designed space, G. within café)",
+      question: "rare books",
+      options: [
+        "A near the entrance",
+        "B in the attic",
+        "C at the back of the shop",
+        "D on a high shelf",
+        "E near the stairs",
+        "F in a specially designed space",
+        "G within the café"
+      ],
       answers: ["D"]
     },
     {
       number: 27,
       type: "matching",
-      question: "children's books (Location: A-G)",
+      question: "children's books",
+      options: [
+        "A near the entrance",
+        "B in the attic",
+        "C at the back of the shop",
+        "D on a high shelf",
+        "E near the stairs",
+        "F in a specially designed space",
+        "G within the café"
+      ],
       answers: ["G"]
     },
     {
       number: 28,
       type: "matching",
-      question: "unwanted books (Location: A-G)",
+      question: "unwanted books",
+      options: [
+        "A near the entrance",
+        "B in the attic",
+        "C at the back of the shop",
+        "D on a high shelf",
+        "E near the stairs",
+        "F in a specially designed space",
+        "G within the café"
+      ],
       answers: ["B"]
     },
     {
       number: 29,
       type: "matching",
-      question: "requested books (Location: A-G)",
+      question: "requested books",
+      options: [
+        "A near the entrance",
+        "B in the attic",
+        "C at the back of the shop",
+        "D on a high shelf",
+        "E near the stairs",
+        "F in a specially designed space",
+        "G within the café"
+      ],
       answers: ["C"]
     },
     {
       number: 30,
       type: "matching",
-      question: "coursebooks (Location: A-G)",
+      question: "coursebooks",
+      options: [
+        "A near the entrance",
+        "B in the attic",
+        "C at the back of the shop",
+        "D on a high shelf",
+        "E near the stairs",
+        "F in a specially designed space",
+        "G within the café"
+      ],
       answers: ["E"]
     }
   ]

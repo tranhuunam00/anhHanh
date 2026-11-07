@@ -6,6 +6,17 @@ export const cambridge19Test3ListeningPart3 = {
   title: "Part 3: Science Experiment for Year 12 Students",
   instructions: "Questions 21–25: Choose the correct letter, A, B or C.\nQuestions 26–30: Complete the flowchart below. Choose FIVE answers from the box and write the correct letter, A–H.",
   questionsRange: [21, 30],
+  boxTitle: "Flowchart Options (Questions 26–30)",
+  boxOptions: [
+    "A size",
+    "B escape",
+    "C age",
+    "D water",
+    "E cereal",
+    "F calculations",
+    "G changes",
+    "H colour"
+  ],
   items: [
     {
       number: 21,
@@ -65,31 +76,81 @@ export const cambridge19Test3ListeningPart3 = {
     {
       number: 26,
       type: "matching",
-      question: "Flowchart: Choose mice which are all the same [Box: A. size, B. escape, C. age, D. water, E. cereal, F. calculations, G. changes, H. colour]",
+      question: "Choose mice which are all the same ...",
+      options: [
+        "A size",
+        "B escape",
+        "C age",
+        "D water",
+        "E cereal",
+        "F calculations",
+        "G changes",
+        "H colour"
+      ],
       answers: ["C"]
     },
     {
       number: 27,
       type: "matching",
-      question: "Divide the mice into two groups, each with a different [Box: A-H]",
+      question: "Divide the mice into two groups, each with a different ...",
+      options: [
+        "A size",
+        "B escape",
+        "C age",
+        "D water",
+        "E cereal",
+        "F calculations",
+        "G changes",
+        "H colour"
+      ],
       answers: ["A"]
     },
     {
       number: 28,
       type: "matching",
-      question: "Feed group B commercial food, but also sugar contained in [Box: A-H]",
+      question: "Feed group B commercial food, but also sugar contained in ...",
+      options: [
+        "A size",
+        "B escape",
+        "C age",
+        "D water",
+        "E cereal",
+        "F calculations",
+        "G changes",
+        "H colour"
+      ],
       answers: ["D"]
     },
     {
       number: 29,
       type: "matching",
-      question: "Take measurements using an electronic scale. Place them in a weighing chamber to prevent [Box: A-H]",
+      question: "Take measurements using an electronic scale. Place them in a weighing chamber to prevent ...",
+      options: [
+        "A size",
+        "B escape",
+        "C age",
+        "D water",
+        "E cereal",
+        "F calculations",
+        "G changes",
+        "H colour"
+      ],
       answers: ["B"]
     },
     {
       number: 30,
       type: "matching",
-      question: "Do all necessary [Box: A-H]",
+      question: "Do all necessary ...",
+      options: [
+        "A size",
+        "B escape",
+        "C age",
+        "D water",
+        "E cereal",
+        "F calculations",
+        "G changes",
+        "H colour"
+      ],
       answers: ["F"]
     }
   ]

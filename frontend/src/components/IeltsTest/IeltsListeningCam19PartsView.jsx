@@ -1,22 +1,29 @@
 import React from "react";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
+import {
+  parseOption,
+  extractMatchingOptions,
+  isChooseTwoSelected
+} from "../../utils/cambridgeOptionUtils.js";
 
 export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoToggle, evaluation, isReview) {
   if (!part) return null;
 
   const isMapPart = Boolean(part.mapImage);
   const mapItems = isMapPart
-    ? (part.items?.filter((it) => it.type === "map_labeling" || it.type === "matching") || [])
+    ? (part.items?.filter((it) => it.type === "map_labeling") || [])
     : [];
   const regularItems = isMapPart
     ? (part.items?.filter((it) => !mapItems.includes(it)) || [])
     : (part.items || []);
 
   const renderItem = (item) => {
+    // 1. Fill Notes / Table completion
     if (item.type === "fill_notes" || item.type === "fill_table") {
       return (
         <div
           key={item.number}
+          id={`ielts-q-${item.number}`}
           className="ielts-notes-item"
           style={{
             marginBottom: "14px",
@@ -40,21 +47,27 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
       );
     }
 
+    // 2. Multiple Choice (Cam 20 / 21 interactive cards with letter circle & text)
     if (item.type === "multiple_choice") {
       return (
-        <div key={item.number} className="ielts-mcq-group" style={{ marginBottom: "20px" }}>
-          <p className="ielts-mcq-question" style={{ fontWeight: 600, marginBottom: "8px" }}>
-            <span className="ielts-q-pill">{item.number}</span> {item.question}
-          </p>
-          <div className="ielts-mcq-options" style={{ display: "flex", flexDirection: "column", gap: "8px", marginLeft: "28px" }}>
-            {item.options?.map((opt) => {
-              const letter = opt.charAt(0);
+        <div
+          key={item.number}
+          id={`ielts-q-${item.number}`}
+          className="ielts-mc-item"
+          style={{ marginBottom: "16px" }}
+        >
+          <div className="ielts-mc-question-row">
+            <span className="ielts-q-pill">{item.number}</span>
+            <p className="ielts-mc-question-text">{item.question}</p>
+          </div>
+          <div className="ielts-mc-options-list">
+            {item.options?.map((rawOpt) => {
+              const { letter, text } = parseOption(rawOpt);
               const isSelected = answers[item.number] === letter;
               return (
                 <label
                   key={letter}
-                  className={`ielts-mcq-label ${isSelected ? "selected" : ""} ${getFeedbackClass(evaluation, item.number, isReview)}`}
-                  style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                  className={`ielts-mc-option-label ${isSelected ? "selected" : ""} ${getFeedbackClass(evaluation, item.number, isReview)}`}
                 >
                   <input
                     type="radio"
@@ -64,7 +77,8 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
                     onChange={() => onChange(item.number, letter)}
                     className="ielts-radio-input"
                   />
-                  <span>{opt}</span>
+                  <span className="ielts-option-letter">{letter}</span>
+                  <span className="ielts-option-text">{text}</span>
                 </label>
               );
             })}
@@ -74,121 +88,112 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
       );
     }
 
+    // 3. Choose Two (Cam 20 / 21 multi-select card with checkboxes)
     if (item.type === "choose_two") {
-      const currentSelected = answers[item.number] || "";
+      // Avoid duplicate question card when this is the second question of a pair
+      if (item.pairNumber && item.number > item.pairNumber) {
+        return null;
+      }
+      const pairNum = item.pairNumber;
       return (
-        <div key={item.number} className="ielts-mcq-group" style={{ marginBottom: "20px" }}>
-          <p className="ielts-mcq-question" style={{ fontWeight: 600, marginBottom: "8px" }}>
-            <span className="ielts-q-pill">{item.number}</span> {item.question}
-          </p>
-          <div className="ielts-mcq-options" style={{ display: "flex", flexDirection: "column", gap: "8px", marginLeft: "28px" }}>
-            {item.options?.map((opt) => {
-              const letter = opt.charAt(0);
-              const isChecked = currentSelected === letter;
+        <div
+          key={item.number}
+          id={`ielts-q-${item.number}`}
+          className="ielts-mc-item"
+          style={{ marginBottom: "16px" }}
+        >
+          <div className="ielts-mc-question-row">
+            <span className="ielts-q-pill">
+              {item.number}{pairNum ? ` & ${pairNum}` : ""}
+            </span>
+            <p className="ielts-mc-question-text">{item.question}</p>
+          </div>
+          <div className="ielts-choose-two-options">
+            {item.options?.map((rawOpt) => {
+              const { letter, text } = parseOption(rawOpt);
+              const isChecked = isChooseTwoSelected(answers, item.number, pairNum, letter);
               return (
                 <label
                   key={letter}
-                  className={`ielts-mcq-label ${isChecked ? "selected" : ""} ${getFeedbackClass(evaluation, item.number, isReview)}`}
-                  style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                  className={`ielts-choose-two-label ${isChecked ? "selected" : ""} ${getFeedbackClass(evaluation, item.number, isReview)}`}
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => {
-                      if (onChooseTwoToggle && item.pairNumber) {
-                        onChooseTwoToggle([item.number, item.pairNumber], letter);
+                      if (onChooseTwoToggle && pairNum) {
+                        onChooseTwoToggle([item.number, pairNum], letter);
                       } else {
                         onChange(item.number, isChecked ? "" : letter);
                       }
                     }}
                     className="ielts-checkbox-input"
                   />
-                  <span>{opt}</span>
+                  <span className="ielts-option-letter">{letter}</span>
+                  <span className="ielts-option-text">{text}</span>
                 </label>
               );
             })}
           </div>
-          {renderFeedback(evaluation, item.number, isReview)}
-        </div>
-      );
-    }
-
-    if (item.type === "matching") {
-      return (
-        <div
-          key={item.number}
-          className="ielts-matching-item"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "12px",
-            padding: "8px 12px",
-            background: "var(--bg-secondary)",
-            borderRadius: "6px"
-          }}
-        >
-          <span style={{ fontSize: "0.95rem" }}>
-            <span className="ielts-q-pill">{item.number}</span> {item.question}
-          </span>
-          <span className="ielts-inline-input-wrapper">
-            <input
-              type="text"
-              maxLength={2}
-              value={answers[item.number] || ""}
-              onChange={(e) => onChange(item.number, e.target.value.toUpperCase())}
-              placeholder="Letter"
-              className={`ielts-real-input ielts-short-input ${getFeedbackClass(evaluation, item.number, isReview)}`}
-              style={{ width: "60px", textAlign: "center", textTransform: "uppercase" }}
-            />
+          <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
             {renderFeedback(evaluation, item.number, isReview)}
-          </span>
+            {pairNum && renderFeedback(evaluation, pairNum, isReview)}
+          </div>
         </div>
       );
     }
 
-    if (item.type === "map_labeling") {
+    // 4. Matching Questions (Cam 20 / 21 dropdown select)
+    if (item.type === "matching") {
+      const matchingOptions = extractMatchingOptions(item, part);
       return (
         <div
           key={item.number}
-          className="ielts-map-question-card"
           id={`ielts-q-${item.number}`}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "12px",
-            padding: "12px 16px",
-            background: "var(--bg-card)",
-            border: "1px solid var(--border-color)",
-            borderRadius: "8px",
-            marginBottom: "10px"
-          }}
+          className="ielts-match-item"
+          style={{ marginBottom: "12px" }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
-            <span className="ielts-q-pill">{item.number}</span>
-            <span style={{ fontWeight: 600, fontSize: "0.95rem", color: "var(--text-primary)" }}>{item.question || item.feature}</span>
-          </div>
-          <select
-            value={answers[item.number] || ""}
-            onChange={(e) => onChange(item.number, e.target.value)}
-            className={`ielts-select-box ${getFeedbackClass(evaluation, item.number, isReview)}`}
+          <div
             style={{
-              minWidth: "110px",
-              padding: "8px 12px",
-              borderRadius: "6px",
-              border: "1px solid var(--border-color)",
-              background: "var(--bg-secondary)",
-              color: "var(--text-primary)",
-              fontWeight: 600,
-              cursor: "pointer"
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              justifyContent: "space-between"
             }}
           >
-            <option value="">Chọn vị trí</option>
-            {(item.options || part.mapLetters || ["A", "B", "C", "D", "E", "F", "G", "H"]).map((letter) => (
-              <option key={letter} value={letter}>Vị trí {letter}</option>
-            ))}
-          </select>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
+              <span className="ielts-q-pill">{item.number}</span>
+              <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                {item.question || item.statement || item.title}
+              </span>
+            </div>
+            <select
+              value={answers[item.number] || ""}
+              onChange={(e) => onChange(item.number, e.target.value)}
+              className={`ielts-select-box ${getFeedbackClass(evaluation, item.number, isReview)}`}
+              style={{
+                minWidth: "120px",
+                maxWidth: "280px",
+                padding: "8px 12px",
+                borderRadius: "6px",
+                border: "1px solid var(--border-color)",
+                background: "var(--bg-secondary)",
+                color: "var(--text-primary)",
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+            >
+              <option value="">Chọn đáp án...</option>
+              {matchingOptions.map((opt) => {
+                const { letter, text } = parseOption(opt);
+                return (
+                  <option key={letter} value={letter}>
+                    {letter} {text ? `- ${text}` : ""}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
           {renderFeedback(evaluation, item.number, isReview)}
         </div>
       );
@@ -199,6 +204,7 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
 
   return (
     <div className="ielts-part-content">
+      {/* Header Banner */}
       <div className="ielts-instructions-banner">
         <h4>{part.title}</h4>
         <p className="ielts-instructions-text" style={{ whiteSpace: "pre-line" }}>
@@ -206,19 +212,74 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
         </p>
       </div>
 
+      {/* Box Options Reference Panel */}
+      {part.boxOptions && !isMapPart && (
+        <div
+          className="ielts-box-options"
+          style={{
+            marginBottom: "20px",
+            padding: "14px 18px",
+            background: "var(--bg-secondary)",
+            borderRadius: "8px",
+            border: "1px solid var(--border-color)"
+          }}
+        >
+          <h6
+            style={{
+              margin: "0 0 10px",
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              color: "var(--text-primary)"
+            }}
+          >
+            {part.boxTitle || "Options / Bảng lựa chọn:"}
+          </h6>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gap: "8px"
+            }}
+          >
+            {part.boxOptions.map((opt) => {
+              const { letter, text } = parseOption(opt);
+              return (
+                <div
+                  key={letter}
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    alignItems: "flex-start",
+                    fontSize: "0.88rem",
+                    color: "var(--text-secondary)"
+                  }}
+                >
+                  <strong style={{ color: "var(--primary)", minWidth: "18px" }}>
+                    {letter}.
+                  </strong>
+                  <span>{text}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Regular Questions (MCQ, Choose Two, Notes, Matching) */}
       {regularItems.length > 0 && (
         <div className="ielts-questions-inner" style={{ marginTop: "16px" }}>
           {regularItems.map(renderItem)}
         </div>
       )}
 
+      {/* Map Labeling Questions (Interactive 2-column sticky split layout) */}
       {isMapPart && mapItems.length > 0 && (
         <div className="ielts-question-group" style={{ marginTop: "24px" }}>
           <h5 style={{ fontWeight: 700, marginBottom: "8px", color: "var(--text-primary)" }}>
             Questions {mapItems[0]?.number}–{mapItems[mapItems.length - 1]?.number}
           </h5>
           <p className="ielts-group-instructions" style={{ color: "var(--text-secondary)", marginBottom: "16px" }}>
-            Label the map below. Choose the correct letter next to Questions {mapItems[0]?.number}–{mapItems[mapItems.length - 1]?.number}.
+            Label the map below. Choose the correct letter, {part.mapLetters ? `${part.mapLetters[0]}–${part.mapLetters[part.mapLetters.length - 1]}` : "A–H"}, next to Questions {mapItems[0]?.number}–{mapItems[mapItems.length - 1]?.number}.
           </p>
 
           <div className="ielts-map-interactive-wrapper" style={{ marginTop: "16px" }}>
@@ -243,7 +304,7 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
               </p>
             </div>
 
-            {/* Right Column: Question Cards */}
+            {/* Right Column: Question Cards with Dropdown Select */}
             <div className="ielts-map-questions-grid" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {mapItems.map((item) => (
                 <div
@@ -263,7 +324,9 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
                     <span className="ielts-q-pill">{item.number}</span>
-                    <span style={{ fontWeight: 600, fontSize: "0.95rem", color: "var(--text-primary)" }}>{item.question || item.feature}</span>
+                    <span style={{ fontWeight: 600, fontSize: "0.95rem", color: "var(--text-primary)" }}>
+                      {item.question || item.feature}
+                    </span>
                   </div>
                   <select
                     value={answers[item.number] || ""}
@@ -280,7 +343,11 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
                       cursor: "pointer"
                     }}
                   >
-                    <option value="">Chọn vị trí</option>
+                    <option value="">
+                      {part.mapLetters && part.mapLetters.length > 1
+                        ? `Chọn ${part.mapLetters[0]}-${part.mapLetters[part.mapLetters.length - 1]}`
+                        : "Chọn vị trí"}
+                    </option>
                     {(item.options || part.mapLetters || ["A", "B", "C", "D", "E", "F", "G", "H"]).map((letter) => (
                       <option key={letter} value={letter}>Vị trí {letter}</option>
                     ))}

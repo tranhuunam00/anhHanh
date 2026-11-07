@@ -85,41 +85,112 @@ export const cambridge19Test3ListeningPart2 = {
   title: "Part 2: Children's Book Festival",
   instructions: "Questions 11–16: Choose SIX answers from the box and write the correct letter, A–H, next to Questions 11–16.\nQuestions 17–18: Choose TWO letters, A–E.\nQuestions 19–20: Choose TWO letters, A–E.",
   questionsRange: [11, 20],
+  boxTitle: "Festival Workshops Information (Questions 11–16)",
+  boxOptions: [
+    "A It involves painting or drawing.",
+    "B It encourages children to consider new relationships.",
+    "C It features a character with a disability.",
+    "D It includes some drama or acting.",
+    "E It deals with unhappy feelings.",
+    "F It is suitable for a specific age group.",
+    "G It explores an aspect of a different culture.",
+    "H It is by a prize-winning author."
+  ],
   items: [
     {
       number: 11,
       type: "matching",
-      question: "Superheroes (A. painting/drawing, B. new relationships, C. disability, D. drama, E. unhappy feeling, F. specific age, G. culture, H. prize-winning author)",
+      question: "Superheroes",
+      options: [
+        "A It involves painting or drawing.",
+        "B It encourages children to consider new relationships.",
+        "C It features a character with a disability.",
+        "D It includes some drama or acting.",
+        "E It deals with unhappy feelings.",
+        "F It is suitable for a specific age group.",
+        "G It explores an aspect of a different culture.",
+        "H It is by a prize-winning author."
+      ],
       answers: ["C"]
     },
     {
       number: 12,
       type: "matching",
-      question: "Just do it (A. painting/drawing, B. new relationships, C. disability, D. drama, E. unhappy feeling, F. specific age, G. culture, H. prize-winning author)",
+      question: "Just do it",
+      options: [
+        "A It involves painting or drawing.",
+        "B It encourages children to consider new relationships.",
+        "C It features a character with a disability.",
+        "D It includes some drama or acting.",
+        "E It deals with unhappy feelings.",
+        "F It is suitable for a specific age group.",
+        "G It explores an aspect of a different culture.",
+        "H It is by a prize-winning author."
+      ],
       answers: ["D"]
     },
     {
       number: 13,
       type: "matching",
-      question: "Count on me (A. painting/drawing, B. new relationships, C. disability, D. drama, E. unhappy feeling, F. specific age, G. culture, H. prize-winning author)",
+      question: "Count on me",
+      options: [
+        "A It involves painting or drawing.",
+        "B It encourages children to consider new relationships.",
+        "C It features a character with a disability.",
+        "D It includes some drama or acting.",
+        "E It deals with unhappy feelings.",
+        "F It is suitable for a specific age group.",
+        "G It explores an aspect of a different culture.",
+        "H It is by a prize-winning author."
+      ],
       answers: ["F"]
     },
     {
       number: 14,
       type: "matching",
-      question: "Speak up (A. painting/drawing, B. new relationships, C. disability, D. drama, E. unhappy feeling, F. specific age, G. culture, H. prize-winning author)",
+      question: "Speak up",
+      options: [
+        "A It involves painting or drawing.",
+        "B It encourages children to consider new relationships.",
+        "C It features a character with a disability.",
+        "D It includes some drama or acting.",
+        "E It deals with unhappy feelings.",
+        "F It is suitable for a specific age group.",
+        "G It explores an aspect of a different culture.",
+        "H It is by a prize-winning author."
+      ],
       answers: ["G"]
     },
     {
       number: 15,
       type: "matching",
-      question: "Jump for joy (A. painting/drawing, B. new relationships, C. disability, D. drama, E. unhappy feeling, F. specific age, G. culture, H. prize-winning author)",
+      question: "Jump for joy",
+      options: [
+        "A It involves painting or drawing.",
+        "B It encourages children to consider new relationships.",
+        "C It features a character with a disability.",
+        "D It includes some drama or acting.",
+        "E It deals with unhappy feelings.",
+        "F It is suitable for a specific age group.",
+        "G It explores an aspect of a different culture.",
+        "H It is by a prize-winning author."
+      ],
       answers: ["B"]
     },
     {
       number: 16,
       type: "matching",
-      question: "Sticks and stones (A. painting/drawing, B. new relationships, C. disability, D. drama, E. unhappy feeling, F. specific age, G. culture, H. prize-winning author)",
+      question: "Sticks and stones",
+      options: [
+        "A It involves painting or drawing.",
+        "B It encourages children to consider new relationships.",
+        "C It features a character with a disability.",
+        "D It includes some drama or acting.",
+        "E It deals with unhappy feelings.",
+        "F It is suitable for a specific age group.",
+        "G It explores an aspect of a different culture.",
+        "H It is by a prize-winning author."
+      ],
       answers: ["H"]
     },
     {

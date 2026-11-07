@@ -6,6 +6,15 @@ export const cambridge19Test2ListeningPart3 = {
   title: "Part 3: Footwear Recycling Project",
   instructions: "Questions 21–24: Choose the correct letter, A, B or C.\nQuestions 25–28: Choose FOUR answers from the box and write the correct letter, A–F.\nQuestions 29–30: Choose the correct letter, A, B or C.",
   questionsRange: [21, 30],
+  boxTitle: "Reasons shoes were rejected (Questions 25–28)",
+  boxOptions: [
+    "A one shoe was missing",
+    "B colour faded",
+    "C hole in it",
+    "D brand new",
+    "E too dirty",
+    "F stitching broken"
+  ],
   items: [
     {
       number: 21,
@@ -54,25 +63,57 @@ export const cambridge19Test2ListeningPart3 = {
     {
       number: 25,
       type: "matching",
-      question: "the high-heeled shoes (Reasons: A. one shoe was missing, B. colour faded, C. hole in it, D. brand new, E. too dirty, F. stitching broken)",
+      question: "the high-heeled shoes",
+      options: [
+        "A one shoe was missing",
+        "B colour faded",
+        "C hole in it",
+        "D brand new",
+        "E too dirty",
+        "F stitching broken"
+      ],
       answers: ["C"]
     },
     {
       number: 26,
       type: "matching",
-      question: "the ankle boots (Reasons: A. one shoe was missing, B. colour faded, C. hole in it, D. brand new, E. too dirty, F. stitching broken)",
+      question: "the ankle boots",
+      options: [
+        "A one shoe was missing",
+        "B colour faded",
+        "C hole in it",
+        "D brand new",
+        "E too dirty",
+        "F stitching broken"
+      ],
       answers: ["F"]
     },
     {
       number: 27,
       type: "matching",
-      question: "the baby shoes (Reasons: A. one shoe was missing, B. colour faded, C. hole in it, D. brand new, E. too dirty, F. stitching broken)",
+      question: "the baby shoes",
+      options: [
+        "A one shoe was missing",
+        "B colour faded",
+        "C hole in it",
+        "D brand new",
+        "E too dirty",
+        "F stitching broken"
+      ],
       answers: ["D"]
     },
     {
       number: 28,
       type: "matching",
-      question: "the trainers (Reasons: A. one shoe was missing, B. colour faded, C. hole in it, D. brand new, E. too dirty, F. stitching broken)",
+      question: "the trainers",
+      options: [
+        "A one shoe was missing",
+        "B colour faded",
+        "C hole in it",
+        "D brand new",
+        "E too dirty",
+        "F stitching broken"
+      ],
       answers: ["A"]
     },
     {
