@@ -91,6 +91,12 @@ export class AudioPlayerController {
 
     this.audio.addEventListener("canplay", () => {
       this.isReady = true;
+      if (this.pendingSeek !== null) {
+        try {
+          this.audio.currentTime = this.pendingSeek;
+        } catch (e) {}
+        this.pendingSeek = null;
+      }
       if (this.pendingPlay) {
         this.pendingPlay = false;
         this.audio.play().catch(() => {});
@@ -189,10 +195,14 @@ export class AudioPlayerController {
     if (this.audio.readyState >= 1) {
       try {
         this.audio.currentTime = this.currentLoopStart;
-        this.audio.play().catch((err) => console.warn("playSegment error:", err));
-      } catch (e) {
-        console.warn("Could not play segment", e);
-      }
+      } catch (e) {}
+    }
+
+    // Call play() immediately to capture user gesture
+    try {
+      this.audio.play().catch((err) => console.warn("playSegment error:", err));
+    } catch (e) {
+      console.warn("Could not play segment", e);
     }
   }
 
@@ -248,11 +258,17 @@ export class AudioPlayerController {
       try {
         if (targetTime !== null) {
           this.audio.currentTime = targetTime;
+        } else if (this.audio.ended) {
+          this.audio.currentTime = 0;
         }
-        this.audio.play().catch((err) => console.warn("playFull error:", err));
-      } catch (e) {
-        console.warn("Could not play full audio", e);
-      }
+      } catch (e) {}
+    }
+
+    // Call play() immediately to capture user gesture
+    try {
+      this.audio.play().catch((err) => console.warn("playFull error:", err));
+    } catch (e) {
+      console.warn("Could not play full audio", e);
     }
   }
 

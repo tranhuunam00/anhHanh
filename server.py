@@ -106,12 +106,23 @@ app.include_router(system_vocab_router)
 app.include_router(destination_b2_router)
 app.include_router(tts_router)
 
+from urllib.parse import unquote
+
 # 5. Mount React frontend build
 base_dir = os.path.dirname(__file__)
 react_dist_dir = os.path.join(base_dir, "frontend", "dist")
 
-# Mount static audio files directory
+# Mount static audio files directory (checking root audio, frontend/dist/audio, and frontend/public/audio)
 audio_dir = os.path.join(base_dir, "audio")
+if not os.path.exists(audio_dir):
+    dist_audio = os.path.join(react_dist_dir, "audio")
+    if os.path.exists(dist_audio):
+        audio_dir = dist_audio
+    else:
+        public_audio = os.path.join(base_dir, "frontend", "public", "audio")
+        if os.path.exists(public_audio):
+            audio_dir = public_audio
+
 if os.path.exists(audio_dir):
     app.mount("/audio", StaticFiles(directory=audio_dir), name="audio")
 
@@ -139,7 +150,8 @@ def serve_spa(full_path: str):
 
     # Check if specific static asset exists in dist (e.g. linguagun_logo.jpg, favicon.svg)
     if full_path:
-        file_path = os.path.join(react_dist_dir, full_path)
+        decoded_path = unquote(full_path)
+        file_path = os.path.join(react_dist_dir, decoded_path)
         if os.path.exists(file_path) and os.path.isfile(file_path):
             return FileResponse(file_path)
 
