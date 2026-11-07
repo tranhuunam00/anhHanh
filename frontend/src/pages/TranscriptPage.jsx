@@ -57,6 +57,13 @@ export const TranscriptPage = React.memo(({ lesson, playerController, onGoToChal
   const activeItemRef = useRef(null);
   const sentinelRef = useRef(null);
 
+  const lessonDuration = useMemo(() => {
+    if (!lesson?.challenges?.length) return 0;
+    return Math.max(...lesson.challenges.map((c) => c.time_end || 0));
+  }, [lesson?.challenges]);
+
+  const effectiveDuration = duration > 0 ? duration : lessonDuration;
+
   // Measure header height for sticky position
   useEffect(() => {
     if (!isActive) return;
@@ -286,7 +293,7 @@ export const TranscriptPage = React.memo(({ lesson, playerController, onGoToChal
             type="range"
             className="full-audio-progress"
             min="0"
-            max={duration || 100}
+            max={effectiveDuration || 100}
             step="0.1"
             value={currentTime}
             onInput={handleSeek}
@@ -294,7 +301,7 @@ export const TranscriptPage = React.memo(({ lesson, playerController, onGoToChal
             title="Kéo để tua thời gian audio"
           />
           <span className="full-audio-time">
-            {formatTime(currentTime)} / {formatTime(duration)}
+            {formatTime(currentTime)} / {formatTime(effectiveDuration)}
           </span>
         </div>
       </div>

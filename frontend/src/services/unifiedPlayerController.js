@@ -98,7 +98,7 @@ export class UnifiedPlayerController {
     }
   }
 
-  load(urlOrId, startSeconds = 0, autoplay = false) {
+  load(urlOrId, startSeconds = 0, autoplay = false, fallbackDuration = 0) {
     if (!urlOrId) return;
 
     if (this.isAudioSource(urlOrId)) {
@@ -106,7 +106,7 @@ export class UnifiedPlayerController {
       if (typeof window !== "undefined") {
         this.ytPlayer.pause();
       }
-      this.audioPlayer.loadAudio(urlOrId, startSeconds, autoplay);
+      this.audioPlayer.loadAudio(urlOrId, startSeconds, autoplay, fallbackDuration);
     } else {
       this.mode = "yt";
       this.audioPlayer.pause();
@@ -116,12 +116,12 @@ export class UnifiedPlayerController {
     }
   }
 
-  loadVideo(urlOrId, startSeconds = 0, autoplay = false) {
-    this.load(urlOrId, startSeconds, autoplay);
+  loadVideo(urlOrId, startSeconds = 0, autoplay = false, fallbackDuration = 0) {
+    this.load(urlOrId, startSeconds, autoplay, fallbackDuration);
   }
 
-  loadAudio(urlOrId, startSeconds = 0, autoplay = false) {
-    this.load(urlOrId, startSeconds, autoplay);
+  loadAudio(urlOrId, startSeconds = 0, autoplay = false, fallbackDuration = 0) {
+    this.load(urlOrId, startSeconds, autoplay, fallbackDuration);
   }
 
   playSegment(start, end, loop = true, prevEnd = null, nextStart = null) {
@@ -177,15 +177,38 @@ export class UnifiedPlayerController {
   }
 
   getCurrentTime() {
-    return this.activePlayer.getCurrentTime();
+    const p = this.activePlayer;
+    if (!p) return 0;
+    try {
+      const t = p.getCurrentTime?.();
+      return typeof t === "number" && !isNaN(t) ? t : 0;
+    } catch (e) {
+      return 0;
+    }
   }
 
   getDuration() {
-    return this.activePlayer.getDuration();
+    const p = this.activePlayer;
+    if (!p) return 0;
+    try {
+      const d = p.getDuration?.();
+      return typeof d === "number" && !isNaN(d) ? d : 0;
+    } catch (e) {
+      return 0;
+    }
   }
 
   isPlaying() {
-    return this.activePlayer.isPlaying();
+    const p = this.activePlayer;
+    if (!p) return false;
+    if (typeof p.isPlaying === "function") {
+      try {
+        return Boolean(p.isPlaying());
+      } catch (e) {
+        return false;
+      }
+    }
+    return Boolean(p.isPlaying || p._isPlayingState || p._isPlaying);
   }
 
   setLooping(enabled) {

@@ -141,5 +141,32 @@ describe("UnifiedPlayerController - Unit Tests", () => {
     assert.equal(unified.audioPlayer.sourceLang, "fr");
     assert.equal(unified.ytPlayer.sourceLang, "fr");
   });
+
+  test("isPlaying is callable as a function on YouTubePlayerController and UnifiedPlayerController without throwing", () => {
+    const unified = new UnifiedPlayerController("dummy-id");
+    // Ensure ytPlayer.isPlaying is a function, not a shadowed boolean property
+    assert.equal(typeof unified.ytPlayer.isPlaying, "function");
+    assert.equal(typeof unified.isPlaying, "function");
+
+    // Must return boolean false initially without throwing
+    assert.equal(unified.ytPlayer.isPlaying(), false);
+    assert.equal(unified.isPlaying(), false);
+
+    // Switch to audio mode and verify isPlaying remains a functional boolean
+    unified.load("/audio/test.mp3");
+    assert.equal(typeof unified.audioPlayer.isPlaying, "function");
+    assert.equal(unified.isPlaying(), false);
+  });
+
+  test("getDuration and getCurrentTime return safe numbers and support fallback duration", () => {
+    const unified = new UnifiedPlayerController("dummy-id");
+    assert.equal(unified.getCurrentTime(), 0);
+    assert.equal(unified.getDuration(), 0);
+
+    // Loading with fallback duration (e.g. from lesson challenges max end time)
+    unified.load("/audio/cambridge19/Test1.mp3", 0, false, 1850.5);
+    assert.equal(unified.getDuration(), 1850.5);
+    assert.equal(unified.audioPlayer.getDuration(), 1850.5);
+  });
 });
 

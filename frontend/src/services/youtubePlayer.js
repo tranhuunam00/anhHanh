@@ -21,7 +21,7 @@ export class YouTubePlayerController {
     this.onStateChangeCallbacks = [];
     this.onEmbedRestricted = null;
     this.isFullMode = false;
-    this.isPlaying = false;
+    this._isPlayingState = false;
   }
 
   setAudioPadding(seconds) {
@@ -108,8 +108,8 @@ export class YouTubePlayerController {
         },
         onStateChange: (event) => {
           if (window.YT && window.YT.PlayerState) {
-            this.isPlaying = event.data === window.YT.PlayerState.PLAYING;
-            this.onStateChangeCallbacks.forEach((cb) => cb(this.isPlaying, event.data));
+            this._isPlayingState = event.data === window.YT.PlayerState.PLAYING;
+            this.onStateChangeCallbacks.forEach((cb) => cb(this._isPlayingState, event.data));
           }
         },
         onError: (e) => {
@@ -329,7 +329,7 @@ export class YouTubePlayerController {
         return this.player.getPlayerState() === 1; // YT.PlayerState.PLAYING = 1
       } catch (e) {}
     }
-    return false;
+    return Boolean(this._isPlayingState);
   }
 
   seekTo(seconds) {

@@ -19,6 +19,7 @@ export class AudioPlayerController {
     this.onStateChangeCallbacks = [];
     this._isPlaying = false;
     this.currentSrc = null;
+    this.fallbackDuration = 0;
   }
 
   setAudioPadding(seconds) {
@@ -58,6 +59,15 @@ export class AudioPlayerController {
     this.audio = new Audio();
     this.audio.preload = "auto";
 
+    this.audio.addEventListener("loadedmetadata", () => {
+      this.isReady = true;
+      this._notifyStateChange(this._isPlaying, 100);
+    });
+
+    this.audio.addEventListener("canplay", () => {
+      this.isReady = true;
+    });
+
     this.audio.addEventListener("playing", () => {
       this._notifyStateChange(true, 1);
     });
@@ -76,11 +86,14 @@ export class AudioPlayerController {
     });
   }
 
-  loadAudio(src, startSeconds = 0, autoplay = false) {
+  loadAudio(src, startSeconds = 0, autoplay = false, fallbackDuration = 0) {
     if (!src) return;
     this.currentSrc = src;
     const start = typeof startSeconds === "number" ? Math.max(0, startSeconds) : 0;
     this.currentLoopStart = start;
+    if (typeof fallbackDuration === "number" && fallbackDuration > 0) {
+      this.fallbackDuration = fallbackDuration;
+    }
 
     if (this.replayTimeout) clearTimeout(this.replayTimeout);
     this.isWaitingReplay = false;
@@ -266,7 +279,10 @@ export class AudioPlayerController {
   }
 
   getDuration() {
-    return this.audio ? this.audio.duration || 0 : 0;
+    if (this.audio && typeof this.audio.duration === "number" && !isNaN(this.audio.duration) && this.audio.duration > 0) {
+      return this.audio.duration;
+    }
+    return this.fallbackDuration || 0;
   }
 
   isPlaying() {
@@ -284,7 +300,7 @@ export class AudioPlayerController {
       try {
         this.audio.pause();
         this.audio.src = "";
-      } catch (e) {}
+      } catch (e) { }
       this.audio = null;
     }
   }

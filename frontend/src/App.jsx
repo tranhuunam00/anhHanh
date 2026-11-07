@@ -530,8 +530,11 @@ export default function App() {
     }
 
     const firstStartTime = lesson.challenges?.[0]?.time_start || 0;
+    const fallbackDuration = lesson.challenges?.length
+      ? Math.max(...lesson.challenges.map((c) => c.time_end || 0))
+      : 0;
     const isDictation = mode === "dictation";
-    playerController.load(lesson.audioUrl, firstStartTime, isDictation);
+    playerController.load(lesson.audioUrl, firstStartTime, isDictation, fallbackDuration);
 
     if (isDictation) {
       setActiveTab("tab-dictation");
