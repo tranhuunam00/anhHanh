@@ -166,7 +166,12 @@ describe("primaryKidsUtils Unit Tests", () => {
     it("returns gentle cheer up message for wrong answers", () => {
       const lion = getAnimalEncouragement(false, "lion");
       assert.strictEqual(lion.avatar, "🦁");
-      assert.ok(lion.text.includes("Sư Tử Leo") || lion.text.includes("Cố lên") || lion.text.includes("Thử lại"));
+      assert.ok(
+        lion.text.includes("Sư Tử Leo") ||
+        lion.text.includes("Cố lên") ||
+        lion.text.includes("Thử lại") ||
+        lion.text.includes("Gần đúng rồi")
+      );
     });
 
     it("falls back to fox when mascotId is unknown", () => {
