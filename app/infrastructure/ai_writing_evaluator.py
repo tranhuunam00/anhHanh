@@ -6,45 +6,20 @@ from typing import List, Dict, Any, Optional
 import httpx
 from app.infrastructure.gemini_model_helper import get_candidate_gemini_models
 from app.infrastructure.writing_prompts_catalog import LANGUAGES_CONFIG
+from app.infrastructure.ai_writing_sentence_splitter import (
+    split_essay_into_sentences,
+    reconcile_sentence_breakdown,
+    get_genre_word_count_limits,
+    compute_word_count,
+)
 
 logger = logging.getLogger(__name__)
 
 
 def generate_fallback_sentence_breakdown(content: str, corrections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Split essay into sequential sentences and evaluate each sentence thoroughly."""
-    raw_sentences = re.split(r'(?<=[.!?])\s+', content.strip())
-    breakdown = []
-    for idx, s in enumerate(raw_sentences, 1):
-        s_clean = s.strip()
-        if not s_clean:
-            continue
-        matching_corr = next((c for c in corrections if c.get("original") and c["original"] in s_clean), None)
-        if matching_corr:
-            orig_err = matching_corr.get("original", "")
-            fixed_snippet = matching_corr.get("corrected", "")
-            fixed_s = s_clean.replace(orig_err, fixed_snippet) if orig_err else s_clean
-            breakdown.append({
-                "sentence_num": idx,
-                "original": s_clean,
-                "is_grammar_correct": False,
-                "grammar_analysis": f"Lỗi ở cụm '{orig_err}': {matching_corr.get('explanation', 'Lỗi ngữ pháp cần chỉnh sửa.')}",
-                "grammar_fix": fixed_s,
-                "upgrade_needed": True,
-                "upgraded_sentence": fixed_s,
-                "upgrade_notes": "Sửa đúng ngữ pháp cơ bản trước, sau đó có thể nâng cấp cấu trúc học thuật."
-            })
-        else:
-            breakdown.append({
-                "sentence_num": idx,
-                "original": s_clean,
-                "is_grammar_correct": True,
-                "grammar_analysis": "Đúng hoàn toàn về mặt ngữ pháp rồi.",
-                "grammar_fix": s_clean,
-                "upgrade_needed": False,
-                "upgraded_sentence": s_clean,
-                "upgrade_notes": "Câu đã tự nhiên, gãy gọn, không cần bổ sung."
-            })
-    return breakdown
+    sentences = split_essay_into_sentences(content)
+    return reconcile_sentence_breakdown(sentences, [], corrections, 7.0)
 
 
 def normalize_vocab_upgrades(vocab_upgrades: Any) -> List[Dict[str, Any]]:
@@ -130,46 +105,45 @@ async def evaluate_writing_impl(
     scoring_only: bool = False
 ) -> Dict[str, Any]:
     """Grade and thoroughly evaluate a student's writing submission using Gemini AI."""
-    if not content or len(content.strip().split()) < 15:
+    word_count = compute_word_count(content)
+    if not content or word_count < 15:
         raise ValueError("Bài viết quá ngắn (tối thiểu 15 từ) để AI có thể đánh giá và chấm điểm chính xác.")
 
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY chưa được cấu hình trên máy chủ.")
 
-    word_count = len(content.strip().split())
+    sentences = split_essay_into_sentences(content)
+    sentence_count = len(sentences)
+    genre_limits = get_genre_word_count_limits(genre)
+    min_required_words = genre_limits["min_words"]
+
     cfg = LANGUAGES_CONFIG.get(language, LANGUAGES_CONFIG["en"])
     lang_name = cfg["name"]
     examiner = cfg["examiner"]
     system_scale = cfg["system"]
     upgrade_target = min(9.0, round((float(target_band) + 0.5) * 2) / 2)
 
+    numbered_sentences_text = "\n".join(
+        f"Câu {i}: \"{s}\"" for i, s in enumerate(sentences, 1)
+    )
+
     if scoring_only:
         task_label = "Task 1 (Task Achievement)" if genre == "ielts_task1" else "Task 2 (Task Response)"
         eval_prompt = f"""Bạn là {examiner}.
 Nhiệm vụ của bạn là CHẤM ĐIỂM BÀI THI IELTS WRITING ({task_label}) của học viên theo đúng thang điểm chuẩn Cambridge IELTS 0.0 - 9.0 (làm tròn 0.5).
-LƯU Ý ĐẶC BIỆT: Đây là chế độ THI THỬ (EXAM TEST MODE). Bạn CHỈ CẦN CHẤM ĐIỂM và đưa ra NHẬN XÉT ĐÁNH GIÁ TỔNG QUAN, TUYỆT ĐỐI KHÔNG CẦN CHỮA TỪNG CÂU VÀ KHÔNG CẦN VIẾT LẠI BÀI VĂN MẪU.
+LƯU Ý: Đây là chế độ THI THỬ. Chỉ cần chấm điểm và nhận xét tổng quan 4 tiêu chí.
 
 ĐỀ BÀI (PROMPT):
 \"\"\"{topic}\"\"\"
 
-THỂ LOẠI (GENRE): {genre}
-ĐỘ DÀI: {word_count} từ
+THỂ LOẠI: {genre} | ĐỘ DÀI: {word_count} từ
 
 BÀI VIẾT CỦA HỌC VIÊN:
 \"\"\"
 {content}
 \"\"\"
 
-YÊU CẦU CHẤM ĐIỂM (BẮT BUỘC ĐỦ 4 TIÊU CHÍ CHUẨN IELTS 9.0):
-1. task_response (hoặc task_achievement đối với Task 1): Chấm điểm 0.0 - 9.0 (làm tròn 0.5) và nhận xét ngắn gọn 1-2 câu.
-2. coherence_cohesion: Chấm điểm 0.0 - 9.0 (làm tròn 0.5) và nhận xét ngắn gọn 1-2 câu.
-3. lexical_resource: Chấm điểm 0.0 - 9.0 (làm tròn 0.5) và nhận xét ngắn gọn 1-2 câu.
-4. grammatical_range_accuracy: Chấm điểm 0.0 - 9.0 (làm tròn 0.5) và nhận xét ngắn gọn 1-2 câu.
-5. overall_score: Điểm tổng kết IELTS Writing (trung bình cộng 4 tiêu chí, làm tròn theo quy tắc IELTS: ví dụ 6.25 -> 6.5, 6.75 -> 7.0).
-6. overall_feedback: Nhận xét tổng quan 2-3 câu ngắn gọn giải thích lý do đạt mức điểm này.
-
-ĐỊNH DẠNG TRẢ VỀ:
-BẮT BUỘC là JSON duy nhất:
+ĐỊNH DẠNG TRẢ VỀ JSON:
 {{
   "overall_score": 6.5,
   "max_score": 9.0,
@@ -183,55 +157,77 @@ BẮT BUỘC là JSON duy nhất:
 }}
 """
     else:
+        # Construct task-specific model essay guidelines
+        if genre == "ielts_task1":
+            model_essay_req = f"""3. BÀI VIẾT MẪU NÂNG CẤP BAND 8.5+ (model_essay):
+   - ĐỘ DÀI BẮT BUỘC: Đạt từ {genre_limits['target_min']} đến {genre_limits['target_max']} từ (TUYỆT ĐỐI KHÔNG ĐƯỢC DƯỚI 150 TỪ).
+   - BẮT BUỘC ĐỦ 4 ĐOẠN VĂN HỌC THUẬT CHUẨN MỰC:
+     + Đoạn 1 (Introduction): Paraphrase lại đề bài một cách tự nhiên bằng từ vựng C1/C2.
+     + Đoạn 2 (Overview): Nêu bật 2-3 xu hướng chính, điểm nổi bật nhất hoặc so sánh tổng quát (không đưa số liệu cụ thể).
+     + Đoạn 3 (Body 1): Phân tích chi tiết nhóm số liệu/đối tượng thứ nhất kèm số liệu %, đối chiếu so sánh.
+     + Đoạn 4 (Body 2): Phân tích chi tiết nhóm số liệu/đối tượng còn lại kèm so sánh đối chiếu và liên từ mạch lạc.
+   - LƯU Ý ĐẶC BIỆT: Dù bài của học viên viết ngắn hoặc thiếu ý, bài mẫu Band 8.5+ VẪN BẮT BUỘC là 1 bài hoàn chỉnh đủ 4 đoạn đạt tối thiểu 160-200 từ."""
+        elif genre == "ielts_task2":
+            model_essay_req = f"""3. BÀI VIẾT MẪU NÂNG CẤP BAND 8.5+ (model_essay):
+   - ĐỘ DÀI BẮT BUỘC: Đạt từ {genre_limits['target_min']} đến {genre_limits['target_max']} từ (TUYỆT ĐỐI KHÔNG ĐƯỢC DƯỚI 250 TỪ).
+   - BẮT BUỘC ĐỦ 4 ĐOẠN VĂN:
+     + Đoạn 1 (Introduction): Dẫn dắt ngữ cảnh + Thesis statement nêu rõ quan điểm cá nhân.
+     + Đoạn 2 (Body 1): Luận điểm 1 sâu sắc + phân tích nguyên nhân + ví dụ thực tế thuyết phục.
+     + Đoạn 3 (Body 2): Luận điểm 2 hoặc phản biện + lập luận chặt chẽ + ví dụ minh họa.
+     + Đoạn 4 (Conclusion): Khẳng định lại quan điểm bằng cách diễn đạt mới + kết luận tương lai.
+   - LƯU Ý ĐẶC BIỆT: Dù học viên viết ngắn, bài mẫu Band 8.5+ VẪN BẮT BUỘC là bài luận hoàn chỉnh đầy đủ luận điểm sâu sắc đạt tối thiểu 270-320 từ."""
+        else:
+            model_essay_req = f"""3. BÀI VIẾT MẪU NÂNG CẤP BAND 8.5+ (model_essay):
+   - ĐỘ DÀI BẮT BUỘC: Đạt từ {genre_limits['target_min']} đến {genre_limits['target_max']} từ (tối thiểu {genre_limits['min_words']} từ).
+   - Viết lại ở trình độ Band 8.5 - 9.0 hoàn chỉnh, tự nhiên và học thuật."""
+
         eval_prompt = f"""Bạn là {examiner}.
-Nhiệm vụ của bạn là đánh giá, chấm điểm cực kỳ khách quan, tỉ mỉ và đưa ra nhận xét sửa lỗi chi tiết cho bài viết bằng {lang_name} của học viên dưới đây theo thang điểm {system_scale}.
+Nhiệm vụ của bạn là đánh giá, chấm điểm khách quan, tỉ mỉ và đưa ra nhận xét sửa lỗi chi tiết cho bài viết bằng {lang_name} của học viên dưới đây theo thang điểm {system_scale}.
 
 ĐỀ BÀI (PROMPT):
 \"\"\"{topic}\"\"\"
 
-NGÔN NGỮ BÀI VIẾT: {lang_name} ({language})
-THỂ LOẠI (GENRE): {genre} (ielts_task2, ielts_task1, email, paragraph, hoặc free)
-MỤC TIÊU BAND / ĐIỂM: {target_band}
-ĐỘ DÀI THỰC TẾ: {word_count} từ/ký tự
+NGÔN NGỮ: {lang_name} ({language}) | THỂ LOẠI: {genre} | MỤC TIÊU: Band {target_band}
+ĐỘ DÀI THỰC TẾ: {word_count} từ ({sentence_count} câu)
 
 BÀI VIẾT CỦA HỌC VIÊN:
 \"\"\"
 {content}
 \"\"\"
 
+DANH SÁCH {sentence_count} CÂU TRONG BÀI VIẾT ĐÃ ĐƯỢC ĐÁNH SỐ:
+{numbered_sentences_text}
+
 YÊU CẦU CHẤM ĐIỂM & ĐÁNH GIÁ (BẮT BUỘC ĐỦ 5 PHẦN):
 1. Chấm điểm theo thang điểm chuẩn IELTS 0.0 - 9.0 (làm tròn đến 0.5):
-   - overall_score: Điểm tổng kết (ví dụ: 6.5, 7.0, 7.5...).
-   - task_response: Điểm và nhận xét mức độ hoàn thành đề bài, luận điểm, dẫn chứng.
-   - coherence_cohesion: Điểm và nhận xét mạch lạc, cấu trúc đoạn, từ nối (linking devices).
-   - lexical_resource: Điểm và nhận xét vốn từ, collocations, tính tự nhiên, độ đa dạng.
-   - grammatical_range_accuracy: Điểm và nhận xét độ đa dạng cấu trúc ngữ pháp và độ chính xác câu.
+   - overall_score, task_response, coherence_cohesion, lexical_resource, grammatical_range_accuracy.
 
 2. Danh sách sửa lỗi chi tiết (corrections):
    - Tìm ra TẤT CẢ các lỗi ngữ pháp, chính tả, dùng từ vụng về, câu cồng kềnh trong bài.
-   - Với mỗi lỗi: "original", "corrected", "type", "explanation".
+   - Mỗi lỗi: "original", "corrected", "type", "explanation".
 
-3. Bài viết mẫu viết lại nâng cấp (model_essay):
-   - Viết lại toàn bộ bài viết này ở trình độ Band 8.5 - 9.0 (Native Academic / Professional level).
+{model_essay_req}
 
 4. Gợi ý từ vựng & Collocations nâng cấp (vocab_upgrades):
    - Trích xuất 5 đến 8 từ vựng hoặc collocations học thuật cao cấp (C1/C2) phù hợp với bài viết này.
-   - MỖI PHẦN TỬ BẮT BUỘC LÀ 1 OBJECT CÓ ĐỦ 5 THUỘC TÍNH:
-     + "word": từ hoặc cụm collocation nâng cấp (C1/C2)
-     + "phonetic": phiên âm IPA chuẩn (vd: "/ˈpær.ə.maʊnt/")
-     + "meaning": giải nghĩa tiếng Việt súc tích, dễ hiểu
-     + "replace_for": từ/cụm từ đơn giản trong bài học viên nên thay thế (hoặc null nếu là từ gợi ý mới)
-     + "context_sentence": câu văn ngữ cảnh học thuật chuẩn mực minh họa cách dùng từ này
+   - Mỗi phần tử có: "word", "phonetic", "meaning", "replace_for", "context_sentence".
 
 5. PHÂN TÍCH VÀ SỬA TỪNG CÂU MỘT (sentence_breakdown):
-   - Chia toàn bộ bài viết của học viên thành danh sách tuần tự TỪNG CÂU MỘT.
-   - Với MỖI CÂU: sentence_num, original, is_grammar_correct, grammar_analysis, grammar_fix, upgrade_needed, upgraded_sentence, upgrade_notes.
-   - QUY TẮC CỐT LÕI VỀ NÂNG CẤP HỌC THUẬT (upgraded_sentence):
-     + CHỈ NÂNG CẤP VƯỢT NỬA BAND (+0.5 band) so với mục tiêu Band {target_band} của học viên (tức là nâng cấp đến mức Band {upgrade_target:.1f}).
-     + TUYỆT ĐỐI KHÔNG NÂNG CẤP KỊCH TRẦN (không nhảy cóc lên Band 8.5 - 9.0 nếu mục tiêu học viên chỉ là Band 6.0 hay 7.0). Nâng cấp phải vừa sức, tự nhiên, bám sát ý tưởng gốc và collocations thực tế ở mức Band {upgrade_target:.1f}.
+   - BÀI VIẾT NÀY CÓ CHÍNH XÁC {sentence_count} CÂU ĐÃ ĐƯỢC ĐÁNH SỐ Ở TRÊN.
+   - BẠN BẮT BUỘC PHẢI TRẢ VỀ ĐỦ {sentence_count} PHẦN TỬ trong mảng `sentence_breakdown` (từ Câu 1 đến Câu {sentence_count}).
+   - TUYỆT ĐỐI KHÔNG ĐƯỢC BỎ SÓT BẤT KỲ CÂU NÀO (KHÔNG ĐƯỢC CHỈ CHẤM 2-3 CÂU ĐẦU RỒI DỪNG LẠI).
+   - Với MỖI CÂU:
+     + "sentence_num": số thứ tự từ 1 đến {sentence_count}
+     + "original": đúng nguyên văn câu của học viên
+     + "is_grammar_correct": true nếu đúng ngữ pháp, false nếu có lỗi
+     + "grammar_analysis": phân tích chi tiết lỗi sai nếu có, hoặc nhận xét tích cực nếu đúng
+     + "grammar_fix": câu đã sửa đúng ngữ pháp
+     + "upgrade_needed": true nếu cần nâng cấp học thuật
+     + "upgraded_sentence": câu viết lại nâng cấp ở mức Band {upgrade_target:.1f}
+     + "upgrade_notes": giải thích từ vựng hoặc cấu trúc nâng cấp
+   - QUY TẮC NÂNG CẤP HỌC THUẬT: Chỉ nâng cấp vượt nửa band (+0.5 band) so với mục tiêu Band {target_band} của học viên (mức Band {upgrade_target:.1f}).
 
-ĐỊNH DẠNG TRẢ VỀ:
-BẮT BUỘC là JSON duy nhất:
+ĐỊNH DẠNG TRẢ VỀ JSON DUY NHẤT:
 {{
   "overall_score": 7.0,
   "max_score": 9.0,
@@ -247,15 +243,7 @@ BẮT BUỘC là JSON duy nhất:
   "corrections": [],
   "sentence_breakdown": [],
   "model_essay": "...",
-  "vocab_upgrades": [
-    {{
-      "word": "paramount",
-      "phonetic": "/ˈpær.ə.maʊnt/",
-      "meaning": "tối quan trọng, có ý nghĩa hàng đầu",
-      "replace_for": "very important",
-      "context_sentence": "Education is of paramount importance to personal and societal development."
-    }}
-  ]
+  "vocab_upgrades": []
 }}
 """
     if images and len(images) > 0:
@@ -297,7 +285,7 @@ LƯU Ý ĐẶC BIỆT VỀ HÌNH ẢNH ĐỀ BÀI ĐÍNH KÈM:
                     }
                 }
                 try:
-                    logger.info(f"Submitting essay evaluation ({word_count} words) to {model_name} ({api_version})...")
+                    logger.info(f"Submitting essay evaluation ({word_count} words, {sentence_count} sentences) to {model_name} ({api_version})...")
                     response = await client.post(url, json=payload, headers=headers)
                     if response.status_code == 200:
                         data = response.json()
@@ -311,11 +299,31 @@ LƯU Ý ĐẶC BIỆT VỀ HÌNH ẢNH ĐỀ BÀI ĐÍNH KÈM:
                             parsed.setdefault("corrections", [])
                             parsed.setdefault("vocab_upgrades", [])
                         else:
-                            if "sentence_breakdown" not in parsed or not isinstance(parsed["sentence_breakdown"], list):
-                                parsed["sentence_breakdown"] = generate_fallback_sentence_breakdown(content, parsed.get("corrections", []))
+                            # Strict reconciliation guarantees 100% sentence coverage
+                            parsed["sentence_breakdown"] = reconcile_sentence_breakdown(
+                                sentences=sentences,
+                                ai_breakdown=parsed.get("sentence_breakdown"),
+                                corrections=parsed.get("corrections"),
+                                target_band=target_band
+                            )
                             parsed["vocab_upgrades"] = normalize_vocab_upgrades(parsed.get("vocab_upgrades", []))
 
-                        logger.info(f"Essay successfully evaluated by {model_name} ({api_version}).")
+                        # Attach word count statistics and IELTS compliance
+                        model_text = str(parsed.get("model_essay") or "")
+                        model_word_count = compute_word_count(model_text)
+                        parsed["model_essay_word_count"] = model_word_count
+                        parsed["min_required_words"] = min_required_words
+                        parsed["student_word_count"] = word_count
+                        parsed["student_sentence_count"] = sentence_count
+                        parsed["is_under_length"] = word_count < min_required_words
+                        if parsed["is_under_length"]:
+                            parsed["under_length_message"] = (
+                                f"Bài viết của bạn chỉ có {word_count} từ, chưa đạt mức tối thiểu chuẩn "
+                                f"{min_required_words} từ của {genre_limits['name']}. Trong bài thi IELTS thật, "
+                                f"điều này sẽ bị trừ điểm nặng ở tiêu chí Task Achievement/Task Response."
+                            )
+
+                        logger.info(f"Essay successfully evaluated by {model_name}: {len(parsed['sentence_breakdown'])} sentences, model essay {model_word_count} words.")
                         return parsed
                     elif response.status_code == 404:
                         logger.warning(f"Model {model_name} on {api_version} returned HTTP 404: {response.text[:150]}")

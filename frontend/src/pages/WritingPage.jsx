@@ -37,6 +37,8 @@ import { createVocabWord } from "../services/authVocabService";
 import { Task1Visualizer } from "../components/Writing/Task1Visualizer";
 import { IeltsPromptLibraryModal } from "../components/Writing/IeltsPromptLibraryModal";
 import { PromptKeywordsBar } from "../components/Writing/PromptKeywordsBar";
+import { WritingModelEssayBox } from "../components/Writing/WritingModelEssayBox";
+import { WritingUnderLengthAlert } from "../components/Writing/WritingUnderLengthAlert";
 import { HighlightedVocabSentence } from "../components/Vocab/HighlightedVocabSentence";
 import { getTabPaneStyle } from "../utils/writingTabPersistenceUtils";
 import "../styles/writing.css";
@@ -170,7 +172,6 @@ export const WritingPage = ({ isActive = false }) => {
   // History state
   const [historyItems, setHistoryItems] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [copiedModel, setCopiedModel] = useState(false);
   const [addedWords, setAddedWords] = useState({});
 
   const timerRef = useRef(null);
@@ -780,15 +781,6 @@ export const WritingPage = ({ isActive = false }) => {
       showToast(e.message || "Không thể chấm bài với AI", "error");
     } finally {
       setIsEvaluating(false);
-    }
-  };
-
-  const handleCopyModel = () => {
-    if (evaluationResult?.model_essay) {
-      navigator.clipboard.writeText(evaluationResult.model_essay);
-      setCopiedModel(true);
-      showToast("Đã sao chép bài viết mẫu Band 8.5+!", "success");
-      setTimeout(() => setCopiedModel(false), 2000);
     }
   };
 
@@ -1553,6 +1545,15 @@ export const WritingPage = ({ isActive = false }) => {
               </div>
             ) : evaluationResult ? (
               <div className="feedback-result-content">
+                {/* Under-length Warning Banner */}
+                <WritingUnderLengthAlert
+                  isUnderLength={evaluationResult.is_under_length}
+                  studentWords={evaluationResult.student_word_count || wordCount}
+                  minRequiredWords={evaluationResult.min_required_words || currentGenreObj.minWords || 150}
+                  genreName={currentGenreObj.name}
+                  customMessage={evaluationResult.under_length_message}
+                />
+
                 {/* Overall Score Badge */}
                 <div className="score-hero-card">
                   <div className="score-circle-wrapper">
@@ -1897,27 +1898,11 @@ export const WritingPage = ({ isActive = false }) => {
                 )}
 
                 {/* Model Rewrite Essay */}
-                {evaluationResult.model_essay && (
-                  <div className="section-block">
-                    <div className="section-title space-between">
-                      <div className="title-left">
-                        <IconSparkles size={16} className="text-primary" />
-                        <span>Bài viết mẫu Band 8.5+ (AI Polished Version)</span>
-                      </div>
-                      <button
-                        type="button"
-                        className="btn-copy-model"
-                        onClick={handleCopyModel}
-                      >
-                        <IconCopy size={13} />
-                        <span>{copiedModel ? "Đã chép" : "Sao chép"}</span>
-                      </button>
-                    </div>
-                    <div className="model-essay-box">
-                      {evaluationResult.model_essay}
-                    </div>
-                  </div>
-                )}
+                <WritingModelEssayBox
+                  modelEssay={evaluationResult.model_essay}
+                  minRequiredWords={evaluationResult.min_required_words || currentGenreObj.minWords || 150}
+                  showToast={showToast}
+                />
               </div>
             ) : (
               <div className="feedback-initial-guide">
