@@ -133,27 +133,51 @@ export class UnifiedPlayerController {
   }
 
   playFull(time) {
-    this.activePlayer.playFull(time);
+    if (typeof this.activePlayer?.playFull === "function") {
+      this.activePlayer.playFull(time);
+    } else if (typeof this.activePlayer?.play === "function") {
+      this.activePlayer.play();
+    }
   }
 
   play() {
-    this.activePlayer.play();
+    if (typeof this.activePlayer?.play === "function") {
+      this.activePlayer.play();
+    } else if (typeof this.activePlayer?.playVideo === "function") {
+      this.activePlayer.playVideo();
+    } else if (typeof this.activePlayer?.playFull === "function") {
+      this.activePlayer.playFull();
+    }
   }
 
   playVideo() {
-    this.activePlayer.playVideo();
+    if (typeof this.activePlayer?.playVideo === "function") {
+      this.activePlayer.playVideo();
+    } else if (typeof this.activePlayer?.play === "function") {
+      this.activePlayer.play();
+    } else if (typeof this.activePlayer?.playFull === "function") {
+      this.activePlayer.playFull();
+    }
   }
 
   pause() {
-    this.activePlayer.pause();
+    if (typeof this.activePlayer?.pause === "function") {
+      this.activePlayer.pause();
+    } else if (typeof this.activePlayer?.pauseVideo === "function") {
+      this.activePlayer.pauseVideo();
+    }
   }
 
   pauseVideo() {
-    this.activePlayer.pauseVideo();
+    this.pause();
   }
 
   pauseFull() {
-    this.activePlayer.pauseFull();
+    if (typeof this.activePlayer?.pauseFull === "function") {
+      this.activePlayer.pauseFull();
+    } else {
+      this.pause();
+    }
   }
 
   togglePlayPause() {

@@ -257,39 +257,78 @@ export function renderCam20Test3Part2(part, answers, onChange, evaluation, isRev
       )}
 
       {mapGroup && (
-        <div className="ielts-question-group">
+        <div className="ielts-question-group" style={{ marginTop: "24px" }}>
           <h5>Questions 17–20</h5>
           <p className="ielts-group-instructions">{mapGroup.instructions}</p>
 
-          <div style={{ textAlign: "center", margin: "16px 0" }}>
-            <img
-              src={mapGroup.imageSrc}
-              alt={mapGroup.mapTitle}
-              style={{ maxWidth: "100%", height: "auto", borderRadius: "8px", border: "1px solid var(--border-color)" }}
-            />
-          </div>
+          <div className="ielts-map-interactive-wrapper" style={{ marginTop: "16px" }}>
+            {/* Left Column: Sticky Map Image */}
+            <div className="ielts-map-image-container" style={{ position: "sticky", top: "16px", alignSelf: "start" }}>
+              <img
+                src={mapGroup.imageSrc}
+                alt={mapGroup.mapTitle || "Listening Map Diagram"}
+                className="ielts-inline-map-image"
+                style={{ width: "100%", height: "auto", maxHeight: "480px", objectFit: "contain" }}
+              />
+              <p
+                className="ielts-visual-hint"
+                style={{
+                  marginTop: "10px",
+                  textAlign: "center",
+                  fontSize: "0.85rem",
+                  color: "var(--text-muted)"
+                }}
+              >
+                Đối chiếu các vị trí chữ cái <strong>A - G</strong> trên sơ đồ để chọn địa điểm cho câu hỏi 17 - 20.
+              </p>
+            </div>
 
-          <div className="ielts-match-list" style={{ marginTop: "16px" }}>
-            {mapGroup.items?.map((it) => (
-              <div key={it.number} className="ielts-match-item" style={{ marginBottom: "14px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <span className="ielts-q-pill">{it.number}</span>
-                  <span style={{ flex: 1, fontSize: "0.95rem" }}>{it.feature}</span>
+            {/* Right Column: Questions 17-20 Cards */}
+            <div className="ielts-map-questions-grid" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {mapGroup.items?.map((it) => (
+                <div
+                  key={it.number}
+                  className="ielts-map-question-card"
+                  id={`ielts-q-${it.number}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "12px",
+                    padding: "12px 16px",
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "8px"
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
+                    <span className="ielts-q-pill">{it.number}</span>
+                    <span style={{ fontWeight: 600, fontSize: "0.95rem", color: "var(--text-primary)" }}>{it.feature}</span>
+                  </div>
                   <select
                     value={answers[it.number] || ""}
                     onChange={(e) => onChange(it.number, e.target.value)}
-                    className={`ielts-select-input ${getFeedbackClass(evaluation, it.number, isReview)}`}
-                    style={{ minWidth: "90px" }}
+                    className={`ielts-select-box ${getFeedbackClass(evaluation, it.number, isReview)}`}
+                    style={{
+                      minWidth: "110px",
+                      padding: "8px 12px",
+                      borderRadius: "6px",
+                      border: "1px solid var(--border-color)",
+                      background: "var(--bg-secondary)",
+                      color: "var(--text-primary)",
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
                   >
                     <option value="">Chọn A-G</option>
                     {mapGroup.options?.map((letter) => (
-                      <option key={letter} value={letter}>{letter}</option>
+                      <option key={letter} value={letter}>Vị trí {letter}</option>
                     ))}
                   </select>
+                  {renderFeedback(evaluation, it.number, isReview)}
                 </div>
-                {renderFeedback(evaluation, it.number, isReview)}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

@@ -467,11 +467,16 @@
   border-radius: 10px;
   padding: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 16px;
+  align-self: start;
 }
 
 .ielts-inline-map-image {
   width: 100%;
   height: auto;
+  max-height: 480px;
+  object-fit: contain;
   display: block;
   border-radius: 6px;
 }

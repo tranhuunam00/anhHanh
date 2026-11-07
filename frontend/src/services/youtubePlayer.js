@@ -286,6 +286,14 @@ export class YouTubePlayerController {
     }
   }
 
+  play() {
+    this.playFull();
+  }
+
+  playVideo() {
+    this.playFull();
+  }
+
   pause() {
     this.pendingPlay = false;
     this.pendingCue = true;

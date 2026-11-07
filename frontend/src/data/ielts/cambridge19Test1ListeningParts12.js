@@ -104,6 +104,7 @@ export const listeningParts12 = [
     instructions: "Questions 11–15: Choose the correct letter, A, B or C.\nQuestions 16–20: Label the map below. Write the correct letter, A–H, next to Questions 16–20.",
     questionsRange: [11, 20],
     mapImage: "/images/ielts/cam19_test1_farley_house_map.png",
+    mapLetters: ["A", "B", "C", "D", "E", "F", "G", "H"],
     items: [
       {
         number: 11,
@@ -169,6 +170,7 @@ export const listeningParts12 = [
         number: 16,
         type: "map_labeling",
         question: "Farm shop",
+        options: ["A", "B", "C", "D", "E", "F", "G", "H"],
         answer: "G",
         answers: ["G"]
       },
@@ -176,6 +178,7 @@ export const listeningParts12 = [
         number: 17,
         type: "map_labeling",
         question: "Disabled entry",
+        options: ["A", "B", "C", "D", "E", "F", "G", "H"],
         answer: "C",
         answers: ["C"]
       },
@@ -183,6 +186,7 @@ export const listeningParts12 = [
         number: 18,
         type: "map_labeling",
         question: "Adventure playground",
+        options: ["A", "B", "C", "D", "E", "F", "G", "H"],
         answer: "B",
         answers: ["B"]
       },
@@ -190,6 +194,7 @@ export const listeningParts12 = [
         number: 19,
         type: "map_labeling",
         question: "Kitchen gardens",
+        options: ["A", "B", "C", "D", "E", "F", "G", "H"],
         answer: "D",
         answers: ["D"]
       },
@@ -197,6 +202,7 @@ export const listeningParts12 = [
         number: 20,
         type: "map_labeling",
         question: "The Temple of the Four Winds",
+        options: ["A", "B", "C", "D", "E", "F", "G", "H"],
         answer: "A",
         answers: ["A"]
       }
