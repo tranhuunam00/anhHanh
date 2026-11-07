@@ -5,6 +5,7 @@ export const listeningParts34 = [
     title: "Part 3: Bread Reuse Project & Food Trends",
     instructions: "Questions 21–24: Choose TWO letters, A–E.\nQuestions 25–30: Choose SIX answers from the box and write the correct letter, A–H, next to Questions 25–30.",
     questionsRange: [21, 30],
+    boxTitle: "Food trends (Questions 25–30)",
     boxOptions: [
       "A This is only relevant to young people.",
       "B This may have disappointing results.",

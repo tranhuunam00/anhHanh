@@ -52,3 +52,4 @@ export function WritingModelEssayBox({ modelEssay, minRequiredWords = 150, showT
     </div>
   );
 }
+

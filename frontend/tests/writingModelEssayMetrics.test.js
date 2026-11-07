@@ -54,3 +54,4 @@ describe("Writing Model Essay Metrics & Under-Length Rules", () => {
     assert.equal(checkCompliance(goodT2, 250).isCompliant, true);
   });
 });
+

@@ -202,6 +202,65 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
     return null;
   };
 
+  const firstMatchingIdx = regularItems.findIndex((it) => it.type === "matching");
+
+  const renderBoxOptions = () => {
+    if (!part.boxOptions || isMapPart) return null;
+    return (
+      <div
+        className="ielts-box-options"
+        style={{
+          marginTop: "24px",
+          marginBottom: "16px",
+          padding: "16px 20px",
+          background: "var(--bg-secondary)",
+          borderRadius: "10px",
+          border: "1px solid var(--border-color)"
+        }}
+      >
+        <h6
+          style={{
+            margin: "0 0 12px",
+            fontWeight: 700,
+            fontSize: "0.98rem",
+            color: "var(--text-primary)"
+          }}
+        >
+          {part.boxTitle || "Options / Bảng lựa chọn:"}
+        </h6>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gap: "10px"
+          }}
+        >
+          {part.boxOptions.map((opt) => {
+            const { letter, text } = parseOption(opt);
+            return (
+              <div
+                key={letter}
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  alignItems: "flex-start",
+                  fontSize: "0.88rem",
+                  color: "var(--text-secondary)",
+                  lineHeight: "1.4"
+                }}
+              >
+                <strong style={{ color: "var(--primary)", minWidth: "18px" }}>
+                  {letter}.
+                </strong>
+                <span>{text}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="ielts-part-content">
       {/* Header Banner */}
@@ -212,63 +271,19 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
         </p>
       </div>
 
-      {/* Box Options Reference Panel */}
-      {part.boxOptions && !isMapPart && (
-        <div
-          className="ielts-box-options"
-          style={{
-            marginBottom: "20px",
-            padding: "14px 18px",
-            background: "var(--bg-secondary)",
-            borderRadius: "8px",
-            border: "1px solid var(--border-color)"
-          }}
-        >
-          <h6
-            style={{
-              margin: "0 0 10px",
-              fontWeight: 700,
-              fontSize: "0.95rem",
-              color: "var(--text-primary)"
-            }}
-          >
-            {part.boxTitle || "Options / Bảng lựa chọn:"}
-          </h6>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "8px"
-            }}
-          >
-            {part.boxOptions.map((opt) => {
-              const { letter, text } = parseOption(opt);
-              return (
-                <div
-                  key={letter}
-                  style={{
-                    display: "flex",
-                    gap: "8px",
-                    alignItems: "flex-start",
-                    fontSize: "0.88rem",
-                    color: "var(--text-secondary)"
-                  }}
-                >
-                  <strong style={{ color: "var(--primary)", minWidth: "18px" }}>
-                    {letter}.
-                  </strong>
-                  <span>{text}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
       {/* Regular Questions (MCQ, Choose Two, Notes, Matching) */}
       {regularItems.length > 0 && (
         <div className="ielts-questions-inner" style={{ marginTop: "16px" }}>
-          {regularItems.map(renderItem)}
+          {regularItems.map((item, idx) => {
+            const targetIdx = firstMatchingIdx !== -1 ? firstMatchingIdx : 0;
+            const shouldRenderBox = idx === targetIdx;
+            return (
+              <React.Fragment key={item.number || idx}>
+                {shouldRenderBox && renderBoxOptions()}
+                {renderItem(item)}
+              </React.Fragment>
+            );
+          })}
         </div>
       )}
 

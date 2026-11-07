@@ -84,5 +84,60 @@ test("cambridgeOptionUtils - Unit Tests", async (t) => {
     assert.equal(isChooseTwoSelected(null, 11, 12, "B"), false);
     assert.equal(isChooseTwoSelected(answers, 11, 12, ""), false);
   });
+
+  await t.test("matching box options target index placement", () => {
+    const getBoxOptionsTargetIndex = (items) => {
+      if (!Array.isArray(items) || items.length === 0) return 0;
+      const idx = items.findIndex((it) => it.type === "matching");
+      return idx !== -1 ? idx : 0;
+    };
+
+    // Test 1 Part 3: Q21-24 choose_two, Q25-30 matching
+    const test1Part3Items = [
+      { number: 21, type: "choose_two" },
+      { number: 22, type: "choose_two" },
+      { number: 23, type: "choose_two" },
+      { number: 24, type: "choose_two" },
+      { number: 25, type: "matching" },
+      { number: 26, type: "matching" },
+      { number: 27, type: "matching" },
+      { number: 28, type: "matching" },
+      { number: 29, type: "matching" },
+      { number: 30, type: "matching" }
+    ];
+    // Box options MUST be placed at index 4 (right before Q25 matching), NOT at index 0 (before Q21)
+    assert.equal(getBoxOptionsTargetIndex(test1Part3Items), 4);
+
+    // Test 2 Part 3: Q21-24 multiple_choice, Q25-28 matching, Q29-30 multiple_choice
+    const test2Part3Items = [
+      { number: 21, type: "multiple_choice" },
+      { number: 22, type: "multiple_choice" },
+      { number: 23, type: "multiple_choice" },
+      { number: 24, type: "multiple_choice" },
+      { number: 25, type: "matching" },
+      { number: 26, type: "matching" },
+      { number: 27, type: "matching" },
+      { number: 28, type: "matching" },
+      { number: 29, type: "multiple_choice" },
+      { number: 30, type: "multiple_choice" }
+    ];
+    assert.equal(getBoxOptionsTargetIndex(test2Part3Items), 4);
+
+    // Test 3 Part 2: Q11-16 matching, Q17-20 choose_two
+    const test3Part2Items = [
+      { number: 11, type: "matching" },
+      { number: 12, type: "matching" },
+      { number: 17, type: "choose_two" },
+      { number: 18, type: "choose_two" }
+    ];
+    assert.equal(getBoxOptionsTargetIndex(test3Part2Items), 0);
+
+    // No matching items
+    const noMatchingItems = [
+      { number: 1, type: "fill_notes" },
+      { number: 2, type: "fill_notes" }
+    ];
+    assert.equal(getBoxOptionsTargetIndex(noMatchingItems), 0);
+  });
 });
 
