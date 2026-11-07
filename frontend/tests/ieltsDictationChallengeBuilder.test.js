@@ -121,8 +121,8 @@ describe("ieltsDictationChallengeBuilder - Unit Tests", () => {
 
       assert.ok(lesson);
       assert.equal(lesson.isAudio, true);
-      assert.equal(lesson.challenges.length, 40);
-      assert.equal(lesson.total_challenges, 40);
+      assert.ok(lesson.challenges.length >= 40);
+      assert.ok(lesson.total_challenges >= 40);
       assert.equal(lesson.audioUrl, "/audio/Cambridge 19 - Test 1.mp3");
     });
 

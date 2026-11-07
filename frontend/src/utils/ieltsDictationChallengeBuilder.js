@@ -1,4 +1,6 @@
 import { IELTS_TESTS } from "../data/ielts/index.js";
+import { cambridge19DictationData } from "../data/ielts/cambridge19DictationData.js";
+import { cambridge20DictationData } from "../data/ielts/cambridge20DictationData.js";
 
 /**
  * Parses duration string (e.g. "05:12", "30:45", "1:49") to seconds
@@ -78,8 +80,27 @@ export function formatChallengeText(item, fallbackIndex) {
 export function buildIeltsAudioLesson(preset) {
   if (!preset) return null;
 
-  const totalDurationSec = parseDurationToSeconds(preset.duration);
   const audioUrl = preset.audioUrl || preset.url;
+
+  // 1. High-priority: Authentic AI-transcribed sentence challenges with millisecond timestamps
+  const authenticData = cambridge19DictationData?.[preset.id] || cambridge20DictationData?.[preset.id];
+  if (authenticData && Array.isArray(authenticData.challenges) && authenticData.challenges.length > 0) {
+    return {
+      video_id: preset.id,
+      title: preset.title,
+      author: preset.author || preset.book || "Cambridge University Press",
+      duration: preset.duration || "05:00",
+      audioUrl: audioUrl,
+      url: audioUrl,
+      isAudio: true,
+      sourceLang: preset.sourceLang || "en",
+      targetLang: preset.targetLang || "vi",
+      total_challenges: authenticData.challenges.length,
+      challenges: authenticData.challenges
+    };
+  }
+
+  const totalDurationSec = parseDurationToSeconds(preset.duration);
 
   // Identify matching test from IELTS_TESTS
   let matchedTest = null;
