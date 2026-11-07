@@ -5,6 +5,8 @@
  * skill auto-submission on timeout, and locking completed skills.
  */
 
+import { calculateOverallIeltsBand } from "./ieltsScoring.js";
+
 // Official IELTS Skill Durations in Seconds
 export const IELTS_SKILL_DURATIONS = {
   listening: 33 * 60, // 33 minutes = 1980s (accommodating full continuous audio ~30-33 mins)
@@ -155,18 +157,16 @@ export const isExamFullyCompleted = (session) => {
 };
 
 /**
- * Computes overall estimated band score from completed skills
+ * Computes overall estimated band score from completed skills using official IELTS rounding
  */
 export const computeOverallBand = (session) => {
   if (!session || !session.skills) return 1.0;
   const lBand = session.skills.listening?.result?.bandScore;
   const rBand = session.skills.reading?.result?.bandScore;
-  const validBands = [lBand, rBand].filter((b) => typeof b === "number" && b > 0);
+  const wBand = session.skills.writing?.result?.bandScore || session.skills.writing?.result?.overall_band;
+  const sBand = session.skills.speaking?.result?.bandScore || session.skills.speaking?.result?.overall_band;
 
-  if (validBands.length === 0) return 1.0;
-  const avg = validBands.reduce((a, b) => a + b, 0) / validBands.length;
-  // IELTS overall band rounding: round to nearest 0.5
-  return Math.round(avg * 2) / 2;
+  return calculateOverallIeltsBand([lBand, rBand, wBand, sBand]);
 };
 
 /**

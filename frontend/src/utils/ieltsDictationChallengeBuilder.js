@@ -1,4 +1,5 @@
 import { IELTS_TESTS } from "../data/ielts/index.js";
+import { cambridge18DictationData } from "../data/ielts/cambridge18DictationData.js";
 import { cambridge19DictationData } from "../data/ielts/cambridge19DictationData.js";
 import { cambridge20DictationData } from "../data/ielts/cambridge20DictationData.js";
 
@@ -83,7 +84,10 @@ export function buildIeltsAudioLesson(preset) {
   const audioUrl = preset.audioUrl || preset.url;
 
   // 1. High-priority: Authentic AI-transcribed sentence challenges with millisecond timestamps
-  const authenticData = cambridge19DictationData?.[preset.id] || cambridge20DictationData?.[preset.id];
+  const authenticData =
+    cambridge18DictationData?.[preset.id] ||
+    cambridge19DictationData?.[preset.id] ||
+    cambridge20DictationData?.[preset.id];
   if (authenticData && Array.isArray(authenticData.challenges) && authenticData.challenges.length > 0) {
     return {
       video_id: preset.id,

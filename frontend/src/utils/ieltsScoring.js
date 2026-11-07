@@ -1,8 +1,47 @@
 /**
  * IELTS Scoring & Evaluation Utilities
  * Official Band Conversion (Listening & Academic Reading), Answer Normalization,
- * and AI Access Authorization.
+ * Official Overall & Writing Band Computation, and AI Access Authorization.
  */
+
+import {
+  cleanTextSymbols,
+  getHyphenVariations,
+  getSpellingVariations,
+  getNumberVariations
+} from "./ieltsSpellingUtils.js";
+
+import {
+  roundToIeltsBand,
+  getListeningBandScore,
+  getReadingBandScore,
+  calculateWritingBandScore,
+  calculateOverallIeltsBand
+} from "./ieltsBandConversion.js";
+
+import {
+  canUseIeltsAiGrading,
+  getIeltsStorageKey,
+  saveIeltsSubmission,
+  getIeltsSubmission,
+  clearIeltsSubmission,
+  formatAudioTime
+} from "./ieltsStorageUtils.js";
+
+// Re-export band conversion and storage utilities for seamless backward compatibility
+export {
+  roundToIeltsBand,
+  getListeningBandScore,
+  getReadingBandScore,
+  calculateWritingBandScore,
+  calculateOverallIeltsBand,
+  canUseIeltsAiGrading,
+  getIeltsStorageKey,
+  saveIeltsSubmission,
+  getIeltsSubmission,
+  clearIeltsSubmission,
+  formatAudioTime
+};
 
 /**
  * Normalizes an answer string for robust IELTS grading
@@ -48,7 +87,6 @@ export const expandOptionalParens = (text) => {
       nextVars.push(v.replace(fullMatch, innerText));
     }
     variations = nextVars;
-    // Check if any pattern still has parentheses
     match = parenRegex.exec(variations[0]);
   }
 
@@ -57,6 +95,8 @@ export const expandOptionalParens = (text) => {
 
 /**
  * Checks if a user's answer matches any of the accepted answer patterns
+ * Handles US/UK spelling variants, hyphens/spaces, numeric symbols, and official abbreviations.
+ *
  * @param {string} userAnswer 
  * @param {string|string[]} acceptedAnswers 
  * @returns {boolean}
@@ -66,6 +106,19 @@ export const checkIeltsAnswer = (userAnswer, acceptedAnswers) => {
   if (!userClean) return false;
 
   const acceptedList = Array.isArray(acceptedAnswers) ? acceptedAnswers : [acceptedAnswers];
+
+  // Candidates for user answer
+  const userCandidates = new Set([userClean]);
+  const userCleanSym = cleanTextSymbols(userClean);
+  userCandidates.add(userCleanSym);
+  getHyphenVariations(userClean).forEach((v) => userCandidates.add(v));
+  getSpellingVariations(userClean).forEach((v) => userCandidates.add(v));
+  getNumberVariations(userClean).forEach((v) => userCandidates.add(v));
+
+  // Safe handling of standard IELTS abbreviations (T/F/NG and Y/N)
+  const tfMap = { t: "true", f: "false", ng: "not given", notgiven: "not given", y: "yes", n: "no" };
+  const userAbbr = tfMap[userClean];
+  if (userAbbr) userCandidates.add(userAbbr);
 
   for (const rawAccepted of acceptedList) {
     if (!rawAccepted) continue;
@@ -77,12 +130,18 @@ export const checkIeltsAnswer = (userAnswer, acceptedAnswers) => {
 
     for (const opt of subOptions) {
       const expanded = expandOptionalParens(opt);
-      if (expanded.includes(userClean)) return true;
+      const fullExpanded = new Set();
+      for (const exp of expanded) {
+        fullExpanded.add(exp);
+        fullExpanded.add(cleanTextSymbols(exp));
+        getHyphenVariations(exp).forEach((v) => fullExpanded.add(v));
+        getSpellingVariations(exp).forEach((v) => fullExpanded.add(v));
+        getNumberVariations(exp).forEach((v) => fullExpanded.add(v));
+      }
 
-      // Safe handling of standard IELTS abbreviations (T/F/NG and Y/N)
-      const tfMap = { t: "true", f: "false", ng: "not given", notgiven: "not given", y: "yes", n: "no" };
-      const userAbbr = tfMap[userClean];
-      if (userAbbr && expanded.includes(userAbbr)) return true;
+      for (const u of userCandidates) {
+        if (fullExpanded.has(u)) return true;
+      }
 
       // Currency stripping comparison (e.g., "£48" vs "48", "67.50" vs "67.5")
       const stripCurrency = (str) => str.replace(/^[£$€¥]\s*/, "");
@@ -90,8 +149,8 @@ export const checkIeltsAnswer = (userAnswer, acceptedAnswers) => {
 
       for (const exp of expanded) {
         if (cleanUserNoCur === stripCurrency(exp)) return true;
-        const numUser = parseFloat(cleanUserNoCur);
-        const numAccepted = parseFloat(stripCurrency(exp));
+        const numUser = parseFloat(cleanUserNoCur.replace(/,/g, ""));
+        const numAccepted = parseFloat(stripCurrency(exp).replace(/,/g, ""));
         if (!isNaN(numUser) && !isNaN(numAccepted) && numUser === numAccepted) {
           return true;
         }
@@ -103,148 +162,7 @@ export const checkIeltsAnswer = (userAnswer, acceptedAnswers) => {
 };
 
 /**
- * Converts Listening raw score (0-40) to IELTS Band Score (1.0 - 9.0)
- * @param {number} rawScore 
- * @returns {number}
- */
-export const getListeningBandScore = (rawScore) => {
-  const score = Math.max(0, Math.min(40, Math.round(Number(rawScore) || 0)));
-  if (score >= 39) return 9.0;
-  if (score >= 37) return 8.5;
-  if (score >= 35) return 8.0;
-  if (score >= 32) return 7.5;
-  if (score >= 30) return 7.0;
-  if (score >= 26) return 6.5;
-  if (score >= 23) return 6.0;
-  if (score >= 18) return 5.5;
-  if (score >= 16) return 5.0;
-  if (score >= 13) return 4.5;
-  if (score >= 10) return 4.0;
-  if (score >= 8) return 3.5;
-  if (score >= 6) return 3.0;
-  if (score >= 4) return 2.5;
-  if (score >= 1) return 2.0;
-  return 1.0;
-};
-
-/**
- * Converts Academic Reading raw score (0-40) to IELTS Band Score (1.0 - 9.0)
- * @param {number} rawScore 
- * @returns {number}
- */
-export const getReadingBandScore = (rawScore) => {
-  const score = Math.max(0, Math.min(40, Math.round(Number(rawScore) || 0)));
-  if (score >= 39) return 9.0;
-  if (score >= 37) return 8.5;
-  if (score >= 35) return 8.0;
-  if (score >= 33) return 7.5;
-  if (score >= 30) return 7.0;
-  if (score >= 27) return 6.5;
-  if (score >= 23) return 6.0;
-  if (score >= 19) return 5.5;
-  if (score >= 15) return 5.0;
-  if (score >= 13) return 4.5;
-  if (score >= 10) return 4.0;
-  if (score >= 8) return 3.5;
-  if (score >= 6) return 3.0;
-  if (score >= 4) return 2.5;
-  if (score >= 1) return 2.0;
-  return 1.0;
-};
-
-/**
- * Checks if user is authorized to use AI evaluation for Writing and Speaking
- * Strictly permitted: itdaogroup@gmail.com, tranhuunam23022000@gmail.com, vuthiquynhtrangbl6d@gmail.com (and variants)
- * @param {object|null|undefined} user 
- * @returns {boolean}
- */
-export const canUseIeltsAiGrading = (user) => {
-  if (!user) return false;
-  if (user.can_use_ai_writing || user.can_use_ai_import || user.role === "ADMIN") {
-    return true;
-  }
-  const email = (user.email || "").toLowerCase().trim();
-  const handle = email.split("@")[0];
-
-  const allowedEmails = [
-    "itdaogroup@gmail.com",
-    "tranhuunam23022000@gmail.com",
-    "vuthiquynhtrangbl6d@gmail.com",
-    "vuthiquynhtrang@gmail.com"
-  ];
-  const allowedHandles = [
-    "itdaogroup",
-    "tranhuunam23022000",
-    "vuthiquynhtrang",
-    "vuthiquynhtrangbl6d"
-  ];
-
-  return allowedEmails.includes(email) || allowedHandles.includes(handle);
-};
-
-/**
- * LocalStorage key generator for IELTS test submissions
- */
-export const getIeltsStorageKey = (testId, skill) => `ielts_sub_${testId}_${skill}`;
-
-export const saveIeltsSubmission = (testId, skill, data) => {
-  try {
-    if (typeof localStorage === "undefined") return;
-    const key = getIeltsStorageKey(testId, skill);
-    localStorage.setItem(key, JSON.stringify({ ...data, savedAt: new Date().toISOString() }));
-  } catch (err) {
-    console.warn("Failed to persist IELTS submission to localStorage:", err);
-  }
-};
-
-export const getIeltsSubmission = (testId, skill) => {
-  try {
-    if (typeof localStorage === "undefined") return null;
-    const key = getIeltsStorageKey(testId, skill);
-    const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : null;
-  } catch {
-    return null;
-  }
-};
-
-/**
- * Clears saved IELTS submission for a specific skill or all skills
- * @param {string} testId
- * @param {string} [skill] - Optional. If omitted, clears all 4 skills.
- */
-export const clearIeltsSubmission = (testId, skill) => {
-  try {
-    if (typeof localStorage === "undefined") return;
-    if (skill) {
-      localStorage.removeItem(getIeltsStorageKey(testId, skill));
-    } else {
-      ["listening", "reading", "writing", "speaking"].forEach((s) => {
-        localStorage.removeItem(getIeltsStorageKey(testId, s));
-      });
-    }
-  } catch (err) {
-    console.warn("Failed to clear IELTS submission from localStorage:", err);
-  }
-};
-
-/**
- * Formats seconds into MM:SS format safely handling edge cases (NaN, Infinity, negatives)
- * @param {number} secs
- * @returns {string}
- */
-export const formatAudioTime = (secs) => {
-  if (typeof secs !== "number" || isNaN(secs) || !isFinite(secs) || secs < 0) {
-    return "00:00";
-  }
-  const total = Math.floor(secs);
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
-};
-
-/**
- * Evaluates Listening answers against test data
+ * Evaluates Listening answers against test data with duplicate prevention on paired selections
  * @param {object} listeningData 
  * @param {object} answers { [qNum]: userVal }
  * @returns {{ correctCount: number, bandScore: number, evalMap: object }}
@@ -257,7 +175,7 @@ export const gradeListeningTest = (listeningData, answers = {}) => {
   let correctCount = 0;
 
   const checkItem = (qNum, acceptedAnswers) => {
-    if (!qNum) return;
+    if (!qNum || evalMap[qNum]) return;
     const userAns = answers[qNum] || "";
     const isCorrect = checkIeltsAnswer(userAns, acceptedAnswers);
     if (isCorrect) correctCount++;
@@ -268,25 +186,61 @@ export const gradeListeningTest = (listeningData, answers = {}) => {
     };
   };
 
+  const evaluatePair = (q1, q2, acceptedList) => {
+    if (evalMap[q1] && evalMap[q2]) return;
+    const accepted = (acceptedList || []).map((a) => String(a).trim().toUpperCase());
+    const u1 = String(answers[q1] || "").trim().toUpperCase();
+    const u2 = String(answers[q2] || "").trim().toUpperCase();
+
+    const correct1 = Boolean(u1 && accepted.includes(u1));
+    const correct2 = Boolean(u2 && accepted.includes(u2) && u2 !== u1);
+
+    if (correct1) correctCount++;
+    if (correct2) correctCount++;
+    evalMap[q1] = { isCorrect: correct1, userAns: answers[q1] || "", accepted };
+    evalMap[q2] = { isCorrect: correct2, userAns: answers[q2] || "", accepted };
+  };
+
   listeningData.parts.forEach((part) => {
-    part?.items?.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    part?.items?.forEach((it) => {
+      if (it?.pairNumber) {
+        evaluatePair(it.number, it.pairNumber, it.answers || it.acceptedAnswers || [it.answer]);
+      } else {
+        checkItem(it.number, it.answers || [it.answer]);
+      }
+    });
+
     part?.sections?.forEach((sec) => {
       sec?.items?.forEach((it) => {
-        if (it?.number) checkItem(it.number, it.answers || [it.answer]);
+        if (it?.pairNumber) {
+          evaluatePair(it.number, it.pairNumber, it.answers || it.acceptedAnswers || [it.answer]);
+        } else if (it?.number) {
+          checkItem(it.number, it.answers || [it.answer]);
+        }
       });
     });
+
     part?.groups?.forEach((g) => {
-      if (g.groupType === "choose_two") {
-        const [q1, q2] = g.numbers || [];
-        const accepted = g.answers || [];
-        const u1 = answers[q1];
-        const u2 = answers[q2];
-        const correct1 = accepted.includes(u1);
-        const correct2 = accepted.includes(u2) && u2 !== u1;
-        if (correct1) correctCount++;
-        if (correct2) correctCount++;
-        evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
-        evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
+      if (g.groupType === "choose_two" && Array.isArray(g.numbers) && g.numbers.length >= 2) {
+        const pairAnswers = g.answers || g.items?.[0]?.answers || g.items?.[0]?.acceptedAnswers || [];
+        evaluatePair(g.numbers[0], g.numbers[1], pairAnswers);
+      } else if (g.groupType === "choose_three" && Array.isArray(g.numbers) && g.numbers.length >= 3) {
+        const [q1, q2, q3] = g.numbers;
+        const rawAnswers = g.answers || g.items?.[0]?.answers || g.items?.[0]?.acceptedAnswers || [];
+        const accepted = rawAnswers.map((a) => String(a).trim().toUpperCase());
+        const u1 = String(answers[q1] || "").trim().toUpperCase();
+        const u2 = String(answers[q2] || "").trim().toUpperCase();
+        const u3 = String(answers[q3] || "").trim().toUpperCase();
+        const used = new Set();
+
+        [ { q: q1, u: u1 }, { q: q2, u: u2 }, { q: q3, u: u3 } ].forEach(({ q, u }) => {
+          const isCorrect = Boolean(u && accepted.includes(u) && !used.has(u));
+          if (isCorrect) {
+            used.add(u);
+            correctCount++;
+          }
+          evalMap[q] = { isCorrect, userAns: answers[q] || "", accepted };
+        });
       } else if (g.groupType === "map_labeling" || g.groupType === "flowchart_completion" || g.groupType === "flow_chart") {
         (g.steps || g.items || []).forEach((it) => checkItem(it.number, it.answers || [it.answer]));
       } else if (g.steps) {
@@ -308,7 +262,7 @@ export const gradeListeningTest = (listeningData, answers = {}) => {
 };
 
 /**
- * Evaluates Academic Reading answers against test data
+ * Evaluates Academic Reading answers against test data with duplicate prevention on paired selections
  * @param {object} readingData 
  * @param {object} answers { [qNum]: userVal }
  * @returns {{ correctCount: number, bandScore: number, evalMap: object }}
@@ -321,7 +275,7 @@ export const gradeReadingTest = (readingData, answers = {}) => {
   let correctCount = 0;
 
   const checkItem = (qNum, acceptedAnswers) => {
-    if (!qNum) return;
+    if (!qNum || evalMap[qNum]) return;
     const userAns = answers[qNum] || "";
     const isCorrect = checkIeltsAnswer(userAns, acceptedAnswers);
     if (isCorrect) correctCount++;
@@ -332,25 +286,61 @@ export const gradeReadingTest = (readingData, answers = {}) => {
     };
   };
 
+  const evaluatePair = (q1, q2, acceptedList) => {
+    if (evalMap[q1] && evalMap[q2]) return;
+    const accepted = (acceptedList || []).map((a) => String(a).trim().toUpperCase());
+    const u1 = String(answers[q1] || "").trim().toUpperCase();
+    const u2 = String(answers[q2] || "").trim().toUpperCase();
+
+    const correct1 = Boolean(u1 && accepted.includes(u1));
+    const correct2 = Boolean(u2 && accepted.includes(u2) && u2 !== u1);
+
+    if (correct1) correctCount++;
+    if (correct2) correctCount++;
+    evalMap[q1] = { isCorrect: correct1, userAns: answers[q1] || "", accepted };
+    evalMap[q2] = { isCorrect: correct2, userAns: answers[q2] || "", accepted };
+  };
+
   readingData.passages.forEach((p) => {
-    p?.items?.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+    p?.items?.forEach((it) => {
+      if (it?.pairNumber) {
+        evaluatePair(it.number, it.pairNumber, it.answers || it.acceptedAnswers || [it.answer]);
+      } else {
+        checkItem(it.number, it.answers || [it.answer]);
+      }
+    });
+
     p?.sections?.forEach((sec) => {
       sec?.items?.forEach((it) => {
-        if (it?.number) checkItem(it.number, it.answers || [it.answer]);
+        if (it?.pairNumber) {
+          evaluatePair(it.number, it.pairNumber, it.answers || it.acceptedAnswers || [it.answer]);
+        } else if (it?.number) {
+          checkItem(it.number, it.answers || [it.answer]);
+        }
       });
     });
+
     p?.groups?.forEach((g) => {
-      if (g.groupType === "choose_two") {
-        const [q1, q2] = g.numbers || [];
-        const accepted = g.answers || [];
-        const u1 = answers[q1];
-        const u2 = answers[q2];
-        const correct1 = accepted.includes(u1);
-        const correct2 = accepted.includes(u2) && u2 !== u1;
-        if (correct1) correctCount++;
-        if (correct2) correctCount++;
-        evalMap[q1] = { isCorrect: correct1, userAns: u1, accepted };
-        evalMap[q2] = { isCorrect: correct2, userAns: u2, accepted };
+      if (g.groupType === "choose_two" && Array.isArray(g.numbers) && g.numbers.length >= 2) {
+        const pairAnswers = g.answers || g.items?.[0]?.answers || g.items?.[0]?.acceptedAnswers || [];
+        evaluatePair(g.numbers[0], g.numbers[1], pairAnswers);
+      } else if (g.groupType === "choose_three" && Array.isArray(g.numbers) && g.numbers.length >= 3) {
+        const [q1, q2, q3] = g.numbers;
+        const rawAnswers = g.answers || g.items?.[0]?.answers || g.items?.[0]?.acceptedAnswers || [];
+        const accepted = rawAnswers.map((a) => String(a).trim().toUpperCase());
+        const u1 = String(answers[q1] || "").trim().toUpperCase();
+        const u2 = String(answers[q2] || "").trim().toUpperCase();
+        const u3 = String(answers[q3] || "").trim().toUpperCase();
+        const used = new Set();
+
+        [ { q: q1, u: u1 }, { q: q2, u: u2 }, { q: q3, u: u3 } ].forEach(({ q, u }) => {
+          const isCorrect = Boolean(u && accepted.includes(u) && !used.has(u));
+          if (isCorrect) {
+            used.add(u);
+            correctCount++;
+          }
+          evalMap[q] = { isCorrect, userAns: answers[q] || "", accepted };
+        });
       } else if (g.groupType === "table_completion") {
         (g.tableItems || g.items || []).forEach((it) => {
           if (it?.number) checkItem(it.number, it.answers || [it.answer]);
@@ -380,5 +370,3 @@ export const gradeReadingTest = (readingData, answers = {}) => {
   const bandScore = getReadingBandScore(correctCount);
   return { correctCount, bandScore, evalMap };
 };
-
-

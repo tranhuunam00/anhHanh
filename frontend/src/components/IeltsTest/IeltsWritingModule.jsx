@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
-import { canUseIeltsAiGrading } from "../../utils/ieltsScoring.js";
+import { canUseIeltsAiGrading, calculateWritingBandScore } from "../../utils/ieltsScoring.js";
 import { Sparkles, Clock, CheckCircle, Lock } from "../../constants/icons.js";
 
 /**
@@ -128,6 +128,12 @@ export const IeltsWritingModule = ({
   const overallBand = evalData
     ? evalData.overall_band || evalData.band || evalData.evaluation?.overall_score || "N/A"
     : null;
+
+  const t1Score = evalResults[1]?.overall_band || evalResults[1]?.band || evalResults[1]?.evaluation?.overall_score;
+  const t2Score = evalResults[2]?.overall_band || evalResults[2]?.band || evalResults[2]?.evaluation?.overall_score;
+  const compositeWritingBand = useMemo(() => {
+    return calculateWritingBandScore(t1Score, t2Score);
+  }, [t1Score, t2Score]);
 
   const rawCriteria = evalData?.evaluation?.criteria_scores || evalData?.criteria_scores || {};
   const trScore =
@@ -274,6 +280,28 @@ export const IeltsWritingModule = ({
       {/* AI Evaluation Result Card (Chỉ chấm điểm 4 tiêu chí chuẩn IELTS và nhận xét mức điểm) */}
       {evalData && (
         <div className="ielts-ai-result-card">
+          {t1Score && t2Score && (
+            <div
+              className="ielts-ai-composite-banner"
+              style={{
+                marginBottom: "12px",
+                padding: "10px 14px",
+                background: "var(--bg-secondary)",
+                borderRadius: "8px",
+                border: "1px solid var(--border-color)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <span style={{ fontSize: "0.9rem", color: "var(--text-secondary)" }}>
+                Điểm Writing chuẩn hóa (Task 1 × 1/3 + Task 2 × 2/3):
+              </span>
+              <strong style={{ fontSize: "1.05rem", color: "var(--primary)" }}>
+                Writing Band {compositeWritingBand.toFixed(1)}
+              </strong>
+            </div>
+          )}
           <div className="ielts-ai-result-header">
             <span className="ielts-ai-band-badge">
               IELTS Band: {overallBand}

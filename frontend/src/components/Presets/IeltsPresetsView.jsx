@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
 import {
   IELTS_TASK_TABS,
+  CAMBRIDGE_18_LESSONS,
+  CAMBRIDGE_18_FULL_LESSONS,
   CAMBRIDGE_19_LESSONS,
   CAMBRIDGE_19_FULL_LESSONS,
   CAMBRIDGE_20_LESSONS,
@@ -42,6 +44,14 @@ export const IeltsPresetsView = React.memo(({
   }, [selectedTask]);
 
   // Filter lessons based on selected task
+  const filteredCam18 = useMemo(() => {
+    return filterIeltsLessons(CAMBRIDGE_18_LESSONS, selectedTask);
+  }, [selectedTask]);
+
+  const filteredCam18Full = useMemo(() => {
+    return selectedTask === "full" ? CAMBRIDGE_18_FULL_LESSONS : [];
+  }, [selectedTask]);
+
   const filteredCam19 = useMemo(() => {
     return filterIeltsLessons(CAMBRIDGE_19_LESSONS, selectedTask);
   }, [selectedTask]);
@@ -185,6 +195,52 @@ export const IeltsPresetsView = React.memo(({
           <span>{activeTaskTab.desc}</span>
         </div>
       </div>
+
+      {/* Group 0: Cambridge 18 (Đã tách riêng 4 Task) */}
+      {selectedTask !== "full" && filteredCam18.length > 0 && (
+        <section className="ielts-book-group">
+          <div className="ielts-book-group-header">
+            <div className="ielts-book-group-title">
+              <BookOpen size={16} color="var(--primary)" />
+              <span>Cambridge IELTS 18</span>
+              <span className="ielts-book-badge split">
+                <Check size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
+                Đã tách riêng 4 Task
+              </span>
+            </div>
+            <span className="text-xs text-muted">
+              {filteredCam18.length} bài luyện tập
+            </span>
+          </div>
+
+          <div className="ielts-presets-cards-grid">
+            {filteredCam18.map(renderCard)}
+          </div>
+        </section>
+      )}
+
+      {/* Group 0B: Cambridge 18 (Trọn bộ 4 đề thi khi chọn tab Trọn bộ) */}
+      {selectedTask === "full" && filteredCam18Full.length > 0 && (
+        <section className="ielts-book-group">
+          <div className="ielts-book-group-header">
+            <div className="ielts-book-group-title">
+              <BookOpen size={16} color="var(--primary)" />
+              <span>Cambridge IELTS 18</span>
+              <span className="ielts-book-badge merged">
+                <Zap size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
+                Gộp 4 phần trong 1 test (Full 30 phút)
+              </span>
+            </div>
+            <span className="text-xs text-muted">
+              {filteredCam18Full.length} bài thi trọn bộ
+            </span>
+          </div>
+
+          <div className="ielts-presets-cards-grid">
+            {filteredCam18Full.map(renderCard)}
+          </div>
+        </section>
+      )}
 
       {/* Group 1: Cambridge 19 (Đã tách riêng 4 Task) */}
       {selectedTask !== "full" && filteredCam19.length > 0 && (
