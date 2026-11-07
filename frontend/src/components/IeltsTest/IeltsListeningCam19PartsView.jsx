@@ -13,6 +13,23 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
         </p>
       </div>
 
+      {part.mapImage && (
+        <div className="ielts-map-container" style={{ margin: "16px 0", textAlign: "center" }}>
+          <img
+            src={part.mapImage}
+            alt="Listening Map / Plan Diagram"
+            className="ielts-map-img"
+            style={{
+              maxWidth: "100%",
+              maxHeight: "380px",
+              borderRadius: "8px",
+              border: "1px solid var(--border-color, #e2e8f0)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+            }}
+          />
+        </div>
+      )}
+
       <div className="ielts-questions-inner" style={{ marginTop: "16px" }}>
         {part.items?.map((item) => {
           if (item.type === "fill_notes" || item.type === "fill_table") {
@@ -97,7 +114,7 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => {
-                            if (onChooseTwoToggle) {
+                            if (onChooseTwoToggle && item.pairNumber) {
                               onChooseTwoToggle([item.number, item.pairNumber], letter);
                             } else {
                               onChange(item.number, isChecked ? "" : letter);

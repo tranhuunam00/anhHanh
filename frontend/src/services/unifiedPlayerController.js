@@ -216,7 +216,11 @@ export class UnifiedPlayerController {
   }
 
   speakText(text, lang) {
-    this.ytPlayer.speakText(text, lang);
+    if (this.isAudioMode) {
+      this.audioPlayer.replayCurrentSegment();
+    } else {
+      this.ytPlayer.speakText(text, lang);
+    }
   }
 
   destroy() {

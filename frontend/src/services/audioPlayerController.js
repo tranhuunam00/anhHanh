@@ -20,6 +20,8 @@ export class AudioPlayerController {
     this._isPlaying = false;
     this.currentSrc = null;
     this.fallbackDuration = 0;
+    this.pendingSeek = null;
+    this.pendingPlay = false;
   }
 
   setAudioPadding(seconds) {
@@ -52,6 +54,15 @@ export class AudioPlayerController {
     });
   }
 
+  _normalizeSrc(src) {
+    if (!src) return "";
+    try {
+      return decodeURI(src).trim();
+    } catch (e) {
+      return (src || "").trim();
+    }
+  }
+
   _initAudioElement() {
     if (this.audio) return;
     if (typeof Audio === "undefined") return;
@@ -61,11 +72,29 @@ export class AudioPlayerController {
 
     this.audio.addEventListener("loadedmetadata", () => {
       this.isReady = true;
+      if (this.pendingSeek !== null) {
+        try {
+          this.audio.currentTime = this.pendingSeek;
+        } catch (e) {
+          console.warn("Error seeking on loadedmetadata:", e);
+        }
+        this.pendingSeek = null;
+      }
+      if (this.pendingPlay) {
+        this.pendingPlay = false;
+        this.audio.play().catch((err) => {
+          console.warn("Pending play on loadedmetadata blocked or error:", err);
+        });
+      }
       this._notifyStateChange(this._isPlaying, 100);
     });
 
     this.audio.addEventListener("canplay", () => {
       this.isReady = true;
+      if (this.pendingPlay) {
+        this.pendingPlay = false;
+        this.audio.play().catch(() => {});
+      }
     });
 
     this.audio.addEventListener("playing", () => {
@@ -81,7 +110,7 @@ export class AudioPlayerController {
     });
 
     this.audio.addEventListener("error", (e) => {
-      console.warn("Audio element error:", e);
+      console.warn("Audio element error:", e, "src:", this.audio?.src);
       this._notifyStateChange(false, -1);
     });
   }
@@ -101,15 +130,29 @@ export class AudioPlayerController {
     this._initAudioElement();
     if (!this.audio) return;
 
-    if (this.audio.src !== src && !this.audio.src.endsWith(src)) {
-      this.audio.src = src;
+    const currentNormalized = this._normalizeSrc(this.audio.src);
+    const targetNormalized = this._normalizeSrc(src);
+
+    if (!currentNormalized.endsWith(targetNormalized)) {
+      this.audio.src = encodeURI(decodeURI(src));
+      this.isReady = false;
+      this.pendingSeek = start;
+      this.pendingPlay = autoplay;
+    } else {
+      if (this.audio.readyState >= 1) {
+        try {
+          this.audio.currentTime = start;
+        } catch (e) {}
+      } else {
+        this.pendingSeek = start;
+        this.pendingPlay = autoplay;
+      }
+      this.isReady = true;
     }
 
-    this.audio.currentTime = start;
-    this.isReady = true;
     this._startLoopMonitor();
 
-    if (autoplay) {
+    if (autoplay && this.audio.readyState >= 1) {
       this.audio.play().catch((err) => {
         console.warn("Autoplay audio blocked or error:", err);
       });
@@ -137,14 +180,19 @@ export class AudioPlayerController {
     this.isWaitingReplay = false;
     if (this.replayTimeout) clearTimeout(this.replayTimeout);
 
+    this.pendingSeek = this.currentLoopStart;
+    this.pendingPlay = true;
+
     this._initAudioElement();
     if (!this.audio) return;
 
-    try {
-      this.audio.currentTime = this.currentLoopStart;
-      this.audio.play().catch((err) => console.warn("playSegment error:", err));
-    } catch (e) {
-      console.warn("Could not play segment", e);
+    if (this.audio.readyState >= 1) {
+      try {
+        this.audio.currentTime = this.currentLoopStart;
+        this.audio.play().catch((err) => console.warn("playSegment error:", err));
+      } catch (e) {
+        console.warn("Could not play segment", e);
+      }
     }
   }
 
@@ -165,12 +213,17 @@ export class AudioPlayerController {
     this.isWaitingReplay = false;
     if (this.replayTimeout) clearTimeout(this.replayTimeout);
 
+    this.pendingSeek = this.currentLoopStart;
+    this.pendingPlay = false;
+
     this._initAudioElement();
     if (!this.audio) return;
 
     try {
       this.audio.pause();
-      this.audio.currentTime = this.currentLoopStart;
+      if (this.audio.readyState >= 1) {
+        this.audio.currentTime = this.currentLoopStart;
+      }
     } catch (e) {
       console.warn("Could not cue segment", e);
     }
@@ -182,20 +235,29 @@ export class AudioPlayerController {
     this.isWaitingReplay = false;
     if (this.replayTimeout) clearTimeout(this.replayTimeout);
 
+    const targetTime = typeof time === "number" ? Math.max(0, time) : null;
+    if (targetTime !== null) {
+      this.pendingSeek = targetTime;
+    }
+    this.pendingPlay = true;
+
     this._initAudioElement();
     if (!this.audio) return;
 
-    try {
-      if (typeof time === "number") {
-        this.audio.currentTime = time;
+    if (this.audio.readyState >= 1) {
+      try {
+        if (targetTime !== null) {
+          this.audio.currentTime = targetTime;
+        }
+        this.audio.play().catch((err) => console.warn("playFull error:", err));
+      } catch (e) {
+        console.warn("Could not play full audio", e);
       }
-      this.audio.play().catch((err) => console.warn("playFull error:", err));
-    } catch (e) {
-      console.warn("Could not play full audio", e);
     }
   }
 
   play() {
+    this.pendingPlay = true;
     if (!this.audio) return;
     this.audio.play().catch((err) => console.warn("play error:", err));
   }
@@ -206,6 +268,7 @@ export class AudioPlayerController {
 
   pause() {
     this.isWaitingReplay = false;
+    this.pendingPlay = false;
     if (this.replayTimeout) clearTimeout(this.replayTimeout);
     if (!this.audio) return;
     try {
@@ -224,8 +287,19 @@ export class AudioPlayerController {
   }
 
   togglePlayPause() {
-    if (!this.audio) return;
+    if (!this.audio) {
+      this.pendingPlay = !this.pendingPlay;
+      return;
+    }
     if (this.audio.paused) {
+      if (!this.isFullMode && typeof this.currentLoopStart === "number") {
+        const cur = this.audio.currentTime || 0;
+        if (cur < this.currentLoopStart || (this.currentLoopEnd && cur >= this.currentLoopEnd - 0.15)) {
+          try {
+            this.audio.currentTime = this.currentLoopStart;
+          } catch (e) {}
+        }
+      }
       this.play();
     } else {
       this.pause();
@@ -236,20 +310,31 @@ export class AudioPlayerController {
     this.isFullMode = false;
     if (this.replayTimeout) clearTimeout(this.replayTimeout);
     this.isWaitingReplay = false;
+    this.pendingSeek = this.currentLoopStart;
+    this.pendingPlay = true;
+
+    this._initAudioElement();
     if (!this.audio) return;
 
-    try {
-      this.audio.currentTime = this.currentLoopStart;
-      this.audio.play().catch((err) => console.warn("replayCurrentSegment error:", err));
-    } catch (e) {
-      console.warn("Could not replay segment", e);
+    if (this.audio.readyState >= 1) {
+      try {
+        this.audio.currentTime = this.currentLoopStart;
+        this.audio.play().catch((err) => console.warn("replayCurrentSegment error:", err));
+      } catch (e) {
+        console.warn("Could not replay segment", e);
+      }
     }
   }
 
   seekTo(seconds) {
     if (!this.audio) return;
     try {
-      this.audio.currentTime = Math.max(0, seconds);
+      const target = Math.max(0, seconds);
+      if (this.audio.readyState >= 1) {
+        this.audio.currentTime = target;
+      } else {
+        this.pendingSeek = target;
+      }
     } catch (e) {
       console.warn("seekTo error:", e);
     }
@@ -259,7 +344,11 @@ export class AudioPlayerController {
     if (!this.audio) return;
     try {
       const target = Math.max(0, (this.audio.currentTime || 0) + seconds);
-      this.audio.currentTime = target;
+      if (this.audio.readyState >= 1) {
+        this.audio.currentTime = target;
+      } else {
+        this.pendingSeek = target;
+      }
     } catch (e) {
       console.warn("seekRelative error:", e);
     }
@@ -300,7 +389,7 @@ export class AudioPlayerController {
       try {
         this.audio.pause();
         this.audio.src = "";
-      } catch (e) { }
+      } catch (e) {}
       this.audio = null;
     }
   }

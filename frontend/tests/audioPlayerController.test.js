@@ -98,6 +98,26 @@ describe("AudioPlayerController - Unit Tests", () => {
 
     assert.equal(ctrl.audio, null);
   });
+
+  test("_normalizeSrc decodes URLs with percent-encoded spaces and special characters", () => {
+    const ctrl = new AudioPlayerController();
+    assert.equal(ctrl._normalizeSrc("http://localhost/audio/Test%201.mp3"), "http://localhost/audio/Test 1.mp3");
+    assert.equal(ctrl._normalizeSrc("/audio/Cambridge%2019%20-%20Test%201.mp3"), "/audio/Cambridge 19 - Test 1.mp3");
+    assert.equal(ctrl._normalizeSrc(null), "");
+    assert.equal(ctrl._normalizeSrc(undefined), "");
+  });
+
+  test("pendingSeek and pendingPlay are tracked when audio is not yet loaded", () => {
+    const ctrl = new AudioPlayerController();
+    ctrl.playSegment(15.0, 30.0, true);
+    assert.equal(ctrl.currentLoopStart, 14.9);
+    assert.equal(ctrl.pendingSeek, 14.9);
+    assert.equal(ctrl.pendingPlay, true);
+
+    ctrl.playFull(45.0);
+    assert.equal(ctrl.pendingSeek, 45.0);
+    assert.equal(ctrl.pendingPlay, true);
+  });
 });
 
 describe("UnifiedPlayerController - Unit Tests", () => {
@@ -167,6 +187,15 @@ describe("UnifiedPlayerController - Unit Tests", () => {
     unified.load("/audio/cambridge19/Test1.mp3", 0, false, 1850.5);
     assert.equal(unified.getDuration(), 1850.5);
     assert.equal(unified.audioPlayer.getDuration(), 1850.5);
+  });
+
+  test("speakText delegates to audio replayCurrentSegment in audio mode without throwing", () => {
+    const unified = new UnifiedPlayerController("dummy-id");
+    unified.load("/audio/test.mp3");
+    assert.equal(unified.isAudioMode, true);
+    // Should call replayCurrentSegment internally without throwing error
+    unified.speakText("Sample Cambridge IELTS sentence", "en");
+    assert.equal(unified.audioPlayer.pendingPlay, true);
   });
 });
 

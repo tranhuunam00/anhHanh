@@ -100,6 +100,7 @@ export default function App() {
   const setActiveTab = useCallback((tabOrFn) => {
     setActiveTabState((prev) => {
       const nextTab = typeof tabOrFn === "function" ? tabOrFn(prev) : tabOrFn;
+      activeTabRef.current = nextTab;
       const targetPath = getPathFromTab(nextTab);
       if (typeof window !== "undefined" && window.location.pathname !== targetPath) {
         window.history.pushState({ tab: nextTab }, "", targetPath);
@@ -537,9 +538,11 @@ export default function App() {
     playerController.load(lesson.audioUrl, firstStartTime, isDictation, fallbackDuration);
 
     if (isDictation) {
+      activeTabRef.current = "tab-dictation";
       setActiveTab("tab-dictation");
-      playChallengeAtIndex(lesson, 0);
+      playChallengeAtIndex(lesson, 0, true);
     } else {
+      activeTabRef.current = "tab-transcript";
       setActiveTab("tab-transcript");
       cueChallengeAtIndex(lesson, 0);
       playerController.pause();
@@ -547,9 +550,9 @@ export default function App() {
   };
 
   // Play segment for challenge at specific index
-  const playChallengeAtIndex = (lessonObj, index) => {
+  const playChallengeAtIndex = (lessonObj, index, force = false) => {
     if (!lessonObj || !lessonObj.challenges || !lessonObj.challenges[index]) return;
-    if (activeTabRef.current !== "tab-dictation") return; // Safety guard: never play if not on dictation tab
+    if (!force && activeTabRef.current !== "tab-dictation") return; // Safety guard: never play if not on dictation tab
     const c = lessonObj.challenges[index];
     const prevC = index > 0 ? lessonObj.challenges[index - 1] : null;
     const nextC = index < lessonObj.challenges.length - 1 ? lessonObj.challenges[index + 1] : null;
@@ -600,7 +603,7 @@ export default function App() {
     }
     if (index < 0) return;
     setCurrentIndex(index);
-    playChallengeAtIndex(currentLesson, index);
+    playChallengeAtIndex(currentLesson, index, true);
 
     // If user goes back to a previously reached sentence: auto-fill and mark completed!
     // User requirement: "các câu trước đó mặc định đã điền, chỉ cần quan tâm đang đến câu nào thôi, cái đáp án đó tự fill"
@@ -789,7 +792,11 @@ export default function App() {
 
   const handleSpeakSentence = () => {
     if (currentChallenge) {
-      playerController.speakText(currentChallenge.text, currentLesson?.detected_source_lang);
+      if (playerController?.isAudioMode) {
+        playerController.replayCurrentSegment();
+      } else {
+        playerController.speakText(currentChallenge.text, currentLesson?.detected_source_lang);
+      }
     }
   };
 
@@ -1197,6 +1204,7 @@ export default function App() {
               playerController={playerController}
               isActive={activeTab === "tab-transcript"}
               onGoToChallenge={(pos) => {
+                activeTabRef.current = "tab-dictation";
                 setActiveTab("tab-dictation");
                 goToChallenge(pos - 1);
               }}

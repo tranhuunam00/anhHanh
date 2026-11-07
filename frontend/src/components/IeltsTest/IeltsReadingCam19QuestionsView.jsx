@@ -68,6 +68,7 @@ export function renderCam19ReadingPassageQuestions(groups, answers, onChange, on
             {/* 2. FILL NOTES / TABLE / SUMMARY */}
             {(groupType === "fill_notes" ||
               groupType === "fill_summary" ||
+              groupType === "summary_with_options" ||
               groupType === "notes_completion" ||
               groupType === "table_completion" ||
               groupType === "summary_completion") && (

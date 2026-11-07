@@ -84,10 +84,14 @@ export const TranscriptPage = React.memo(({ lesson, playerController, onGoToChal
     if (!isActive || !playerController) return;
 
     const interval = setInterval(() => {
-      setCurrentTime(playerController.getCurrentTime() || 0);
-      setDuration(playerController.getDuration() || 0);
-      const playing = playerController.isPlaying?.() ?? false;
-      setIsPlayingFull(playing);
+      try {
+        setCurrentTime(playerController.getCurrentTime() || 0);
+        setDuration(playerController.getDuration() || 0);
+        const playing = typeof playerController.isPlaying === "function" ? playerController.isPlaying() : false;
+        setIsPlayingFull(playing);
+      } catch (err) {
+        console.warn("TranscriptPage audio polling error:", err);
+      }
     }, 300);
 
     return () => clearInterval(interval);

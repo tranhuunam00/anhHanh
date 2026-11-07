@@ -16,10 +16,10 @@ skill_agent_namth/
 cookies.txt
 *cookies*.txt
 data/uploads/
-# Cambridge IELTS raw sources, audio & PDFs
+# Root duplicate audio folder (only frontend/public/audio is served by Vite)
+/audio/
+# Cambridge IELTS raw heavy PDFs & duplicates (PDFs > 100MB blocked by GitHub)
 *.pdf
-audio/
-frontend/public/audio/cambridge19/
-frontend/public/audio/cambridge20/
-frontend/public/audio/cambridge*/
+frontend/public/audio/cambridge19/IELTS 19 Audio/
+frontend/public/audio/cambridge20/剑桥20/
 
