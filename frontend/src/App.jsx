@@ -26,7 +26,8 @@ import { DestinationB2Page } from "./components/DestinationB2/DestinationB2Page"
 import { VisualVocabPage } from "./components/VisualVocab";
 import { RootWordsPage } from "./components/RootWords";
 import { IeltsTestPage } from "./pages/IeltsTestPage";
-import { GraduationCap } from "./constants/icons";
+import { PrimaryKidsPage } from "./components/PrimaryKids";
+import { GraduationCap, PawPrint } from "./constants/icons";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -70,6 +71,7 @@ export default function App() {
     if (path === "/history" || path.startsWith("/history/")) return "tab-history";
     if (path === "/audio-studio" || path.startsWith("/audio-studio/")) return "tab-audio-studio";
     if (path === "/ielts" || path.startsWith("/ielts/") || path === "/ielts-test" || path.startsWith("/ielts-test/")) return "tab-ielts-test";
+    if (path === "/kids" || path.startsWith("/kids/") || path === "/tieu-hoc" || path.startsWith("/tieu-hoc/") || path === "/primary" || path.startsWith("/primary/")) return "tab-primary";
     return "tab-dictation";
   };
 
@@ -995,6 +997,16 @@ export default function App() {
             </button>
 
             <button
+              className={`tab-btn ${activeTab === "tab-primary" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-primary")}
+              style={activeTab === "tab-primary" ? { borderColor: "#10b981" } : {}}
+              title="Tiểu Học: Global English 4 (Stage 4) - Vườn Thú Tiếng Anh Safari"
+            >
+              <PawPrint className="tab-btn-icon" />
+              <span>Tiểu học</span>
+            </button>
+
+            <button
               className={`tab-btn ${activeTab === "tab-root-words" ? "active" : ""}`}
               onClick={() => setActiveTab("tab-root-words")}
               style={activeTab === "tab-root-words" ? { borderColor: "#2563eb" } : {}}
@@ -1286,6 +1298,11 @@ export default function App() {
             token={token}
             onOpenAuth={() => setIsAuthOpen(true)}
           />
+        </div>
+
+        {/* TAB 12: Tiểu Học - Global English 4 Gamified Safari */}
+        <div style={{ display: activeTab === "tab-primary" ? "block" : "none" }}>
+          <PrimaryKidsPage isActive={activeTab === "tab-primary"} />
         </div>
       </main>
 

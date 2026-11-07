@@ -1138,3 +1138,17 @@ export const FastForward = (props) => (
     <polygon points="2 19 11 12 2 5 2 19" />
   </BaseIcon>
 );
+
+export const IconPaw = (props) => (
+  <BaseIcon {...props}>
+    <circle cx="12" cy="5" r="2" />
+    <circle cx="6" cy="9" r="2" />
+    <circle cx="18" cy="9" r="2" />
+    <circle cx="4" cy="15" r="1.8" />
+    <path d="M12 12c-2.8 0-5 2.2-5 5 0 2 1.6 3.5 3.5 3.5.8 0 1.5-.5 1.5-.5s.7.5 1.5.5c1.9 0 3.5-1.5 3.5-3.5 0-2.8-2.2-5-5-5z" />
+  </BaseIcon>
+);
+
+export const PawPrint = IconPaw;
+export const Paw = IconPaw;
+

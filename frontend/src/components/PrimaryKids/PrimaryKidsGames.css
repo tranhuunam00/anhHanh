@@ -1,0 +1,328 @@
+
+.kids-vocab-meaning {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.kids-vocab-example {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.5rem;
+  border-left: 3px solid var(--primary);
+  font-style: italic;
+}
+
+/* Panda Feeder Game Area */
+.kids-game-box {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.kids-game-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.kids-game-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+}
+
+.kids-game-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.kids-panda-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.kids-panda-mascot-big {
+  font-size: 4.5rem;
+  animation: pandaBounce 2s infinite ease-in-out;
+}
+
+@keyframes pandaBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.kids-food-card-current {
+  background: var(--bg-secondary);
+  border: 2px dashed var(--border-color);
+  border-radius: 1.25rem;
+  padding: 1.25rem 2.5rem;
+  text-align: center;
+}
+
+.kids-food-icon-big {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.kids-food-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.kids-bins-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.kids-bin-btn {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kids-bin-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.kids-bin-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.kids-bin-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Fox Runner River Word Blocks */
+.kids-river-stage {
+  background: var(--bg-secondary);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border: 2px solid var(--border-color);
+}
+
+.kids-sentence-target-box {
+  background: var(--bg-card);
+  border: 2px dashed var(--primary);
+  border-radius: 0.85rem;
+  padding: 1rem;
+  min-height: 70px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.kids-word-stone {
+  background: var(--primary);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.65rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.25);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.kids-word-stone:hover {
+  transform: translateY(-2px);
+}
+
+.kids-word-stone.in-pool {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-color);
+}
+
+.kids-word-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* Space Explorer Planets Track */
+.kids-planets-track {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.kids-planet-pill {
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kids-planet-pill.active {
+  border-color: #eab308;
+  background: rgba(234, 179, 8, 0.1);
+  transform: translateY(-2px);
+}
+
+.kids-planet-icon {
+  font-size: 1.85rem;
+}
+
+/* Exam & Question Options */
+.kids-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.kids-option-card {
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
+  border-radius: 0.85rem;
+  padding: 0.9rem 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.kids-option-card:hover {
+  border-color: var(--primary);
+  background: var(--bg-card);
+}
+
+.kids-option-card.correct {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.kids-option-card.wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.kids-option-letter {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Feedback & Encouragement Box */
+.kids-feedback-box {
+  background: var(--bg-secondary);
+  border-radius: 0.85rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-left: 4px solid var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.kids-feedback-avatar {
+  font-size: 2rem;
+}
+
+/* Action Button Bar */
+.kids-action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.kids-btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.65rem 1.35rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.kids-btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.kids-btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-color);
+  border-radius: 0.75rem;
+  padding: 0.65rem 1.15rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.kids-btn-secondary:hover {
+  border-color: var(--primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .kids-safari-container {
+    padding: 0.75rem 0.5rem 2.5rem 0.5rem;
+  }
+  .kids-bins-row {
+    grid-template-columns: 1fr;
+  }
+  .kids-vocab-grid {
+    grid-template-columns: 1fr;
+  }
+}
