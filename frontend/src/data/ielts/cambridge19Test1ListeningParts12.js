@@ -5,12 +5,50 @@ export const listeningParts12 = [
     title: "Part 1: Hinchingbrooke Country Park",
     instructions: "Complete the notes below.\nWrite ONE WORD AND/OR A NUMBER for each answer.",
     questionsRange: [1, 10],
+    noteBlock: {
+      title: "Hinchingbrooke Country Park",
+      sections: [
+        {
+          heading: "The park",
+          lines: [
+            { prefix: "Area: ", number: 1, suffix: " hectares" },
+            { text: "Habitats: wetland, grassland and woodland" },
+            { prefix: "Wetland: lakes, ponds and a ", number: 2, suffix: "" },
+            { text: "Wildlife includes birds, insects and animals" }
+          ]
+        },
+        {
+          heading: "Subjects studied in educational visits include",
+          lines: [
+            { prefix: "Science: Children look at ", number: 3, suffix: " about plants, etc." },
+            { prefix: "Geography: includes learning to use a ", number: 4, suffix: " and compass" },
+            { text: "History: changes in land use" },
+            { prefix: "Leisure and tourism: mostly concentrates on the park's ", number: 5, suffix: "" },
+            { prefix: "Music: Children make ", number: 6, suffix: " with natural materials, and experiment with rhythm and speed." }
+          ]
+        },
+        {
+          heading: "Benefits of outdoor educational visits",
+          lines: [
+            { prefix: "They give children a feeling of ", number: 7, suffix: " that they may not have elsewhere." },
+            { prefix: "Children learn new ", number: 8, suffix: " and gain self-confidence." }
+          ]
+        },
+        {
+          heading: "Practical issues",
+          lines: [
+            { prefix: "Cost per child: £ ", number: 9, suffix: "" },
+            { prefix: "Adults, such as ", number: 10, suffix: ", free" }
+          ]
+        }
+      ]
+    },
     items: [
       {
         number: 1,
         type: "fill_notes",
         section: "The park",
-        prefix: "Area: covers ",
+        prefix: "Area: ",
         suffix: " hectares",
         answer: "69",
         answers: ["69", "sixty-nine", "sixty nine"]

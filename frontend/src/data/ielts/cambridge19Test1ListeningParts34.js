@@ -130,6 +130,40 @@ export const listeningParts34 = [
     title: "Part 4: Céide Fields Neolithic Farming",
     instructions: "Complete the notes below.\nWrite ONE WORD ONLY for each answer.",
     questionsRange: [31, 40],
+    noteBlock: {
+      title: "Céide Fields",
+      subtitle: "an important Neolithic archaeological site in the northwest of Ireland",
+      sections: [
+        {
+          heading: "Discovery",
+          lines: [
+            { prefix: "In the 1930s, a local teacher realised that stones beneath the bog surface were once ", number: 31, suffix: "." },
+            { prefix: "His ", number: 32, suffix: " became an archaeologist and undertook an investigation of the site:" },
+            { prefix: "— a traditional method used by local people to dig for ", number: 33, suffix: " was used to identify where stones were located" },
+            { text: "— carbon dating later proved the site was Neolithic." },
+            { prefix: "Items are well preserved in the bog because of a lack of ", number: 34, suffix: "." }
+          ]
+        },
+        {
+          heading: "Neolithic farmers",
+          lines: [
+            { prefix: "Houses were ", number: 35, suffix: " in shape and had a hole in the roof." },
+            { text: "Neolithic innovations include:" },
+            { text: "— cooking indoors" },
+            { prefix: "— pots used for storage and to make ", number: 36, suffix: "" },
+            { prefix: "Each field at Céide was large enough to support a big ", number: 37, suffix: "." },
+            { prefix: "The fields were probably used to restrict the grazing of animals — no evidence of structures to house them during ", number: 38, suffix: "." }
+          ]
+        },
+        {
+          heading: "Reasons for the decline in farming",
+          lines: [
+            { prefix: "a decline in ", number: 39, suffix: " quality" },
+            { prefix: "an increase in ", number: 40, suffix: "" }
+          ]
+        }
+      ]
+    },
     items: [
       {
         number: 31,

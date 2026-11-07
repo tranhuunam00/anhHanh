@@ -6,6 +6,55 @@ export const cambridge19Test4ListeningPart1 = {
   title: "Part 1: First Day at Work",
   instructions: "Questions 1–6: Complete the notes below. Write ONE WORD AND/OR A NUMBER for each answer.\nQuestions 7–10: Complete the table below. Write ONE WORD ONLY for each answer.",
   questionsRange: [1, 10],
+  contentBlocks: [
+    {
+      type: "notes",
+      groupTitle: "Questions 1–6",
+      instructions: "Complete the notes below. Write ONE WORD AND/OR A NUMBER for each answer.",
+      title: "First day at work",
+      sections: [
+        {
+          heading: "",
+          lines: [
+            { prefix: "Name of supervisor: ", number: 1, suffix: "" },
+            { prefix: "Where to leave coat and bag: use ", number: 2, suffix: " in staffroom" },
+            { text: "See Tiffany in HR:" },
+            { prefix: "— to give ", number: 3, suffix: "" },
+            { prefix: "— to collect ", number: 4, suffix: "" },
+            { prefix: "Location of HR office: on ", number: 5, suffix: " floor" },
+            { prefix: "Supervisor's mobile number: ", number: 6, suffix: "" }
+          ]
+        }
+      ]
+    },
+    {
+      type: "table",
+      groupTitle: "Questions 7–10",
+      instructions: "Complete the table below. Write ONE WORD ONLY for each answer.",
+      title: "Responsibilities",
+      headers: ["", "Task 1", "Task 2", "Notes"],
+      rows: [
+        [
+          "Bakery section",
+          "Check sell-by dates",
+          "Change price labels",
+          { prefix: "Use ", number: 7, suffix: " labels" }
+        ],
+        [
+          "Sushi takeaway counter",
+          { prefix: "Re-stock with ", number: 8, suffix: " boxes if needed" },
+          "Wipe preparation area and clean the sink",
+          "Do not clean any knives"
+        ],
+        [
+          "Meat and fish counters",
+          "Clean the serving area, including the weighing scales",
+          { prefix: "Collect ", number: 9, suffix: " for the fish from the cold-room" },
+          { prefix: "Must wear special ", number: 10, suffix: "" }
+        ]
+      ]
+    }
+  ],
   items: [
     {
       number: 1,

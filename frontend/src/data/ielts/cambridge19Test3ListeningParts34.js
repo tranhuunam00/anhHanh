@@ -161,6 +161,43 @@ export const cambridge19Test3ListeningPart4 = {
   title: "Part 4: Microplastics",
   instructions: "Complete the notes below.\nWrite ONE WORD ONLY for each answer.",
   questionsRange: [31, 40],
+  noteBlock: {
+    title: "Microplastics",
+    sections: [
+      {
+        heading: "Where microplastics come from",
+        lines: [
+          { prefix: "fibres from some ", number: 31, suffix: " during washing" },
+          { text: "the breakdown of large pieces of plastic waste" },
+          { text: "waste from industry" },
+          { text: "the action of vehicle tyres on roads" }
+        ]
+      },
+      {
+        heading: "Effects of microplastics",
+        lines: [
+          { prefix: "They cause injuries to the ", number: 32, suffix: " of wildlife and affect their digestive systems." },
+          { prefix: "They enter the food chain, e.g., in bottled and tap water, ", number: 33, suffix: " and seafood." },
+          { prefix: "They may not affect human health, but they are already banned in skin cleaning products and ", number: 34, suffix: " in some countries." },
+          { prefix: "Microplastics enter the soil through the air, rain and ", number: 35, suffix: " in the soil." }
+        ]
+      },
+      {
+        heading: "Microplastics in the soil — a study by Anglia Ruskin University",
+        lines: [
+          { prefix: "Earthworms are important because they add ", number: 36, suffix: " to the soil." },
+          { prefix: "The study aimed to find whether microplastics in earthworms affect the ", number: 37, suffix: " of plants." },
+          { text: "The study found that microplastics caused:" },
+          { prefix: "— ", number: 38, suffix: " loss in earthworms" },
+          { text: "— fewer seeds to germinate" },
+          { prefix: "— a rise in the level of ", number: 39, suffix: "" },
+          { text: "The study concluded:" },
+          { text: "— soil should be seen as an important natural process." },
+          { prefix: "— changes to soil damage both ecosystems and ", number: 40, suffix: "" }
+        ]
+      }
+    ]
+  },
   items: [
     {
       number: 31,

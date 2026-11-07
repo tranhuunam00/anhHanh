@@ -5,17 +5,25 @@ import {
   extractMatchingOptions,
   isChooseTwoSelected
 } from "../../utils/cambridgeOptionUtils.js";
+import {
+  renderBlock,
+  renderNoteBlock,
+  renderFormBlock,
+  renderTableBlock,
+  extractAllHandledQuestionNumbers
+} from "./IeltsListeningBlockRenderer.jsx";
 
 export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoToggle, evaluation, isReview) {
   if (!part) return null;
 
+  const handledQuestionNumbers = extractAllHandledQuestionNumbers(part);
   const isMapPart = Boolean(part.mapImage);
   const mapItems = isMapPart
     ? (part.items?.filter((it) => it.type === "map_labeling") || [])
     : [];
   const regularItems = isMapPart
-    ? (part.items?.filter((it) => !mapItems.includes(it)) || [])
-    : (part.items || []);
+    ? (part.items?.filter((it) => !mapItems.includes(it) && !handledQuestionNumbers.has(it.number)) || [])
+    : (part.items?.filter((it) => !handledQuestionNumbers.has(it.number)) || []);
 
   const renderItem = (item) => {
     // 1. Fill Notes / Table completion
@@ -270,6 +278,32 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
           {part.instructions}
         </p>
       </div>
+
+      {/* Structured Content Blocks (Notes, Forms, Tables) */}
+      {part.contentBlocks && Array.isArray(part.contentBlocks) && (
+        <div className="ielts-content-blocks" style={{ marginTop: "16px" }}>
+          {part.contentBlocks.map((b, idx) => (
+            <React.Fragment key={idx}>
+              {renderBlock(b, answers, onChange, evaluation, isReview)}
+            </React.Fragment>
+          ))}
+        </div>
+      )}
+      {!part.contentBlocks && part.noteBlock && (
+        <div style={{ marginTop: "16px" }}>
+          {renderNoteBlock(part.noteBlock, answers, onChange, evaluation, isReview)}
+        </div>
+      )}
+      {!part.contentBlocks && part.formBlock && (
+        <div style={{ marginTop: "16px" }}>
+          {renderFormBlock(part.formBlock, answers, onChange, evaluation, isReview)}
+        </div>
+      )}
+      {!part.contentBlocks && part.tableBlock && (
+        <div style={{ marginTop: "16px" }}>
+          {renderTableBlock(part.tableBlock, answers, onChange, evaluation, isReview)}
+        </div>
+      )}
 
       {/* Regular Questions (MCQ, Choose Two, Notes, Matching) */}
       {regularItems.length > 0 && (

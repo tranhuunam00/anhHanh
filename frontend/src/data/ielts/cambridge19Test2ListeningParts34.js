@@ -146,6 +146,57 @@ export const cambridge19Test2ListeningPart4 = {
   title: "Part 4: Tardigrades",
   instructions: "Complete the notes below.\nWrite ONE WORD ONLY for each answer.",
   questionsRange: [31, 40],
+  noteBlock: {
+    title: "Tardigrades",
+    subtitle: "more than 1,000 species, 0.05–1.2 millimetres long",
+    sections: [
+      {
+        heading: "",
+        lines: [
+          { prefix: "also known as water 'bears' (due to how they ", number: 31, suffix: ") and 'moss piglets'" }
+        ]
+      },
+      {
+        heading: "Physical appearance",
+        lines: [
+          { prefix: "a ", number: 32, suffix: ", round body and four pairs of legs" },
+          { prefix: "claws or ", number: 33, suffix: " for gripping" },
+          { text: "absence of respiratory organs" },
+          { prefix: "body filled with a liquid that carries both ", number: 34, suffix: " and blood" },
+          { prefix: "mouth shaped like a ", number: 35, suffix: " with teeth called stylets" }
+        ]
+      },
+      {
+        heading: "Habitat",
+        lines: [
+          { text: "often found at the bottom of a lake or on plants" },
+          { prefix: "very resilient and can exist in very low or high ", number: 36, suffix: "" }
+        ]
+      },
+      {
+        heading: "Cryptobiosis",
+        lines: [
+          { text: "In dry conditions, they roll into a ball called a 'tun'." },
+          { text: "They stay alive with a much lower metabolism than usual." },
+          { prefix: "A type of ", number: 37, suffix: " ensures their DNA is not damaged." },
+          { prefix: "Research is underway to find out how many days they can stay alive in ", number: 38, suffix: "" }
+        ]
+      },
+      {
+        heading: "Feeding",
+        lines: [
+          { prefix: "consume liquids, e.g., those found in moss or ", number: 39, suffix: "" },
+          { text: "may eat other tardigrades" }
+        ]
+      },
+      {
+        heading: "Conservation status",
+        lines: [
+          { prefix: "They are not considered to be ", number: 40, suffix: "" }
+        ]
+      }
+    ]
+  },
   items: [
     {
       number: 31,

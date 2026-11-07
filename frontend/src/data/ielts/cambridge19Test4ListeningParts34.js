@@ -155,6 +155,48 @@ export const cambridge19Test4ListeningPart4 = {
   title: "Part 4: Tree Planting & Reforestation",
   instructions: "Complete the notes below.\nWrite ONE WORD ONLY for each answer.",
   questionsRange: [31, 40],
+  noteBlock: {
+    title: "Tree planting",
+    sections: [
+      {
+        heading: "Reforestation projects should:",
+        lines: [
+          { text: "include a range of tree species" },
+          { prefix: "not include invasive species because of possible ", number: 31, suffix: " with native species" },
+          { prefix: "aim to capture carbon, protect the environment and provide sustainable sources of ", number: 32, suffix: " for local people" },
+          { prefix: "use tree seeds with a high genetic diversity to increase resistance to ", number: 33, suffix: " and climate change" },
+          { prefix: "plant trees on previously forested land which is in a bad condition, not select land which is being used for ", number: 34, suffix: "" }
+        ]
+      },
+      {
+        heading: "Large-scale reforestation projects",
+        lines: [
+          { prefix: "Base planning decisions on information from accurate ", number: 35, suffix: "" },
+          { prefix: "Drones are useful for identifying areas in Brazil which are endangered by keeping ", number: 36, suffix: " and illegal logging." }
+        ]
+      },
+      {
+        heading: "Lampang Province, Northern Thailand",
+        lines: [
+          { text: "A forest was restored in an area damaged by mining." },
+          { text: "A variety of native fig trees were planted, which are important for" },
+          { text: "— supporting many wildlife species" },
+          { prefix: "— increasing the ", number: 37, suffix: " of recovery by attracting animals and birds," },
+          { prefix: "e.g., ", number: 38, suffix: " were soon attracted to the area." }
+        ]
+      },
+      {
+        heading: "Involving local communities",
+        lines: [
+          { prefix: "Destruction of mangrove forests in Madagascar made it difficult for people to make a living from ", number: 39, suffix: "" },
+          { text: "The mangrove reforestation project:" },
+          { text: "— provided employment for local people" },
+          { text: "— restored a healthy ecosystem" },
+          { prefix: "— protects against the higher risk of ", number: 40, suffix: "" }
+        ]
+      }
+    ]
+  },
   items: [
     {
       number: 31,

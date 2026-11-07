@@ -6,6 +6,36 @@ export const cambridge19Test2ListeningPart1 = {
   title: "Part 1: Guitar Group",
   instructions: "Questions 1–6: Complete the form below. Write ONE WORD AND/OR A NUMBER for each answer.\nQuestions 7–10: Complete the table below. Write ONE WORD ONLY for each answer.",
   questionsRange: [1, 10],
+  contentBlocks: [
+    {
+      type: "form",
+      groupTitle: "Questions 1–6",
+      instructions: "Complete the form below. Write ONE WORD AND/OR A NUMBER for each answer.",
+      title: "Guitar Group",
+      fields: [
+        { label: "Coordinator: Gary", number: 1, prefix: "", suffix: "" },
+        { label: "Level:", number: 2, prefix: "", suffix: "" },
+        { label: "Place: the", number: 3, prefix: "", suffix: "" },
+        { label: "Address:", number: 4, prefix: "", suffix: " Street, First floor, Room T347" },
+        { label: "Time: Thursday morning at", number: 5, prefix: "", suffix: "" },
+        { label: "Recommended website: 'The perfect", number: 6, prefix: "", suffix: "'" }
+      ]
+    },
+    {
+      type: "table",
+      groupTitle: "Questions 7–10",
+      instructions: "Complete the table below. Write ONE WORD ONLY for each answer.",
+      title: "A typical 45-minute guitar lesson",
+      headers: ["Time", "Activity", "Notes"],
+      rows: [
+        ["5 minutes", "tuning guitars", { prefix: "using an app or by ", number: 7, suffix: "" }],
+        ["10 minutes", "strumming chords using our thumbs", { prefix: "keeping time while the teacher is ", number: 8, suffix: "" }],
+        ["15 minutes", "playing songs", { prefix: "often listening to a ", number: 9, suffix: " of a song" }],
+        ["10 minutes", "playing single notes and simple tunes", { prefix: "playing together, then playing ", number: 10, suffix: "" }],
+        ["5 minutes", "noting things to practise at home", "-"]
+      ]
+    }
+  ],
   items: [
     {
       number: 1,

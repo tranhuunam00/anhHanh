@@ -6,6 +6,43 @@ export const cambridge19Test3ListeningPart1 = {
   title: "Part 1: Local Food Shops",
   instructions: "Questions 1–6: Complete the notes below. Write ONE WORD AND/OR A NUMBER for each answer.\nQuestions 7–10: Complete the table below. Write ONE WORD ONLY for each answer.",
   questionsRange: [1, 10],
+  contentBlocks: [
+    {
+      type: "notes",
+      groupTitle: "Questions 1–6",
+      instructions: "Complete the notes below. Write ONE WORD AND/OR A NUMBER for each answer.",
+      title: "Local food shops",
+      sections: [
+        {
+          heading: "Where to go",
+          lines: [
+            { text: "Fish market" },
+            { prefix: "Kite Place — near the ", number: 1, suffix: "" },
+            { prefix: "cross the ", number: 2, suffix: " and turn right" },
+            { prefix: "best to go before ", number: 3, suffix: " pm, earlier than closing time" },
+            { text: "Organic shop" },
+            { prefix: "called '", number: 4, suffix: "'" },
+            { text: "below a restaurant in the large, grey building" },
+            { prefix: "look for the large ", number: 5, suffix: " outside" },
+            { text: "Supermarket" },
+            { prefix: "take a ", number: 6, suffix: " minibus, number 289" }
+          ]
+        }
+      ]
+    },
+    {
+      type: "table",
+      groupTitle: "Questions 7–10",
+      instructions: "Complete the table below. Write ONE WORD ONLY for each answer.",
+      title: "Shopping",
+      headers: ["", "To buy", "Other ideas"],
+      rows: [
+        ["Fish market", "a dozen prawns", { prefix: "a handful of ", number: 7, suffix: " (type of seaweed)" }],
+        ["Organic shop", { prefix: "beans and a ", number: 8, suffix: " for dessert" }, { prefix: "spices and ", number: 9, suffix: "" }],
+        ["Bakery", "a brown loaf", { prefix: "a ", number: 10, suffix: " tart" }]
+      ]
+    }
+  ],
   items: [
     {
       number: 1,
