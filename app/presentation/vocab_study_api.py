@@ -15,6 +15,8 @@ from app.presentation.vocab_schemas import ReviewResultRequest
 from app.application.vocab_srs_service import (
     calculate_srs_progress,
     generate_quiz_options,
+    resolve_mastered_at_timestamp,
+    compute_time_range_bounds,
     FALLBACK_DISTRACTORS,
 )
 
@@ -100,6 +102,9 @@ async def get_practice_session(
     time_range: Optional[str] = Query(None, alias='time_range'),
     start_date: Optional[str] = Query(None, alias='start_date'),
     end_date: Optional[str] = Query(None, alias='end_date'),
+    mastered_time_range: Optional[str] = Query(None, alias='mastered_time_range'),
+    mastered_start_date: Optional[str] = Query(None, alias='mastered_start_date'),
+    mastered_end_date: Optional[str] = Query(None, alias='mastered_end_date'),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
@@ -113,30 +118,22 @@ async def get_practice_session(
             stmt = stmt.where(UserVocabulary.status == sf)
 
     if time_range and time_range.upper() != 'ALL':
-        tr = time_range.upper()
-        now = datetime.now(timezone.utc)
-        if tr == 'TODAY':
-            today_start = datetime(now.year, now.month, now.day, 0, 0, 0, tzinfo=timezone.utc)
-            stmt = stmt.where(UserVocabulary.created_at >= today_start)
-        elif tr == '3DAYS':
-            stmt = stmt.where(UserVocabulary.created_at >= now - timedelta(days=3))
-        elif tr == '7DAYS':
-            stmt = stmt.where(UserVocabulary.created_at >= now - timedelta(days=7))
-        elif tr == '30DAYS':
-            stmt = stmt.where(UserVocabulary.created_at >= now - timedelta(days=30))
-        elif tr == 'CUSTOM':
-            if start_date:
-                try:
-                    s_dt = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc)
-                    stmt = stmt.where(UserVocabulary.created_at >= s_dt)
-                except Exception:
-                    pass
-            if end_date:
-                try:
-                    e_dt = datetime.fromisoformat(end_date).replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
-                    stmt = stmt.where(UserVocabulary.created_at <= e_dt)
-                except Exception:
-                    pass
+        s_dt, e_dt = compute_time_range_bounds(time_range, start_date, end_date)
+        if s_dt is not None:
+            stmt = stmt.where(UserVocabulary.created_at >= s_dt)
+        if e_dt is not None:
+            stmt = stmt.where(UserVocabulary.created_at <= e_dt)
+
+    if mastered_time_range and mastered_time_range.upper() != 'ALL':
+        ms_dt, me_dt = compute_time_range_bounds(mastered_time_range, mastered_start_date, mastered_end_date)
+        stmt = stmt.where(
+            UserVocabulary.status == 'MASTERED',
+            UserVocabulary.mastered_at != None
+        )
+        if ms_dt is not None:
+            stmt = stmt.where(UserVocabulary.mastered_at >= ms_dt)
+        if me_dt is not None:
+            stmt = stmt.where(UserVocabulary.mastered_at <= me_dt)
 
     res = await db.execute(stmt)
     all_words = list(res.scalars().all())
@@ -223,6 +220,7 @@ async def submit_vocab_review_result(
             vocab.mastery_score = max(vocab.mastery_score or 0, 4)
     else:
         vocab.status = srs_update["status"]
+    vocab.mastered_at = resolve_mastered_at_timestamp(vocab.status)
 
     await db.commit()
     await db.refresh(vocab)

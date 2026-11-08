@@ -8,7 +8,7 @@ import {
 } from "../src/utils/ieltsDictationChallengeBuilder.js";
 import { CAMBRIDGE_19_LESSONS, CAMBRIDGE_19_FULL_LESSONS } from "../src/constants/ieltsCambridge19Presets.js";
 import { CAMBRIDGE_20_LESSONS, CAMBRIDGE_20_FULL_LESSONS } from "../src/constants/ieltsCambridge20Presets.js";
-import { CAMBRIDGE_21_LESSONS } from "../src/constants/ieltsCambridge21Presets.js";
+import { CAMBRIDGE_21_LESSONS, CAMBRIDGE_21_FULL_LESSONS } from "../src/constants/ieltsCambridge21Presets.js";
 
 describe("ieltsDictationChallengeBuilder - Unit Tests", () => {
   describe("parseDurationToSeconds", () => {
@@ -139,12 +139,18 @@ describe("ieltsDictationChallengeBuilder - Unit Tests", () => {
       assert.ok(fullLesson.challenges.length >= 30);
     });
 
-    test("Builds lesson for Cambridge 21 full test", () => {
-      const preset = CAMBRIDGE_21_LESSONS[0];
-      const lesson = buildIeltsAudioLesson(preset);
-      assert.ok(lesson);
-      assert.equal(lesson.isAudio, true);
-      assert.ok(lesson.challenges.length >= 30);
+    test("Builds lesson for Cambridge 21 split task and full test with authentic Whisper transcript", () => {
+      const splitPreset = CAMBRIDGE_21_LESSONS[0];
+      const splitLesson = buildIeltsAudioLesson(splitPreset);
+      assert.ok(splitLesson);
+      assert.equal(splitLesson.isAudio, true);
+      assert.ok(splitLesson.challenges.length >= 40);
+
+      const fullPreset = CAMBRIDGE_21_FULL_LESSONS[0];
+      const fullLesson = buildIeltsAudioLesson(fullPreset);
+      assert.ok(fullLesson);
+      assert.equal(fullLesson.isAudio, true);
+      assert.ok(fullLesson.challenges.length >= 200);
     });
 
     test("Returns null for null or invalid preset", () => {

@@ -1,9 +1,25 @@
 import React, { useState, useMemo } from "react";
 import { PRESET_LANGUAGES, PRESET_LESSONS_BY_CATEGORY } from "../../constants/presets";
 import { extractYouTubeId } from "../../utils/textNormalizer";
-import { Lightbulb, Clock, PlayCircle } from "../Icons";
+import {
+  Lightbulb,
+  Clock,
+  PlayCircle,
+  Globe,
+  MessageCircle,
+  Target,
+  GraduationCap,
+  ArrowRight
+} from "../Icons";
 import { IeltsPresetsView } from "./IeltsPresetsView";
 import "../../styles/ieltsPresets.css";
+
+function renderCategoryIcon(iconKey, size = 15) {
+  if (iconKey === "message") return <MessageCircle size={size} />;
+  if (iconKey === "target") return <Target size={size} />;
+  if (iconKey === "graduation") return <GraduationCap size={size} />;
+  return <Globe size={size} />;
+}
 
 export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading }) => {
   const [selectedLang, setSelectedLang] = useState("en");
@@ -37,7 +53,9 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
         <div className="presets-header-title">
           <PlayCircle size={22} style={{ verticalAlign: "middle", marginRight: 6 }} />
           <span>Thử ngay – Luyện đa ngôn ngữ</span>
-          <span className="presets-header-badge">5 Cấp độ Dễ ➔ Khó</span>
+          <span className="presets-header-badge">
+            5 Cấp độ Dễ <ArrowRight size={12} style={{ verticalAlign: "middle", margin: "0 2px" }} /> Khó
+          </span>
         </div>
         <p className="presets-header-subtitle">
           <Lightbulb size={16} color="var(--primary, #6366f1)" style={{ verticalAlign: "middle", marginRight: 6 }} />
@@ -52,12 +70,14 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
           return (
             <button
               key={lang.id}
+              type="button"
               role="tab"
               aria-selected={isLangActive}
               className={`preset-lang-tab ${isLangActive ? "active" : ""}`}
               onClick={() => handleLangChange(lang)}
             >
-              <span className="preset-lang-flag">{lang.flag}</span>
+              <Globe size={15} className="preset-lang-icon" />
+              <span className="preset-lang-code-badge">{lang.code || lang.id.toUpperCase()}</span>
               <span className="preset-lang-name">{lang.name}</span>
             </button>
           );
@@ -72,12 +92,13 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
             return (
               <button
                 key={sub.id}
+                type="button"
                 role="tab"
                 aria-selected={isSubActive}
                 className={`preset-subcat-tab ${isSubActive ? "active" : ""}`}
                 onClick={() => setSelectedSubcat(sub.id)}
               >
-                <span className="preset-subcat-icon">{sub.icon}</span>
+                <span className="preset-subcat-icon">{renderCategoryIcon(sub.iconKey, 15)}</span>
                 <span className="preset-subcat-name">{sub.name}</span>
                 <span className="preset-subcat-tag">{sub.tag}</span>
               </button>
@@ -98,18 +119,20 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
           {/* Category Overview & Level Steps */}
           <div className="presets-level-overview">
             <div className="presets-category-info">
-              <span className="presets-category-icon">{currentCategoryData.icon}</span>
+              <span className="presets-category-icon">
+                {renderCategoryIcon(currentCategoryData.iconKey, 15)}
+              </span>
               <span className="presets-category-desc">{currentCategoryData.desc}</span>
             </div>
             <div className="presets-level-stepper">
               <span className="step-tag step-1">1. Rất dễ</span>
-              <span className="step-arrow">➔</span>
+              <span className="step-arrow"><ArrowRight size={12} /></span>
               <span className="step-tag step-2">2. Dễ</span>
-              <span className="step-arrow">➔</span>
+              <span className="step-arrow"><ArrowRight size={12} /></span>
               <span className="step-tag step-3">3. Trung cấp</span>
-              <span className="step-arrow">➔</span>
+              <span className="step-arrow"><ArrowRight size={12} /></span>
               <span className="step-tag step-4">4. Nâng cao</span>
-              <span className="step-arrow">➔</span>
+              <span className="step-arrow"><ArrowRight size={12} /></span>
               <span className="step-tag step-5">5. Chuyên sâu</span>
             </div>
           </div>
@@ -174,9 +197,13 @@ export const PresetsSection = React.memo(({ activeUrl, onSelectPreset, isLoading
                         <PlayCircle size={12} style={{ verticalAlign: "middle", marginRight: 4 }} />
                         {lesson.author}
                       </span>
-                      <span className="preset-card-lang-target">{lesson.langLabel}</span>
+                      <span className="preset-card-lang-target">
+                        <Globe size={11} style={{ verticalAlign: "middle", marginRight: 4 }} />
+                        {lesson.langLabel}
+                      </span>
                     </div>
                     <button
+                      type="button"
                       className={`preset-card-action-btn ${isActive ? "btn-active" : ""}`}
                       disabled={isLoading}
                       onClick={(e) => {

@@ -1,25 +1,25 @@
 export const SOURCE_LANGUAGES = [
-  { code: "en", name: "English", label: "🇺🇸 Tiếng Anh" },
-  { code: "auto", name: "Auto", label: "🌐 Tự động" },
-  { code: "fr", name: "Français", label: "🇫🇷 Tiếng Pháp" },
-  { code: "ja", name: "日本語", label: "🇯🇵 Tiếng Nhật" },
-  { code: "ko", name: "한국어", label: "🇰🇷 Tiếng Hàn" },
-  { code: "zh", name: "中文", label: "🇨🇳 Tiếng Trung" },
-  { code: "de", name: "Deutsch", label: "🇩🇪 Tiếng Đức" },
-  { code: "es", name: "Español", label: "🇪🇸 Tiếng TBN" },
-  { code: "vi", name: "Tiếng Việt", label: "🇻🇳 Tiếng Việt" },
+  { code: "en", name: "English", label: "Tiếng Anh (EN)" },
+  { code: "auto", name: "Auto", label: "Tự động (Auto)" },
+  { code: "fr", name: "Français", label: "Tiếng Pháp (FR)" },
+  { code: "ja", name: "日本語", label: "Tiếng Nhật (JA)" },
+  { code: "ko", name: "한국어", label: "Tiếng Hàn (KO)" },
+  { code: "zh", name: "中文", label: "Tiếng Trung (ZH)" },
+  { code: "de", name: "Deutsch", label: "Tiếng Đức (DE)" },
+  { code: "es", name: "Español", label: "Tiếng TBN (ES)" },
+  { code: "vi", name: "Tiếng Việt", label: "Tiếng Việt (VI)" },
 ];
 
 export const TARGET_LANGUAGES = [
-  { code: "vi", name: "Tiếng Việt", label: "🇻🇳 Tiếng Việt" },
-  { code: "en", name: "English", label: "🇺🇸 Tiếng Anh" },
-  { code: "fr", name: "Français", label: "🇫🇷 Tiếng Pháp" },
-  { code: "ja", name: "日本語", label: "🇯🇵 Tiếng Nhật" },
-  { code: "ko", name: "한국어", label: "🇰🇷 Tiếng Hàn" },
-  { code: "zh", name: "中文", label: "🇨🇳 Tiếng Trung" },
-  { code: "de", name: "Deutsch", label: "🇩🇪 Tiếng Đức" },
-  { code: "es", name: "Español", label: "🇪🇸 Tiếng TBN" },
-  { code: "none", name: "Không dịch", label: "🚫 Không dịch" },
+  { code: "vi", name: "Tiếng Việt", label: "Tiếng Việt (VI)" },
+  { code: "en", name: "English", label: "Tiếng Anh (EN)" },
+  { code: "fr", name: "Français", label: "Tiếng Pháp (FR)" },
+  { code: "ja", name: "日本語", label: "Tiếng Nhật (JA)" },
+  { code: "ko", name: "한국어", label: "Tiếng Hàn (KO)" },
+  { code: "zh", name: "中文", label: "Tiếng Trung (ZH)" },
+  { code: "de", name: "Deutsch", label: "Tiếng Đức (DE)" },
+  { code: "es", name: "Español", label: "Tiếng TBN (ES)" },
+  { code: "none", name: "Không dịch", label: "Không dịch" },
 ];
 
 export const SPEECH_LANG_MAP = {

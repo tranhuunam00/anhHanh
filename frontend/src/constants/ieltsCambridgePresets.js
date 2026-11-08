@@ -15,7 +15,10 @@ import {
   CAMBRIDGE_20_LESSONS,
   CAMBRIDGE_20_FULL_LESSONS
 } from "./ieltsCambridge20Presets.js";
-import { CAMBRIDGE_21_LESSONS } from "./ieltsCambridge21Presets.js";
+import {
+  CAMBRIDGE_21_LESSONS,
+  CAMBRIDGE_21_FULL_LESSONS
+} from "./ieltsCambridge21Presets.js";
 
 export {
   CAMBRIDGE_18_LESSONS,
@@ -24,7 +27,8 @@ export {
   CAMBRIDGE_19_FULL_LESSONS,
   CAMBRIDGE_20_LESSONS,
   CAMBRIDGE_20_FULL_LESSONS,
-  CAMBRIDGE_21_LESSONS
+  CAMBRIDGE_21_LESSONS,
+  CAMBRIDGE_21_FULL_LESSONS
 };
 
 export const IELTS_TASK_TABS = [

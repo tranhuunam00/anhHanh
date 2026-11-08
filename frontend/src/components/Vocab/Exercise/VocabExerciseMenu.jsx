@@ -27,6 +27,13 @@ export const VocabExerciseMenu = ({
   customEndDate = "",
   onCustomEndDateChange,
   timeCounts = {},
+  masteredTimeRange = "ALL",
+  onSelectMasteredTimeRange,
+  masteredStartDate = "",
+  onMasteredStartDateChange,
+  masteredEndDate = "",
+  onMasteredEndDateChange,
+  masteredTimeCounts = {},
   selectedFormat = EXERCISE_FORMATS.D1,
   onSelectFormat,
   selectedLimit = 20,
@@ -179,7 +186,7 @@ export const VocabExerciseMenu = ({
               )}
             </div>
 
-            {/* Time Range Filter Section: Lọc theo thời gian lưu từ vựng */}
+            {/* Time Range Filter Section: Lọc theo thời gian lưu & thời gian ấn thuộc */}
             <VocabTimeFilterSection
               timeRange={timeRange}
               onSelectTimeRange={onSelectTimeRange}
@@ -188,6 +195,13 @@ export const VocabExerciseMenu = ({
               customEndDate={customEndDate}
               onCustomEndDateChange={onCustomEndDateChange}
               timeCounts={timeCounts}
+              masteredTimeRange={masteredTimeRange}
+              onSelectMasteredTimeRange={onSelectMasteredTimeRange}
+              masteredStartDate={masteredStartDate}
+              onMasteredStartDateChange={onMasteredStartDateChange}
+              masteredEndDate={masteredEndDate}
+              onMasteredEndDateChange={onMasteredEndDateChange}
+              masteredTimeCounts={masteredTimeCounts}
               scannedCount={poolCount}
             />
 

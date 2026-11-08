@@ -2,6 +2,7 @@ import { IELTS_TESTS } from "../data/ielts/index.js";
 import { cambridge18DictationData } from "../data/ielts/cambridge18DictationData.js";
 import { cambridge19DictationData } from "../data/ielts/cambridge19DictationData.js";
 import { cambridge20DictationData } from "../data/ielts/cambridge20DictationData.js";
+import { cambridge21DictationData } from "../data/ielts/cambridge21DictationData.js";
 
 /**
  * Parses duration string (e.g. "05:12", "30:45", "1:49") to seconds
@@ -87,7 +88,8 @@ export function buildIeltsAudioLesson(preset) {
   const authenticData =
     cambridge18DictationData?.[preset.id] ||
     cambridge19DictationData?.[preset.id] ||
-    cambridge20DictationData?.[preset.id];
+    cambridge20DictationData?.[preset.id] ||
+    cambridge21DictationData?.[preset.id];
   if (authenticData && Array.isArray(authenticData.challenges) && authenticData.challenges.length > 0) {
     return {
       video_id: preset.id,

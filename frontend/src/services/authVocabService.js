@@ -221,7 +221,10 @@ export const fetchPracticeSession = async (
   token = null,
   timeRange = "ALL",
   startDate = null,
-  endDate = null
+  endDate = null,
+  masteredTimeRange = "ALL",
+  masteredStartDate = null,
+  masteredEndDate = null
 ) => {
   try {
     const headers = {};
@@ -232,6 +235,11 @@ export const fetchPracticeSession = async (
     if (timeRange && timeRange !== "ALL") params.append("time_range", timeRange);
     if (startDate) params.append("start_date", startDate);
     if (endDate) params.append("end_date", endDate);
+    if (masteredTimeRange && masteredTimeRange !== "ALL") {
+      params.append("mastered_time_range", masteredTimeRange);
+    }
+    if (masteredStartDate) params.append("mastered_start_date", masteredStartDate);
+    if (masteredEndDate) params.append("mastered_end_date", masteredEndDate);
     const query = params.toString() ? `?${params.toString()}` : "";
     const res = await fetch(`/api/vocab/practice-session${query}`, { headers });
     if (res.ok) {

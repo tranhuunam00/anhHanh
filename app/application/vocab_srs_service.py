@@ -2,7 +2,7 @@
 import re
 import random
 from datetime import datetime, timedelta, timezone
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 
 FALLBACK_DISTRACTORS = [
     "thành công", "phát triển", "bắt đầu", "kết quả", "thay đổi",
@@ -95,3 +95,68 @@ def generate_quiz_options(
     options = selected_distractors + [clean_correct or "Chưa có nghĩa tiếng Việt"]
     random.shuffle(options)
     return options
+
+
+def resolve_mastered_at_timestamp(
+    new_status: Optional[str],
+    now: Optional[datetime] = None
+) -> Optional[datetime]:
+    """Resolve the mastered_at timestamp when updating a vocabulary word's status.
+
+    - When new_status is 'MASTERED' (case-insensitive): returns current UTC timestamp (or `now`).
+    - When new_status is 'NEW', 'LEARNING', or any non-MASTERED status: returns None (clears column).
+    """
+    if not new_status or not isinstance(new_status, str):
+        return None
+    normalized = new_status.strip().upper()
+    if normalized == 'MASTERED':
+        return now if now is not None else datetime.now(timezone.utc)
+    return None
+
+
+def compute_time_range_bounds(
+    time_range: Optional[str],
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    now: Optional[datetime] = None
+) -> Tuple[Optional[datetime], Optional[datetime]]:
+    """Compute (start_dt, end_dt) UTC datetime bounds for vocabulary time filtering."""
+    if not time_range or not isinstance(time_range, str):
+        return (None, None)
+
+    tr = time_range.strip().upper()
+    if tr == 'ALL' or not tr:
+        return (None, None)
+
+    ref_now = now if now is not None else datetime.now(timezone.utc)
+    if ref_now.tzinfo is None:
+        ref_now = ref_now.replace(tzinfo=timezone.utc)
+
+    if tr == 'TODAY':
+        today_start = datetime(ref_now.year, ref_now.month, ref_now.day, 0, 0, 0, tzinfo=timezone.utc)
+        return (today_start, None)
+    if tr == '3DAYS':
+        return (ref_now - timedelta(days=3), None)
+    if tr == '7DAYS':
+        return (ref_now - timedelta(days=7), None)
+    if tr == '30DAYS':
+        return (ref_now - timedelta(days=30), None)
+    if tr == 'CUSTOM':
+        s_dt: Optional[datetime] = None
+        e_dt: Optional[datetime] = None
+        if start_date and isinstance(start_date, str) and start_date.strip():
+            try:
+                parsed_s = datetime.fromisoformat(start_date.strip())
+                s_dt = parsed_s.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
+            except Exception:
+                s_dt = None
+        if end_date and isinstance(end_date, str) and end_date.strip():
+            try:
+                parsed_e = datetime.fromisoformat(end_date.strip())
+                e_dt = parsed_e.replace(hour=23, minute=59, second=59, microsecond=999999, tzinfo=timezone.utc)
+            except Exception:
+                e_dt = None
+        return (s_dt, e_dt)
+
+    return (None, None)
+

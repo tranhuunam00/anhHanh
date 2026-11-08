@@ -5,6 +5,8 @@ from datetime import datetime, timezone, timedelta
 from app.application.vocab_srs_service import (
     calculate_srs_progress,
     generate_quiz_options,
+    resolve_mastered_at_timestamp,
+    compute_time_range_bounds,
     FALLBACK_DISTRACTORS,
 )
 from app.application.vocab_import_service import (
@@ -229,3 +231,75 @@ def test_prepare_file_for_ai_extraction_image_bytes():
     assert text is None
     assert len(imgs) == 1
     assert imgs[0] == fake_img
+
+
+# ============================================================================
+# 5. Mastered Timestamp & Time Range Bounds Unit Tests
+# ============================================================================
+
+def test_resolve_mastered_at_timestamp():
+    """Test setting mastered_at when status becomes MASTERED and clearing to None otherwise."""
+    ref_now = datetime(2026, 11, 8, 10, 0, 0, tzinfo=timezone.utc)
+
+    # Happy path: MASTERED sets timestamp
+    assert resolve_mastered_at_timestamp("MASTERED", now=ref_now) == ref_now
+    assert resolve_mastered_at_timestamp("  mastered ", now=ref_now) == ref_now
+    auto_ts = resolve_mastered_at_timestamp("MASTERED")
+    assert isinstance(auto_ts, datetime)
+
+    # Internal logic: non-MASTERED clears column to None
+    assert resolve_mastered_at_timestamp("NEW", now=ref_now) is None
+    assert resolve_mastered_at_timestamp("LEARNING", now=ref_now) is None
+
+    # Boundary & bad input cases
+    assert resolve_mastered_at_timestamp("", now=ref_now) is None
+    assert resolve_mastered_at_timestamp("   ", now=ref_now) is None
+    assert resolve_mastered_at_timestamp(None, now=ref_now) is None
+    assert resolve_mastered_at_timestamp(123, now=ref_now) is None  # type: ignore
+
+
+def test_compute_time_range_bounds():
+    """Test computing UTC datetime bounds for ALL, TODAY, 3DAYS, 7DAYS, 30DAYS, and CUSTOM."""
+    ref_now = datetime(2026, 11, 8, 14, 30, 0, tzinfo=timezone.utc)
+
+    assert compute_time_range_bounds("ALL", now=ref_now) == (None, None)
+    assert compute_time_range_bounds(None, now=ref_now) == (None, None)
+    assert compute_time_range_bounds("", now=ref_now) == (None, None)
+    assert compute_time_range_bounds("UNKNOWN", now=ref_now) == (None, None)
+
+    s_today, e_today = compute_time_range_bounds("TODAY", now=ref_now)
+    assert s_today == datetime(2026, 11, 8, 0, 0, 0, tzinfo=timezone.utc)
+    assert e_today is None
+
+    s_3d, e_3d = compute_time_range_bounds("3DAYS", now=ref_now)
+    assert s_3d == ref_now - timedelta(days=3)
+    assert e_3d is None
+
+    s_7d, e_7d = compute_time_range_bounds("7DAYS", now=ref_now)
+    assert s_7d == ref_now - timedelta(days=7)
+    assert e_7d is None
+
+    s_30d, e_30d = compute_time_range_bounds("30DAYS", now=ref_now)
+    assert s_30d == ref_now - timedelta(days=30)
+    assert e_30d is None
+
+    # Custom date range
+    s_cust, e_cust = compute_time_range_bounds(
+        "CUSTOM",
+        start_date="2026-11-01",
+        end_date="2026-11-08",
+        now=ref_now
+    )
+    assert s_cust == datetime(2026, 11, 1, 0, 0, 0, tzinfo=timezone.utc)
+    assert e_cust == datetime(2026, 11, 8, 23, 59, 59, 999999, tzinfo=timezone.utc)
+
+    # Custom with malformed date strings
+    s_bad, e_bad = compute_time_range_bounds(
+        "CUSTOM",
+        start_date="not-a-date",
+        end_date="invalid",
+        now=ref_now
+    )
+    assert s_bad is None
+    assert e_bad is None
+

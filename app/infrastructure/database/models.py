@@ -169,6 +169,7 @@ class UserVocabulary(Base):
     mastery_score = Column(Integer, default=0, nullable=False)
     source_lang = Column(String(10), default='en', nullable=True)
     part_of_speech = Column(String(100), nullable=True)
+    mastered_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     user = relationship('User', back_populates='vocabulary')
@@ -190,6 +191,7 @@ class UserVocabulary(Base):
             'next_review_at': self.next_review_at.isoformat() if self.next_review_at else None,
             'review_interval_days': self.review_interval_days,
             'mastery_score': self.mastery_score,
+            'mastered_at': self.mastered_at.isoformat() if self.mastered_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
 

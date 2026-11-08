@@ -8,6 +8,7 @@ import {
   CAMBRIDGE_20_LESSONS,
   CAMBRIDGE_20_FULL_LESSONS,
   CAMBRIDGE_21_LESSONS,
+  CAMBRIDGE_21_FULL_LESSONS,
   filterIeltsLessons
 } from "../../constants/ieltsCambridgePresets";
 import {
@@ -69,10 +70,11 @@ export const IeltsPresetsView = React.memo(({
   }, [selectedTask]);
 
   const filteredCam21 = useMemo(() => {
-    if (selectedTask === "all" || selectedTask === "full") {
-      return CAMBRIDGE_21_LESSONS;
-    }
-    return CAMBRIDGE_21_LESSONS;
+    return filterIeltsLessons(CAMBRIDGE_21_LESSONS, selectedTask);
+  }, [selectedTask]);
+
+  const filteredCam21Full = useMemo(() => {
+    return selectedTask === "full" || selectedTask === "all" ? CAMBRIDGE_21_FULL_LESSONS : [];
   }, [selectedTask]);
 
   const handleSelectMode = (lesson, mode, e) => {
@@ -334,8 +336,31 @@ export const IeltsPresetsView = React.memo(({
         </section>
       )}
 
-      {/* Group 3: Cambridge 21 (Gộp 4 phần trong 1 test) */}
-      {(selectedTask === "all" || selectedTask === "full" || filteredCam21.length > 0) && (
+      {/* Group 3: Cambridge 21 (Đã tách riêng 4 Task) */}
+      {selectedTask !== "full" && filteredCam21.length > 0 && (
+        <section className="ielts-book-group" style={{ marginTop: "12px" }}>
+          <div className="ielts-book-group-header">
+            <div className="ielts-book-group-title">
+              <BookOpen size={16} color="var(--primary)" />
+              <span>Cambridge IELTS 21</span>
+              <span className="ielts-book-badge split">
+                <Check size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
+                Đã tách riêng 4 Task
+              </span>
+            </div>
+            <span className="text-xs text-muted">
+              {filteredCam21.length} bài luyện tập
+            </span>
+          </div>
+
+          <div className="ielts-presets-cards-grid">
+            {filteredCam21.map(renderCard)}
+          </div>
+        </section>
+      )}
+
+      {/* Group 3B: Cambridge 21 (Trọn bộ 4 đề thi Full 30 phút) */}
+      {filteredCam21Full.length > 0 && (
         <section className="ielts-book-group" style={{ marginTop: "12px" }}>
           <div className="ielts-book-group-header">
             <div className="ielts-book-group-title">
@@ -347,12 +372,12 @@ export const IeltsPresetsView = React.memo(({
               </span>
             </div>
             <span className="text-xs text-muted">
-              {filteredCam21.length} bài thi trọn bộ
+              {filteredCam21Full.length} bài thi trọn bộ
             </span>
           </div>
 
           <div className="ielts-presets-cards-grid">
-            {filteredCam21.map(renderCard)}
+            {filteredCam21Full.map(renderCard)}
           </div>
         </section>
       )}

@@ -202,19 +202,27 @@
     height: 32px;
   }
 
-  /* Action Buttons Toolbar */
+  /* Action Buttons Toolbar - 2 per row, ergonomic touch size */
   .dictation-actions {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    margin-bottom: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
   }
   .dictation-actions .btn {
     width: 100%;
     justify-content: center;
-    padding: 7px 6px;
-    font-size: 0.78rem;
-    min-height: 36px;
+    padding: 12px 12px;
+    font-size: 0.94rem;
+    font-weight: 600;
+    min-height: 48px;
+    border-radius: 10px;
+    gap: 8px;
+  }
+  .dictation-actions .btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 
   /* Full Audio Hero Section (Tab 2) - Compact & Sleek on Mobile */

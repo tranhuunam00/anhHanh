@@ -280,16 +280,26 @@ export const VocabCard = ({
 
         {/* Footer: Status select and Quick Action Buttons */}
         <div className="vocab-card-footer" onClick={(e) => e.stopPropagation()}>
-          <select
-            className={`vocab-status-select status-${v.status}`}
-            value={v.status}
-            onChange={(e) => onStatusChange(v.id, e.target.value)}
-            title="Đổi trạng thái học tập (Phím tắt: 1: Mới lưu | 2: Đang nhớ | 3: Đã thuộc | S: Đổi tiếp)"
-          >
-            <option value="NEW">Mới lưu (1)</option>
-            <option value="LEARNING">Đang nhớ (2)</option>
-            <option value="MASTERED">Đã thuộc (3)</option>
-          </select>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            <select
+              className={`vocab-status-select status-${v.status}`}
+              value={v.status}
+              onChange={(e) => onStatusChange(v.id, e.target.value)}
+              title="Đổi trạng thái học tập (Phím tắt: 1: Mới lưu | 2: Đang nhớ | 3: Đã thuộc | S: Đổi tiếp)"
+            >
+              <option value="NEW">Mới lưu (1)</option>
+              <option value="LEARNING">Đang nhớ (2)</option>
+              <option value="MASTERED">Đã thuộc (3)</option>
+            </select>
+            {v.status === "MASTERED" && v.mastered_at && (
+              <span
+                style={{ fontSize: "0.66rem", color: "#10b981", fontWeight: 600 }}
+                title={`Đã thuộc lúc: ${new Date(v.mastered_at).toLocaleString("vi-VN")}`}
+              >
+                Thuộc: {new Date(v.mastered_at).toLocaleDateString("vi-VN")}
+              </span>
+            )}
+          </div>
 
           <div style={{ display: "flex", gap: "4px" }}>
             <button

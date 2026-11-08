@@ -33,6 +33,7 @@ router.include_router(vocab_ai_exercise_router)
 
 
 from app.infrastructure.pos_service import normalize_pos_string
+from app.application.vocab_srs_service import resolve_mastered_at_timestamp
 from app.presentation.vocab_api_helpers import (
     resolve_word_meaning_helper,
     resolve_word_pos_helper,
@@ -324,6 +325,7 @@ async def update_vocabulary_status(
         raise HTTPException(status_code=404, detail='Từ vựng không tồn tại')
 
     vocab.status = payload.status
+    vocab.mastered_at = resolve_mastered_at_timestamp(payload.status)
     await db.commit()
     await db.refresh(vocab)
     return {'message': 'Đã cập nhật trạng thái', 'vocab': vocab.to_dict()}
@@ -451,6 +453,7 @@ async def update_vocabulary_details(
 
     if payload.status is not None and payload.status in ['NEW', 'LEARNING', 'MASTERED']:
         vocab.status = payload.status
+        vocab.mastered_at = resolve_mastered_at_timestamp(payload.status)
 
     if payload.part_of_speech is not None:
         vocab.part_of_speech = normalize_pos_string(payload.part_of_speech)

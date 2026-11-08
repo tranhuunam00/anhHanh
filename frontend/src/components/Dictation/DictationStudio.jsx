@@ -363,32 +363,32 @@ export const DictationStudio = React.memo(({
           title="Kiểm tra câu vừa gõ (Enter)"
           onClick={() => onCheck && onCheck(localInput)}
         >
-          <Check size={16} strokeWidth={2.5} />
+          <Check size={18} strokeWidth={2.5} />
           <span>Kiểm tra</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Bỏ qua câu hiện tại (tự điền đáp án - Esc)" onClick={onSkip}>
-          <SkipForward size={15} strokeWidth={2.2} />
+          <SkipForward size={18} strokeWidth={2.2} />
           <span>Bỏ qua</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Phát lại câu hiện tại (Ctrl)" onClick={onReplay}>
-          <RotateCcw size={15} strokeWidth={2.2} />
+          <RotateCcw size={18} strokeWidth={2.2} />
           <span>Lặp lại</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Nghe phát âm giọng mẫu câu này" onClick={onSpeakSentence}>
-          <Volume2 size={16} strokeWidth={2} />
+          <Volume2 size={18} strokeWidth={2} />
           <span>Nghe câu</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (~ / ` / Enter 2 lần / Ctrl+H / Alt+H)" onClick={handleTriggerHintLetter}>
-          <KeyRound size={15} strokeWidth={2} />
+          <KeyRound size={18} strokeWidth={2} />
           <span>Gợi ý chữ</span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Mở 1 từ tiếp theo (Tab / Alt+W / Ctrl+Shift+H)" onClick={handleTriggerHintWord}>
-          <Lightbulb size={15} strokeWidth={2} />
+          <Lightbulb size={18} strokeWidth={2} />
           <span>Gợi ý từ</span>
         </button>
       </div>

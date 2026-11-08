@@ -6,6 +6,7 @@ import {
   CAMBRIDGE_19_FULL_LESSONS,
   CAMBRIDGE_20_LESSONS,
   CAMBRIDGE_21_LESSONS,
+  CAMBRIDGE_21_FULL_LESSONS,
   filterIeltsLessons
 } from "../src/constants/ieltsCambridgePresets.js";
 
@@ -138,13 +139,25 @@ describe("ieltsCambridgePresets Unit Tests", () => {
     });
   });
 
-  describe("CAMBRIDGE_21_LESSONS Data Integrity (4 Merged Full Tests)", () => {
-    it("happy path: contains exactly 4 full combined test lessons", () => {
-      assert.equal(CAMBRIDGE_21_LESSONS.length, 4);
+  describe("CAMBRIDGE_21_LESSONS Data Integrity (16 Separate Task Parts + 4 Merged Full Tests)", () => {
+    it("happy path: contains 16 split lessons and 4 full combined test lessons", () => {
+      assert.equal(CAMBRIDGE_21_LESSONS.length, 16);
+      assert.equal(CAMBRIDGE_21_FULL_LESSONS.length, 4);
     });
 
-    it("verifies all lessons have isSplit === false and taskKey === 'full'", () => {
+    it("verifies all split lessons have isSplit === true and valid split audio URLs", () => {
       CAMBRIDGE_21_LESSONS.forEach((lesson) => {
+        assert.equal(lesson.book, "Cambridge 21");
+        assert.equal(lesson.isSplit, true);
+        assert.ok(lesson.testNumber >= 1 && lesson.testNumber <= 4);
+        assert.ok(lesson.taskNumber >= 1 && lesson.taskNumber <= 4);
+        assert.equal(lesson.taskKey, `task${lesson.taskNumber}`);
+        assert.ok(lesson.audioUrl && lesson.audioUrl.startsWith("/audio/cambridge21/split/"));
+      });
+    });
+
+    it("verifies all full lessons have isSplit === false and taskKey === 'full'", () => {
+      CAMBRIDGE_21_FULL_LESSONS.forEach((lesson) => {
         assert.equal(lesson.book, "Cambridge 21");
         assert.equal(lesson.isSplit, false);
         assert.equal(lesson.taskKey, "full");
@@ -188,11 +201,11 @@ describe("ieltsCambridgePresets Unit Tests", () => {
       assert.equal(all3.length, 16);
     });
 
-    it("boundary case: filters Cambridge 19 Full and Cambridge 21 by 'full'", () => {
+    it("boundary case: filters Cambridge 19 Full and Cambridge 21 Full by 'full'", () => {
       const fullCam19 = filterIeltsLessons(CAMBRIDGE_19_FULL_LESSONS, "full");
       assert.equal(fullCam19.length, 4);
 
-      const fullCam21 = filterIeltsLessons(CAMBRIDGE_21_LESSONS, "full");
+      const fullCam21 = filterIeltsLessons(CAMBRIDGE_21_FULL_LESSONS, "full");
       assert.equal(fullCam21.length, 4);
     });
 

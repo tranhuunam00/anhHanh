@@ -2,7 +2,13 @@ import React, { useState, useCallback, useMemo } from "react";
 import { submitVocabReviewResult, updateVocabStatus, fetchPracticeSession } from "../../services/authVocabService";
 import { fetchSystemDistractors } from "../../services/systemVocabService";
 import { EXERCISE_FORMATS } from "../../utils/vocabExerciseGenerators";
-import { filterVocabByTimeRange, countVocabByTimeRanges } from "../../utils/vocabTimeFilterUtils";
+import {
+  filterVocabByTimeRange,
+  filterVocabByMasteredTimeRange,
+  countVocabByTimeRanges,
+  countVocabByMasteredTimeRanges,
+  resolveMasteredAtClient,
+} from "../../utils/vocabTimeFilterUtils";
 import { VocabExerciseMenu } from "./Exercise/VocabExerciseMenu";
 import { VocabExercisePractice } from "./Exercise/VocabExercisePractice";
 import { VocabExerciseSummary } from "./Exercise/VocabExerciseSummary";
@@ -29,10 +35,29 @@ export default function VocabExerciseHubModal({
   // Status Filter: "UNMASTERED" (Từ chưa thuộc - mặc định) | "MASTERED" (Từ đã thuộc) | "ALL" (Tất cả)
   const [statusFilter, setStatusFilter] = useState("UNMASTERED");
 
-  // Time Range Filter: "ALL" | "TODAY" | "3DAYS" | "7DAYS" | "30DAYS" | "CUSTOM"
+  // Time Range Filter (created_at): "ALL" | "TODAY" | "3DAYS" | "7DAYS" | "30DAYS" | "CUSTOM"
   const [timeRange, setTimeRange] = useState("ALL");
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
+
+  // Mastered Time Range Filter (mastered_at): "ALL" | "TODAY" | "3DAYS" | "7DAYS" | "30DAYS" | "CUSTOM"
+  const [masteredTimeRange, setMasteredTimeRange] = useState("ALL");
+  const [masteredStartDate, setMasteredStartDate] = useState("");
+  const [masteredEndDate, setMasteredEndDate] = useState("");
+
+  const handleSelectStatusFilter = useCallback((nextStatus) => {
+    setStatusFilter(nextStatus);
+    if (nextStatus === "UNMASTERED") {
+      setMasteredTimeRange("ALL");
+    }
+  }, []);
+
+  const handleSelectMasteredTimeRange = useCallback((nextRange) => {
+    setMasteredTimeRange(nextRange);
+    if (nextRange && nextRange !== "ALL") {
+      setStatusFilter("MASTERED");
+    }
+  }, []);
 
   // Selected word quantity: 20, 40, 60, 80 or "ALL"
   const [selectedLimit, setSelectedLimit] = useState(20);
@@ -54,15 +79,51 @@ export default function VocabExerciseHubModal({
     return vocabPool || [];
   }, [statusFilter, unmasteredPool, masteredPool, vocabPool]);
 
-  // Live count for each time range option based on statusFilteredPool ("đến đâu quét đến đó luôn")
+  // Live count for each creation time range option based on statusFilteredPool & masteredTimeRange
   const timeCounts = useMemo(() => {
-    return countVocabByTimeRanges(statusFilteredPool);
-  }, [statusFilteredPool]);
+    const poolAfterMastered = filterVocabByMasteredTimeRange(
+      statusFilteredPool,
+      masteredTimeRange,
+      masteredStartDate,
+      masteredEndDate
+    );
+    return countVocabByTimeRanges(poolAfterMastered);
+  }, [statusFilteredPool, masteredTimeRange, masteredStartDate, masteredEndDate]);
 
-  // Active word pool filtered by both status AND time range
+  // Live count for each mastered_at time range option
+  const masteredTimeCounts = useMemo(() => {
+    const poolAfterCreated = filterVocabByTimeRange(
+      vocabPool || [],
+      timeRange,
+      customStartDate,
+      customEndDate
+    );
+    return countVocabByMasteredTimeRanges(poolAfterCreated);
+  }, [vocabPool, timeRange, customStartDate, customEndDate]);
+
+  // Active word pool filtered by status, creation time range, AND mastered time range
   const activePool = useMemo(() => {
-    return filterVocabByTimeRange(statusFilteredPool, timeRange, customStartDate, customEndDate);
-  }, [statusFilteredPool, timeRange, customStartDate, customEndDate]);
+    const afterCreated = filterVocabByTimeRange(
+      statusFilteredPool,
+      timeRange,
+      customStartDate,
+      customEndDate
+    );
+    return filterVocabByMasteredTimeRange(
+      afterCreated,
+      masteredTimeRange,
+      masteredStartDate,
+      masteredEndDate
+    );
+  }, [
+    statusFilteredPool,
+    timeRange,
+    customStartDate,
+    customEndDate,
+    masteredTimeRange,
+    masteredStartDate,
+    masteredEndDate,
+  ]);
 
   // Active practice session words, bank distractors and score tracking
   const [items, setItems] = useState([]);
@@ -90,7 +151,10 @@ export default function VocabExerciseHubModal({
           token,
           timeRange,
           customStartDate,
-          customEndDate
+          customEndDate,
+          masteredTimeRange,
+          masteredStartDate,
+          masteredEndDate
         );
         if (res && Array.isArray(res.items) && res.items.length > 0) {
           sessionWords = res.items;
@@ -187,6 +251,7 @@ export default function VocabExerciseHubModal({
       // Immediate status override in local memory and parent list
       if (forceStatus && currentItem) {
         currentItem.status = forceStatus;
+        currentItem.mastered_at = resolveMasteredAtClient(forceStatus);
         if (onUpdateWordStatus) {
           onUpdateWordStatus(currentItem.id, forceStatus);
         }
@@ -247,7 +312,7 @@ export default function VocabExerciseHubModal({
         masteredCount={masteredPool.length}
         availableWords={activePool.length}
         statusFilter={statusFilter}
-        onSelectStatusFilter={setStatusFilter}
+        onSelectStatusFilter={handleSelectStatusFilter}
         timeRange={timeRange}
         onSelectTimeRange={setTimeRange}
         customStartDate={customStartDate}
@@ -255,6 +320,13 @@ export default function VocabExerciseHubModal({
         customEndDate={customEndDate}
         onCustomEndDateChange={setCustomEndDate}
         timeCounts={timeCounts}
+        masteredTimeRange={masteredTimeRange}
+        onSelectMasteredTimeRange={handleSelectMasteredTimeRange}
+        masteredStartDate={masteredStartDate}
+        onMasteredStartDateChange={setMasteredStartDate}
+        masteredEndDate={masteredEndDate}
+        onMasteredEndDateChange={setMasteredEndDate}
+        masteredTimeCounts={masteredTimeCounts}
         selectedFormat={selectedFormat}
         onSelectFormat={setSelectedFormat}
         selectedLimit={selectedLimit}

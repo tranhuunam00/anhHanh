@@ -2,8 +2,11 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import {
   TIME_RANGE_OPTIONS,
+  resolveMasteredAtClient,
   filterVocabByTimeRange,
+  filterVocabByMasteredTimeRange,
   countVocabByTimeRanges,
+  countVocabByMasteredTimeRanges,
 } from "../src/utils/vocabTimeFilterUtils.js";
 
 describe("vocabTimeFilterUtils Unit Tests", () => {
@@ -149,6 +152,103 @@ describe("vocabTimeFilterUtils Unit Tests", () => {
     test("contains standard required options", () => {
       const keys = TIME_RANGE_OPTIONS.map((o) => o.key);
       assert.deepEqual(keys, ["ALL", "TODAY", "3DAYS", "7DAYS", "30DAYS", "CUSTOM"]);
+    });
+  });
+
+  describe("resolveMasteredAtClient", () => {
+    test("happy path: sets ISO timestamp when status is MASTERED", () => {
+      const fixedIso = "2026-10-22T10:30:00.000Z";
+      assert.equal(resolveMasteredAtClient("MASTERED", fixedIso), fixedIso);
+      assert.equal(resolveMasteredAtClient("  mastered ", fixedIso), fixedIso);
+
+      const autoIso = resolveMasteredAtClient("MASTERED");
+      assert.equal(typeof autoIso, "string");
+      assert.ok(!isNaN(new Date(autoIso).getTime()));
+    });
+
+    test("internal logic: clears timestamp to null when status is NEW or LEARNING", () => {
+      assert.equal(resolveMasteredAtClient("NEW"), null);
+      assert.equal(resolveMasteredAtClient("LEARNING"), null);
+      assert.equal(resolveMasteredAtClient("UNMASTERED"), null);
+    });
+
+    test("boundary & bad inputs: returns null safely for empty, null, undefined, or non-string", () => {
+      assert.equal(resolveMasteredAtClient(""), null);
+      assert.equal(resolveMasteredAtClient("   "), null);
+      assert.equal(resolveMasteredAtClient(null), null);
+      assert.equal(resolveMasteredAtClient(undefined), null);
+      assert.equal(resolveMasteredAtClient(123), null);
+      assert.equal(resolveMasteredAtClient({}), null);
+    });
+  });
+
+  describe("filterVocabByMasteredTimeRange & countVocabByMasteredTimeRanges", () => {
+    const masteredWords = [
+      { id: "m1", word: "alpha", status: "MASTERED", mastered_at: "2026-10-22T09:00:00Z" }, // Today
+      { id: "m2", word: "beta", status: "MASTERED", mastered_at: "2026-10-20T15:00:00Z" },  // 2d ago
+      { id: "m3", word: "gamma", status: "MASTERED", mastered_at: "2026-10-17T10:00:00Z" }, // 5d ago
+      { id: "m4", word: "delta", status: "MASTERED", mastered_at: "2026-10-05T10:00:00Z" }, // 17d ago
+      { id: "m5", word: "epsilon", status: "MASTERED", mastered_at: "2026-08-01T10:00:00Z" }, // >30d ago
+      { id: "u1", word: "zeta", status: "LEARNING", mastered_at: null }, // Not mastered
+      { id: "u2", word: "eta", status: "NEW" }, // Not mastered, no mastered_at
+      { id: "bad", word: "theta", status: "MASTERED", mastered_at: "INVALID_DATE" },
+    ];
+
+    test("happy path: 'ALL' returns all provided words unchanged", () => {
+      const res = filterVocabByMasteredTimeRange(masteredWords, "ALL", null, null, refDate);
+      assert.equal(res.length, masteredWords.length);
+    });
+
+    test("happy path: 'TODAY' returns only MASTERED words with mastered_at today", () => {
+      const res = filterVocabByMasteredTimeRange(masteredWords, "TODAY", null, null, refDate);
+      assert.deepEqual(res.map((w) => w.id), ["m1"]);
+    });
+
+    test("happy path: '3DAYS', '7DAYS', '30DAYS' filter accurately by mastered_at", () => {
+      const r3 = filterVocabByMasteredTimeRange(masteredWords, "3DAYS", null, null, refDate);
+      assert.deepEqual(r3.map((w) => w.id), ["m1", "m2"]);
+
+      const r7 = filterVocabByMasteredTimeRange(masteredWords, "7DAYS", null, null, refDate);
+      assert.deepEqual(r7.map((w) => w.id), ["m1", "m2", "m3"]);
+
+      const r30 = filterVocabByMasteredTimeRange(masteredWords, "30DAYS", null, null, refDate);
+      assert.deepEqual(r30.map((w) => w.id), ["m1", "m2", "m3", "m4"]);
+    });
+
+    test("happy path: 'CUSTOM' filters mastered_at within start and end dates", () => {
+      const rCustom = filterVocabByMasteredTimeRange(
+        masteredWords,
+        "CUSTOM",
+        "2026-10-16",
+        "2026-10-21",
+        refDate
+      );
+      assert.deepEqual(rCustom.map((w) => w.id), ["m2", "m3"]);
+    });
+
+    test("boundary & error cases: handles empty, null, or unknown range", () => {
+      assert.deepEqual(filterVocabByMasteredTimeRange([], "TODAY"), []);
+      assert.deepEqual(filterVocabByMasteredTimeRange(null, "TODAY"), []);
+      assert.equal(filterVocabByMasteredTimeRange(masteredWords, "UNKNOWN", null, null, refDate).length, masteredWords.length);
+    });
+
+    test("countVocabByMasteredTimeRanges calculates accurate counts for each bucket", () => {
+      const counts = countVocabByMasteredTimeRanges(masteredWords, refDate);
+      assert.equal(counts.ALL, 6); // 6 items have status === 'MASTERED'
+      assert.equal(counts.TODAY, 1);
+      assert.equal(counts["3DAYS"], 2);
+      assert.equal(counts["7DAYS"], 3);
+      assert.equal(counts["30DAYS"], 4);
+      assert.equal(counts.CUSTOM, 0);
+
+      assert.deepEqual(countVocabByMasteredTimeRanges(null), {
+        ALL: 0,
+        TODAY: 0,
+        "3DAYS": 0,
+        "7DAYS": 0,
+        "30DAYS": 0,
+        CUSTOM: 0,
+      });
     });
   });
 });

@@ -15,6 +15,7 @@ import { AIVocabImportModal } from "../Modals/AIVocabImportModal";
 import { BatchVocabTextImportModal } from "../Modals/BatchVocabTextImportModal";
 import { ThemeVocabExplorerModal } from "../Modals/ThemeVocabExplorerModal";
 import { markVocabStudiedToday } from "../../utils/dailyReminderManager";
+import { resolveMasteredAtClient } from "../../utils/vocabTimeFilterUtils";
 import { getVoiceLang } from "../../utils/languageVoices";
 import { VocabToolbar } from "./VocabToolbar";
 import { VocabKeyboardShortcutsBar } from "./VocabKeyboardShortcutsBar";
@@ -134,10 +135,11 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
 
   const handleStatusChange = async (vocabId, newStatus) => {
     try {
-      await updateVocabStatus(vocabId, newStatus, token);
+      const res = await updateVocabStatus(vocabId, newStatus, token);
+      const nextMasteredAt = res?.vocab?.mastered_at !== undefined ? res.vocab.mastered_at : resolveMasteredAtClient(newStatus);
       showToast("Đã cập nhật trạng thái từ vựng", "success");
       setItems((prev) =>
-        prev.map((item) => (item.id === vocabId ? { ...item, status: newStatus } : item))
+        prev.map((item) => (item.id === vocabId ? { ...item, status: newStatus, mastered_at: nextMasteredAt } : item))
       );
       if (refreshStreak) refreshStreak();
       if (refreshSavedVocab) refreshSavedVocab();
