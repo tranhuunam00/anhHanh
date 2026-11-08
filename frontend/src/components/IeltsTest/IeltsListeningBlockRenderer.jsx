@@ -393,24 +393,27 @@ export function renderTableBlock(tableBlock, answers, onChange, evaluation, isRe
           </tr>
         </thead>
         <tbody>
-          {tableBlock.rows?.map((row, rIdx) => (
-            <tr key={rIdx}>
-              {row.map((cell, cIdx) => (
-                <td
-                  key={cIdx}
-                  style={{
-                    padding: "10px 14px",
-                    border: "1px solid var(--border-color)",
-                    verticalAlign: "top",
-                    fontSize: "0.92rem",
-                    color: "var(--text-primary)"
-                  }}
-                >
-                  {renderCell(cell)}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {tableBlock.rows?.map((row, rIdx) => {
+            const cells = Array.isArray(row) ? row : Array.isArray(row?.cols) ? row.cols : [];
+            return (
+              <tr key={rIdx}>
+                {cells.map((cell, cIdx) => (
+                  <td
+                    key={cIdx}
+                    style={{
+                      padding: "10px 14px",
+                      border: "1px solid var(--border-color)",
+                      verticalAlign: "top",
+                      fontSize: "0.92rem",
+                      color: "var(--text-primary)"
+                    }}
+                  >
+                    {renderCell(cell)}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

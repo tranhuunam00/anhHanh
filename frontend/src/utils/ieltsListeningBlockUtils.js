@@ -33,11 +33,10 @@ export function extractQuestionNumbersFromBlock(block) {
 
   if (Array.isArray(block.rows)) {
     for (const r of block.rows) {
-      if (Array.isArray(r)) {
-        for (const cell of r) {
-          if (cell && typeof cell === "object" && typeof cell.number === "number") {
-            nums.push(cell.number);
-          }
+      const cells = Array.isArray(r) ? r : Array.isArray(r?.cols) ? r.cols : [];
+      for (const cell of cells) {
+        if (cell && typeof cell === "object" && typeof cell.number === "number") {
+          nums.push(cell.number);
         }
       }
     }

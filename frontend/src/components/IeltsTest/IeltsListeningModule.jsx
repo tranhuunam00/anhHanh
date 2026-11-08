@@ -51,6 +51,7 @@ import {
   renderCam20Test4Part4
 } from "./IeltsListeningCam20Test4PartsViews.jsx";
 import { renderCam19ListeningPart } from "./IeltsListeningCam19PartsView.jsx";
+import { usesDataDrivenListeningRenderer } from "../../utils/ieltsListeningRendererRouting.js";
 
 /**
  * IELTS Listening Test Module (Exam-Standard Full-Width UI)
@@ -136,7 +137,7 @@ export const IeltsListeningModule = ({
       {/* Full-Screen Questions Scroll Area */}
       <div className="ielts-listening-full-scroll">
         <div className="ielts-listening-full-body">
-          {listeningData?.testId?.startsWith("cambridge-19-") ? (
+          {usesDataDrivenListeningRenderer(listeningData?.testId) ? (
             renderCam19ListeningPart(
               parts[activePart - 1],
               answers,
