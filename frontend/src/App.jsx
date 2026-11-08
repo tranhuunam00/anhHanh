@@ -44,6 +44,7 @@ import {
 } from "./services/authVocabService";
 import { UnifiedPlayerController } from "./services/unifiedPlayerController";
 import { buildIeltsAudioLesson } from "./utils/ieltsDictationChallengeBuilder";
+import { resolveAudioPresetFromUrl } from "./utils/ieltsPresetResolver";
 import { SpeechRecognitionService } from "./services/speechRecognition";
 
 import { evaluateMasked, getNextLetterHint, getNextWordHint } from "./utils/diffCalculator";
@@ -345,13 +346,7 @@ export default function App() {
 
     const cleanUrl = cleanYouTubeUrl(urlOrId);
     if (cleanUrl.startsWith("/audio/") || cleanUrl.includes(".mp3") || cleanUrl.includes(".m4a")) {
-      handleSelectLocalAudioPreset({
-        id: cleanUrl,
-        url: cleanUrl,
-        audioUrl: cleanUrl,
-        title: "Cambridge IELTS Authentic Audio",
-        duration: "05:00"
-      }, "dictation");
+      handleSelectLocalAudioPreset(resolveAudioPresetFromUrl(cleanUrl), "dictation");
       return;
     }
     const sLang = reqSourceLang !== undefined ? reqSourceLang : sourceLang;
@@ -391,13 +386,7 @@ export default function App() {
 
     const cleanUrl = cleanYouTubeUrl(urlOrId);
     if (cleanUrl.startsWith("/audio/") || cleanUrl.includes(".mp3") || cleanUrl.includes(".m4a")) {
-      handleSelectLocalAudioPreset({
-        id: cleanUrl,
-        url: cleanUrl,
-        audioUrl: cleanUrl,
-        title: "Cambridge IELTS Authentic Audio",
-        duration: "05:00"
-      }, "dictation");
+      handleSelectLocalAudioPreset(resolveAudioPresetFromUrl(cleanUrl), "dictation");
       return;
     }
     const sLang = reqSourceLang !== undefined ? reqSourceLang : sourceLang;
