@@ -73,8 +73,8 @@ export const VocabExercisePractice = ({
 
   const clozeData = useMemo(() => {
     if (format !== EXERCISE_FORMATS.D3 || !currentItem) return null;
-    return getD3ClozeSentence(currentItem);
-  }, [currentItem, format]);
+    return getD3ClozeSentence(currentItem, currentIndex);
+  }, [currentItem, currentIndex, format]);
 
   useEffect(() => {
     setSelectedOption(null);
@@ -288,17 +288,25 @@ export const VocabExercisePractice = ({
                       ”
                     </div>
 
-                    {isAnswered && (
-                      <div className="ex-cloze-hint-row">
+                    <div className="ex-cloze-hint-row">
+                      {currentItem.meaning && (
                         <div className="ex-cloze-meaning-badge">
-                          <span className="ex-cloze-hint-tag">Nghĩa:</span>
+                          <span className="ex-cloze-hint-tag">Nghĩa cần điền:</span>
                           <strong>{currentItem.meaning}</strong>
                         </div>
+                      )}
 
-                        {currentItem.phonetic && (
-                          <span className="ex-cloze-ipa-badge">{currentItem.phonetic}</span>
-                        )}
+                      {(currentItem.part_of_speech || (clozeData?.posCategory && clozeData.posCategory !== "general")) && (
+                        <span className="ex-cloze-ipa-badge">
+                          {currentItem.part_of_speech || clozeData.posCategory}
+                        </span>
+                      )}
 
+                      {isAnswered && currentItem.phonetic && (
+                        <span className="ex-cloze-ipa-badge">{currentItem.phonetic}</span>
+                      )}
+
+                      {isAnswered && (
                         <button
                           type="button"
                           className={`ex-audio-mini-btn ${isPlayingAudio ? "playing" : ""}`}
@@ -307,10 +315,10 @@ export const VocabExercisePractice = ({
                         >
                           <Volume2 size={16} />
                         </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
-                    {isAnswered && clozeData?.translation && (
+                    {isAnswered && !clozeData?.isFallback && clozeData?.translation && (
                       <div className="ex-cloze-translation-box">
                         <span className="ex-cloze-trans-label">Dịch câu:</span> “{clozeData.translation}”
                       </div>

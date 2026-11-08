@@ -3,8 +3,12 @@
 Extracts auto-enrichment and caching routines to maintain Single Responsibility
 and keep presentation API controllers modular and well within line limits.
 """
+import json
 import logging
-from typing import Optional, Tuple, Dict, Any
+import re
+import urllib.parse
+import urllib.request
+from typing import Optional, Tuple, Dict, Any, Callable
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +17,97 @@ from app.infrastructure.pos_service import normalize_pos_string
 from app.infrastructure.database.models import DictionaryWord
 
 logger = logging.getLogger(__name__)
+
+
+def format_definition_as_context(clean_word: str, raw_definition: Optional[str]) -> str:
+    """Format an English dictionary definition into a clean cloze-ready context sentence."""
+    if not clean_word or not isinstance(clean_word, str) or not clean_word.strip():
+        return ""
+    if not raw_definition or not isinstance(raw_definition, str) or not raw_definition.strip():
+        return ""
+
+    word_str = clean_word.strip()
+    cleaned_def = re.sub(r"^\s*\([^)]+\)\s*", "", raw_definition.strip())
+    cleaned_def = re.sub(r"\s*\([^)]+\)\s*$", "", cleaned_def).strip()
+    if not cleaned_def:
+        return ""
+
+    if cleaned_def[0].isupper() and len(cleaned_def) > 1:
+        cleaned_def = cleaned_def[0].lower() + cleaned_def[1:]
+    if not cleaned_def.endswith("."):
+        cleaned_def += "."
+
+    return f'In English, "{word_str}" means: {cleaned_def}'
+
+
+def fetch_dictionary_example_sentence(clean_word: str) -> Optional[str]:
+    """Fetch a real English example sentence or definition-based context from DictionaryAPI / Datamuse."""
+    if not clean_word or not isinstance(clean_word, str):
+        return None
+    word_str = clean_word.strip()
+    if not word_str:
+        return None
+
+    stem = word_str.lower()[:4] if len(word_str) >= 4 else word_str.lower()
+    fallback_def = None
+
+    try:
+        url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{urllib.parse.quote(word_str.lower())}"
+        req = urllib.request.Request(url, headers={"User-Agent": "DailyDictationStudio/2.0"})
+        with urllib.request.urlopen(req, timeout=2.0) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            if isinstance(data, list):
+                for entry in data:
+                    for meaning_block in entry.get("meanings", []):
+                        for d in meaning_block.get("definitions", []):
+                            ex = (d.get("example") or "").strip()
+                            if ex and stem in ex.lower():
+                                return ex
+                            if not fallback_def and d.get("definition"):
+                                fallback_def = d.get("definition").strip()
+    except Exception:
+        pass
+
+    if not fallback_def:
+        try:
+            details = ImageSearchService.get_word_details(word_str.lower())
+            fallback_def = details.get("definition")
+        except Exception:
+            fallback_def = None
+
+    if fallback_def:
+        formatted = format_definition_as_context(word_str, fallback_def)
+        return formatted if formatted else None
+
+    return None
+
+
+def resolve_word_context_helper(
+    clean_word: str,
+    provided_context: Optional[str],
+    src_lang: str = "en",
+    fetch_example_fn: Optional[Callable[[str], Optional[str]]] = None
+) -> str:
+    """Resolve user-provided context sentence or auto-fetch a real example/definition sentence."""
+    if provided_context and isinstance(provided_context, str) and provided_context.strip():
+        return provided_context.strip()
+
+    if not clean_word or not isinstance(clean_word, str) or not clean_word.strip():
+        return ""
+
+    norm_lang = (src_lang or "en").strip().lower()
+    if norm_lang not in ("en", "auto"):
+        return ""
+
+    lookup_fn = fetch_example_fn or fetch_dictionary_example_sentence
+    try:
+        auto_sentence = lookup_fn(clean_word.strip())
+        if auto_sentence and isinstance(auto_sentence, str) and auto_sentence.strip():
+            return auto_sentence.strip()
+    except Exception as e:
+        logger.debug(f"Auto example lookup skipped for '{clean_word}': {e}")
+
+    return ""
 
 
 def resolve_word_meaning_helper(

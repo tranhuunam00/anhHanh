@@ -9,6 +9,9 @@ import {
   generateD3Options,
   generateD4Options,
   getD3ClozeSentence,
+  inferWordPosCategory,
+  buildInflectionRegex,
+  hashWordToIndex,
   isAnswerCorrect,
   FALLBACK_DISTRACTORS_VI,
   FALLBACK_DISTRACTORS_BY_LANG,
@@ -266,6 +269,52 @@ describe("vocabExerciseGenerators - getD3ClozeSentence", () => {
     assert.equal(res.clozeSentence, "[ ______ ]");
     assert.equal(res.originalSentence, "");
     assert.equal(res.translation, "");
+    assert.equal(res.isFallback, true);
+  });
+
+  test("masks inflected forms (-ed, -ing, -ies, doubled consonant) in context_sentence", () => {
+    assert.equal(
+      maskTargetWordInSentence("She achieved her long-term goal.", "achieve"),
+      "She [ ______ ] her long-term goal."
+    );
+    assert.equal(
+      maskTargetWordInSentence("New strategies were implemented.", "strategy"),
+      "New [ ______ ] were implemented."
+    );
+    assert.equal(
+      maskTargetWordInSentence("He stopped the car immediately.", "stop"),
+      "He [ ______ ] the car immediately."
+    );
+    assert.equal(buildInflectionRegex(""), null);
+    assert.equal(buildInflectionRegex(null), null);
+    assert.equal(buildInflectionRegex("go"), null);
+  });
+
+  test("infers POS categories accurately and generates distinct non-repeating templates on consecutive turns", () => {
+    assert.equal(inferWordPosCategory({ word: "accommodate", part_of_speech: "verb" }), "verb");
+    assert.equal(inferWordPosCategory({ word: "reluctant", part_of_speech: "adjective" }), "adjective");
+    assert.equal(inferWordPosCategory({ word: "quickly", meaning: "một cách nhanh chóng" }), "adverb");
+    assert.equal(inferWordPosCategory({ word: "friendly", meaning: "thân thiện" }), "general");
+    assert.equal(inferWordPosCategory({ word: "development", meaning: "sự phát triển" }), "noun");
+    assert.equal(inferWordPosCategory({ word: "take into account", meaning: "cân nhắc" }), "phrase");
+    assert.equal(inferWordPosCategory(null), "general");
+
+    const w1 = { id: 101, word: "accommodate", meaning: "đáp ứng", part_of_speech: "verb", source_lang: "en" };
+    const w2 = { id: 102, word: "implement", meaning: "triển khai", part_of_speech: "verb", source_lang: "en" };
+    const w3 = { id: 103, word: "negotiate", meaning: "đàm phán", part_of_speech: "verb", source_lang: "en" };
+
+    const s0 = getD3ClozeSentence(w1, 0);
+    const s1 = getD3ClozeSentence(w2, 1);
+    const s2 = getD3ClozeSentence(w3, 2);
+
+    assert.equal(s0.isFallback, true);
+    assert.equal(s1.isFallback, true);
+    assert.equal(s2.isFallback, true);
+    assert.notEqual(s0.clozeSentence, s1.clozeSentence);
+    assert.notEqual(s1.clozeSentence, s2.clozeSentence);
+    assert.equal(hashWordToIndex("", 8), 0);
+    assert.equal(hashWordToIndex("test", 1), 0);
+    assert.equal(hashWordToIndex("test", 8) >= 0 && hashWordToIndex("test", 8) < 8, true);
   });
 });
 

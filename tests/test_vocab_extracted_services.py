@@ -17,6 +17,11 @@ from app.application.vocab_file_service import (
     validate_file_extension,
     prepare_file_for_ai_extraction,
 )
+from app.presentation.vocab_api_helpers import (
+    format_definition_as_context,
+    fetch_dictionary_example_sentence,
+    resolve_word_context_helper,
+)
 
 
 # ============================================================================
@@ -302,4 +307,50 @@ def test_compute_time_range_bounds():
     )
     assert s_bad is None
     assert e_bad is None
+
+
+# ============================================================================
+# 6. Auto Context Sentence & Definition Cloze Helper Unit Tests
+# ============================================================================
+
+def test_format_definition_as_context():
+    """Test formatting English dictionary definition into cloze-ready sentence."""
+    res = format_definition_as_context(
+        "resilient",
+        "(of systems or people) Returning quickly to normal after damaging events."
+    )
+    assert res == 'In English, "resilient" means: returning quickly to normal after damaging events.'
+
+    # Without trailing period
+    res2 = format_definition_as_context("fragile", "Easily broken")
+    assert res2 == 'In English, "fragile" means: easily broken.'
+
+    # Edge / bad cases
+    assert format_definition_as_context("", "Valid def") == ""
+    assert format_definition_as_context("word", "") == ""
+    assert format_definition_as_context("word", None) == ""
+    assert format_definition_as_context("word", "(only parens)") == ""
+
+
+def test_resolve_word_context_helper():
+    """Test resolving user context sentence or falling back to dictionary example lookup."""
+    # 1. User provided context takes priority
+    assert resolve_word_context_helper("reluctant", "  She was reluctant to go.  ") == "She was reluctant to go."
+
+    # 2. Auto-enrichment via injected lookup function for English
+    mock_fn = lambda w: f"Example with {w} in context."
+    assert resolve_word_context_helper("reluctant", "", "en", fetch_example_fn=mock_fn) == "Example with reluctant in context."
+    assert resolve_word_context_helper("reluctant", None, "auto", fetch_example_fn=mock_fn) == "Example with reluctant in context."
+
+    # 3. Non-English languages skip English dictionary lookup
+    assert resolve_word_context_helper("bonjour", "", "fr", fetch_example_fn=mock_fn) == ""
+
+    # 4. Empty word or exception handling
+    assert resolve_word_context_helper("", "", "en", fetch_example_fn=mock_fn) == ""
+    def failing_fn(_w):
+        raise RuntimeError("Network error")
+    assert resolve_word_context_helper("reluctant", "", "en", fetch_example_fn=failing_fn) == ""
+    assert fetch_dictionary_example_sentence("") is None
+    assert fetch_dictionary_example_sentence(None) is None  # type: ignore
+
 

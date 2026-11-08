@@ -137,33 +137,20 @@ export const FALLBACK_DISTRACTORS_BY_LANG = {
   ],
 };
 
-/**
- * Mask target word in a sentence for Dạng 2 context hints
- * e.g. "We are in desperate need of help." -> "We are in [ ______ ] of help."
- */
-export const maskTargetWordInSentence = (sentence, targetWord) => {
-  if (!sentence || typeof sentence !== "string") return "";
-  if (!targetWord || typeof targetWord !== "string") return sentence;
+import {
+  maskTargetWordInSentence,
+  getD3ClozeSentence,
+  inferWordPosCategory,
+  buildInflectionRegex,
+  hashWordToIndex,
+} from "./vocabClozeGenerator.js";
 
-  const cleanWord = targetWord.trim();
-  if (!cleanWord) return sentence;
-
-  // Escape special regex characters in the target word
-  const escaped = cleanWord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-  // Attempt word boundary matching first (supports Latin scripts)
-  const wordBoundaryRegex = new RegExp(`\\b${escaped}\\b`, "i");
-  if (wordBoundaryRegex.test(sentence)) {
-    return sentence.replace(wordBoundaryRegex, "[ ______ ]");
-  }
-
-  // Fallback: non-boundary match (useful for CJK scripts or hyphenated terms)
-  const looseRegex = new RegExp(escaped, "i");
-  if (looseRegex.test(sentence)) {
-    return sentence.replace(looseRegex, "[ ______ ]");
-  }
-
-  return sentence;
+export {
+  maskTargetWordInSentence,
+  getD3ClozeSentence,
+  inferWordPosCategory,
+  buildInflectionRegex,
+  hashWordToIndex,
 };
 
 /**
@@ -246,78 +233,29 @@ export const generateD2Options = (currentItem, pool = [], extraDistractors = [])
 };
 
 /**
- * Extract or generate cloze sentence with target word masked as [ ______ ]
- * Handles context_sentence splitting and multi-language template fallbacks
- */
-export const getD3ClozeSentence = (currentItem) => {
-  if (!currentItem) {
-    return {
-      clozeSentence: "[ ______ ]",
-      originalSentence: "",
-      translation: "",
-      masked: true,
-    };
-  }
-
-  const rawSentence = (currentItem.context_sentence || "").trim();
-  const word = (currentItem.word || "").trim();
-
-  if (rawSentence) {
-    let orig = rawSentence;
-    let trans = "";
-
-    const bracketIdx = rawSentence.indexOf("[");
-    if (bracketIdx > 0 && rawSentence.endsWith("]")) {
-      orig = rawSentence.substring(0, bracketIdx).trim();
-      trans = rawSentence.substring(bracketIdx + 1, rawSentence.length - 1).trim();
-    } else {
-      orig = rawSentence.replace(/^"+|"+$/g, "").trim();
-    }
-
-    const masked = maskTargetWordInSentence(orig, word);
-    if (masked.includes("[ ______ ]")) {
-      return {
-        clozeSentence: masked,
-        originalSentence: orig,
-        translation: trans,
-        masked: true,
-      };
-    }
-
-    return {
-      clozeSentence: `${orig} ➔ Điền: [ ______ ]`,
-      originalSentence: orig,
-      translation: trans,
-      masked: true,
-    };
-  }
-
-  // Fallback sentence when no context_sentence was recorded
-  const sourceLang = (currentItem.source_lang || "en").toLowerCase();
-  const fallbacksByLang = {
-    en: "The speaker emphasized that [ ______ ] is vital for achieving this goal.",
-    fr: "L'orateur a souligné que [ ______ ] est essentiel pour atteindre cet objectif.",
-    de: "Der Sprecher betonte, dass [ ______ ] für dieses Ziel unerlässlich ist.",
-    ja: "目標を達成するためには、[ ______ ] が極めて重要であると強調された。",
-    zh: "发言人强调，[ ______ ] 对于实现这一目标至关重要。",
-    ko: "발표자는 이 목표를 달성하기 위해 [ ______ ] 이/가 필수적이라고 강조했습니다.",
-    es: "El orador enfatizó que [ ______ ] es fundamental para lograr este objetivo.",
-  };
-
-  const template = fallbacksByLang[sourceLang] || fallbacksByLang.en;
-  return {
-    clozeSentence: template,
-    originalSentence: template.replace("[ ______ ]", word),
-    translation: currentItem.meaning ? `Nghĩa: ${currentItem.meaning}` : "",
-    masked: true,
-  };
-};
-
-/**
  * Generate 4 multiple-choice options for Dạng 3 (Target: Word to fit cloze blank)
+ * Prioritizes distractors matching the target word's POS category when available.
  */
 export const generateD3Options = (currentItem, pool = [], extraDistractors = []) => {
-  return generateD2Options(currentItem, pool, extraDistractors);
+  if (!currentItem || !currentItem.word) return [];
+
+  const targetPos = inferWordPosCategory(currentItem);
+  const poolArray = Array.isArray(pool) ? pool : [];
+  const extraArray = Array.isArray(extraDistractors) ? extraDistractors : [];
+
+  if (targetPos && targetPos !== "general") {
+    const samePosPool = poolArray.filter(
+      (it) => it && it.id !== currentItem.id && it.word && inferWordPosCategory(it) === targetPos
+    );
+    const samePosExtra = extraArray.filter(
+      (it) => it && it.word && inferWordPosCategory(it) === targetPos
+    );
+    if (samePosPool.length + samePosExtra.length >= 3) {
+      return generateD2Options(currentItem, samePosPool, samePosExtra);
+    }
+  }
+
+  return generateD2Options(currentItem, poolArray, extraArray);
 };
 
 /**

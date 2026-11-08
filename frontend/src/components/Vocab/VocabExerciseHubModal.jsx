@@ -192,11 +192,14 @@ export default function VocabExerciseHubModal({
       setMaxCombo(0);
       setResultsHistory([]);
 
-      // Pre-fetch bank distractors to enrich multiple-choice options
+      // Pre-fetch bank distractors before entering practice view so MCQ options stay stable
       const targetLang = sessionWords[0]?.source_lang || "en";
-      fetchSystemDistractors(targetLang, 40)
-        .then((dist) => setBankDistractors(dist || []))
-        .catch(() => {});
+      try {
+        const dist = await fetchSystemDistractors(targetLang, 40);
+        setBankDistractors(dist || []);
+      } catch {
+        setBankDistractors([]);
+      }
 
       setViewMode("PRACTICE");
     } catch (err) {
