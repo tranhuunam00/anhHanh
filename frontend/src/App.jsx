@@ -27,7 +27,7 @@ import { VisualVocabPage } from "./components/VisualVocab";
 import { RootWordsPage } from "./components/RootWords";
 import { IeltsTestPage } from "./pages/IeltsTestPage";
 import { PrimaryKidsPage } from "./components/PrimaryKids";
-import { GraduationCap, PawPrint } from "./constants/icons";
+import { GraduationCap } from "./constants/icons";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -985,15 +985,6 @@ export default function App() {
               <span>Đề thi thật IELTS</span>
             </button>
 
-            <button
-              className={`tab-btn ${activeTab === "tab-primary" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-primary")}
-              style={activeTab === "tab-primary" ? { borderColor: "#10b981" } : {}}
-              title="Tiểu Học: Global English 4 (Stage 4) - Vườn Thú Tiếng Anh Safari"
-            >
-              <PawPrint className="tab-btn-icon" />
-              <span>Tiểu học</span>
-            </button>
 
             <button
               className={`tab-btn ${activeTab === "tab-root-words" ? "active" : ""}`}
