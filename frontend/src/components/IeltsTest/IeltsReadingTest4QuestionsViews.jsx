@@ -1,7 +1,8 @@
 import React from "react";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
+import { IeltsExerciseExplanationGroup } from "./IeltsReadingExplanationCard.jsx";
 
-export function renderTest4Passage1Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest4Passage1Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-4", passageText = "") {
   const tfGroup = groups?.find((g) => g.groupType === "true_false_not_given");
   const flowGroup = groups?.find((g) => g.groupType === "flowchart_completion");
   const notesGroup = groups?.find((g) => g.groupType === "notes_completion");
@@ -53,6 +54,7 @@ export function renderTest4Passage1Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={tfGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -88,6 +90,7 @@ export function renderTest4Passage1Questions(groups, answers, onChange, evaluati
               </div>
             </div>
           </div>
+          <IeltsExerciseExplanationGroup group={flowGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -114,13 +117,14 @@ export function renderTest4Passage1Questions(groups, answers, onChange, evaluati
               </ul>
             </div>
           </div>
+          <IeltsExerciseExplanationGroup group={notesGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>
   );
 }
 
-export function renderTest4Passage2Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest4Passage2Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-4", passageText = "") {
   const summaryGroup = groups?.find((g) => g.groupType === "summary_words_box");
   const ynGroup = groups?.find((g) => g.groupType === "yes_no_not_given");
   const mcGroup = groups?.find((g) => g.groupType === "multiple_choice");
@@ -219,6 +223,7 @@ export function renderTest4Passage2Questions(groups, answers, onChange, evaluati
               {renderFeedback(evaluation, 19, isReview)} to those that multilingual schoolchildren in Europe experience.
             </p>
           </div>
+          <IeltsExerciseExplanationGroup group={summaryGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -253,6 +258,7 @@ export function renderTest4Passage2Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={ynGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -283,13 +289,14 @@ export function renderTest4Passage2Questions(groups, answers, onChange, evaluati
               {renderFeedback(evaluation, item.number, isReview)}
             </div>
           ))}
+          <IeltsExerciseExplanationGroup group={mcGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>
   );
 }
 
-export function renderTest4Passage3Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest4Passage3Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-4", passageText = "") {
   const summaryGroup = groups?.find((g) => g.groupType === "summary_words_box");
   const ynGroup = groups?.find((g) => g.groupType === "yes_no_not_given");
   const mcGroup = groups?.find((g) => g.groupType === "multiple_choice");
@@ -384,6 +391,7 @@ export function renderTest4Passage3Questions(groups, answers, onChange, evaluati
               {renderFeedback(evaluation, 32, isReview)} , but Bellerby could not find what he wanted.
             </p>
           </div>
+          <IeltsExerciseExplanationGroup group={summaryGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -418,6 +426,7 @@ export function renderTest4Passage3Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={ynGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -448,6 +457,7 @@ export function renderTest4Passage3Questions(groups, answers, onChange, evaluati
               {renderFeedback(evaluation, item.number, isReview)}
             </div>
           ))}
+          <IeltsExerciseExplanationGroup group={mcGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>

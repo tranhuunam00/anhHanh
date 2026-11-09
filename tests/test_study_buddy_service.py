@@ -4,7 +4,9 @@ import math
 from app.application.study_buddy_service import (
     calculate_haversine_distance_km,
     format_distance_display,
+    compute_online_status,
 )
+from datetime import datetime, timezone, timedelta
 
 
 class TestStudyBuddyDistanceCalculations:
@@ -52,4 +54,51 @@ class TestStudyBuddyDistanceCalculations:
         """None or negative distances return fallback message."""
         assert format_distance_display(None) == "Không xác định"
         assert format_distance_display(-5.0) == "Không xác định"
+
+
+class TestOnlineStatusCalculation:
+    """Tests for compute_online_status logic."""
+
+    def test_online_status_none_or_missing(self):
+        """None last_active_at returns offline."""
+        status = compute_online_status(None)
+        assert status["is_online"] is False
+        assert status["code"] == "offline"
+
+    def test_online_status_within_five_minutes(self):
+        """Recent activity within 5 minutes returns online."""
+        now = datetime.now(timezone.utc)
+        recent = now - timedelta(seconds=120)
+        status = compute_online_status(recent)
+        assert status["is_online"] is True
+        assert status["code"] == "online"
+        assert status["label"] == "Đang online"
+
+    def test_online_status_recently_active(self):
+        """Activity between 5 mins and 1 hour returns recently_active with minutes."""
+        now = datetime.now(timezone.utc)
+        past_20_mins = now - timedelta(minutes=20)
+        status = compute_online_status(past_20_mins)
+        assert status["is_online"] is False
+        assert status["code"] == "recently_active"
+        assert "20 phút trước" in status["label"]
+
+    def test_online_status_away(self):
+        """Activity between 1 hour and 24 hours returns hours ago."""
+        now = datetime.now(timezone.utc)
+        past_3_hours = now - timedelta(hours=3)
+        status = compute_online_status(past_3_hours)
+        assert status["is_online"] is False
+        assert status["code"] == "away"
+        assert "3 giờ trước" in status["label"]
+
+    def test_online_status_days_ago(self):
+        """Activity older than 24 hours returns days ago."""
+        now = datetime.now(timezone.utc)
+        past_2_days = now - timedelta(days=2)
+        status = compute_online_status(past_2_days)
+        assert status["is_online"] is False
+        assert status["code"] == "offline"
+        assert "2 ngày trước" in status["label"]
+
 

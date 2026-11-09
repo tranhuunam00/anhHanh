@@ -9,6 +9,7 @@ export const cambridge19Test2Writing = {
       timeSuggestion: "You should spend about 20 minutes on this task.",
       prompt: "The plans below show a harbour in 2000 and how it looks today.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
+      image: "/images/ielts/cam19_test2_writing_task1.png",
       diagramTitle: "Development of a coastal harbour (2000 vs Present)"
     },
     {

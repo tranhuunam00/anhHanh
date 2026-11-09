@@ -114,6 +114,7 @@ export const IconCopy = (props) => (
     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
   </BaseIcon>
 );
+export const Copy = IconCopy;
 
 // 9. Plus / Add
 export const IconPlus = (props) => (

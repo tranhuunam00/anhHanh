@@ -64,6 +64,10 @@ export default function App() {
   // Helper to map URL path to active tab
   const getTabFromPath = () => {
     if (typeof window === "undefined") return "tab-dictation";
+    const search = window.location.search;
+    if (search && (search.includes("buddy_invite=") || search.includes("invite="))) {
+      return "tab-buddy";
+    }
     const path = window.location.pathname.toLowerCase();
     if (path === "/admin" || path.startsWith("/admin/")) return "tab-admin";
     if (path === "/vocab" || path.startsWith("/vocab/")) return "tab-vocab";
@@ -926,6 +930,7 @@ export default function App() {
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
         onOpenVocabTab={() => setActiveTab("tab-vocab")}
+        onOpenBuddyTab={() => setActiveTab("tab-buddy")}
         onOpenFeedback={() => setIsFeedbackOpen(true)}
         onOpenAdminTab={() => setActiveTab("tab-admin")}
       />

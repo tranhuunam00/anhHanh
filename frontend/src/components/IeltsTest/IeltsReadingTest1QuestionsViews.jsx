@@ -1,7 +1,8 @@
 import React from "react";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
+import { IeltsExerciseExplanationGroup } from "./IeltsReadingExplanationCard.jsx";
 
-export function renderTest1Passage1Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest1Passage1Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-1", passageText = "") {
   const notesGroup = groups?.find((g) => g.groupType === "notes_completion");
   const tfGroup = groups?.find((g) => g.groupType === "true_false_not_given");
 
@@ -62,6 +63,7 @@ export function renderTest1Passage1Questions(groups, answers, onChange, evaluati
               </ul>
             </div>
           </div>
+          <IeltsExerciseExplanationGroup group={notesGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -96,13 +98,14 @@ export function renderTest1Passage1Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={tfGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>
   );
 }
 
-export function renderTest1Passage2Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest1Passage2Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-1", passageText = "") {
   const matchInfoGroup = groups?.find((g) => g.groupType === "matching_information");
   const summaryGroup = groups?.find((g) => g.groupType === "summary_completion");
   const matchPeopleGroup = groups?.find((g) => g.groupType === "matching_people");
@@ -148,6 +151,7 @@ export function renderTest1Passage2Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={matchInfoGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -167,6 +171,7 @@ export function renderTest1Passage2Questions(groups, answers, onChange, evaluati
               In another experiment, the researchers had 48 people spend periods of 90 minutes either lying back in a chair or floating in a tank. Brain scans then revealed that those people who had been in a tank had decreased activity in parts of the brain associated with {renderSummaryInput(21)} .
             </p>
           </div>
+          <IeltsExerciseExplanationGroup group={summaryGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -204,13 +209,14 @@ export function renderTest1Passage2Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={matchPeopleGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>
   );
 }
 
-export function renderTest1Passage3Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest1Passage3Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-1", passageText = "") {
   const mcGroup = groups?.find((g) => g.groupType === "multiple_choice");
   const summaryBoxGroup = groups?.find((g) => g.groupType === "summary_box");
   const ynnGroup = groups?.find((g) => g.groupType === "yes_no_not_given");
@@ -249,6 +255,7 @@ export function renderTest1Passage3Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={mcGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -357,6 +364,7 @@ export function renderTest1Passage3Questions(groups, answers, onChange, evaluati
               {" "}were penalised.
             </p>
           </div>
+          <IeltsExerciseExplanationGroup group={summaryBoxGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -391,6 +399,7 @@ export function renderTest1Passage3Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={ynnGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>

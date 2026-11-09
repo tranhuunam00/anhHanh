@@ -4,6 +4,9 @@ import {
   getBuddyStatusMeta,
   filterBuddiesByQuery,
   sanitizeBuddiesList,
+  generateBuddyShareLink,
+  parseBuddyInviteFromUrl,
+  formatOnlineStatusBadge,
   RADIUS_OPTIONS,
 } from "../src/utils/studyBuddyUtils.js";
 
@@ -101,6 +104,65 @@ describe("studyBuddyUtils Unit Tests", () => {
       assert.ok(Array.isArray(RADIUS_OPTIONS));
       assert.ok(RADIUS_OPTIONS.length >= 3);
       assert.equal(RADIUS_OPTIONS[0].value, 5);
+    });
+  });
+
+  describe("generateBuddyShareLink", () => {
+    test("generates valid invite link with userId", () => {
+      const link = generateBuddyShareLink("user-123", "https://shotlang.com");
+      assert.equal(link, "https://shotlang.com/?buddy_invite=user-123");
+    });
+
+    test("returns empty string when userId is null or empty", () => {
+      assert.equal(generateBuddyShareLink(null), "");
+      assert.equal(generateBuddyShareLink(""), "");
+    });
+  });
+
+  describe("parseBuddyInviteFromUrl", () => {
+    test("parses buddy_invite param accurately", () => {
+      assert.equal(parseBuddyInviteFromUrl("?buddy_invite=user-abc-123"), "user-abc-123");
+      assert.equal(parseBuddyInviteFromUrl("?tab=buddy&buddy_invite=xyz456"), "xyz456");
+    });
+
+    test("parses invite param as fallback", () => {
+      assert.equal(parseBuddyInviteFromUrl("?invite=user-789"), "user-789");
+    });
+
+    test("returns null for empty, missing or invalid queries", () => {
+      assert.equal(parseBuddyInviteFromUrl(""), null);
+      assert.equal(parseBuddyInviteFromUrl("?other=123"), null);
+      assert.equal(parseBuddyInviteFromUrl(null), null);
+    });
+  });
+
+  describe("formatOnlineStatusBadge", () => {
+    test("returns online badge for is_online=true", () => {
+      const res = formatOnlineStatusBadge({ is_online: true, label: "Đang online", code: "online" });
+      assert.equal(res.isOnline, true);
+      assert.equal(res.label, "Đang online");
+      assert.equal(res.colorClass, "status-online");
+      assert.equal(res.dotColor, "#10b981");
+    });
+
+    test("returns recently_active badge for recent activity", () => {
+      const res = formatOnlineStatusBadge({ is_online: false, label: "15 phút trước", code: "recently_active" });
+      assert.equal(res.isOnline, false);
+      assert.equal(res.label, "15 phút trước");
+      assert.equal(res.colorClass, "status-recent");
+      assert.equal(res.dotColor, "#f59e0b");
+    });
+
+    test("returns offline badge for null or offline status", () => {
+      const resNull = formatOnlineStatusBadge(null);
+      assert.equal(resNull.isOnline, false);
+      assert.equal(resNull.colorClass, "status-offline");
+      assert.equal(resNull.dotColor, "#94a3b8");
+
+      const resOffline = formatOnlineStatusBadge({ is_online: false, label: "2 ngày trước", code: "offline" });
+      assert.equal(resOffline.isOnline, false);
+      assert.equal(resOffline.label, "2 ngày trước");
+      assert.equal(resOffline.colorClass, "status-offline");
     });
   });
 });

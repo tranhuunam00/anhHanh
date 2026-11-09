@@ -79,3 +79,73 @@ export function sanitizeBuddiesList(rawList) {
   return rawList.filter((b) => b && typeof b === "object" && Boolean(b.id && b.name));
 }
 
+/**
+ * Tạo liên kết chia sẻ kết bạn cá nhân
+ * @param {string} userId
+ * @param {string} [origin]
+ * @returns {string}
+ */
+export function generateBuddyShareLink(userId, origin = "") {
+  if (!userId) return "";
+  const base = origin || (typeof window !== "undefined" ? window.location.origin : "");
+  return `${base}/?buddy_invite=${encodeURIComponent(userId)}`;
+}
+
+/**
+ * Trích xuất mã mời kết bạn từ query params URL
+ * @param {string} searchStr e.g. "?buddy_invite=xyz" hoặc "?invite=xyz"
+ * @returns {string|null}
+ */
+export function parseBuddyInviteFromUrl(searchStr) {
+  if (!searchStr || typeof searchStr !== "string") return null;
+  try {
+    const params = new URLSearchParams(searchStr);
+    return params.get("buddy_invite") || params.get("invite") || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Định dạng nhãn và kiểu hiển thị trạng thái online
+ * @param {object|null|undefined} onlineStatus { is_online, label, code }
+ * @returns {{ isOnline: boolean, label: string, colorClass: string, dotColor: string }}
+ */
+export function formatOnlineStatusBadge(onlineStatus) {
+  if (!onlineStatus || typeof onlineStatus !== "object") {
+    return {
+      isOnline: false,
+      label: "Ngoại tuyến",
+      colorClass: "status-offline",
+      dotColor: "#94a3b8",
+    };
+  }
+  const isOnline = Boolean(onlineStatus.is_online);
+  const code = onlineStatus.code || "offline";
+  const label = onlineStatus.label || (isOnline ? "Đang online" : "Ngoại tuyến");
+
+  if (isOnline) {
+    return {
+      isOnline: true,
+      label,
+      colorClass: "status-online",
+      dotColor: "#10b981", // Emerald green
+    };
+  }
+  if (code === "recently_active") {
+    return {
+      isOnline: false,
+      label,
+      colorClass: "status-recent",
+      dotColor: "#f59e0b", // Amber
+    };
+  }
+  return {
+    isOnline: false,
+    label,
+    colorClass: "status-offline",
+    dotColor: "#94a3b8", // Slate gray
+  };
+}
+
+

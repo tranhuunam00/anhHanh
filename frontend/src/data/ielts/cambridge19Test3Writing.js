@@ -9,6 +9,7 @@ export const cambridge19Test3Writing = {
       timeSuggestion: "You should spend about 20 minutes on this task.",
       prompt: "The diagram below shows how a biofuel called ethanol is produced.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
+      image: "/images/ielts/cam19_test3_writing_task1.png",
       diagramTitle: "Industrial production process of ethanol biofuel"
     },
     {

@@ -139,3 +139,42 @@ export async function unfriend(token, otherId) {
   }
 }
 
+/**
+ * Search study buddies by email, user ID, or name
+ */
+export async function searchStudyBuddies(token, query) {
+  if (!token || !query?.trim()) return { ok: false, results: [] };
+  try {
+    const params = new URLSearchParams({ q: query.trim() });
+    const res = await fetch(`${BASE_URL}/search?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) {
+      return { ok: false, results: [] };
+    }
+    return await res.json();
+  } catch {
+    return { ok: false, results: [] };
+  }
+}
+
+/**
+ * Ping backend to refresh user's online activity
+ */
+export async function pingBuddyActive(token) {
+  if (!token) return;
+  try {
+    await fetch(`${BASE_URL}/ping`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch {
+    // Ignore silent ping errors
+  }
+}
+
+

@@ -14,6 +14,7 @@ from app.application.study_buddy_service import (
     respond_to_friend_request,
     get_user_friendships_list,
     remove_friend,
+    search_study_buddies_by_query,
 )
 
 logger = logging.getLogger(__name__)
@@ -130,4 +131,34 @@ async def api_unfriend(
     """Unfriend or cancel connection."""
     res = await remove_friend(db=db, user_id=current_user.id, other_id=other_id)
     return res
+
+
+@router.get("/search")
+async def api_search_buddies(
+    q: str = Query(..., min_length=1, description="Email, User ID, or Name"),
+    limit: int = Query(20, ge=1, le=50),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Search study buddies by email, user ID (invite link), or name."""
+    results = await search_study_buddies_by_query(
+        db=db,
+        current_user_id=current_user.id,
+        query=q,
+        limit=limit,
+    )
+    return {"ok": True, "results": results, "total": len(results)}
+
+
+@router.post("/ping")
+async def api_ping_active(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Keep current user's online activity alive."""
+    from datetime import datetime, timezone
+    current_user.last_active_at = datetime.now(timezone.utc)
+    await db.commit()
+    return {"ok": True}
+
 

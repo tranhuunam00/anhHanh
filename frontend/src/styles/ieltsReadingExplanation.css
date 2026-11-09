@@ -1,0 +1,228 @@
+/* ==========================================================================
+   IELTS Academic Reading - Question Explanations & Evidence Stylesheet
+   Designed for review mode ("chữa đề"). Clean, tidy, and visual-friendly.
+   Light & Dark Mode Compatible via System CSS Variables (<= 500 lines)
+   ========================================================================== */
+
+/* --- Exercise-Level Explanation Group Container (Dưới mỗi bài) --- */
+.ielts-group-explanation-box {
+  margin-top: 18px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+}
+
+.ielts-group-explanation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  user-select: none;
+}
+
+.ielts-group-explanation-header:hover {
+  background: var(--bg-secondary);
+}
+
+.ielts-group-explanation-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ielts-group-explanation-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ielts-group-toggle-all-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ielts-group-toggle-all-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* --- Explanation List & Individual Question Cards --- */
+.ielts-explanation-items-list {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ielts-single-explanation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.ielts-single-explanation-card.is-correct {
+  border-left: 3.5px solid #10b981;
+}
+
+.ielts-single-explanation-card.is-incorrect {
+  border-left: 3.5px solid #ef4444;
+}
+
+.ielts-explanation-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.ielts-explanation-card-header:hover {
+  background: var(--bg-secondary);
+}
+
+.ielts-explanation-card-title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ielts-explanation-card-body {
+  padding: 10px 14px 14px;
+  border-top: 1px dashed var(--border-color);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-card);
+}
+
+/* Location Badge */
+.ielts-explanation-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(37, 99, 235, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+/* Evidence Blockquote */
+.ielts-explanation-evidence {
+  background: var(--bg-secondary);
+  border-left: 3px solid var(--primary);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.ielts-explanation-evidence-label {
+  font-weight: 700;
+  font-style: normal;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+  display: block;
+}
+
+/* Rationale Explanation */
+.ielts-explanation-reason {
+  color: var(--text-primary);
+}
+
+.ielts-explanation-reason-label {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+  display: block;
+}
+
+/* Keywords Synonym Comparison */
+.ielts-explanation-keywords-box {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ielts-keyword-pair-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.77rem;
+  background: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.ielts-keyword-q {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ielts-keyword-arrow {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.ielts-keyword-p {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Inline Trigger Button (Hiển thị ngay dưới câu hỏi trong danh sách) */
+.ielts-inline-why-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--primary);
+  cursor: pointer;
+  margin-left: 6px;
+  vertical-align: middle;
+  transition: all 0.15s ease;
+}
+
+.ielts-inline-why-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+

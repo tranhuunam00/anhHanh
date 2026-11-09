@@ -40,6 +40,31 @@ def format_distance_display(distance_km: float) -> str:
     return f"Cách {distance_km:.1f} km"
 
 
+def compute_online_status(last_active_at: Optional[datetime]) -> Dict[str, Any]:
+    """Compute whether a user is currently online and human-readable last active label."""
+    if not last_active_at:
+        return {"is_online": False, "label": "Chưa hoạt động", "code": "offline"}
+
+    now = datetime.now(timezone.utc)
+    if last_active_at.tzinfo is None:
+        last_active = last_active_at.replace(tzinfo=timezone.utc)
+    else:
+        last_active = last_active_at
+
+    delta_seconds = max(0, (now - last_active).total_seconds())
+    if delta_seconds <= 300:  # <= 5 mins
+        return {"is_online": True, "label": "Đang online", "code": "online"}
+    elif delta_seconds <= 3600:  # <= 1 hour
+        mins = max(1, int(delta_seconds // 60))
+        return {"is_online": False, "label": f"{mins} phút trước", "code": "recently_active"}
+    elif delta_seconds <= 86400:  # <= 24 hours
+        hours = max(1, int(delta_seconds // 3600))
+        return {"is_online": False, "label": f"{hours} giờ trước", "code": "away"}
+    else:
+        days = max(1, int(delta_seconds // 86400))
+        return {"is_online": False, "label": f"{days} ngày trước", "code": "offline"}
+
+
 async def update_user_location(
     db: AsyncSession,
     user_id: str,
@@ -56,9 +81,11 @@ async def update_user_location(
     if not user:
         return None
 
+    now_utc = datetime.now(timezone.utc)
     user.latitude = float(latitude)
     user.longitude = float(longitude)
-    user.location_updated_at = datetime.now(timezone.utc)
+    user.location_updated_at = now_utc
+    user.last_active_at = now_utc
     if study_target is not None:
         user.study_target = study_target.strip()[:100]
     if is_location_sharing is not None:
@@ -130,6 +157,7 @@ async def get_nearby_study_buddies(
                 "words_today": streak.words_today if streak else 0,
                 "friendship_status": rel_status,
                 "friendship_id": friendship_id,
+                "online_status": compute_online_status(user.last_active_at or user.location_updated_at),
                 "last_active": user.location_updated_at.isoformat() if user.location_updated_at else None,
             })
 
@@ -232,12 +260,15 @@ async def get_user_friendships_list(db: AsyncSession, user_id: str) -> Dict[str,
             "friendship_id": f.id,
             "id": friend_user.id,
             "name": friend_user.name,
+            "email": friend_user.email,
             "avatar_url": friend_user.avatar_url,
             "study_target": friend_user.study_target or "Luyện nghe & Chép chính tả",
             "bio": friend_user.bio or "",
             "streak": streak.current_streak if streak else 0,
             "words_today": streak.words_today if streak else 0,
             "connected_at": f.updated_at.isoformat() if f.updated_at else None,
+            "online_status": compute_online_status(friend_user.last_active_at or friend_user.location_updated_at),
+            "last_active": (friend_user.last_active_at or friend_user.location_updated_at).isoformat() if (friend_user.last_active_at or friend_user.location_updated_at) else None,
         })
 
     # 2. Incoming pending requests
@@ -256,14 +287,89 @@ async def get_user_friendships_list(db: AsyncSession, user_id: str) -> Dict[str,
             "friendship_id": f.id,
             "id": sender_user.id,
             "name": sender_user.name,
+            "email": sender_user.email,
             "avatar_url": sender_user.avatar_url,
             "study_target": sender_user.study_target or "Luyện nghe & Chép chính tả",
             "bio": sender_user.bio or "",
             "streak": streak.current_streak if streak else 0,
             "created_at": f.created_at.isoformat() if f.created_at else None,
+            "online_status": compute_online_status(sender_user.last_active_at or sender_user.location_updated_at),
         })
 
     return {"friends": friends, "incoming_requests": requests}
+
+
+async def search_study_buddies_by_query(
+    db: AsyncSession,
+    current_user_id: str,
+    query: str,
+    limit: int = 20,
+) -> List[Dict[str, Any]]:
+    """Search study buddies by email, user ID (from share invite link), or name."""
+    clean_q = (query or "").strip()
+    if not clean_q or len(clean_q) < 2:
+        return []
+
+    # Check if exact UUID
+    is_exact_id = len(clean_q) == 36 and "-" in clean_q
+    if is_exact_id:
+        filter_cond = and_(User.id == clean_q, User.id != current_user_id)
+    else:
+        filter_cond = and_(
+            User.id != current_user_id,
+            or_(
+                User.email.ilike(f"{clean_q}%"),
+                User.email == clean_q,
+                User.name.ilike(f"%{clean_q}%"),
+            ),
+        )
+
+    stmt = (
+        select(User, UserStreak)
+        .outerjoin(UserStreak, User.id == UserStreak.user_id)
+        .where(filter_cond)
+        .limit(limit)
+    )
+    res = await db.execute(stmt)
+    rows = res.all()
+
+    # Query friendships to determine relation status
+    friendships_stmt = select(Friendship).where(
+        or_(Friendship.sender_id == current_user_id, Friendship.receiver_id == current_user_id)
+    )
+    f_res = await db.execute(friendships_stmt)
+    friendships = f_res.scalars().all()
+
+    rel_map = {}
+    for f in friendships:
+        other_id = f.receiver_id if f.sender_id == current_user_id else f.sender_id
+        if f.status == "ACCEPTED":
+            rel_map[other_id] = ("FRIEND", f.id)
+        elif f.status == "PENDING":
+            if f.sender_id == current_user_id:
+                rel_map[other_id] = ("PENDING_SENT", f.id)
+            else:
+                rel_map[other_id] = ("PENDING_RECEIVED", f.id)
+
+    results = []
+    for user, streak in rows:
+        rel_status, friendship_id = rel_map.get(user.id, ("NONE", None))
+        results.append({
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "avatar_url": user.avatar_url,
+            "study_target": user.study_target or "Luyện nghe & Chép chính tả",
+            "bio": user.bio or "",
+            "streak": streak.current_streak if streak else 0,
+            "words_today": streak.words_today if streak else 0,
+            "friendship_status": rel_status,
+            "friendship_id": friendship_id,
+            "online_status": compute_online_status(user.last_active_at or user.location_updated_at),
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+        })
+
+    return results
 
 
 async def remove_friend(db: AsyncSession, user_id: str, other_id: str) -> Dict[str, Any]:

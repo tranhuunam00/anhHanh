@@ -162,6 +162,35 @@ export const IeltsWritingModule = ({
     evalData?.evaluation?.detailed_feedback ||
     "";
 
+  const taskImage = currentTask?.image || currentTask?.imageSrc || currentTask?.diagramImage;
+
+  // Extract clean paragraphs from task
+  const promptParagraphs = useMemo(() => {
+    if (!currentTask) return [];
+    if (Array.isArray(currentTask.instructions) && currentTask.instructions.length > 0) {
+      return currentTask.instructions;
+    }
+    const raw = currentTask.prompt || currentTask.topic || currentTask.question || "";
+    if (!raw) return [];
+    const lines = raw.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+
+    const hasTime = lines.some((l) => l.toLowerCase().startsWith("you should spend"));
+    const hasWordLimit = lines.some((l) => l.toLowerCase().startsWith("write at least"));
+
+    const result = [];
+    if (!hasTime && currentTask.timeSuggestion) {
+      result.push(currentTask.timeSuggestion);
+    }
+    if (activeTask === 2 && !lines.some((l) => l.toLowerCase().includes("write about the following topic"))) {
+      result.push("Write about the following topic:");
+    }
+    result.push(...lines);
+    if (!hasWordLimit) {
+      result.push(`Write at least ${currentTask.minWords || (activeTask === 1 ? 150 : 250)} words.`);
+    }
+    return result;
+  }, [currentTask, activeTask]);
+
   // Left Pane: Official Prompt & Structure Strategy Guide
   const leftPaneContent = (
     <div className="ielts-left-scroll-pane ielts-writing-prompt-pane">
@@ -183,15 +212,15 @@ export const IeltsWritingModule = ({
       {/* Official Exam Prompt Card */}
       <div className="ielts-writing-prompt-card">
         <div className="ielts-writing-prompt-header">
-          <span className="ielts-prompt-tag-badge">IELTS ACADEMIC WRITING • {currentTask.title.toUpperCase()}</span>
+          <span className="ielts-prompt-tag-badge">IELTS ACADEMIC WRITING • {currentTask?.title?.toUpperCase() || "WRITING"}</span>
           <span className="ielts-time-hint">
             <Clock className="w-4 h-4 mr-1 text-primary inline" />
-            {currentTask.timeSuggestion}
+            {currentTask?.timeSuggestion || (activeTask === 1 ? "You should spend about 20 minutes on this task." : "You should spend about 40 minutes on this task.")}
           </span>
         </div>
 
         <div className="ielts-writing-instructions">
-          {currentTask.instructions?.map((para, i) => {
+          {promptParagraphs.map((para, i) => {
             if (para.startsWith("You should spend")) {
               return (
                 <p key={i} className="ielts-prompt-meta-time"><strong>{para}</strong></p>
@@ -202,8 +231,48 @@ export const IeltsWritingModule = ({
                 <p key={i} className="ielts-prompt-meta-length"><strong>{para}</strong></p>
               );
             }
+            if (para.toLowerCase().startsWith("write about the following topic")) {
+              return (
+                <p key={i} className="ielts-prompt-topic-intro"><em>{para}</em></p>
+              );
+            }
+
+            const lower = para.toLowerCase();
+            const isAction =
+              lower.startsWith("summarise the information") ||
+              lower.startsWith("give reasons for your answer") ||
+              lower.startsWith("to what extent") ||
+              lower.startsWith("do you think") ||
+              lower.startsWith("do you agree") ||
+              lower.startsWith("discuss both") ||
+              lower.startsWith("what is the value") ||
+              lower.startsWith("how important") ||
+              lower.startsWith("what are the arguments") ||
+              lower.startsWith("how has global fashion");
+
+            const isTopicStatement =
+              activeTask === 2 &&
+              !isAction &&
+              !para.startsWith("You should") &&
+              !para.startsWith("Write");
+
+            if (isTopicStatement) {
+              return (
+                <div key={i} className="ielts-prompt-quote-box">
+                  {isReview ? (
+                    <HighlightedVocabSentence text={para} contextSentence={para} />
+                  ) : (
+                    para
+                  )}
+                </div>
+              );
+            }
+
             return (
-              <p key={i} className="ielts-prompt-action-text">
+              <p
+                key={i}
+                className={isAction ? "ielts-prompt-action-text" : "ielts-prompt-desc-text"}
+              >
                 {isReview ? (
                   <HighlightedVocabSentence text={para} contextSentence={para} />
                 ) : (
@@ -215,11 +284,11 @@ export const IeltsWritingModule = ({
         </div>
 
         {/* Task 1 Diagram Image */}
-        {(currentTask.image || currentTask.imageSrc) && (
+        {taskImage && (
           <div className="ielts-writing-image-wrap">
             {currentTask.diagramTitle && <h5 className="ielts-diagram-title">{currentTask.diagramTitle}</h5>}
             <img
-              src={currentTask.image || currentTask.imageSrc}
+              src={taskImage}
               alt="IELTS Writing Task 1 diagram"
               className="ielts-writing-diagram-img"
             />

@@ -80,6 +80,14 @@ export const IeltsReadingModule = ({
   const currentLeftPassage = passages.find((p) => p.passageNumber === leftPassage) || passages[0];
   const currentRightPassage = passages.find((p) => p.passageNumber === rightPassage) || passages[0];
 
+  const currentRightPassageText = useMemo(() => {
+    if (!currentRightPassage) return "";
+    if (Array.isArray(currentRightPassage.paragraphs)) {
+      return currentRightPassage.paragraphs.map((p) => p.text).join("\n\n");
+    }
+    return currentRightPassage.text || "";
+  }, [currentRightPassage]);
+
   const handleSelectPassage = (num) => {
     setActivePassage(num);
     setLeftPassage(num);
@@ -177,86 +185,90 @@ export const IeltsReadingModule = ({
   const rightPaneContent = (
     <div className="ielts-right-scroll-pane ielts-reading-questions-pane">
       <div className="ielts-questions-body">
-        {readingData?.testId?.startsWith("cambridge-19-") ? (
+        {readingData?.testId?.startsWith("cambridge-17-") ||
+        readingData?.testId?.startsWith("cambridge-18-") ||
+        readingData?.testId?.startsWith("cambridge-19-") ? (
           renderCam19ReadingPassageQuestions(
             currentRightPassage.groups,
             answers,
             handleInputChange,
             handleChooseTwoToggle,
             effectiveEval,
-            isReview
+            isReview,
+            readingData?.testId,
+            currentRightPassageText
           )
         ) : readingData?.testId === "cambridge-20-test-1" ? (
           <>
             {rightPassage === 1 &&
-              renderCam20Test1Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test1Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 2 &&
-              renderCam20Test1Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test1Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 3 &&
-              renderCam20Test1Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test1Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
           </>
         ) : readingData?.testId === "cambridge-20-test-2" ? (
           <>
             {rightPassage === 1 &&
-              renderCam20Test2Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test2Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 2 &&
-              renderCam20Test2Passage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              renderCam20Test2Passage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 3 &&
-              renderCam20Test2Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test2Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
           </>
         ) : readingData?.testId === "cambridge-20-test-3" ? (
           <>
             {rightPassage === 1 &&
-              renderCam20Test3Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test3Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 2 &&
-              renderCam20Test3Passage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              renderCam20Test3Passage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 3 &&
-              renderCam20Test3Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test3Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
           </>
         ) : readingData?.testId === "cambridge-20-test-4" ? (
           <>
             {rightPassage === 1 &&
-              renderCam20Test4Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test4Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 2 &&
-              renderCam20Test4Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test4Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 3 &&
-              renderCam20Test4Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderCam20Test4Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
           </>
         ) : readingData?.testId === "cambridge-21-test-1" ? (
           <>
             {rightPassage === 1 &&
-              renderTest1Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest1Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 2 &&
-              renderTest1Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest1Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 3 &&
-              renderTest1Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest1Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
           </>
         ) : readingData?.testId === "cambridge-21-test-3" ? (
           <>
             {rightPassage === 1 &&
-              renderTest3Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest3Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 2 &&
-              renderTest3Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest3Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 3 &&
-              renderTest3Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest3Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
           </>
         ) : readingData?.testId === "cambridge-21-test-4" ? (
           <>
             {rightPassage === 1 &&
-              renderTest4Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest4Passage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 2 &&
-              renderTest4Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest4Passage2Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
             {rightPassage === 3 &&
-              renderTest4Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderTest4Passage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId, currentRightPassageText)}
           </>
         ) : (
           <>
             {rightPassage === 1 &&
-              renderPassage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderPassage1Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId || "cambridge-21-test-2", currentRightPassageText)}
             {rightPassage === 2 &&
-              renderPassage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview)}
+              renderPassage2Questions(currentRightPassage.groups, answers, handleInputChange, handleChooseTwoToggle, effectiveEval, isReview, readingData?.testId || "cambridge-21-test-2", currentRightPassageText)}
             {rightPassage === 3 &&
-              renderPassage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview)}
+              renderPassage3Questions(currentRightPassage.groups, answers, handleInputChange, effectiveEval, isReview, readingData?.testId || "cambridge-21-test-2", currentRightPassageText)}
           </>
         )}
       </div>

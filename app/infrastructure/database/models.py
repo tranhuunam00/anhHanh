@@ -40,6 +40,7 @@ class User(Base):
     is_location_sharing = Column(Boolean, default=True, nullable=False)
     study_target = Column(String(100), default='Luyện nghe & Chép chính tả', nullable=True)
     bio = Column(String(255), nullable=True)
+    last_active_at = Column(DateTime(timezone=True), default=func.now(), nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     lessons = relationship('UserLesson', back_populates='user', cascade='all, delete-orphan')
@@ -79,6 +80,7 @@ class User(Base):
             'is_location_sharing': self.is_location_sharing if self.is_location_sharing is not None else True,
             'study_target': self.study_target or 'Luyện nghe & Chép chính tả',
             'bio': self.bio,
+            'last_active_at': self.last_active_at.isoformat() if self.last_active_at else None,
             'can_use_ai_import': self.can_use_ai_import,
             'can_use_ai_writing': self.can_use_ai_writing,
             'created_at': self.created_at.isoformat() if self.created_at else None,

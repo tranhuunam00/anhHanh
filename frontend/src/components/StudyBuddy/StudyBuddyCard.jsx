@@ -1,6 +1,6 @@
 import React from "react";
 import { MapPin, Flame, UserPlus, UserCheck, Clock, Check, X } from "../Icons";
-import { getBuddyStatusMeta } from "../../utils/studyBuddyUtils";
+import { getBuddyStatusMeta, formatOnlineStatusBadge } from "../../utils/studyBuddyUtils";
 
 /**
  * StudyBuddyCard - Molecule Component
@@ -29,6 +29,7 @@ export const StudyBuddyCard = React.memo(({
   } = buddy;
 
   const meta = getBuddyStatusMeta(friendship_status);
+  const onlineMeta = formatOnlineStatusBadge(buddy.online_status);
 
   return (
     <div className={`study-buddy-card ${friendship_status === "FRIEND" ? "is-friend" : ""}`}>
@@ -42,6 +43,11 @@ export const StudyBuddyCard = React.memo(({
               {(name || "U").charAt(0).toUpperCase()}
             </div>
           )}
+          <span
+            className={`buddy-avatar-online-dot ${onlineMeta.colorClass}`}
+            style={{ backgroundColor: onlineMeta.dotColor }}
+            title={onlineMeta.label}
+          />
           {streak > 0 && (
             <span className="buddy-streak-badge" title={`Chuỗi học tập ${streak} ngày liên tiếp`}>
               <Flame size={11} />
@@ -55,10 +61,24 @@ export const StudyBuddyCard = React.memo(({
             <h4 className="buddy-name" title={name}>{name}</h4>
           </div>
 
-          <div className="buddy-distance-tag">
-            <MapPin size={12} />
-            <span>{distance_label || "Gần đây"}</span>
+          <div className="buddy-meta-tags-row">
+            {distance_label && (
+              <div className="buddy-distance-tag">
+                <MapPin size={12} />
+                <span>{distance_label}</span>
+              </div>
+            )}
+            <div className={`buddy-online-pill ${onlineMeta.colorClass}`}>
+              <span className="buddy-status-dot" style={{ backgroundColor: onlineMeta.dotColor }}></span>
+              <span>{onlineMeta.label}</span>
+            </div>
           </div>
+
+          {buddy.email && (
+            <span className="buddy-email-tag" title={buddy.email}>
+              {buddy.email}
+            </span>
+          )}
         </div>
       </div>
 
@@ -80,6 +100,11 @@ export const StudyBuddyCard = React.memo(({
         <span className="buddy-stat-item">
           Hôm nay: <strong>+{words_today} từ</strong>
         </span>
+        {buddy.connected_at && (
+          <span className="buddy-stat-connected" title={`Kết nối từ ${buddy.connected_at}`}>
+            Bạn bè từ: {new Date(buddy.connected_at).toLocaleDateString("vi-VN")}
+          </span>
+        )}
       </div>
 
       {/* Action Toolbar */}

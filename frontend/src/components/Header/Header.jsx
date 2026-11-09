@@ -13,6 +13,7 @@ import {
   Trees,
   ArrowRight,
   Globe,
+  Users,
 } from "../Icons";
 import { SOURCE_LANGUAGES, TARGET_LANGUAGES } from "../../constants/languages";
 import { useAuth } from "../../context/AuthContext";
@@ -37,6 +38,7 @@ export const Header = React.memo(({
   onOpenVocabTab,
   onOpenFeedback,
   onOpenAdminTab,
+  onOpenBuddyTab,
 }) => {
 
   const { user, token, isAuthenticated, streak, unlearnedWords, logout } = useAuth();
@@ -285,6 +287,17 @@ export const Header = React.memo(({
                     >
                       <BookOpen size={15} color="#6366f1" />
                       <span>Sổ tay từ vựng</span>
+                    </div>
+                    <div
+                      className="user-dropdown-item"
+                      style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-primary)" }}
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onOpenBuddyTab && onOpenBuddyTab();
+                      }}
+                    >
+                      <Users size={15} color="#10b981" />
+                      <span>Bạn học quanh đây</span>
                     </div>
                     {user.role === "ADMIN" && (
                       <div

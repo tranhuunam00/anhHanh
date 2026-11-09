@@ -1,7 +1,8 @@
 import React from "react";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
+import { IeltsExerciseExplanationGroup } from "./IeltsReadingExplanationCard.jsx";
 
-export function renderTest3Passage1Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest3Passage1Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-3", passageText = "") {
   const notesGroup = groups?.find((g) => g.groupType === "notes_completion");
   const tfGroup = groups?.find((g) => g.groupType === "true_false_not_given");
 
@@ -67,6 +68,7 @@ export function renderTest3Passage1Questions(groups, answers, onChange, evaluati
               </ul>
             </div>
           </div>
+          <IeltsExerciseExplanationGroup group={notesGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -101,13 +103,14 @@ export function renderTest3Passage1Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={tfGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>
   );
 }
 
-export function renderTest3Passage2Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest3Passage2Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-3", passageText = "") {
   const tfGroup = groups?.find((g) => g.groupType === "true_false_not_given");
   const notesGroup = groups?.find((g) => g.groupType === "notes_completion");
 
@@ -158,6 +161,7 @@ export function renderTest3Passage2Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={tfGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -188,13 +192,14 @@ export function renderTest3Passage2Questions(groups, answers, onChange, evaluati
               </ul>
             </div>
           </div>
+          <IeltsExerciseExplanationGroup group={notesGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>
   );
 }
 
-export function renderTest3Passage3Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderTest3Passage3Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-21-test-3", passageText = "") {
   const mcGroup = groups?.find((g) => g.groupType === "multiple_choice");
   const matchGroup = groups?.find((g) => g.groupType === "matching_sentence_endings");
   const ynnGroup = groups?.find((g) => g.groupType === "yes_no_not_given");
@@ -228,6 +233,7 @@ export function renderTest3Passage3Questions(groups, answers, onChange, evaluati
               {renderFeedback(evaluation, item.number, isReview)}
             </div>
           ))}
+          <IeltsExerciseExplanationGroup group={mcGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -269,6 +275,7 @@ export function renderTest3Passage3Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={matchGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -303,6 +310,7 @@ export function renderTest3Passage3Questions(groups, answers, onChange, evaluati
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={ynnGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>

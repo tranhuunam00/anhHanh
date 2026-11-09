@@ -8,12 +8,15 @@ import {
   UserPlus,
   ShieldCheck,
   Sparkles,
+  Mail,
 } from "../Icons";
 import { StudyBuddyCard } from "./StudyBuddyCard";
+import { StudyBuddySearchPanel } from "./StudyBuddySearchPanel";
 import {
   RADIUS_OPTIONS,
   filterBuddiesByQuery,
   sanitizeBuddiesList,
+  parseBuddyInviteFromUrl,
 } from "../../utils/studyBuddyUtils";
 import {
   fetchNearbyBuddies,
@@ -22,6 +25,7 @@ import {
   fetchFriendsList,
   unfriend,
   updateLocation,
+  pingBuddyActive,
 } from "../../services/studyBuddyService";
 import "./studyBuddy.css";
 
@@ -42,6 +46,28 @@ export const StudyBuddyView = ({ token, currentUser, showToast }) => {
   const [requests, setRequests] = useState([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
   const [processingId, setProcessingId] = useState(null);
+  const [inviteQuery, setInviteQuery] = useState("");
+
+  // Detect invite link on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const inviteCode = parseBuddyInviteFromUrl(window.location.search);
+      if (inviteCode) {
+        setSubTab("search");
+        setInviteQuery(inviteCode);
+      }
+    }
+  }, []);
+
+  // Periodic active heartbeat ping
+  useEffect(() => {
+    if (!token) return;
+    pingBuddyActive(token);
+    const interval = setInterval(() => {
+      pingBuddyActive(token);
+    }, 120000);
+    return () => clearInterval(interval);
+  }, [token]);
 
   // Request real GPS coordinates from browser
   const handleRequestGps = useCallback(() => {
@@ -246,6 +272,15 @@ export const StudyBuddyView = ({ token, currentUser, showToast }) => {
             <span>Bạn bè</span>
             {friends.length > 0 && <span className="buddy-tab-badge">{friends.length}</span>}
           </button>
+
+          <button
+            type="button"
+            className={`buddy-tab-btn ${subTab === "search" ? "active" : ""}`}
+            onClick={() => setSubTab("search")}
+          >
+            <Mail size={14} />
+            <span>Tìm bằng Email / Link</span>
+          </button>
         </div>
 
         {/* Refresh button */}
@@ -389,6 +424,22 @@ export const StudyBuddyView = ({ token, currentUser, showToast }) => {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB 4: SEARCH BY EMAIL OR SHARE LINK */}
+      {subTab === "search" && (
+        <div className="study-buddy-tab-content">
+          <StudyBuddySearchPanel
+            token={token}
+            currentUser={currentUser}
+            onSendRequest={handleSendRequest}
+            onRespond={handleRespond}
+            onUnfriend={handleUnfriend}
+            processingId={processingId}
+            showToast={showToast}
+            initialQuery={inviteQuery}
+          />
         </div>
       )}
     </div>

@@ -9,6 +9,7 @@ export const cambridge19Test4Writing = {
       timeSuggestion: "You should spend about 20 minutes on this task.",
       prompt: "The charts below give information on the location and types of dance classes young people in a town in Australia are currently attending.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
+      image: "/images/ielts/cam19_test4_writing_task1.png",
       diagramTitle: "Dance classes attended by young people in Australia by venue and style"
     },
     {

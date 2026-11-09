@@ -2,6 +2,7 @@ import React from "react";
 import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence.jsx";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
 import { parseOption } from "../../utils/cambridgeOptionUtils.js";
+import { IeltsExerciseExplanationGroup } from "./IeltsReadingExplanationCard.jsx";
 
 /**
  * Universal Question Renderer for Cambridge 19 Reading Passages
@@ -13,7 +14,9 @@ export function renderCam19ReadingPassageQuestions(
   onChange,
   onChooseTwoToggle,
   evaluation,
-  isReview
+  isReview,
+  testId = "cambridge-19",
+  passageText = ""
 ) {
   if (!groups || groups.length === 0) return null;
 
@@ -128,12 +131,12 @@ export function renderCam19ReadingPassageQuestions(
             )}
 
             {/* 2. FILL NOTES / SUMMARY / TABLE */}
-            {(groupType === "fill_notes" ||
-              groupType === "fill_summary" ||
-              groupType === "summary_with_options" ||
-              groupType === "notes_completion" ||
-              groupType === "table_completion" ||
-              groupType === "summary_completion") && (
+            {(groupType.includes("fill") ||
+              groupType.includes("notes") ||
+              groupType.includes("summary") ||
+              groupType.includes("table") ||
+              groupType.includes("completion") ||
+              groupType.includes("flowchart")) && (
               <div className="ielts-notes-list">
                 {items?.map((it) => (
                   <div
@@ -349,9 +352,12 @@ export function renderCam19ReadingPassageQuestions(
                 })}
               </div>
             )}
+            <IeltsExerciseExplanationGroup group={group} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
           </section>
         );
       })}
     </div>
   );
 }
+
+export const renderUniversalReadingPassageQuestions = renderCam19ReadingPassageQuestions;

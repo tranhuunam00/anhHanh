@@ -1,7 +1,8 @@
 import React from "react";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
+import { IeltsExerciseExplanationGroup } from "./IeltsReadingExplanationCard.jsx";
 
-export function renderCam20Test2Passage1Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderCam20Test2Passage1Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-20-test-2", passageText = "") {
   const notesGroup = groups?.find((g) => g.groupType === "fill_notes");
   const tfGroup = groups?.find((g) => g.groupType === "true_false_not_given");
 
@@ -42,6 +43,7 @@ export function renderCam20Test2Passage1Questions(groups, answers, onChange, eva
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={notesGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -77,13 +79,14 @@ export function renderCam20Test2Passage1Questions(groups, answers, onChange, eva
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={tfGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>
   );
 }
 
-export function renderCam20Test2Passage2Questions(groups, answers, onChange, onChooseTwoToggle, evaluation, isReview) {
+export function renderCam20Test2Passage2Questions(groups, answers, onChange, onChooseTwoToggle, evaluation, isReview, testId = "cambridge-20-test-2", passageText = "") {
   const matchInfoGroup = groups?.find((g) => g.groupType === "matching_information");
   const notesGroup = groups?.find((g) => g.groupType === "fill_notes");
   const chooseTwo1 = groups?.[2];
@@ -119,6 +122,7 @@ export function renderCam20Test2Passage2Questions(groups, answers, onChange, onC
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={matchInfoGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -147,6 +151,7 @@ export function renderCam20Test2Passage2Questions(groups, answers, onChange, onC
               ))}
             </ul>
           </div>
+          <IeltsExerciseExplanationGroup group={notesGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -180,6 +185,7 @@ export function renderCam20Test2Passage2Questions(groups, answers, onChange, onC
           </div>
           {renderFeedback(evaluation, 23, isReview)}
           {renderFeedback(evaluation, 24, isReview)}
+          <IeltsExerciseExplanationGroup group={chooseTwo1} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </div>
       )}
 
@@ -213,13 +219,14 @@ export function renderCam20Test2Passage2Questions(groups, answers, onChange, onC
           </div>
           {renderFeedback(evaluation, 25, isReview)}
           {renderFeedback(evaluation, 26, isReview)}
+          <IeltsExerciseExplanationGroup group={chooseTwo2} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </div>
       )}
     </div>
   );
 }
 
-export function renderCam20Test2Passage3Questions(groups, answers, onChange, evaluation, isReview) {
+export function renderCam20Test2Passage3Questions(groups, answers, onChange, evaluation, isReview, testId = "cambridge-20-test-2", passageText = "") {
   const ynGroup = groups?.find((g) => g.groupType === "yes_no_not_given");
   const summaryBoxGroup = groups?.find((g) => g.groupType === "summary_with_box");
   const mcGroup = groups?.find((g) => g.groupType === "multiple_choice");
@@ -258,6 +265,7 @@ export function renderCam20Test2Passage3Questions(groups, answers, onChange, eva
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={ynGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -302,6 +310,7 @@ export function renderCam20Test2Passage3Questions(groups, answers, onChange, eva
               ))}
             </div>
           </div>
+          <IeltsExerciseExplanationGroup group={summaryBoxGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
 
@@ -341,6 +350,7 @@ export function renderCam20Test2Passage3Questions(groups, answers, onChange, eva
               </div>
             ))}
           </div>
+          <IeltsExerciseExplanationGroup group={mcGroup} evaluation={evaluation} isReview={isReview} testId={testId} passageText={passageText} />
         </section>
       )}
     </div>
