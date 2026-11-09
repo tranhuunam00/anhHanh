@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence.jsx";
 import { IeltsRecordedAudioPlayer } from "./IeltsRecordedAudioPlayer.jsx";
 import { IeltsSpeakingBottomNav } from "./IeltsSpeakingBottomNav.jsx";
 import {
@@ -32,7 +33,8 @@ import {
 export const IeltsSpeakingModule = ({
   speakingData,
   user = null,
-  isLocked = false
+  isLocked = false,
+  isReview = false
 }) => {
   const parts = useMemo(() => speakingData?.parts || [], [speakingData]);
   const [activePart, setActivePart] = useState(1);
@@ -312,11 +314,23 @@ export const IeltsSpeakingModule = ({
             {currentQuestion?.isCueCard ? (
               <div className="ielts-cue-card">
                 <span className="ielts-cue-card-badge">CANDIDATE CUE CARD</span>
-                <h4 className="ielts-cue-topic">{currentQuestion.topic}</h4>
+                <h4 className="ielts-cue-topic">
+                  {isReview && currentQuestion?.topic ? (
+                    <HighlightedVocabSentence text={currentQuestion.topic} contextSentence={currentQuestion.topic} />
+                  ) : (
+                    currentQuestion?.topic
+                  )}
+                </h4>
                 <p className="ielts-cue-intro">You should say:</p>
                 <ul className="ielts-cue-prompts">
-                  {currentQuestion.prompts.map((p, idx) => (
-                    <li key={idx}>{p}</li>
+                  {currentQuestion?.prompts?.map((p, idx) => (
+                    <li key={idx}>
+                      {isReview ? (
+                        <HighlightedVocabSentence text={p} contextSentence={p} />
+                      ) : (
+                        p
+                      )}
+                    </li>
                   ))}
                 </ul>
                 <div className="ielts-cue-mode-indicator">
@@ -332,7 +346,13 @@ export const IeltsSpeakingModule = ({
                 {currentQuestion?.theme && (
                   <span className="ielts-q-theme-badge">Chủ đề: {currentQuestion.theme}</span>
                 )}
-                <h3 className="ielts-question-prompt-text">{currentQuestion?.text}</h3>
+                <h3 className="ielts-question-prompt-text">
+                  {isReview && currentQuestion?.text ? (
+                    <HighlightedVocabSentence text={currentQuestion.text} contextSentence={currentQuestion.text} />
+                  ) : (
+                    currentQuestion?.text
+                  )}
+                </h3>
 
                 <button
                   type="button"

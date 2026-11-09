@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { Header } from "./components/Header/Header";
 import { PlayerCard } from "./components/Player/PlayerCard";
 import { DictationStudio } from "./components/Dictation/DictationStudio";
+import { IeltsSpotlightSection } from "./components/Presets/IeltsSpotlightSection";
 import { PresetsSection } from "./components/Presets/PresetsSection";
 import { QuestionsDrawer } from "./components/Drawer/QuestionsDrawer";
 import { SettingsModal } from "./components/Modals/SettingsModal";
@@ -437,6 +438,16 @@ export default function App() {
         effectivePos = Number(prog.lastPosition);
       }
 
+      // Resilient fallback: if challenges map has completed questions, pick maxCompleted + 1
+      if (prog?.challenges && Object.keys(prog.challenges).length > 0) {
+        const completedNums = Object.keys(prog.challenges)
+          .map(Number)
+          .filter((n) => !isNaN(n) && prog.challenges[n]?.isCompleted);
+        if (completedNums.length > 0) {
+          effectivePos = Math.max(effectivePos, Math.max(...completedNums) + 1);
+        }
+      }
+
       // 5. Calculate initial question index (0-indexed)
       const finalPos = Math.max(1, effectivePos || 1);
       const targetIndex = finalPos <= lessonData.challenges.length ? finalPos - 1 : 0;
@@ -509,8 +520,23 @@ export default function App() {
 
     const prog = loadLessonProgress(lesson.video_id, sLang, tLang);
     setProgressMap(prog || { challenges: {}, lastPosition: 1 });
-    setMaxReachedIndex(0);
-    setCurrentIndex(0);
+
+    const totalChallenges = lesson.challenges?.length || 1;
+    let effectivePos = Number(prog?.lastPosition) || 1;
+
+    // Resilient fallback: if challenges map has completed questions, pick maxCompleted + 1
+    if (prog?.challenges && Object.keys(prog.challenges).length > 0) {
+      const completedNums = Object.keys(prog.challenges)
+        .map(Number)
+        .filter((n) => !isNaN(n) && prog.challenges[n]?.isCompleted);
+      if (completedNums.length > 0) {
+        effectivePos = Math.max(effectivePos, Math.max(...completedNums) + 1);
+      }
+    }
+
+    const targetIndex = Math.min(totalChallenges - 1, Math.max(0, effectivePos - 1));
+    setMaxReachedIndex(targetIndex);
+    setCurrentIndex(targetIndex);
     userInputRef.current = "";
     setUserInput("");
     setIsCompleted(false);
@@ -521,22 +547,40 @@ export default function App() {
       speechRef.current.setLang(langCode);
     }
 
-    const firstStartTime = lesson.challenges?.[0]?.time_start || 0;
+    const targetChallenge = lesson.challenges?.[targetIndex];
+    const targetStartTime = targetChallenge ? targetChallenge.time_start : 0;
     const fallbackDuration = lesson.challenges?.length
       ? Math.max(...lesson.challenges.map((c) => c.time_end || 0))
       : 0;
     const isDictation = mode === "dictation";
-    playerController.load(lesson.audioUrl, firstStartTime, isDictation, fallbackDuration);
+    playerController.load(lesson.audioUrl, targetStartTime, isDictation, fallbackDuration);
 
     if (isDictation) {
       activeTabRef.current = "tab-dictation";
       setActiveTab("tab-dictation");
-      playChallengeAtIndex(lesson, 0, true);
+      playChallengeAtIndex(lesson, targetIndex, true);
     } else {
       activeTabRef.current = "tab-transcript";
       setActiveTab("tab-transcript");
-      cueChallengeAtIndex(lesson, 0);
+      cueChallengeAtIndex(lesson, targetIndex);
       playerController.pause();
+    }
+
+    // Sync session and resume position with backend DB if authenticated
+    if (token) {
+      startLessonSession(lesson.video_id, token, sLang, tLang).then((sessionData) => {
+        if (sessionData && sessionData.currentPosition) {
+          const dbPos = Number(sessionData.currentPosition);
+          if (dbPos > 0 && dbPos > effectivePos) {
+            const dbIndex = Math.min(totalChallenges - 1, Math.max(0, dbPos - 1));
+            setMaxReachedIndex((prev) => Math.max(prev, dbIndex));
+            setCurrentIndex(dbIndex);
+            if (isDictation) {
+              playChallengeAtIndex(lesson, dbIndex, true);
+            }
+          }
+        }
+      }).catch(() => {});
     }
   };
 
@@ -1166,6 +1210,16 @@ export default function App() {
               />
             </div>
           </div>
+
+          {/* Khoảng riêng luyện thi IELTS Cambridge đặt ngay trên "Thử ngay – Luyện đa ngôn ngữ" */}
+          <IeltsSpotlightSection
+            activeUrl={urlInput}
+            isLoading={isLoading}
+            onSelectPreset={(preset, mode = "dictation") => {
+              handleSelectLocalAudioPreset(preset, mode);
+            }}
+            onGoToIeltsExam={() => setActiveTab("tab-ielts")}
+          />
 
           <PresetsSection
             activeUrl={urlInput}

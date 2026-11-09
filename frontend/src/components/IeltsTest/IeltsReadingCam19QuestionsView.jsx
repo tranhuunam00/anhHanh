@@ -1,4 +1,5 @@
 import React from "react";
+import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence.jsx";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
 import { parseOption } from "../../utils/cambridgeOptionUtils.js";
 
@@ -63,7 +64,7 @@ export function renderCam19ReadingPassageQuestions(
                     return (
                       <div key={letter} style={{ display: "flex", gap: "8px", fontSize: "0.88rem", color: "var(--text-secondary)" }}>
                         <strong style={{ color: "var(--primary)", minWidth: "22px" }}>{letter}.</strong>
-                        <span>{text}</span>
+                        <span>{isReview ? <HighlightedVocabSentence text={text} contextSentence={text} /> : text}</span>
                       </div>
                     );
                   })}
@@ -89,7 +90,9 @@ export function renderCam19ReadingPassageQuestions(
                     >
                       <div className="ielts-mc-question-row">
                         <span className="ielts-q-pill">{it.number}</span>
-                        <p className="ielts-mc-question-text">{it.statement || it.question}</p>
+                        <p className="ielts-mc-question-text">
+                          {isReview ? <HighlightedVocabSentence text={it.statement || it.question} contextSentence={it.statement || it.question} /> : (it.statement || it.question)}
+                        </p>
                       </div>
                       <div className="ielts-tf-options" style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
                         {opts.map((val) => {
@@ -143,7 +146,7 @@ export function renderCam19ReadingPassageQuestions(
                       fontSize: "1.02rem"
                     }}
                   >
-                    <span>{it.prefix}</span>
+                    <span>{isReview ? <HighlightedVocabSentence text={it.prefix} contextSentence={it.prefix} /> : it.prefix}</span>
                     <span className="ielts-inline-input-wrapper">
                       <span className="ielts-q-pill">{it.number}</span>
                       <input
@@ -153,7 +156,7 @@ export function renderCam19ReadingPassageQuestions(
                         className={`ielts-real-input ${getFeedbackClass(evaluation, it.number, isReview)}`}
                       />
                     </span>
-                    <span>{it.suffix}</span>
+                    <span>{isReview ? <HighlightedVocabSentence text={it.suffix} contextSentence={it.suffix} /> : it.suffix}</span>
                     {renderFeedback(evaluation, it.number, isReview)}
                   </div>
                 ))}
@@ -172,7 +175,9 @@ export function renderCam19ReadingPassageQuestions(
                   >
                     <div className="ielts-mc-question-row">
                       <span className="ielts-q-pill">{it.number}</span>
-                      <p className="ielts-mc-question-text">{it.question}</p>
+                      <p className="ielts-mc-question-text">
+                        {isReview ? <HighlightedVocabSentence text={it.question} contextSentence={it.question} /> : it.question}
+                      </p>
                     </div>
                     <div className="ielts-mc-options-list">
                       {it.options?.map((rawOpt) => {
@@ -193,7 +198,9 @@ export function renderCam19ReadingPassageQuestions(
                               className="ielts-radio-input"
                             />
                             <span className="ielts-option-letter">{letter}</span>
-                            <span className="ielts-option-text">{text}</span>
+                            <span className="ielts-option-text">
+                              {isReview ? <HighlightedVocabSentence text={text} contextSentence={text} /> : text}
+                            </span>
                           </label>
                         );
                       })}
@@ -240,7 +247,7 @@ export function renderCam19ReadingPassageQuestions(
                         <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
                           <span className="ielts-q-pill">{it.number}</span>
                           <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)" }}>
-                            {it.question || it.statement || it.title}
+                            {isReview ? <HighlightedVocabSentence text={it.question || it.statement || it.title} contextSentence={it.question || it.statement || it.title} /> : (it.question || it.statement || it.title)}
                           </span>
                         </div>
                         <select
@@ -297,7 +304,9 @@ export function renderCam19ReadingPassageQuestions(
                         <span className="ielts-q-pill">
                           {it.number}{pairNum ? ` & ${pairNum}` : ""}
                         </span>
-                        <p className="ielts-mc-question-text">{it.question}</p>
+                        <p className="ielts-mc-question-text">
+                          {isReview ? <HighlightedVocabSentence text={it.question} contextSentence={it.question} /> : it.question}
+                        </p>
                       </div>
                       <div className="ielts-choose-two-options">
                         {it.options?.map((rawOpt) => {
@@ -324,7 +333,9 @@ export function renderCam19ReadingPassageQuestions(
                                 className="ielts-checkbox-input"
                               />
                               <span className="ielts-option-letter">{letter}</span>
-                              <span className="ielts-option-text">{text}</span>
+                              <span className="ielts-option-text">
+                                {isReview ? <HighlightedVocabSentence text={text} contextSentence={text} /> : text}
+                              </span>
                             </label>
                           );
                         })}

@@ -1,4 +1,5 @@
 import React from "react";
+import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence.jsx";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
 import {
   parseOption,
@@ -39,7 +40,7 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
             fontSize: "1.02rem"
           }}
         >
-          <span>{item.prefix}</span>
+          <span>{isReview ? <HighlightedVocabSentence text={item.prefix} contextSentence={item.prefix} /> : item.prefix}</span>
           <span className="ielts-inline-input-wrapper">
             <span className="ielts-q-pill">{item.number}</span>
             <input
@@ -49,7 +50,7 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
               className={`ielts-real-input ${getFeedbackClass(evaluation, item.number, isReview)}`}
             />
           </span>
-          <span>{item.suffix}</span>
+          <span>{isReview ? <HighlightedVocabSentence text={item.suffix} contextSentence={item.suffix} /> : item.suffix}</span>
           {renderFeedback(evaluation, item.number, isReview)}
         </div>
       );
@@ -66,7 +67,9 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
         >
           <div className="ielts-mc-question-row">
             <span className="ielts-q-pill">{item.number}</span>
-            <p className="ielts-mc-question-text">{item.question}</p>
+            <p className="ielts-mc-question-text">
+              {isReview ? <HighlightedVocabSentence text={item.question} contextSentence={item.question} /> : item.question}
+            </p>
           </div>
           <div className="ielts-mc-options-list">
             {item.options?.map((rawOpt) => {
@@ -86,7 +89,9 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
                     className="ielts-radio-input"
                   />
                   <span className="ielts-option-letter">{letter}</span>
-                  <span className="ielts-option-text">{text}</span>
+                  <span className="ielts-option-text">
+                    {isReview ? <HighlightedVocabSentence text={text} contextSentence={text} /> : text}
+                  </span>
                 </label>
               );
             })}
@@ -114,7 +119,9 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
             <span className="ielts-q-pill">
               {item.number}{pairNum ? ` & ${pairNum}` : ""}
             </span>
-            <p className="ielts-mc-question-text">{item.question}</p>
+            <p className="ielts-mc-question-text">
+              {isReview ? <HighlightedVocabSentence text={item.question} contextSentence={item.question} /> : item.question}
+            </p>
           </div>
           <div className="ielts-choose-two-options">
             {item.options?.map((rawOpt) => {
@@ -138,7 +145,9 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
                     className="ielts-checkbox-input"
                   />
                   <span className="ielts-option-letter">{letter}</span>
-                  <span className="ielts-option-text">{text}</span>
+                  <span className="ielts-option-text">
+                    {isReview ? <HighlightedVocabSentence text={text} contextSentence={text} /> : text}
+                  </span>
                 </label>
               );
             })}

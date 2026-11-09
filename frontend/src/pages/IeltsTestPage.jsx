@@ -425,7 +425,7 @@ export const IeltsTestPage = ({
                 user={user}
                 token={token}
                 isLocked={isCurrentSkillLocked}
-                isReview={isReviewMode}
+                isReview={isReviewMode || isCurrentSkillLocked}
               />
             )}
             {activeSkill === "speaking" && (
@@ -434,6 +434,7 @@ export const IeltsTestPage = ({
                 speakingData={testData.skills.speaking}
                 user={user}
                 isLocked={isCurrentSkillLocked && !isReviewMode}
+                isReview={isReviewMode || isCurrentSkillLocked}
               />
             )}
           </>

@@ -1,4 +1,5 @@
 import React from "react";
+import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence.jsx";
 import { getFeedbackClass, renderFeedback } from "./ieltsFeedbackHelpers.jsx";
 export {
   extractQuestionNumbersFromBlock,
@@ -125,7 +126,7 @@ export function renderNoteBlock(noteBlock, answers, onChange, evaluation, isRevi
                         listStyleType: "none"
                       }}
                     >
-                      {cleanText}
+                      {isReview ? <HighlightedVocabSentence text={cleanText} contextSentence={cleanText} /> : cleanText}
                     </li>
                   );
                 }
@@ -154,7 +155,7 @@ export function renderNoteBlock(noteBlock, answers, onChange, evaluation, isRevi
                         background: "var(--text-muted)"
                       }}
                     />
-                    <span>{cleanText}</span>
+                    <span>{isReview ? <HighlightedVocabSentence text={cleanText} contextSentence={cleanText} /> : cleanText}</span>
                   </li>
                 );
               }
@@ -185,7 +186,7 @@ export function renderNoteBlock(noteBlock, answers, onChange, evaluation, isRevi
                       background: "var(--primary)"
                     }}
                   />
-                  <span>{cleanPrefix}</span>
+                  <span>{isReview ? <HighlightedVocabSentence text={cleanPrefix} contextSentence={cleanPrefix} /> : cleanPrefix}</span>
                   <span className="ielts-inline-input-wrapper">
                     <span className="ielts-q-pill">{qNum}</span>
                     <input
@@ -196,7 +197,7 @@ export function renderNoteBlock(noteBlock, answers, onChange, evaluation, isRevi
                       style={{ minWidth: "120px" }}
                     />
                   </span>
-                  <span>{line.suffix}</span>
+                  <span>{isReview ? <HighlightedVocabSentence text={line.suffix} contextSentence={line.suffix} /> : line.suffix}</span>
                   {renderFeedback(evaluation, qNum, isReview)}
                 </li>
               );
@@ -271,7 +272,7 @@ export function renderFormBlock(formBlock, answers, onChange, evaluation, isRevi
           if (f.text) {
             return (
               <div key={idx} style={{ fontSize: "0.96rem", color: "var(--text-secondary)" }}>
-                {f.text}
+                {isReview ? <HighlightedVocabSentence text={f.text} contextSentence={f.text} /> : f.text}
               </div>
             );
           }
@@ -300,7 +301,7 @@ export function renderFormBlock(formBlock, answers, onChange, evaluation, isRevi
                   style={{ minWidth: "120px" }}
                 />
               </span>
-              <span>{f.suffix}</span>
+              <span>{isReview ? <HighlightedVocabSentence text={f.suffix} contextSentence={f.suffix} /> : f.suffix}</span>
               {renderFeedback(evaluation, qNum, isReview)}
             </div>
           );

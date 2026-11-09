@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence.jsx";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
 import { canUseIeltsAiGrading, calculateWritingBandScore } from "../../utils/ieltsScoring.js";
 import { Sparkles, Clock, CheckCircle, Lock } from "../../constants/icons.js";
@@ -202,7 +203,13 @@ export const IeltsWritingModule = ({
               );
             }
             return (
-              <p key={i} className="ielts-prompt-action-text">{para}</p>
+              <p key={i} className="ielts-prompt-action-text">
+                {isReview ? (
+                  <HighlightedVocabSentence text={para} contextSentence={para} />
+                ) : (
+                  para
+                )}
+              </p>
             );
           })}
         </div>
@@ -277,6 +284,39 @@ export const IeltsWritingModule = ({
         </div>
       </div>
 
+      {/* Khi đã nộp bài / review mode: hiển thị bản xem lại có highlight từ vựng học thuật */}
+      {isReview && currentEssay && (
+        <div
+          className="ielts-review-essay-highlight-card"
+          style={{
+            marginTop: "16px",
+            padding: "16px 18px",
+            background: "var(--bg-secondary)",
+            borderRadius: "10px",
+            border: "1px solid var(--border-color)",
+            lineHeight: "1.75"
+          }}
+        >
+          <h5
+            style={{
+              margin: "0 0 10px 0",
+              fontSize: "0.95rem",
+              fontWeight: 700,
+              color: "var(--text-primary)"
+            }}
+          >
+            Xem lại bài viết & Từ vựng của bạn:
+          </h5>
+          <div className="ielts-review-essay-paragraphs">
+            {currentEssay.split("\n\n").map((para, pIdx) => (
+              <p key={pIdx} style={{ marginBottom: "12px", color: "var(--text-primary)" }}>
+                <HighlightedVocabSentence text={para} contextSentence={para} />
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* AI Evaluation Result Card (Chỉ chấm điểm 4 tiêu chí chuẩn IELTS và nhận xét mức điểm) */}
       {evalData && (
         <div className="ielts-ai-result-card">
@@ -333,7 +373,13 @@ export const IeltsWritingModule = ({
           {feedbackText && (
             <div className="ielts-ai-feedback-section">
               <h5>Nhận xét đánh giá theo tiêu chuẩn IELTS:</h5>
-              <p className="ielts-ai-feedback-text">{feedbackText}</p>
+              <div className="ielts-ai-feedback-text">
+                {isReview ? (
+                  <HighlightedVocabSentence text={feedbackText} contextSentence={feedbackText} />
+                ) : (
+                  feedbackText
+                )}
+              </div>
             </div>
           )}
         </div>

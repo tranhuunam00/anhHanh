@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence.jsx";
 import { isSingleLetterLabel } from "./ieltsFeedbackHelpers.jsx";
 import { gradeReadingTest } from "../../utils/ieltsScoring.js";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
@@ -115,9 +116,21 @@ export const IeltsReadingModule = ({
         <article className="ielts-passage-article">
           <header className="ielts-passage-header">
             <span className="ielts-badge">READING PASSAGE {currentLeftPassage.passageNumber} • PART {currentLeftPassage.passageNumber}</span>
-            <h2 className="ielts-passage-title">{currentLeftPassage.title}</h2>
+            <h2 className="ielts-passage-title">
+              {isReview && currentLeftPassage.title ? (
+                <HighlightedVocabSentence text={currentLeftPassage.title} contextSentence={currentLeftPassage.title} />
+              ) : (
+                currentLeftPassage.title
+              )}
+            </h2>
             {currentLeftPassage.subtitle && (
-              <p className="ielts-passage-subtitle">{currentLeftPassage.subtitle}</p>
+              <p className="ielts-passage-subtitle">
+                {isReview ? (
+                  <HighlightedVocabSentence text={currentLeftPassage.subtitle} contextSentence={currentLeftPassage.subtitle} />
+                ) : (
+                  currentLeftPassage.subtitle
+                )}
+              </p>
             )}
           </header>
 
@@ -133,13 +146,25 @@ export const IeltsReadingModule = ({
                     <span className={`ielts-paragraph-label ${isSingleLetter ? "is-letter" : "is-heading"}`}>
                       {para.id}
                     </span>
-                    <p className="ielts-paragraph-text">{para.text}</p>
+                    <p className="ielts-paragraph-text">
+                      {isReview ? (
+                        <HighlightedVocabSentence text={para.text} contextSentence={para.text} />
+                      ) : (
+                        para.text
+                      )}
+                    </p>
                   </div>
                 );
               })
             ) : (
               currentLeftPassage.text?.split("\n\n").map((para, idx) => (
-                <p key={idx} className="ielts-paragraph-text">{para}</p>
+                <p key={idx} className="ielts-paragraph-text">
+                  {isReview ? (
+                    <HighlightedVocabSentence text={para} contextSentence={para} />
+                  ) : (
+                    para
+                  )}
+                </p>
               ))
             )}
           </div>

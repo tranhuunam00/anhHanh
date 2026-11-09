@@ -194,19 +194,40 @@ async def start_lesson_session(
     db: AsyncSession = Depends(get_db)
 ):
     """Start a study session: ensure lesson + subtitles cached in DB, return resume position."""
-    vid = extract_youtube_id(payload.video_id)
+    raw_vid = payload.video_id.strip()
     source_lang = _validate_lang(payload.source_lang, 'en')
     target_lang = _validate_lang(payload.target_lang, 'vi')
 
-    subtitle_repo = LessonSubtitleRepo(db)
-    req = GetLessonRequest(
-        url_or_id=vid,
-        grouping_mode='sentence',
-        source_lang=source_lang,
-        target_lang=target_lang,
-        force_refresh=bool(payload.force_refresh),
-    )
-    lesson_dto, lesson_record = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
+    is_yt = False
+    try:
+        vid = extract_youtube_id(raw_vid)
+        is_yt = True
+    except Exception:
+        vid = raw_vid
+
+    if is_yt:
+        subtitle_repo = LessonSubtitleRepo(db)
+        req = GetLessonRequest(
+            url_or_id=vid,
+            grouping_mode='sentence',
+            source_lang=source_lang,
+            target_lang=target_lang,
+            force_refresh=bool(payload.force_refresh),
+        )
+        lesson_dto, lesson_record = await _get_lesson_uc.execute_with_db(req, subtitle_repo)
+    else:
+        l_res = await db.execute(select(Lesson).where(Lesson.video_id == vid))
+        lesson_record = l_res.scalar_one_or_none()
+        if not lesson_record:
+            lesson_record = Lesson(
+                video_id=vid,
+                title=f"IELTS Audio Lesson - {vid}",
+                thumbnail_url="",
+                total_challenges=0,
+                sentences_data=[]
+            )
+            db.add(lesson_record)
+            await db.flush()
 
     current_pos = 1
     is_done = False
@@ -225,11 +246,11 @@ async def start_lesson_session(
         'lesson': {
             'id': lesson_record.id,
             'videoId': lesson_record.video_id,
-            'youtubeUrl': lesson_record.youtube_url,
+            'youtubeUrl': lesson_record.youtube_url or "",
             'title': lesson_record.title,
-            'thumbnailUrl': lesson_record.thumbnail_url,
+            'thumbnailUrl': lesson_record.thumbnail_url or "",
             'totalChallenges': lesson_record.total_challenges,
-            'sentences': lesson_record.sentences_data,
+            'sentences': lesson_record.sentences_data or [],
             'sourceLang': source_lang,
             'targetLang': target_lang,
         },
@@ -247,7 +268,12 @@ async def update_lesson_progress(
     db: AsyncSession = Depends(get_db)
 ):
     """Update active sentence current_position and update daily streak & words counter."""
-    vid = extract_youtube_id(payload.video_id)
+    raw_vid = payload.video_id.strip()
+    try:
+        vid = extract_youtube_id(raw_vid)
+    except Exception:
+        vid = raw_vid
+
     source_lang = _validate_lang(payload.source_lang, 'en')
     target_lang = _validate_lang(payload.target_lang, 'vi')
     streak_info = {'current_streak': 0, 'words_today': payload.words_typed}
@@ -257,14 +283,24 @@ async def update_lesson_progress(
         l_res = await db.execute(select(Lesson).where(Lesson.video_id == vid))
         lesson = l_res.scalar_one_or_none()
 
-        if lesson:
-            user_lesson, _ = await _get_or_create_user_lesson(
-                db, current_user.id, lesson.id, source_lang, target_lang
+        if not lesson:
+            lesson = Lesson(
+                video_id=vid,
+                title=f"Lesson {vid}",
+                thumbnail_url="",
+                total_challenges=0,
+                sentences_data=[]
             )
-            user_lesson.current_position = payload.target_position
-            if payload.is_completed:
-                user_lesson.is_completed = True
-            user_lesson.last_studied_at = datetime.now(timezone.utc)
+            db.add(lesson)
+            await db.flush()
+
+        user_lesson, _ = await _get_or_create_user_lesson(
+            db, current_user.id, lesson.id, source_lang, target_lang
+        )
+        user_lesson.current_position = payload.target_position
+        if payload.is_completed:
+            user_lesson.is_completed = True
+        user_lesson.last_studied_at = datetime.now(timezone.utc)
 
         # 2. Update UserStreak
         s_res = await db.execute(select(UserStreak).where(UserStreak.user_id == current_user.id))

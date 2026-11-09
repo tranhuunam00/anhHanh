@@ -304,3 +304,133 @@
   border: 1px dashed var(--border-color);
   border-radius: 10px;
 }
+
+/* ==========================================================================
+   Dedicated IELTS Spotlight Section (Placed directly above Multi-Language)
+   ========================================================================== */
+
+.ielts-spotlight-section {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ielts-spotlight-header {
+  margin-bottom: 4px;
+}
+
+.ielts-spotlight-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.ielts-spotlight-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ielts-spotlight-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.ielts-spotlight-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.18));
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: var(--primary);
+  letter-spacing: 0.3px;
+}
+
+.ielts-spotlight-badge-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.ielts-btn-goto-exam {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ielts-btn-goto-exam:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.ielts-spotlight-subtitle {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Expand & Collapse Action Bars */
+.ielts-spotlight-expand-bar,
+.ielts-spotlight-collapse-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 14px;
+}
+
+.ielts-btn-expand-more,
+.ielts-btn-collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.ielts-btn-expand-more:hover,
+.ielts-btn-collapse:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--bg-secondary);
+  box-shadow: 0 3px 12px rgba(99, 102, 241, 0.18);
+  transform: translateY(-1px);
+}

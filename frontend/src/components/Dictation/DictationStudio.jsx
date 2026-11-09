@@ -363,33 +363,33 @@ export const DictationStudio = React.memo(({
           title="Kiểm tra câu vừa gõ (Enter)"
           onClick={() => onCheck && onCheck(localInput)}
         >
-          <Check size={18} strokeWidth={2.5} />
-          <span>Kiểm tra</span>
+          <Check size={15} strokeWidth={2.5} />
+          <span>Kiểm tra <span className="btn-shortcut-hint">(Enter)</span></span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Bỏ qua câu hiện tại (tự điền đáp án - Esc)" onClick={onSkip}>
-          <SkipForward size={18} strokeWidth={2.2} />
-          <span>Bỏ qua</span>
+          <SkipForward size={15} strokeWidth={2.2} />
+          <span>Bỏ qua <span className="btn-shortcut-hint">(Esc)</span></span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Phát lại câu hiện tại (Ctrl)" onClick={onReplay}>
-          <RotateCcw size={18} strokeWidth={2.2} />
-          <span>Lặp lại</span>
+          <RotateCcw size={15} strokeWidth={2.2} />
+          <span>Lặp lại <span className="btn-shortcut-hint">(Ctrl)</span></span>
         </button>
 
-        <button className="btn btn-secondary btn-with-icon" title="Nghe phát âm giọng mẫu câu này" onClick={onSpeakSentence}>
-          <Volume2 size={18} strokeWidth={2} />
-          <span>Nghe câu</span>
+        <button className="btn btn-secondary btn-with-icon" title="Nghe phát âm giọng mẫu câu này (Space)" onClick={onSpeakSentence}>
+          <Volume2 size={15} strokeWidth={2} />
+          <span>Nghe câu <span className="btn-shortcut-hint">(Space)</span></span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Mở 1 ký tự tiếp theo (~ / ` / Enter 2 lần / Ctrl+H / Alt+H)" onClick={handleTriggerHintLetter}>
-          <KeyRound size={18} strokeWidth={2} />
-          <span>Gợi ý chữ</span>
+          <KeyRound size={15} strokeWidth={2} />
+          <span>Gợi ý chữ <span className="btn-shortcut-hint">(`)</span></span>
         </button>
 
         <button className="btn btn-secondary btn-with-icon" title="Mở 1 từ tiếp theo (Tab / Alt+W / Ctrl+Shift+H)" onClick={handleTriggerHintWord}>
-          <Lightbulb size={18} strokeWidth={2} />
-          <span>Gợi ý từ</span>
+          <Lightbulb size={15} strokeWidth={2} />
+          <span>Gợi ý từ <span className="btn-shortcut-hint">(Tab)</span></span>
         </button>
       </div>
 
