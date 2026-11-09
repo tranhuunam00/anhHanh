@@ -28,7 +28,9 @@ import {
   resetExamSessionState,
   canAccessSkill,
   getNextSkill,
-  isExamFullyCompleted
+  isExamFullyCompleted,
+  getFirstIncompleteSkill,
+  clearExamLocalArtifacts
 } from "../utils/ieltsExamTimer.js";
 import {
   BookOpen,
@@ -104,18 +106,21 @@ export const IeltsTestPage = ({
 
     if (!sess.isConfirmed) {
       setIsConfirmOpen(true);
+    } else {
+      setActiveSkill(getFirstIncompleteSkill(sess));
     }
   }, [selectedTestId]);
 
-  // Activate timer for current skill when session is confirmed
+  // Activate timer for current skill when session is confirmed or uncompleted
   useEffect(() => {
-    if (examSession.isConfirmed && !isSkillCompletedAndLocked(examSession, activeSkill)) {
+    if (isConfirmOpen) return;
+    if (!isSkillCompletedAndLocked(examSession, activeSkill)) {
       if (examSession.skills[activeSkill]?.status !== "in_progress") {
         const next = activateSkillTimer(examSession, activeSkill);
         setExamSession(next);
       }
     }
-  }, [activeSkill, examSession]);
+  }, [activeSkill, examSession, isConfirmOpen]);
 
   const remainingSeconds = getSkillRemainingSeconds(examSession, activeSkill);
   const isCurrentSkillLocked = isSkillCompletedAndLocked(examSession, activeSkill);
@@ -138,7 +143,7 @@ export const IeltsTestPage = ({
     });
   };
 
-  // Grade Listening
+  // Grade Listening & immediately advance to Reading with timer active
   const gradeListening = useCallback(() => {
     if (!testData?.skills?.listening) return;
     const { correctCount, bandScore, evalMap } = gradeListeningTest(
@@ -158,12 +163,18 @@ export const IeltsTestPage = ({
       rawScore: correctCount,
       bandScore
     });
-    setExamSession(lockedSession);
+    const nextSkill = getNextSkill("listening");
+    const nextSession = nextSkill ? activateSkillTimer(lockedSession, nextSkill) : lockedSession;
+    setExamSession(nextSession);
+    if (nextSkill) {
+      setActiveSkill(nextSkill);
+    }
+    setIsReviewMode(false);
     setModalData({ skill: "listening", rawScore: correctCount, bandScore });
     setIsModalOpen(true);
   }, [testData, listeningAnswers, selectedTestId, examSession]);
 
-  // Grade Reading
+  // Grade Reading & immediately advance to Writing with timer active
   const gradeReading = useCallback(() => {
     if (!testData?.skills?.reading) return;
     const { correctCount, bandScore, evalMap } = gradeReadingTest(
@@ -183,7 +194,13 @@ export const IeltsTestPage = ({
       rawScore: correctCount,
       bandScore
     });
-    setExamSession(lockedSession);
+    const nextSkill = getNextSkill("reading");
+    const nextSession = nextSkill ? activateSkillTimer(lockedSession, nextSkill) : lockedSession;
+    setExamSession(nextSession);
+    if (nextSkill) {
+      setActiveSkill(nextSkill);
+    }
+    setIsReviewMode(false);
     setModalData({ skill: "reading", rawScore: correctCount, bandScore });
     setIsModalOpen(true);
   }, [testData, readingAnswers, selectedTestId, examSession]);
@@ -199,13 +216,13 @@ export const IeltsTestPage = ({
         submitted: true,
         savedAt: new Date().toISOString()
       });
-      setExamSession(lockedSession);
-      const next = getNextSkill("writing");
-      if (next) {
-        setActiveSkill(next);
-        const nextActivated = activateSkillTimer(lockedSession, next);
-        setExamSession(nextActivated);
+      const nextSkill = getNextSkill("writing");
+      const nextSession = nextSkill ? activateSkillTimer(lockedSession, nextSkill) : lockedSession;
+      setExamSession(nextSession);
+      if (nextSkill) {
+        setActiveSkill(nextSkill);
       }
+      setIsReviewMode(false);
     } else if (activeSkill === "speaking") {
       const lockedSession = completeAndLockSkill(examSession, "speaking", {
         submitted: true,
@@ -216,30 +233,31 @@ export const IeltsTestPage = ({
     }
   }, [activeSkill, gradeListening, gradeReading, examSession]);
 
-  // Countdown timer ticker & auto-submit on timeout
+  // 1-second countdown interval
   useEffect(() => {
-    if (!isActive || !examSession.isConfirmed) return;
+    if (!isActive) return;
     const interval = setInterval(() => {
-      const rem = getSkillRemainingSeconds(examSession, activeSkill);
-      if (rem <= 0 && examSession.skills?.[activeSkill]?.status === "in_progress") {
-        handleSubmitSkill();
-      }
       setTimerTick((t) => t + 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, [isActive, examSession, activeSkill, handleSubmitSkill]);
+  }, [isActive]);
+
+  // Auto-submit on timeout
+  useEffect(() => {
+    if (
+      examSession.skills?.[activeSkill]?.status === "in_progress" &&
+      remainingSeconds <= 0
+    ) {
+      handleSubmitSkill();
+    }
+  }, [remainingSeconds, activeSkill, examSession, handleSubmitSkill]);
 
   const handleStartExamConfirm = () => {
     let sess = examSession;
     if (sess.skills?.[activeSkill]?.status === "completed") {
-      clearIeltsSubmission(selectedTestId, activeSkill);
-      if (activeSkill === "listening") {
-        setListeningAnswers({});
-        setListeningEval(null);
-      } else if (activeSkill === "reading") {
-        setReadingAnswers({});
-        setReadingEval(null);
-      }
+      clearExamLocalArtifacts(selectedTestId, activeSkill);
+      if (activeSkill === "listening") { setListeningAnswers({}); setListeningEval(null); }
+      if (activeSkill === "reading") { setReadingAnswers({}); setReadingEval(null); }
       sess = {
         ...sess,
         skills: {
@@ -263,19 +281,8 @@ export const IeltsTestPage = ({
   };
 
   const handleResetExam = () => {
-    // Clear all saved submissions from localStorage
-    clearIeltsSubmission(selectedTestId);
-    // Clear writing essays from localStorage
-    try {
-      const prefix = `ielts_essay_${selectedTestId}_`;
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith(prefix)) localStorage.removeItem(key);
-      });
-      // Clear speaking notes
-      localStorage.removeItem("ielts_speaking_notes_cam21_t2");
-    } catch { /* ignore */ }
-    const fresh = resetExamSessionState(selectedTestId);
-    const activated = activateSkillTimer(fresh, "listening");
+    clearExamLocalArtifacts(selectedTestId);
+    const activated = activateSkillTimer(resetExamSessionState(selectedTestId), "listening");
     setExamSession(activated);
     setListeningAnswers({});
     setReadingAnswers({});
@@ -292,25 +299,9 @@ export const IeltsTestPage = ({
 
   const handleRetakeSkill = (skillToRetake) => {
     const targetSkill = skillToRetake || activeSkill;
-    clearIeltsSubmission(selectedTestId, targetSkill);
-    if (targetSkill === "listening") {
-      setListeningAnswers({});
-      setListeningEval(null);
-    } else if (targetSkill === "reading") {
-      setReadingAnswers({});
-      setReadingEval(null);
-    } else if (targetSkill === "writing") {
-      try {
-        const prefix = `ielts_essay_${selectedTestId}_`;
-        Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith(prefix)) localStorage.removeItem(key);
-        });
-      } catch { /* ignore */ }
-    } else if (targetSkill === "speaking") {
-      try {
-        localStorage.removeItem("ielts_speaking_notes_cam21_t2");
-      } catch { /* ignore */ }
-    }
+    clearExamLocalArtifacts(selectedTestId, targetSkill);
+    if (targetSkill === "listening") { setListeningAnswers({}); setListeningEval(null); }
+    if (targetSkill === "reading") { setReadingAnswers({}); setReadingEval(null); }
 
     const updatedSkills = {
       ...examSession.skills,
@@ -323,13 +314,10 @@ export const IeltsTestPage = ({
         result: null
       }
     };
-    const updatedSession = {
-      ...examSession,
-      isFullyCompleted: false,
-      completedAt: null,
-      skills: updatedSkills
-    };
-    const activated = activateSkillTimer(updatedSession, targetSkill);
+    const activated = activateSkillTimer(
+      { ...examSession, isFullyCompleted: false, completedAt: null, skills: updatedSkills },
+      targetSkill
+    );
     setExamSession(activated);
     setActiveSkill(targetSkill);
     setIsReviewMode(false);
@@ -344,13 +332,14 @@ export const IeltsTestPage = ({
   }, [modalData.skill]);
 
   const handleGoToNextSkill = () => {
-    if (nextSkillForModal) {
-      setActiveSkill(nextSkillForModal);
-      const nextActivated = activateSkillTimer(examSession, nextSkillForModal);
+    const nextSkill = nextSkillForModal || getNextSkill(activeSkill);
+    if (nextSkill) {
+      setActiveSkill(nextSkill);
+      const nextActivated = activateSkillTimer(examSession, nextSkill);
       setExamSession(nextActivated);
       setIsReviewMode(false);
-      setIsModalOpen(false);
     }
+    setIsModalOpen(false);
   };
 
   const handleReviewFromFinalReport = () => {
@@ -374,7 +363,14 @@ export const IeltsTestPage = ({
         }}
         onOpenInfo={() => setIsConfirmOpen(true)}
         activeSkill={activeSkill}
-        onSelectSkill={(sk) => setActiveSkill(sk)}
+        onSelectSkill={(sk) => {
+          setActiveSkill(sk);
+          if (!isSkillCompletedAndLocked(examSession, sk)) {
+            setIsReviewMode(false);
+            const activated = activateSkillTimer(examSession, sk);
+            setExamSession(activated);
+          }
+        }}
         examSession={examSession}
         isReviewMode={isReviewMode}
         remainingSeconds={remainingSeconds}
@@ -452,7 +448,13 @@ export const IeltsTestPage = ({
         onStartExam={handleStartExamConfirm}
         onResumeExam={() => setIsConfirmOpen(false)}
         onResetExam={handleResetExam}
-        onClose={() => setIsConfirmOpen(false)}
+        onClose={() => {
+          if (!examSession.isConfirmed) {
+            handleStartExamConfirm();
+          } else {
+            setIsConfirmOpen(false);
+          }
+        }}
       />
 
       {/* Skill Result Modal */}

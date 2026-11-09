@@ -5,7 +5,7 @@
  * skill auto-submission on timeout, and locking completed skills.
  */
 
-import { calculateOverallIeltsBand } from "./ieltsScoring.js";
+import { calculateOverallIeltsBand, clearIeltsSubmission } from "./ieltsScoring.js";
 
 // Official IELTS Skill Durations in Seconds
 export const IELTS_SKILL_DURATIONS = {
@@ -244,6 +244,8 @@ export const completeAndLockSkill = (session, skill, resultData = null) => {
 
   const nextSession = {
     ...session,
+    isConfirmed: true,
+    confirmedAt: session.confirmedAt || new Date().toISOString(),
     isFullyCompleted: isAllDone,
     completedAt: isAllDone ? new Date().toISOString() : session.completedAt,
     skills: updatedSkills
@@ -251,6 +253,61 @@ export const completeAndLockSkill = (session, skill, resultData = null) => {
 
   saveExamSessionState(session.testId, nextSession);
   return nextSession;
+};
+
+/**
+ * Returns the first incomplete skill in sequential order (Listening -> Reading -> Writing -> Speaking).
+ * Falls back to "listening" if all are completed or on invalid input.
+ */
+export const getFirstIncompleteSkill = (session) => {
+  if (!session || !session.skills) return "listening";
+  for (const sk of IELTS_SKILL_ORDER) {
+    if (session.skills[sk]?.status !== "completed") {
+      return sk;
+    }
+  }
+  return "listening";
+};
+
+/**
+ * Clears exam localStorage artifacts for a test (or single skill)
+ */
+export const clearExamLocalArtifacts = (testId, skill = null) => {
+  clearIeltsSubmission(testId, skill);
+  if (typeof localStorage === "undefined") return;
+  try {
+    const prefix = `ielts_essay_${testId}_`;
+    const keysToRemove = [];
+
+    // Collect keys using localStorage.key() or fallback to property enumeration
+    if (typeof localStorage.length === "number" && typeof localStorage.key === "function") {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (!skill || skill === "writing") && k.startsWith(prefix)) {
+          keysToRemove.push(k);
+        }
+      }
+    }
+
+    const directKeys = Object.keys(localStorage.store || localStorage);
+    directKeys.forEach((k) => {
+      if ((!skill || skill === "writing") && k.startsWith(prefix)) {
+        keysToRemove.push(k);
+      }
+    });
+
+    keysToRemove.forEach((k) => {
+      try {
+        localStorage.removeItem(k);
+      } catch { /* ignore */ }
+    });
+
+    if (!skill || skill === "speaking") {
+      localStorage.removeItem("ielts_speaking_notes_cam21_t2");
+    }
+  } catch {
+    /* ignore */
+  }
 };
 
 /**

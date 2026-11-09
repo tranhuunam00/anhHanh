@@ -16,13 +16,22 @@ import {
   canAccessSkill,
   getNextSkill,
   isExamFullyCompleted,
-  computeOverallBand
+  computeOverallBand,
+  getFirstIncompleteSkill,
+  clearExamLocalArtifacts
 } from "../src/utils/ieltsExamTimer.js";
 
 // Mock localStorage for node test runner
 class MockStorage {
   constructor() {
     this.store = {};
+  }
+  get length() {
+    return Object.keys(this.store).length;
+  }
+  key(index) {
+    const keys = Object.keys(this.store);
+    return keys[index] || null;
   }
   getItem(key) {
     return this.store[key] || null;
@@ -248,5 +257,53 @@ describe("ieltsExamTimer - isExamFullyCompleted & computeOverallBand", () => {
     assert.equal(computeOverallBand({}), 1.0);
   });
 });
+
+describe("ieltsExamTimer - getFirstIncompleteSkill & clearExamLocalArtifacts", () => {
+  it("completeAndLockSkill sets isConfirmed to true", () => {
+    const session = createDefaultSession("test_confirm_on_lock");
+    assert.equal(session.isConfirmed, false);
+    const locked = completeAndLockSkill(session, "listening");
+    assert.equal(locked.isConfirmed, true);
+    assert.ok(locked.confirmedAt);
+  });
+
+  it("getFirstIncompleteSkill returns first uncompleted skill in order", () => {
+    const session = createDefaultSession("test_first_inc");
+    assert.equal(getFirstIncompleteSkill(session), "listening");
+
+    session.skills.listening.status = "completed";
+    assert.equal(getFirstIncompleteSkill(session), "reading");
+
+    session.skills.reading.status = "completed";
+    assert.equal(getFirstIncompleteSkill(session), "writing");
+
+    session.skills.writing.status = "completed";
+    assert.equal(getFirstIncompleteSkill(session), "speaking");
+
+    session.skills.speaking.status = "completed";
+    assert.equal(getFirstIncompleteSkill(session), "listening");
+  });
+
+  it("getFirstIncompleteSkill boundary cases", () => {
+    assert.equal(getFirstIncompleteSkill(null), "listening");
+    assert.equal(getFirstIncompleteSkill({}), "listening");
+    assert.equal(getFirstIncompleteSkill({ skills: null }), "listening");
+  });
+
+  it("clearExamLocalArtifacts clears matching localStorage items", () => {
+    localStorage.setItem("ielts_essay_cam21_t2_task1", "essay content");
+    localStorage.setItem("ielts_essay_cam21_t2_task2", "essay content 2");
+    localStorage.setItem("ielts_speaking_notes_cam21_t2", "notes");
+
+    clearExamLocalArtifacts("cam21_t2", "writing");
+    assert.equal(localStorage.getItem("ielts_essay_cam21_t2_task1"), null);
+    assert.equal(localStorage.getItem("ielts_essay_cam21_t2_task2"), null);
+    assert.equal(localStorage.getItem("ielts_speaking_notes_cam21_t2"), "notes");
+
+    clearExamLocalArtifacts("cam21_t2");
+    assert.equal(localStorage.getItem("ielts_speaking_notes_cam21_t2"), null);
+  });
+});
+
 
 
