@@ -29,6 +29,9 @@ import { RootWordsPage } from "./components/RootWords";
 import { IeltsTestPage } from "./pages/IeltsTestPage";
 import { PrimaryKidsPage } from "./components/PrimaryKids";
 import { GraduationCap } from "./constants/icons";
+import { Users } from "./components/Icons";
+import { AuthGateScreen } from "./components/Auth/AuthGateScreen";
+import { StudyBuddyView } from "./components/StudyBuddy/StudyBuddyView";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -56,7 +59,7 @@ import { SPEECH_LANG_MAP } from "./constants/languages";
 export default function App() {
   const { theme, toggleTheme } = useTheme();
   const { settings, updateSetting, resetSettings } = useSettings();
-  const { token, user, refreshStreak, showToast, streak } = useAuth();
+  const { token, user, isAuthenticated, refreshStreak, showToast, streak } = useAuth();
 
   // Helper to map URL path to active tab
   const getTabFromPath = () => {
@@ -72,6 +75,7 @@ export default function App() {
     if (path === "/roots" || path.startsWith("/roots/") || path === "/root-words" || path.startsWith("/root-words/")) return "tab-root-words";
     if (path === "/history" || path.startsWith("/history/")) return "tab-history";
     if (path === "/audio-studio" || path.startsWith("/audio-studio/")) return "tab-audio-studio";
+    if (path === "/buddy" || path === "/ban-hoc" || path.startsWith("/buddy/")) return "tab-buddy";
     if (path === "/ielts" || path.startsWith("/ielts/") || path === "/ielts-test" || path.startsWith("/ielts-test/")) return "tab-ielts-test";
     if (path === "/kids" || path.startsWith("/kids/") || path === "/tieu-hoc" || path.startsWith("/tieu-hoc/") || path === "/primary" || path.startsWith("/primary/")) return "tab-primary";
     return "tab-dictation";
@@ -89,6 +93,7 @@ export default function App() {
       case "tab-transcript": return "/transcript";
       case "tab-history": return "/history";
       case "tab-audio-studio": return "/audio-studio";
+      case "tab-buddy": return "/buddy";
       case "tab-ielts-test": return "/ielts";
       default: return "/";
     }
@@ -909,7 +914,13 @@ export default function App() {
         }}
         autoDetectedLang={autoDetectedLang}
         isLoading={isLoading}
-        onLoadLesson={(url) => handleRequestPreview(url, sourceLang, targetLang)}
+        onLoadLesson={(url) => {
+          if (!isAuthenticated) {
+            setIsAuthOpen(true);
+            return;
+          }
+          handleRequestPreview(url, sourceLang, targetLang);
+        }}
         theme={theme}
         onToggleTheme={toggleTheme}
         onOpenSettings={() => setIsSettingsOpen(true)}
@@ -919,7 +930,13 @@ export default function App() {
         onOpenAdminTab={() => setActiveTab("tab-admin")}
       />
 
-      <main className="main-container">
+      {!isAuthenticated ? (
+        <AuthGateScreen
+          onOpenLogin={() => setIsAuthOpen(true)}
+          onOpenRegister={() => setIsAuthOpen(true)}
+        />
+      ) : (
+        <main className="main-container">
         {/* Navigation Tabs Header - Compact Single-Row Layout */}
         <div className="tabs-header">
           <div className="tabs-nav-group">
@@ -1027,6 +1044,16 @@ export default function App() {
             >
               <GraduationCap className="tab-btn-icon" />
               <span>Đề thi thật IELTS</span>
+            </button>
+
+            <button
+              className={`tab-btn ${activeTab === "tab-buddy" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-buddy")}
+              style={activeTab === "tab-buddy" ? { borderColor: "#10b981" } : {}}
+              title="Tìm bạn học quanh đây (Định vị GPS thực tế)"
+            >
+              <Users size={16} />
+              <span>Bạn học quanh đây</span>
             </button>
 
 
@@ -1338,7 +1365,17 @@ export default function App() {
         <div style={{ display: activeTab === "tab-primary" ? "block" : "none" }}>
           <PrimaryKidsPage isActive={activeTab === "tab-primary"} />
         </div>
+
+        {/* TAB 13: Bạn học quanh đây (GPS Study Buddies) */}
+        <div style={{ display: activeTab === "tab-buddy" ? "block" : "none" }}>
+          <StudyBuddyView
+            token={token}
+            currentUser={user}
+            showToast={showToast}
+          />
+        </div>
       </main>
+      )}
 
       {/* Professional ShotLang Footer (Hidden during IELTS exam mode to prevent window scroll) */}
       {activeTab !== "tab-ielts-test" && (
@@ -1349,13 +1386,15 @@ export default function App() {
       )}
 
       {/* Floating Vocab Selection Saver Tooltip */}
-      <FloatingVocabSaver
-        currentSentence={currentChallenge?.text || ""}
-        currentVideoId={currentLesson?.video_id || ""}
-        currentTimestamp={currentChallenge?.time_start || 0}
-        sourceLang={currentLesson?.source_lang || sourceLang || "en"}
-        targetLang={targetLang || "vi"}
-      />
+      {isAuthenticated && (
+        <FloatingVocabSaver
+          currentSentence={currentChallenge?.text || ""}
+          currentVideoId={currentLesson?.video_id || ""}
+          currentTimestamp={currentChallenge?.time_start || 0}
+          sourceLang={currentLesson?.source_lang || sourceLang || "en"}
+          targetLang={targetLang || "vi"}
+        />
+      )}
 
       {/* Feedback Modal */}
       <FeedbackModal

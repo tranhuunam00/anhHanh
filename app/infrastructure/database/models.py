@@ -34,6 +34,12 @@ class User(Base):
     name = Column(String(100), nullable=False)
     role = Column(String(20), default='USER', nullable=False)
     avatar_url = Column(Text, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    location_updated_at = Column(DateTime(timezone=True), nullable=True)
+    is_location_sharing = Column(Boolean, default=True, nullable=False)
+    study_target = Column(String(100), default='Luyện nghe & Chép chính tả', nullable=True)
+    bio = Column(String(255), nullable=True)
     created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
 
     lessons = relationship('UserLesson', back_populates='user', cascade='all, delete-orphan')
@@ -67,6 +73,12 @@ class User(Base):
             'name': self.name,
             'role': self.role,
             'avatar_url': self.avatar_url,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'location_updated_at': self.location_updated_at.isoformat() if self.location_updated_at else None,
+            'is_location_sharing': self.is_location_sharing if self.is_location_sharing is not None else True,
+            'study_target': self.study_target or 'Luyện nghe & Chép chính tả',
+            'bio': self.bio,
             'can_use_ai_import': self.can_use_ai_import,
             'can_use_ai_writing': self.can_use_ai_writing,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -447,3 +459,5 @@ from app.infrastructure.database.destination_b2_models import (
     DestinationB2Exercise,
     DestinationB2Progress,
 )
+from app.infrastructure.database.study_buddy_models import Friendship
+

@@ -1044,6 +1044,23 @@ export const Users = (props) => (
   </BaseIcon>
 );
 
+export const UserPlus = (props) => (
+  <BaseIcon {...props}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <line x1="19" y1="8" x2="19" y2="14" />
+    <line x1="22" y1="11" x2="16" y2="11" />
+  </BaseIcon>
+);
+
+export const UserCheck = (props) => (
+  <BaseIcon {...props}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <polyline points="16 11 18 13 22 9" />
+  </BaseIcon>
+);
+
 export const Mail = (props) => (
   <BaseIcon {...props}>
     <rect width="20" height="16" x="2" y="4" rx="2" />
