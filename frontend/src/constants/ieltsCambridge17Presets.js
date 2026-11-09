@@ -336,7 +336,8 @@ export const CAMBRIDGE_17_FULL_LESSONS = [
     targetLang: "vi",
     author: "Cambridge University Press",
     langLabel: "🇺🇸 English → 🇻🇳 Tiếng Việt",
-    isFullTest: true
+    isFullTest: true,
+    isSplit: false
   },
   {
     id: "cam17-t2-full",
@@ -355,7 +356,8 @@ export const CAMBRIDGE_17_FULL_LESSONS = [
     targetLang: "vi",
     author: "Cambridge University Press",
     langLabel: "🇺🇸 English → 🇻🇳 Tiếng Việt",
-    isFullTest: true
+    isFullTest: true,
+    isSplit: false
   },
   {
     id: "cam17-t3-full",
@@ -374,7 +376,8 @@ export const CAMBRIDGE_17_FULL_LESSONS = [
     targetLang: "vi",
     author: "Cambridge University Press",
     langLabel: "🇺🇸 English → 🇻🇳 Tiếng Việt",
-    isFullTest: true
+    isFullTest: true,
+    isSplit: false
   },
   {
     id: "cam17-t4-full",
@@ -393,7 +396,8 @@ export const CAMBRIDGE_17_FULL_LESSONS = [
     targetLang: "vi",
     author: "Cambridge University Press",
     langLabel: "🇺🇸 English → 🇻🇳 Tiếng Việt",
-    isFullTest: true
+    isFullTest: true,
+    isSplit: false
   }
 ];
 

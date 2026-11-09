@@ -2,6 +2,8 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
   IELTS_TASK_TABS,
+  CAMBRIDGE_17_LESSONS,
+  CAMBRIDGE_17_FULL_LESSONS,
   CAMBRIDGE_19_LESSONS,
   CAMBRIDGE_19_FULL_LESSONS,
   CAMBRIDGE_20_LESSONS,
@@ -19,6 +21,78 @@ describe("ieltsCambridgePresets Unit Tests", () => {
       IELTS_TASK_TABS.forEach((tab) => {
         assert.ok(tab.label && tab.label.length > 0, `Tab ${tab.id} must have a label`);
         assert.ok(tab.desc && tab.desc.length > 0, `Tab ${tab.id} must have a description`);
+      });
+    });
+  });
+
+  describe("CAMBRIDGE_17_LESSONS Data Integrity (16 Separate Task Parts)", () => {
+    it("happy path: contains exactly 16 lessons across 4 tests (4 tasks each)", () => {
+      assert.equal(CAMBRIDGE_17_LESSONS.length, 16);
+    });
+
+    it("verifies all lessons have isSplit === true and book === 'Cambridge 17'", () => {
+      CAMBRIDGE_17_LESSONS.forEach((lesson) => {
+        assert.equal(lesson.book, "Cambridge 17");
+        assert.equal(lesson.isSplit, true);
+        assert.ok(lesson.testNumber >= 1 && lesson.testNumber <= 4);
+        assert.ok(lesson.taskNumber >= 1 && lesson.taskNumber <= 4);
+        assert.equal(lesson.taskKey, `task${lesson.taskNumber}`);
+      });
+    });
+
+    it("verifies each lesson has complete metadata and valid authentic local audio URL format", () => {
+      CAMBRIDGE_17_LESSONS.forEach((lesson) => {
+        assert.ok(lesson.id && lesson.id.startsWith("cam17-"));
+        assert.ok(lesson.title && lesson.title.includes("Cam 17 - Test"));
+        assert.ok(lesson.summary && lesson.summary.length > 10);
+        assert.ok(lesson.duration && lesson.duration.includes(":"));
+        assert.ok(lesson.audioUrl && lesson.audioUrl.startsWith("/audio/cambridge17/"));
+        assert.ok(lesson.url && lesson.url.startsWith("/audio/cambridge17/"));
+        assert.ok(!lesson.url.includes("youtube.com"));
+        assert.ok(lesson.author && lesson.author.length > 0);
+        assert.ok(lesson.diffColor && lesson.diffColor.startsWith("#"));
+      });
+    });
+
+    it("internal logic: each test has exactly 4 distinct tasks (Task 1, 2, 3, 4)", () => {
+      for (let testNum = 1; testNum <= 4; testNum++) {
+        const testTasks = CAMBRIDGE_17_LESSONS.filter((l) => l.testNumber === testNum);
+        assert.equal(testTasks.length, 4);
+        const taskNums = testTasks.map((l) => l.taskNumber).sort();
+        assert.deepEqual(taskNums, [1, 2, 3, 4]);
+      }
+    });
+
+    it("verifies specific titles for Test 1 through 4 tasks match Cambridge 17 syllabus", () => {
+      const t1s1 = CAMBRIDGE_17_LESSONS.find((l) => l.id === "cam17-t1-s1");
+      assert.ok(t1s1 && t1s1.title.includes("Buckworth Conservation Group"));
+
+      const t2s1 = CAMBRIDGE_17_LESSONS.find((l) => l.id === "cam17-t2-s1");
+      assert.ok(t2s1 && t2s1.title.includes("Children's Birthday Party Booking"));
+
+      const t3s1 = CAMBRIDGE_17_LESSONS.find((l) => l.id === "cam17-t3-s1");
+      assert.ok(t3s1 && t3s1.title.includes("Renting Accommodation in Ireland"));
+
+      const t4s1 = CAMBRIDGE_17_LESSONS.find((l) => l.id === "cam17-t4-s1");
+      assert.ok(t4s1 && t4s1.title.includes("Easy Life Cleaning Services"));
+    });
+  });
+
+  describe("CAMBRIDGE_17_FULL_LESSONS Data Integrity (4 Full Combined Tests)", () => {
+    it("happy path: contains exactly 4 full combined test lessons", () => {
+      assert.equal(CAMBRIDGE_17_FULL_LESSONS.length, 4);
+    });
+
+    it("verifies all full lessons have isSplit === false and taskKey === 'full'", () => {
+      CAMBRIDGE_17_FULL_LESSONS.forEach((lesson) => {
+        assert.equal(lesson.book, "Cambridge 17");
+        assert.equal(lesson.isSplit, false);
+        assert.equal(lesson.taskKey, "full");
+        assert.equal(lesson.taskNumber, "full");
+        assert.ok(lesson.badge.includes("Full Test"));
+        assert.ok(lesson.title.includes("Full 4 Parts"));
+        assert.ok(lesson.audioUrl && lesson.audioUrl.startsWith("/audio/"));
+        assert.ok(lesson.url && lesson.url.startsWith("/audio/"));
       });
     });
   });

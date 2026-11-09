@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
 import {
   IELTS_TASK_TABS,
+  CAMBRIDGE_17_LESSONS,
+  CAMBRIDGE_17_FULL_LESSONS,
   CAMBRIDGE_18_LESSONS,
   CAMBRIDGE_18_FULL_LESSONS,
   CAMBRIDGE_19_LESSONS,
@@ -23,12 +25,19 @@ import {
   Zap
 } from "../Icons";
 
+const CAMBRIDGE_BOOKS = [
+  { id: "cam17", title: "Cambridge IELTS 17", split: CAMBRIDGE_17_LESSONS, full: CAMBRIDGE_17_FULL_LESSONS },
+  { id: "cam18", title: "Cambridge IELTS 18", split: CAMBRIDGE_18_LESSONS, full: CAMBRIDGE_18_FULL_LESSONS },
+  { id: "cam19", title: "Cambridge IELTS 19", split: CAMBRIDGE_19_LESSONS, full: CAMBRIDGE_19_FULL_LESSONS },
+  { id: "cam20", title: "Cambridge IELTS 20", split: CAMBRIDGE_20_LESSONS, full: CAMBRIDGE_20_FULL_LESSONS },
+  { id: "cam21", title: "Cambridge IELTS 21", split: CAMBRIDGE_21_LESSONS, full: CAMBRIDGE_21_FULL_LESSONS, alwaysShowFull: true }
+];
+
 /**
  * Specialized IELTS Cambridge Presets View
  * - Supports filtering by Task: Task 1, Task 2, Task 3, Task 4, Full or All
- * - Cambridge 19: 16 individual split parts (Test 1..4 x Task 1..4) + 4 full combined tests
- * - Cambridge 20: 16 individual split parts (Test 1..4 x Task 1..4) + 4 full combined tests
- * - Cambridge 21: 4 full combined test lessons (Test 1..4 x Full 4 Tasks)
+ * - Cambridge 17, 18, 19, 20: 16 individual split parts (Test 1..4 x Task 1..4) + 4 full combined tests
+ * - Cambridge 21: 16 individual split parts + 4 full combined test lessons
  * - 100% Local Authentic Cambridge Audio Files
  * - Dual-action buttons: [ 🎧 Nghe cả bài ] (Transcript) & [ ✍️ Chép chính tả ] (Dictation)
  * - 100% Internal Icon System (BaseIcon from ../Icons)
@@ -44,37 +53,17 @@ export const IeltsPresetsView = React.memo(({
     return IELTS_TASK_TABS.find((t) => t.id === selectedTask) || IELTS_TASK_TABS[0];
   }, [selectedTask]);
 
-  // Filter lessons based on selected task
-  const filteredCam18 = useMemo(() => {
-    return filterIeltsLessons(CAMBRIDGE_18_LESSONS, selectedTask);
-  }, [selectedTask]);
-
-  const filteredCam18Full = useMemo(() => {
-    return selectedTask === "full" ? CAMBRIDGE_18_FULL_LESSONS : [];
-  }, [selectedTask]);
-
-  const filteredCam19 = useMemo(() => {
-    return filterIeltsLessons(CAMBRIDGE_19_LESSONS, selectedTask);
-  }, [selectedTask]);
-
-  const filteredCam19Full = useMemo(() => {
-    return selectedTask === "full" ? CAMBRIDGE_19_FULL_LESSONS : [];
-  }, [selectedTask]);
-
-  const filteredCam20 = useMemo(() => {
-    return filterIeltsLessons(CAMBRIDGE_20_LESSONS, selectedTask);
-  }, [selectedTask]);
-
-  const filteredCam20Full = useMemo(() => {
-    return selectedTask === "full" ? CAMBRIDGE_20_FULL_LESSONS : [];
-  }, [selectedTask]);
-
-  const filteredCam21 = useMemo(() => {
-    return filterIeltsLessons(CAMBRIDGE_21_LESSONS, selectedTask);
-  }, [selectedTask]);
-
-  const filteredCam21Full = useMemo(() => {
-    return selectedTask === "full" || selectedTask === "all" ? CAMBRIDGE_21_FULL_LESSONS : [];
+  const bookSections = useMemo(() => {
+    return CAMBRIDGE_BOOKS.map((b) => {
+      const splitItems = filterIeltsLessons(b.split, selectedTask);
+      const isFullOnly = selectedTask === "full";
+      const fullItems = (isFullOnly || (b.alwaysShowFull && selectedTask === "all")) ? b.full : [];
+      return {
+        ...b,
+        splitItems: isFullOnly ? [] : splitItems,
+        fullItems
+      };
+    });
   }, [selectedTask]);
 
   const handleSelectMode = (lesson, mode, e) => {
@@ -198,189 +187,56 @@ export const IeltsPresetsView = React.memo(({
         </div>
       </div>
 
-      {/* Group 0: Cambridge 18 (Đã tách riêng 4 Task) */}
-      {selectedTask !== "full" && filteredCam18.length > 0 && (
-        <section className="ielts-book-group">
-          <div className="ielts-book-group-header">
-            <div className="ielts-book-group-title">
-              <BookOpen size={16} color="var(--primary)" />
-              <span>Cambridge IELTS 18</span>
-              <span className="ielts-book-badge split">
-                <Check size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
-                Đã tách riêng 4 Task
-              </span>
-            </div>
-            <span className="text-xs text-muted">
-              {filteredCam18.length} bài luyện tập
-            </span>
-          </div>
+      {/* Render Cambridge Books Groups */}
+      {bookSections.map((book) => (
+        <React.Fragment key={book.id}>
+          {/* Split 4 Tasks Section */}
+          {book.splitItems.length > 0 && (
+            <section className="ielts-book-group">
+              <div className="ielts-book-group-header">
+                <div className="ielts-book-group-title">
+                  <BookOpen size={16} color="var(--primary)" />
+                  <span>{book.title}</span>
+                  <span className="ielts-book-badge split">
+                    <Check size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
+                    Đã tách riêng 4 Task
+                  </span>
+                </div>
+                <span className="text-xs text-muted">
+                  {book.splitItems.length} bài luyện tập
+                </span>
+              </div>
 
-          <div className="ielts-presets-cards-grid">
-            {filteredCam18.map(renderCard)}
-          </div>
-        </section>
-      )}
+              <div className="ielts-presets-cards-grid">
+                {book.splitItems.map(renderCard)}
+              </div>
+            </section>
+          )}
 
-      {/* Group 0B: Cambridge 18 (Trọn bộ 4 đề thi khi chọn tab Trọn bộ) */}
-      {selectedTask === "full" && filteredCam18Full.length > 0 && (
-        <section className="ielts-book-group">
-          <div className="ielts-book-group-header">
-            <div className="ielts-book-group-title">
-              <BookOpen size={16} color="var(--primary)" />
-              <span>Cambridge IELTS 18</span>
-              <span className="ielts-book-badge merged">
-                <Zap size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
-                Gộp 4 phần trong 1 test (Full 30 phút)
-              </span>
-            </div>
-            <span className="text-xs text-muted">
-              {filteredCam18Full.length} bài thi trọn bộ
-            </span>
-          </div>
+          {/* Full 30-Minute Combined Test Section */}
+          {book.fullItems.length > 0 && (
+            <section className="ielts-book-group" style={{ marginTop: "12px" }}>
+              <div className="ielts-book-group-header">
+                <div className="ielts-book-group-title">
+                  <BookOpen size={16} color="var(--primary)" />
+                  <span>{book.title}</span>
+                  <span className="ielts-book-badge merged">
+                    <Zap size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
+                    Gộp 4 phần trong 1 test (Full 30 phút)
+                  </span>
+                </div>
+                <span className="text-xs text-muted">
+                  {book.fullItems.length} bài thi trọn bộ
+                </span>
+              </div>
 
-          <div className="ielts-presets-cards-grid">
-            {filteredCam18Full.map(renderCard)}
-          </div>
-        </section>
-      )}
-
-      {/* Group 1: Cambridge 19 (Đã tách riêng 4 Task) */}
-      {selectedTask !== "full" && filteredCam19.length > 0 && (
-        <section className="ielts-book-group">
-          <div className="ielts-book-group-header">
-            <div className="ielts-book-group-title">
-              <BookOpen size={16} color="var(--primary)" />
-              <span>Cambridge IELTS 19</span>
-              <span className="ielts-book-badge split">
-                <Check size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
-                Đã tách riêng 4 Task
-              </span>
-            </div>
-            <span className="text-xs text-muted">
-              {filteredCam19.length} bài luyện tập
-            </span>
-          </div>
-
-          <div className="ielts-presets-cards-grid">
-            {filteredCam19.map(renderCard)}
-          </div>
-        </section>
-      )}
-
-      {/* Group 1B: Cambridge 19 (Trọn bộ 4 đề thi khi chọn tab Trọn bộ) */}
-      {selectedTask === "full" && filteredCam19Full.length > 0 && (
-        <section className="ielts-book-group">
-          <div className="ielts-book-group-header">
-            <div className="ielts-book-group-title">
-              <BookOpen size={16} color="var(--primary)" />
-              <span>Cambridge IELTS 19</span>
-              <span className="ielts-book-badge merged">
-                <Zap size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
-                Gộp 4 phần trong 1 test (Full 30 phút)
-              </span>
-            </div>
-            <span className="text-xs text-muted">
-              {filteredCam19Full.length} bài thi trọn bộ
-            </span>
-          </div>
-
-          <div className="ielts-presets-cards-grid">
-            {filteredCam19Full.map(renderCard)}
-          </div>
-        </section>
-      )}
-
-      {/* Group 2: Cambridge 20 (Đã tách riêng 4 Task) */}
-      {selectedTask !== "full" && filteredCam20.length > 0 && (
-        <section className="ielts-book-group" style={{ marginTop: "12px" }}>
-          <div className="ielts-book-group-header">
-            <div className="ielts-book-group-title">
-              <BookOpen size={16} color="var(--primary)" />
-              <span>Cambridge IELTS 20</span>
-              <span className="ielts-book-badge split">
-                <Check size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
-                Đã tách riêng 4 Task
-              </span>
-            </div>
-            <span className="text-xs text-muted">
-              {filteredCam20.length} bài luyện tập
-            </span>
-          </div>
-
-          <div className="ielts-presets-cards-grid">
-            {filteredCam20.map(renderCard)}
-          </div>
-        </section>
-      )}
-
-      {/* Group 2B: Cambridge 20 (Trọn bộ 4 đề thi khi chọn tab Trọn bộ) */}
-      {selectedTask === "full" && filteredCam20Full.length > 0 && (
-        <section className="ielts-book-group" style={{ marginTop: "12px" }}>
-          <div className="ielts-book-group-header">
-            <div className="ielts-book-group-title">
-              <BookOpen size={16} color="var(--primary)" />
-              <span>Cambridge IELTS 20</span>
-              <span className="ielts-book-badge merged">
-                <Zap size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
-                Gộp 4 phần trong 1 test (Full 30 phút)
-              </span>
-            </div>
-            <span className="text-xs text-muted">
-              {filteredCam20Full.length} bài thi trọn bộ
-            </span>
-          </div>
-
-          <div className="ielts-presets-cards-grid">
-            {filteredCam20Full.map(renderCard)}
-          </div>
-        </section>
-      )}
-
-      {/* Group 3: Cambridge 21 (Đã tách riêng 4 Task) */}
-      {selectedTask !== "full" && filteredCam21.length > 0 && (
-        <section className="ielts-book-group" style={{ marginTop: "12px" }}>
-          <div className="ielts-book-group-header">
-            <div className="ielts-book-group-title">
-              <BookOpen size={16} color="var(--primary)" />
-              <span>Cambridge IELTS 21</span>
-              <span className="ielts-book-badge split">
-                <Check size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
-                Đã tách riêng 4 Task
-              </span>
-            </div>
-            <span className="text-xs text-muted">
-              {filteredCam21.length} bài luyện tập
-            </span>
-          </div>
-
-          <div className="ielts-presets-cards-grid">
-            {filteredCam21.map(renderCard)}
-          </div>
-        </section>
-      )}
-
-      {/* Group 3B: Cambridge 21 (Trọn bộ 4 đề thi Full 30 phút) */}
-      {filteredCam21Full.length > 0 && (
-        <section className="ielts-book-group" style={{ marginTop: "12px" }}>
-          <div className="ielts-book-group-header">
-            <div className="ielts-book-group-title">
-              <BookOpen size={16} color="var(--primary)" />
-              <span>Cambridge IELTS 21</span>
-              <span className="ielts-book-badge merged">
-                <Zap size={12} style={{ verticalAlign: "middle", marginRight: 3 }} />
-                Gộp 4 phần trong 1 test (Full 30 phút)
-              </span>
-            </div>
-            <span className="text-xs text-muted">
-              {filteredCam21Full.length} bài thi trọn bộ
-            </span>
-          </div>
-
-          <div className="ielts-presets-cards-grid">
-            {filteredCam21Full.map(renderCard)}
-          </div>
-        </section>
-      )}
+              <div className="ielts-presets-cards-grid">
+                {book.fullItems.map(renderCard)}
+              </div>
+            </section>
+          )}
+        </React.Fragment>
+      ))}
     </div>
   );
 });
