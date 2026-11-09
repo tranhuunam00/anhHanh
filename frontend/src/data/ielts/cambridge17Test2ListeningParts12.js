@@ -11,23 +11,23 @@ export const listeningParts12 = [
         {
           heading: "Library",
           lines: [
-            { prefix: "• Help with ", number: 1, suffix: " books (times to be arranged)" },
-            { prefix: "• Help needed to keep ", number: 2, suffix: " of books up to date" },
-            { prefix: "• Library is in the ", number: 3, suffix: " Room in the village hall" }
+            { prefix: "Help with ", number: 1, suffix: " books (times to be arranged)" },
+            { prefix: "Help needed to keep ", number: 2, suffix: " of books up to date" },
+            { prefix: "Library is in the ", number: 3, suffix: " Room in the village hall" }
           ]
         },
         {
           heading: "Lunch club",
           lines: [
-            { prefix: "• Help by providing ", number: 4, suffix: "" },
-            { prefix: "• Help with hobbies such as ", number: 5, suffix: "" }
+            { prefix: "Help by providing ", number: 4, suffix: "" },
+            { prefix: "Help with hobbies such as ", number: 5, suffix: "" }
           ]
         },
         {
           heading: "Help for individuals needed next week",
           lines: [
-            { prefix: "• Taking Mrs Carroll to ", number: 6, suffix: "" },
-            { prefix: "• Work in the ", number: 7, suffix: " at Mr Selsbury's house" }
+            { prefix: "Taking Mrs Carroll to ", number: 6, suffix: "" },
+            { prefix: "Work in the ", number: 7, suffix: " at Mr Selsbury's house" }
           ]
         }
       ]

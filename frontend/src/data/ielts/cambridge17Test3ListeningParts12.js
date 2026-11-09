@@ -11,30 +11,30 @@ export const listeningParts12 = [
         {
           heading: "Jack's advice",
           lines: [
-            { prefix: "• Recommends surfing for ", number: 1, suffix: " holidays in the summer" },
-            { prefix: "• Need to be quite ", number: 2, suffix: "" }
+            { prefix: "Recommends surfing for ", number: 1, suffix: " holidays in the summer" },
+            { prefix: "Need to be quite ", number: 2, suffix: "" }
           ]
         },
         {
           heading: "Irish surfing locations",
           lines: [
-            { text: "County Clare" },
-            { prefix: "– Lahinch has some good quality ", number: 3, suffix: " and surf schools" },
-            { text: "– There are famous cliffs nearby" },
-            { text: "County Mayo" },
-            { prefix: "– Good surf school at ", number: 4, suffix: " beach" },
-            { prefix: "– Surf camp lasts for one ", number: 5, suffix: "" },
-            { prefix: "– Can also explore the local ", number: 6, suffix: " by kayak" }
+            { text: "County Clare", isSubheading: true },
+            { prefix: "Lahinch has some good quality ", number: 3, suffix: " and surf schools" },
+            { text: "There are famous cliffs nearby" },
+            { text: "County Mayo", isSubheading: true },
+            { prefix: "Good surf school at ", number: 4, suffix: " beach" },
+            { prefix: "Surf camp lasts for one ", number: 5, suffix: "" },
+            { prefix: "Can also explore the local ", number: 6, suffix: " by kayak" }
           ]
         },
         {
           heading: "Weather & Costs",
           lines: [
-            { prefix: "• Best month to go: ", number: 7, suffix: "" },
-            { prefix: "• Average temperature in summer: approx. ", number: 8, suffix: " degrees" },
-            { text: "Costs" },
-            { prefix: "– Wetsuit and surfboard: ", number: 9, suffix: " euros per day" },
-            { prefix: "– Also advisable to hire ", number: 10, suffix: " for warmth" }
+            { prefix: "Best month to go: ", number: 7, suffix: "" },
+            { prefix: "Average temperature in summer: approx. ", number: 8, suffix: " degrees" },
+            { text: "Costs", isSubheading: true },
+            { prefix: "Wetsuit and surfboard: ", number: 9, suffix: " euros per day" },
+            { prefix: "Also advisable to hire ", number: 10, suffix: " for warmth" }
           ]
         }
       ]

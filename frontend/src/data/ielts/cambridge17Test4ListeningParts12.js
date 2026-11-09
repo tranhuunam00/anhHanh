@@ -11,33 +11,33 @@ export const listeningParts12 = [
         {
           heading: "Basic cleaning package offered",
           lines: [
-            { text: "• Cleaning all surfaces" },
-            { prefix: "• Cleaning the ", number: 1, suffix: " throughout the apartment" },
-            { text: "• Cleaning shower, sinks, toilet etc." }
+            { text: "Cleaning all surfaces" },
+            { prefix: "Cleaning the ", number: 1, suffix: " throughout the apartment" },
+            { text: "Cleaning shower, sinks, toilet etc." }
           ]
         },
         {
           heading: "Additional services agreed",
           lines: [
-            { text: "Every week" },
-            { prefix: "− Cleaning the ", number: 2, suffix: "" },
-            { prefix: "− Ironing clothes – ", number: 3, suffix: " only" },
-            { text: "Every month" },
-            { prefix: "− Cleaning all the ", number: 4, suffix: " from the inside" },
-            { prefix: "− Washing down the ", number: 5, suffix: "" }
+            { text: "Every week", isSubheading: true },
+            { prefix: "Cleaning the ", number: 2, suffix: "" },
+            { prefix: "Ironing clothes – ", number: 3, suffix: " only" },
+            { text: "Every month", isSubheading: true },
+            { prefix: "Cleaning all the ", number: 4, suffix: " from the inside" },
+            { prefix: "Washing down the ", number: 5, suffix: "" }
           ]
         },
         {
           heading: "Other possibilities & Information on the cleaners",
           lines: [
-            { prefix: "• They can organise a plumber or an ", number: 6, suffix: " if necessary." },
-            { prefix: "• A special cleaning service is available for customers who are allergic to ", number: 7, suffix: "." },
-            { text: "Information on the cleaners" },
-            { prefix: "• Before being hired, all cleaners have a background check carried out by the ", number: 8, suffix: "." },
-            { text: "• References are required." },
-            { prefix: "• All cleaners are given ", number: 9, suffix: " for two weeks." },
-            { prefix: "• Customers send a ", number: 10, suffix: " after each visit." },
-            { text: "• Usually, each customer has one regular cleaner." }
+            { prefix: "They can organise a plumber or an ", number: 6, suffix: " if necessary." },
+            { prefix: "A special cleaning service is available for customers who are allergic to ", number: 7, suffix: "." },
+            { text: "Information on the cleaners", isSubheading: true },
+            { prefix: "Before being hired, all cleaners have a background check carried out by the ", number: 8, suffix: "." },
+            { text: "References are required." },
+            { prefix: "All cleaners are given ", number: 9, suffix: " for two weeks." },
+            { prefix: "Customers send a ", number: 10, suffix: " after each visit." },
+            { text: "Usually, each customer has one regular cleaner." }
           ]
         }
       ]

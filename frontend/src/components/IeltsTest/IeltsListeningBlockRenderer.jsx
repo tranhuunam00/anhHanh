@@ -106,6 +106,30 @@ export function renderNoteBlock(noteBlock, answers, onChange, evaluation, isRevi
           >
             {sec.lines?.map((line, lIdx) => {
               if (line.text) {
+                // Strip any leading bullet characters to avoid double dots
+                const cleanText = line.text.replace(/^[•\-\*–—−]\s*/, "");
+
+                // Subheading / subcategory header inside notes (no bullet dot)
+                if (line.isSubheading || line.subheading) {
+                  return (
+                    <li
+                      key={lIdx}
+                      style={{
+                        marginTop: lIdx > 0 ? "14px" : "6px",
+                        marginBottom: "6px",
+                        lineHeight: "1.6",
+                        fontSize: "0.98rem",
+                        fontWeight: 700,
+                        color: "var(--text-primary)",
+                        paddingLeft: "0",
+                        listStyleType: "none"
+                      }}
+                    >
+                      {cleanText}
+                    </li>
+                  );
+                }
+
                 // Plain context sentence or bullet point (Zero text omission)
                 return (
                   <li
@@ -130,13 +154,14 @@ export function renderNoteBlock(noteBlock, answers, onChange, evaluation, isRevi
                         background: "var(--text-muted)"
                       }}
                     />
-                    <span>{line.text}</span>
+                    <span>{cleanText}</span>
                   </li>
                 );
               }
 
-              // Question input line
+              // Question input line: strip any leading bullet to prevent double dots
               const qNum = line.number;
+              const cleanPrefix = (line.prefix || "").replace(/^[•\-\*–—−]\s*/, "");
               return (
                 <li
                   key={lIdx}
@@ -160,7 +185,7 @@ export function renderNoteBlock(noteBlock, answers, onChange, evaluation, isRevi
                       background: "var(--primary)"
                     }}
                   />
-                  <span>{line.prefix}</span>
+                  <span>{cleanPrefix}</span>
                   <span className="ielts-inline-input-wrapper">
                     <span className="ielts-q-pill">{qNum}</span>
                     <input

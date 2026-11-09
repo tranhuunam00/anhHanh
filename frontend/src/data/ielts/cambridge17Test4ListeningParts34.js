@@ -136,38 +136,38 @@ export const listeningParts34 = [
         {
           heading: "What is maple syrup?",
           lines: [
-            { text: "• made from the sap of the maple tree" },
-            { prefix: "• colour described as ", number: 31, suffix: "" },
-            { text: "• added to food or used in cooking" },
-            { prefix: "• very ", number: 32, suffix: " compared to refined sugar" }
+            { text: "made from the sap of the maple tree" },
+            { prefix: "colour described as ", number: 31, suffix: "" },
+            { text: "added to food or used in cooking" },
+            { prefix: "very ", number: 32, suffix: " compared to refined sugar" }
           ]
         },
         {
           heading: "The maple tree",
           lines: [
-            { text: "• has many species; needs sunny days and cool nights" },
-            { text: "• maple leaf has been on the Canadian flag since 1964" },
-            { text: "• needs moist soil but does not need fertiliser" },
-            { prefix: "• best growing conditions and ", number: 33, suffix: " are in Canada and North America" }
+            { text: "has many species; needs sunny days and cool nights" },
+            { text: "maple leaf has been on the Canadian flag since 1964" },
+            { text: "needs moist soil but does not need fertiliser" },
+            { prefix: "best growing conditions and ", number: 33, suffix: " are in Canada and North America" }
           ]
         },
         {
           heading: "Early maple sugar producers",
           lines: [
-            { text: "• made holes in the tree trunks" },
-            { prefix: "• used hot ", number: 34, suffix: " to heat the sap" },
-            { text: "• used tree bark to make containers for collection" }
+            { text: "made holes in the tree trunks" },
+            { prefix: "used hot ", number: 34, suffix: " to heat the sap" },
+            { text: "used tree bark to make containers for collection" }
           ]
         },
         {
           heading: "Today's maple syrup production",
           lines: [
-            { prefix: "• Tree trunks may not have the correct ", number: 35, suffix: " until growing for 40 years." },
-            { prefix: "• A tap is drilled into the trunk and a ", number: 36, suffix: " carries the sap into a bucket." },
-            { prefix: "• Large pans called evaporators are heated by means of a ", number: 37, suffix: "." },
-            { prefix: "• A lot of ", number: 38, suffix: " is produced during the evaporation process." },
-            { prefix: "• 'Sugar sand' is removed because it makes the syrup look ", number: 39, suffix: " and affects the taste." },
-            { prefix: "• A huge quantity of sap is needed to make a ", number: 40, suffix: " of maple syrup." }
+            { prefix: "Tree trunks may not have the correct ", number: 35, suffix: " until growing for 40 years." },
+            { prefix: "A tap is drilled into the trunk and a ", number: 36, suffix: " carries the sap into a bucket." },
+            { prefix: "Large pans called evaporators are heated by means of a ", number: 37, suffix: "." },
+            { prefix: "A lot of ", number: 38, suffix: " is produced during the evaporation process." },
+            { prefix: "'Sugar sand' is removed because it makes the syrup look ", number: 39, suffix: " and affects the taste." },
+            { prefix: "A huge quantity of sap is needed to make a ", number: 40, suffix: " of maple syrup." }
           ]
         }
       ]

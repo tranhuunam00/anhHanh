@@ -128,41 +128,41 @@ export const listeningParts34 = [
         {
           heading: "Definition",
           lines: [
-            { text: "• a winding spiral path leading to a central area" }
+            { text: "a winding spiral path leading to a central area" }
           ]
         },
         {
           heading: "Labyrinths compared with mazes",
           lines: [
-            { prefix: "• Mazes are a type of ", number: 31, suffix: "" },
-            { prefix: "− ", number: 32, suffix: " is needed to navigate through a maze" },
-            { prefix: "− the word 'maze' is derived from a word meaning a feeling of ", number: 33, suffix: "" },
-            { text: "• Labyrinths represent a journey through life" },
-            { prefix: "− they have frequently been used in ", number: 34, suffix: " and prayer" }
+            { prefix: "Mazes are a type of ", number: 31, suffix: "" },
+            { prefix: "", number: 32, suffix: " is needed to navigate through a maze" },
+            { prefix: "the word 'maze' is derived from a word meaning a feeling of ", number: 33, suffix: "" },
+            { text: "Labyrinths represent a journey through life" },
+            { prefix: "they have frequently been used in ", number: 34, suffix: " and prayer" }
           ]
         },
         {
           heading: "Early examples of the labyrinth spiral",
           lines: [
-            { prefix: "• Ancient carvings on ", number: 35, suffix: " have been found across many cultures" },
-            { text: "• The Pima, a Native American tribe, wove the symbol on baskets" },
-            { prefix: "• Ancient Greeks used the symbol on ", number: 36, suffix: "" }
+            { prefix: "Ancient carvings on ", number: 35, suffix: " have been found across many cultures" },
+            { text: "The Pima, a Native American tribe, wove the symbol on baskets" },
+            { prefix: "Ancient Greeks used the symbol on ", number: 36, suffix: "" }
           ]
         },
         {
           heading: "Walking labyrinths",
           lines: [
-            { prefix: "• The largest surviving example of a turf labyrinth once had a big ", number: 37, suffix: " at its centre" }
+            { prefix: "The largest surviving example of a turf labyrinth once had a big ", number: 37, suffix: " at its centre" }
           ]
         },
         {
           heading: "Labyrinths nowadays",
           lines: [
-            { prefix: "• Believed to have a beneficial impact on mental and physical health, e.g., walking a maze can reduce a person's ", number: 38, suffix: " rate" },
-            { text: "• Used in medical and health and fitness settings and also prisons" },
-            { text: "• Popular with patients, visitors and staff in hospitals" },
-            { prefix: "− patients who can't walk can use 'finger labyrinths' made from ", number: 39, suffix: "" },
-            { prefix: "− research has shown that Alzheimer's sufferers experience less ", number: 40, suffix: "" }
+            { prefix: "Believed to have a beneficial impact on mental and physical health, e.g., walking a maze can reduce a person's ", number: 38, suffix: " rate" },
+            { text: "Used in medical and health and fitness settings and also prisons" },
+            { text: "Popular with patients, visitors and staff in hospitals" },
+            { prefix: "patients who can't walk can use 'finger labyrinths' made from ", number: 39, suffix: "" },
+            { prefix: "research has shown that Alzheimer's sufferers experience less ", number: 40, suffix: "" }
           ]
         }
       ]

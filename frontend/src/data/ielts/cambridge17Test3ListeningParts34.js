@@ -120,33 +120,33 @@ export const listeningParts34 = [
         {
           heading: "Hibernation theory",
           lines: [
-            { prefix: "• It was believed that birds hibernated underwater or buried themselves in ", number: 31, suffix: "." },
-            { text: "• This theory was later disproved by experiments on caged birds." }
+            { prefix: "It was believed that birds hibernated underwater or buried themselves in ", number: 31, suffix: "." },
+            { text: "This theory was later disproved by experiments on caged birds." }
           ]
         },
         {
           heading: "Transmutation theory",
           lines: [
-            { text: "• Aristotle believed birds changed from one species into another in summer and winter." },
-            { prefix: "– In autumn he observed that redstarts experience the loss of ", number: 32, suffix: " and thought they then turned into robins." },
-            { prefix: "– Aristotle's assumptions were logical because the two species of birds had a similar ", number: 33, suffix: "." }
+            { text: "Aristotle believed birds changed from one species into another in summer and winter." },
+            { prefix: "In autumn he observed that redstarts experience the loss of ", number: 32, suffix: " and thought they then turned into robins." },
+            { prefix: "Aristotle's assumptions were logical because the two species of birds had a similar ", number: 33, suffix: "." }
           ]
         },
         {
           heading: "17th century",
           lines: [
-            { prefix: "• Charles Morton popularised the idea that birds fly to the ", number: 34, suffix: " in winter." }
+            { prefix: "Charles Morton popularised the idea that birds fly to the ", number: 34, suffix: " in winter." }
           ]
         },
         {
           heading: "Scientific developments",
           lines: [
-            { prefix: "• In 1822, a stork was killed in Germany which had an African spear in its ", number: 35, suffix: "." },
-            { prefix: "– previously there had been no ", number: 36, suffix: " that storks migrate to Africa" },
-            { prefix: "• Little was known about the ", number: 37, suffix: " and journeys of migrating birds until ringing was established." },
-            { prefix: "– It was thought large birds carried small birds across huge ", number: 38, suffix: "." },
-            { prefix: "– Ringing depended on what is called the '", number: 39, suffix: "' of dead birds." },
-            { prefix: "• In 1931, the first ", number: 40, suffix: " to show the migration of European birds was printed." }
+            { prefix: "In 1822, a stork was killed in Germany which had an African spear in its ", number: 35, suffix: "." },
+            { prefix: "previously there had been no ", number: 36, suffix: " that storks migrate to Africa" },
+            { prefix: "Little was known about the ", number: 37, suffix: " and journeys of migrating birds until ringing was established." },
+            { prefix: "It was thought large birds carried small birds across huge ", number: 38, suffix: "." },
+            { prefix: "Ringing depended on what is called the '", number: 39, suffix: "' of dead birds." },
+            { prefix: "In 1931, the first ", number: 40, suffix: " to show the migration of European birds was printed." }
           ]
         }
       ]

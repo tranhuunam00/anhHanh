@@ -11,30 +11,30 @@ export const listeningParts12 = [
         {
           heading: "Regular activities",
           lines: [
-            { text: "Beach" },
-            { prefix: "• making sure the beach does not have ", number: 1, suffix: " on it" },
-            { prefix: "• no ", number: 2, suffix: "" },
-            { text: "Nature reserve" },
-            { text: "• maintaining paths" },
-            { text: "• nesting boxes for birds installed" },
-            { prefix: "• next task is taking action to attract ", number: 3, suffix: " to the place" },
-            { prefix: "• identifying types of ", number: 4, suffix: "" },
-            { prefix: "• building a new ", number: 5, suffix: "" }
+            { text: "Beach", isSubheading: true },
+            { prefix: "making sure the beach does not have ", number: 1, suffix: " on it" },
+            { prefix: "no ", number: 2, suffix: "" },
+            { text: "Nature reserve", isSubheading: true },
+            { text: "maintaining paths" },
+            { text: "nesting boxes for birds installed" },
+            { prefix: "next task is taking action to attract ", number: 3, suffix: " to the place" },
+            { prefix: "identifying types of ", number: 4, suffix: "" },
+            { prefix: "building a new ", number: 5, suffix: "" }
           ]
         },
         {
           heading: "Forthcoming events",
           lines: [
-            { text: "Saturday" },
-            { text: "• meet at Dunsmore Beach car park" },
-            { prefix: "• walk across the sands and reach the ", number: 6, suffix: "" },
-            { text: "• take a picnic" },
-            { prefix: "• wear appropriate ", number: 7, suffix: "" },
-            { text: "Woodwork session" },
-            { prefix: "• suitable for ", number: 8, suffix: " to participate in" },
-            { prefix: "• making ", number: 9, suffix: " out of wood" },
-            { text: "• 17th, from 10 a.m. to 3 p.m." },
-            { prefix: "• cost of session (no camping): £", number: 10, suffix: "" }
+            { text: "Saturday", isSubheading: true },
+            { text: "meet at Dunsmore Beach car park" },
+            { prefix: "walk across the sands and reach the ", number: 6, suffix: "" },
+            { text: "take a picnic" },
+            { prefix: "wear appropriate ", number: 7, suffix: "" },
+            { text: "Woodwork session", isSubheading: true },
+            { prefix: "suitable for ", number: 8, suffix: " to participate in" },
+            { prefix: "making ", number: 9, suffix: " out of wood" },
+            { text: "17th, from 10 a.m. to 3 p.m." },
+            { prefix: "cost of session (no camping): £", number: 10, suffix: "" }
           ]
         }
       ]

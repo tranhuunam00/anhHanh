@@ -132,34 +132,34 @@ export const listeningParts34 = [
         {
           heading: "The Icelandic language",
           lines: [
-            { prefix: "• has approximately ", number: 31, suffix: " speakers" },
-            { prefix: "• has a ", number: 32, suffix: " that is still growing" },
-            { text: "• has not changed a lot over the last thousand years" },
-            { prefix: "• has its own words for computer-based concepts, such as web browser and ", number: 33, suffix: "" }
+            { prefix: "has approximately ", number: 31, suffix: " speakers" },
+            { prefix: "has a ", number: 32, suffix: " that is still growing" },
+            { text: "has not changed a lot over the last thousand years" },
+            { prefix: "has its own words for computer-based concepts, such as web browser and ", number: 33, suffix: "" }
           ]
         },
         {
           heading: "Young speakers",
           lines: [
-            { prefix: "• are big users of digital technology, such as ", number: 34, suffix: "" },
-            { prefix: "• are becoming ", number: 35, suffix: " very quickly" },
-            { prefix: "• are having discussions using only English while they are in the ", number: 36, suffix: " at school" },
-            { prefix: "• are better able to identify the content of a ", number: 37, suffix: " in English than Icelandic" }
+            { prefix: "are big users of digital technology, such as ", number: 34, suffix: "" },
+            { prefix: "are becoming ", number: 35, suffix: " very quickly" },
+            { prefix: "are having discussions using only English while they are in the ", number: 36, suffix: " at school" },
+            { prefix: "are better able to identify the content of a ", number: 37, suffix: " in English than Icelandic" }
           ]
         },
         {
           heading: "Technology and internet companies",
           lines: [
-            { prefix: "• write very little in Icelandic because of the small number of speakers and because of how complicated its ", number: 38, suffix: " is" }
+            { prefix: "write very little in Icelandic because of the small number of speakers and because of how complicated its ", number: 38, suffix: " is" }
           ]
         },
         {
           heading: "The Icelandic government",
           lines: [
-            { text: "• has set up a fund to support the production of more digital content in the language" },
-            { text: "• believes that Icelandic has a secure future" },
-            { prefix: "• is worried that young Icelanders may lose their ", number: 39, suffix: " as Icelanders" },
-            { prefix: "• is worried about the consequences of children not being ", number: 40, suffix: " in either Icelandic or English" }
+            { text: "has set up a fund to support the production of more digital content in the language" },
+            { text: "believes that Icelandic has a secure future" },
+            { prefix: "is worried that young Icelanders may lose their ", number: 39, suffix: " as Icelanders" },
+            { prefix: "is worried about the consequences of children not being ", number: 40, suffix: " in either Icelandic or English" }
           ]
         }
       ]
