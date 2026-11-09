@@ -1,9 +1,12 @@
+import { CAMBRIDGE_17_LESSONS, CAMBRIDGE_17_FULL_LESSONS } from "../constants/ieltsCambridge17Presets.js";
 import { CAMBRIDGE_18_LESSONS, CAMBRIDGE_18_FULL_LESSONS } from "../constants/ieltsCambridge18Presets.js";
 import { CAMBRIDGE_19_LESSONS, CAMBRIDGE_19_FULL_LESSONS } from "../constants/ieltsCambridge19Presets.js";
 import { CAMBRIDGE_20_LESSONS, CAMBRIDGE_20_FULL_LESSONS } from "../constants/ieltsCambridge20Presets.js";
 import { CAMBRIDGE_21_LESSONS, CAMBRIDGE_21_FULL_LESSONS } from "../constants/ieltsCambridge21Presets.js";
 
 const ALL_IELTS_AUDIO_PRESETS = [
+  ...CAMBRIDGE_17_LESSONS,
+  ...CAMBRIDGE_17_FULL_LESSONS,
   ...CAMBRIDGE_18_LESSONS,
   ...CAMBRIDGE_18_FULL_LESSONS,
   ...CAMBRIDGE_19_LESSONS,

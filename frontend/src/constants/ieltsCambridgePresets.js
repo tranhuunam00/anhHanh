@@ -1,8 +1,12 @@
 /**
  * Cambridge IELTS Practice Lessons Data Index
- * Re-exports modular presets for Cambridge 18, 19, 20 & 21
+ * Re-exports modular presets for Cambridge 17, 18, 19, 20 & 21
  */
 
+import {
+  CAMBRIDGE_17_LESSONS,
+  CAMBRIDGE_17_FULL_LESSONS
+} from "./ieltsCambridge17Presets.js";
 import {
   CAMBRIDGE_18_LESSONS,
   CAMBRIDGE_18_FULL_LESSONS
@@ -21,6 +25,8 @@ import {
 } from "./ieltsCambridge21Presets.js";
 
 export {
+  CAMBRIDGE_17_LESSONS,
+  CAMBRIDGE_17_FULL_LESSONS,
   CAMBRIDGE_18_LESSONS,
   CAMBRIDGE_18_FULL_LESSONS,
   CAMBRIDGE_19_LESSONS,
@@ -32,7 +38,7 @@ export {
 };
 
 export const IELTS_TASK_TABS = [
-  { id: "all", label: "Tất cả", desc: "Toàn bộ bài tập Cambridge 18, 19, 20 & 21 (Audio gốc chính thức)" },
+  { id: "all", label: "Tất cả", desc: "Toàn bộ bài tập Cambridge 17, 18, 19, 20 & 21 (Audio gốc chính thức)" },
   { id: "task1", label: "Task 1", desc: "Hội thoại Form Completion (Điền thông tin, số đo, ngày tháng)" },
   { id: "task2", label: "Task 2", desc: "Độc thoại Monologue (Hướng dẫn, sơ đồ bản đồ, quy chế)" },
   { id: "task3", label: "Task 3", desc: "Thảo luận Academic Discussion (Nhóm 2-3 người & giảng viên)" },

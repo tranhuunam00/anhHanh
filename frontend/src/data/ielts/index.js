@@ -1,3 +1,7 @@
+import { cambridge17Test1 } from "./cambridge17Test1Data.js";
+import { cambridge17Test2 } from "./cambridge17Test2Data.js";
+import { cambridge17Test3 } from "./cambridge17Test3Data.js";
+import { cambridge17Test4 } from "./cambridge17Test4Data.js";
 import { cambridge18Test1 } from "./cambridge18Test1Data.js";
 import { cambridge18Test2 } from "./cambridge18Test2Data.js";
 import { cambridge18Test3 } from "./cambridge18Test3Data.js";
@@ -16,6 +20,48 @@ import { cambridge21Test3 } from "./cambridge21Test3Data.js";
 import { cambridge21Test4 } from "./cambridge21Test4Data.js";
 
 export const IELTS_TESTS = [
+  // Cambridge IELTS 17 (Đầy đủ 4 kỹ năng)
+  {
+    id: "cambridge-17-test-1",
+    title: "Cambridge IELTS 17 - Test 1",
+    badge: "Đầy đủ 4 kỹ năng",
+    book: "Cambridge 17",
+    testNumber: 1,
+    pages: "Trang 10 - 30",
+    audioAvailable: true,
+    data: cambridge17Test1
+  },
+  {
+    id: "cambridge-17-test-2",
+    title: "Cambridge IELTS 17 - Test 2",
+    badge: "Đầy đủ 4 kỹ năng",
+    book: "Cambridge 17",
+    testNumber: 2,
+    pages: "Trang 31 - 52",
+    audioAvailable: true,
+    data: cambridge17Test2
+  },
+  {
+    id: "cambridge-17-test-3",
+    title: "Cambridge IELTS 17 - Test 3",
+    badge: "Đầy đủ 4 kỹ năng",
+    book: "Cambridge 17",
+    testNumber: 3,
+    pages: "Trang 53 - 74",
+    audioAvailable: true,
+    data: cambridge17Test3
+  },
+  {
+    id: "cambridge-17-test-4",
+    title: "Cambridge IELTS 17 - Test 4",
+    badge: "Đầy đủ 4 kỹ năng",
+    book: "Cambridge 17",
+    testNumber: 4,
+    pages: "Trang 75 - 95",
+    audioAvailable: true,
+    data: cambridge17Test4
+  },
+
   // Cambridge IELTS 18 (Đầy đủ 4 kỹ năng)
   {
     id: "cambridge-18-test-1",
