@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Link2, Copy, Check, RotateCw, Mail, Users } from "../Icons";
+import { Search, Link2, Copy, Check, RotateCw, Mail, Users, X } from "../Icons";
 import { StudyBuddyCard } from "./StudyBuddyCard";
 import { searchStudyBuddies } from "../../services/studyBuddyService";
 import { generateBuddyShareLink, sanitizeBuddiesList } from "../../utils/studyBuddyUtils";
@@ -140,7 +140,7 @@ export const StudyBuddySearchPanel = ({
                   setHasSearched(false);
                 }}
               >
-                ✕
+                <X size={13} />
               </button>
             )}
           </div>

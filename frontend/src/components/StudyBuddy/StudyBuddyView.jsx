@@ -226,7 +226,7 @@ export const StudyBuddyView = ({ token, currentUser, showToast }) => {
               disabled={isGpsLoading}
             >
               <Compass size={14} className={isGpsLoading ? "spin" : ""} />
-              <span>{isGpsLoading ? "Đang dò GPS..." : "📍 Bật định vị tìm bạn"}</span>
+              <span>{isGpsLoading ? "Đang dò GPS..." : "Bật định vị tìm bạn"}</span>
             </button>
           )}
         </div>

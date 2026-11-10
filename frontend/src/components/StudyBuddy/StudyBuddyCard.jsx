@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, Flame, UserPlus, UserCheck, Clock, Check, X } from "../Icons";
+import { MapPin, Flame, UserPlus, UserCheck, Clock, Check, X, Target } from "../Icons";
 import { getBuddyStatusMeta, formatOnlineStatusBadge } from "../../utils/studyBuddyUtils";
 
 /**
@@ -85,7 +85,8 @@ export const StudyBuddyCard = React.memo(({
       {/* Target & Bio */}
       <div className="buddy-target-wrap">
         <span className="buddy-target-pill" title="Mục tiêu học tập">
-          🎯 {study_target || "Luyện nghe & Chép chính tả"}
+          <Target size={12} style={{ display: "inline-block", verticalAlign: "middle", marginRight: "4px" }} />
+          <span>{study_target || "Luyện nghe & Chép chính tả"}</span>
         </span>
       </div>
 
