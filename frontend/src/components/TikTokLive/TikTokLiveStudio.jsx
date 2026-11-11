@@ -83,7 +83,7 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
         }));
         if (msg.first_winner) {
           setFirstWinner(msg.first_winner);
-          playWebAudioChime("correct");
+          if (isActive) playWebAudioChime("correct");
         }
       } else if (msg.type === "NEW_COMMENT") {
         setSession((prev) => {
@@ -97,7 +97,7 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
         });
         if (msg.is_correct && !firstWinner) {
           setFirstWinner(msg);
-          playWebAudioChime("correct");
+          if (isActive) playWebAudioChime("correct");
         }
       } else if (msg.type === "NEW_GIFT") {
         setSession((prev) => ({
@@ -105,7 +105,7 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
           total_gifts: prev.total_gifts + (msg.diamond_count || 1),
           recent_events: [...prev.recent_events, msg].slice(-20),
         }));
-        playWebAudioChime("gift");
+        if (isActive) playWebAudioChime("gift");
       } else if (msg.type === "NEW_LIKE") {
         setSession((prev) => ({
           ...prev,
@@ -135,8 +135,9 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
     };
   }, [isActive, loadSnapshot, firstWinner]);
 
-  // 3. Countdown timer loop
+  // 3. Countdown timer loop (only runs when actively viewing this tab)
   useEffect(() => {
+    if (!isActive) return;
     if (session.is_round_active && timeLeft > 0) {
       timerRef.current = setTimeout(() => {
         setTimeLeft((prev) => prev - 1);
@@ -145,7 +146,7 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
       endQuestionRound();
     }
     return () => clearTimeout(timerRef.current);
-  }, [session.is_round_active, timeLeft]);
+  }, [session.is_round_active, timeLeft, isActive]);
 
   // 4. Keyboard ESC listener to exit fullscreen
   useEffect(() => {

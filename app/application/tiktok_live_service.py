@@ -356,13 +356,23 @@ class TikTokLiveSession:
             DisconnectEvent
         )
 
-        self.unique_id = unique_id.strip().lstrip("@")
+        raw_input = unique_id.strip()
+        room_id_match = re.search(r"room_id=(\d+)|^(\d{15,25})$", raw_input)
+        target_room_id = int(room_id_match.group(1) or room_id_match.group(2)) if room_id_match else None
+
+        if target_room_id:
+            self.unique_id = str(target_room_id)
+            client_user = "live"
+        else:
+            self.unique_id = raw_input.lstrip("@")
+            client_user = self.unique_id
+
         self.status = "connecting"
         self.error_message = ""
         self.broadcast({"type": "STATUS_CHANGE", "status": self.status, "unique_id": self.unique_id})
 
         try:
-            self.client = TikTokLiveClient(unique_id=self.unique_id)
+            self.client = TikTokLiveClient(unique_id=client_user)
 
             @self.client.on(ConnectEvent)
             async def on_connect(event: ConnectEvent):
@@ -421,11 +431,16 @@ class TikTokLiveSession:
                 except Exception as ex:
                     logger.warning(f"Error processing TikTok gift event: {ex}")
 
-            await self.client.connect()
+            if target_room_id:
+                await self.client.connect(room_id=target_room_id, fetch_live_check=False)
+            else:
+                await self.client.connect(fetch_live_check=False)
         except Exception as e:
             self.status = "error"
             err_str = str(e)
-            if "UserOfflineError" in err_str or "offline" in err_str.lower():
+            if "SIGI_STATE" in err_str or "JSONDecodeError" in err_str:
+                self.error_message = f"TikTok chặn dò username tự động từ VPS. Hãy dán Room ID (dãy số chia sẻ Live) để kết nối trực tiếp 100%!"
+            elif "UserOfflineError" in err_str or "offline" in err_str.lower():
                 self.error_message = f"Tài khoản @{self.unique_id} hiện chưa phát sóng Live trên TikTok. Hãy mở app TikTok Bắt đầu Live trước, hoặc bấm các nút Chế độ Test bên dưới!"
             elif "UserNotFound" in err_str or "not found" in err_str.lower():
                 self.error_message = f"Không tìm thấy tài khoản @{self.unique_id} trên TikTok. Vui lòng kiểm tra lại ID."
