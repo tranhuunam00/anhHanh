@@ -6,6 +6,7 @@ import {
   formatViewerPoints,
   getRankBadge,
   formatTikTokErrorMessage,
+  playWebAudioChime,
 } from "../src/utils/tiktokLiveUtils.js";
 
 test("normalizeTikTokAnswer extracts single letter or raw text", () => {
@@ -75,6 +76,16 @@ test("formatTikTokErrorMessage formats errors into clear Vietnamese guidance", (
   // 5. Empty / null input fallback
   const emptyErr = formatTikTokErrorMessage("", "test");
   assert.ok(emptyErr.includes("Hãy bật Chế độ Test bên dưới"));
+});
+
+test("playWebAudioChime handles all sound types gracefully without throwing", () => {
+  // In node.js without AudioContext, all calls must be safe no-ops
+  assert.doesNotThrow(() => playWebAudioChime("correct"));
+  assert.doesNotThrow(() => playWebAudioChime("gift"));
+  assert.doesNotThrow(() => playWebAudioChime("timeout"));
+  assert.doesNotThrow(() => playWebAudioChime("tick"));
+  assert.doesNotThrow(() => playWebAudioChime("start"));
+  assert.doesNotThrow(() => playWebAudioChime("unknown"));
 });
 
 

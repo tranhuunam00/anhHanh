@@ -46,6 +46,11 @@ export async function nextQuestion() {
   return res.json();
 }
 
+export async function prevQuestion() {
+  const res = await fetch("/api/tiktok-live/prev-question", { method: "POST" });
+  return res.json();
+}
+
 export async function simulateLiveEvent({ event_type, comment, gift_name, diamond_count, nickname, user_id }) {
   const res = await fetch("/api/tiktok-live/simulate", {
     method: "POST",

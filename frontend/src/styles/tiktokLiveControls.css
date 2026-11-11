@@ -378,3 +378,64 @@
   background: rgba(255, 255, 255, 0.25);
   color: #38bdf8;
 }
+
+/* Floating Dock for Fullscreen Streamer Controls */
+.tiktok-fullscreen-dock {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.btn-dock-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+  color: #ffffff;
+}
+
+.btn-dock-action.start {
+  background: #2563eb;
+}
+
+.btn-dock-action.start:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-dock-action.end {
+  background: #ef4444;
+}
+
+.btn-dock-action.end:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.btn-dock-action.next {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-dock-action.next:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: #38bdf8;
+  transform: translateY(-1px);
+}

@@ -91,6 +91,13 @@ async def next_question():
     return {"status": "next", "event": event}
 
 
+@router.post("/prev-question")
+async def prev_question():
+    """Go back to previous question in the deck."""
+    event = active_live_session.prev_question()
+    return {"status": "prev", "event": event}
+
+
 @router.post("/simulate")
 async def simulate_event(payload: SimulateEventRequest):
     """Simulate a comment, like, or gift for instant offline testing."""

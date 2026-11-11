@@ -178,6 +178,14 @@ class TikTokLiveSession:
             self.current_question_index = 0
         return self.start_round()
 
+    def prev_question(self) -> Dict[str, Any]:
+        """Go back to previous question."""
+        if self.current_question_index > 0:
+            self.current_question_index -= 1
+        else:
+            self.current_question_index = len(self.questions) - 1
+        return self.start_round()
+
     def process_comment(
         self,
         user_id: str,

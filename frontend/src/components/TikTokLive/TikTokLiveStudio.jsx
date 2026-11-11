@@ -6,6 +6,7 @@ import {
   startQuestionRound,
   endQuestionRound,
   nextQuestion,
+  prevQuestion,
   simulateLiveEvent,
   createTikTokLiveWebSocket,
 } from "../../services/tiktokLiveService";
@@ -13,7 +14,7 @@ import { TikTokLiveQuestionCard } from "./TikTokLiveQuestionCard";
 import { TikTokLiveLeaderboard } from "./TikTokLiveLeaderboard";
 import { TikTokLiveControls } from "./TikTokLiveControls";
 import { playWebAudioChime } from "../../utils/tiktokLiveUtils";
-import { Radio, Maximize2, Minimize2, ArrowLeft, X } from "../Icons";
+import { Radio, Maximize2, Minimize2, ArrowLeft, X, Play, Check, FastForward } from "../Icons";
 import "../../styles/tiktokLive.css";
 
 export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
@@ -139,25 +140,20 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
   useEffect(() => {
     if (!isActive) return;
     if (session.is_round_active && timeLeft > 0) {
+      // Crisp countdown tick during final 5 seconds
+      if (timeLeft <= 5) {
+        playWebAudioChime("tick");
+      }
       timerRef.current = setTimeout(() => {
         setTimeLeft((prev) => prev - 1);
       }, 1000);
     } else if (session.is_round_active && timeLeft === 0) {
+      // Time is up sound & end round
+      playWebAudioChime("timeout");
       endQuestionRound();
     }
     return () => clearTimeout(timerRef.current);
   }, [session.is_round_active, timeLeft, isActive]);
-
-  // 4. Keyboard ESC listener to exit fullscreen
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape" && isFullScreen) {
-        setIsFullScreen(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isFullScreen]);
 
   // Actions
   const handleConnect = async (username) => {
@@ -178,21 +174,57 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
     }
   };
 
-  const handleStartRound = async () => {
+  const handleStartRound = useCallback(async () => {
+    if (isActive) playWebAudioChime("start");
     await startQuestionRound();
-  };
+  }, [isActive]);
 
-  const handleEndRound = async () => {
+  const handleEndRound = useCallback(async () => {
+    if (isActive) playWebAudioChime("timeout");
     await endQuestionRound();
-  };
+  }, [isActive]);
 
-  const handleNextQuestion = async () => {
+  const handleNextQuestion = useCallback(async () => {
+    if (isActive) playWebAudioChime("start");
     await nextQuestion();
-  };
+  }, [isActive]);
+
+  const handlePrevQuestion = useCallback(async () => {
+    if (isActive) playWebAudioChime("start");
+    await prevQuestion();
+  }, [isActive]);
 
   const handleSimulate = async (type, data) => {
     await simulateLiveEvent({ event_type: type, ...data });
   };
+
+  // 4. Keyboard Hotkeys (Space = Start/End, N/ArrowRight = Next, P/ArrowLeft = Prev, ESC = Exit Fullscreen)
+  useEffect(() => {
+    if (!isActive) return;
+    const handleKeyDown = (e) => {
+      // Ignore if user is focused inside an input or textarea
+      if (["INPUT", "TEXTAREA"].includes(e.target?.tagName)) return;
+
+      if (e.key === "Escape" && isFullScreen) {
+        setIsFullScreen(false);
+      } else if (e.code === "Space") {
+        e.preventDefault();
+        if (session.is_round_active) {
+          handleEndRound();
+        } else {
+          handleStartRound();
+        }
+      } else if (e.key === "ArrowRight" || e.key === "n" || e.key === "N") {
+        e.preventDefault();
+        handleNextQuestion();
+      } else if (e.key === "ArrowLeft" || e.key === "p" || e.key === "P") {
+        e.preventDefault();
+        handlePrevQuestion();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isActive, isFullScreen, session.is_round_active, handleEndRound, handleStartRound, handleNextQuestion, handlePrevQuestion]);
 
   return (
     <div className={`tiktok-live-page-root ${isFullScreen ? "is-fullscreen" : ""}`}>
@@ -315,6 +347,43 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
           </div>
         )}
       </div>
+
+      {/* Floating Quick Control Dock for Streamer in Fullscreen */}
+      {isFullScreen && (
+        <div className="tiktok-fullscreen-dock">
+          {session.is_round_active ? (
+            <button
+              type="button"
+              className="btn-dock-action end"
+              onClick={handleEndRound}
+              title="Chốt đáp án (Phím Space)"
+            >
+              <Check size={16} />
+              <span>Chốt đáp án (Space)</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn-dock-action start"
+              onClick={handleStartRound}
+              title="Bắt đầu câu hỏi (Phím Space)"
+            >
+              <Play size={16} />
+              <span>Bắt đầu (Space)</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="btn-dock-action next"
+            onClick={handleNextQuestion}
+            title="Câu tiếp theo (Phím N hoặc →)"
+          >
+            <FastForward size={16} />
+            <span>Câu tiếp (N / →)</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -66,6 +66,17 @@ class TestTikTokLiveSessionRounds:
         assert session.current_question_index == 1
         assert session.is_round_active is True
 
+    def test_prev_question_goes_back(self):
+        session = TikTokLiveSession(room_id="test_room")
+        session.next_question()
+        assert session.current_question_index == 1
+        session.prev_question()
+        assert session.current_question_index == 0
+        assert session.is_round_active is True
+        # Wrap around to end
+        session.prev_question()
+        assert session.current_question_index == len(session.questions) - 1
+
 
 class TestTikTokLiveScoringAndLeaderboard:
     """Tests for scoring rules, rankings, and gift boosts."""
