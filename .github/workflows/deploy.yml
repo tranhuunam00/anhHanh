@@ -54,17 +54,26 @@ jobs:
             docker compose up -d --build
             
             # Đợi container web sẵn sàng (tránh lỗi OCI procReady race condition khi exec tức thì)
-            echo "⏳ Đang đợi container web khởi động và sẵn sàng..."
+            echo "⏳ Đang đợi container web khởi động và đạt trạng thái running..."
+            WEB_RUNNING=0
             for i in $(seq 1 15); do
               STATUS=$(docker inspect --format='{{.State.Status}}' dailydictation_web 2>/dev/null || true)
               if [ "$STATUS" = "running" ]; then
                 echo "🟢 Container dailydictation_web đang ở trạng thái: running"
+                WEB_RUNNING=1
                 break
               fi
               echo "⏳ Trạng thái container: ${STATUS:-khởi tạo}. Đợi thêm 2s (lần $i/15)..."
               sleep 2
             done
-            sleep 4
+
+            if [ "$WEB_RUNNING" -ne 1 ]; then
+              echo "❌ Lỗi: Container web không thể đạt trạng thái running (trạng thái: $STATUS)!"
+              echo "📋 Log gần nhất của web container:"
+              docker compose logs --tail=100 web
+              exit 1
+            fi
+            sleep 3
             
             # Chạy migration database (retry tối đa 10 lần)
             echo "🔄 Bắt đầu chạy database migration..."
