@@ -32,6 +32,8 @@ import { GraduationCap } from "./constants/icons";
 import { Users } from "./components/Icons";
 import { AuthGateScreen } from "./components/Auth/AuthGateScreen";
 import { StudyBuddyView } from "./components/StudyBuddy/StudyBuddyView";
+import { TikTokLiveStudio } from "./components/TikTokLive/TikTokLiveStudio";
+import { Radio } from "./components/Icons";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
 
@@ -1061,6 +1063,17 @@ export default function App() {
               <span>Bạn học quanh đây</span>
             </button>
 
+            <button
+              className={`tab-btn ${activeTab === "tab-tiktok-live" ? "active" : ""}`}
+              onClick={() => setActiveTab("tab-tiktok-live")}
+              style={activeTab === "tab-tiktok-live" ? { borderColor: "#ef4444" } : {}}
+              title="Phòng học tương tác TikTok LIVE (OBS & TikTok Live Studio)"
+            >
+              <Radio size={16} color="#ef4444" />
+              <span>TikTok Live</span>
+              <span style={{ background: "#ef4444", color: "#ffffff", fontSize: "0.68rem", fontWeight: 800, padding: "1px 5px", borderRadius: "4px", marginLeft: "4px" }}>HOT</span>
+            </button>
+
 
             <button
               className={`tab-btn ${activeTab === "tab-root-words" ? "active" : ""}`}
@@ -1378,6 +1391,13 @@ export default function App() {
             currentUser={user}
             showToast={showToast}
           />
+        </div>
+
+        {/* TAB 14: TikTok LIVE Interactive Classroom */}
+        <div style={{ display: activeTab === "tab-tiktok-live" ? "block" : "none" }}>
+          {activeTab === "tab-tiktok-live" && (
+            <TikTokLiveStudio isActive={activeTab === "tab-tiktok-live"} />
+          )}
         </div>
       </main>
       )}

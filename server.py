@@ -27,6 +27,7 @@ from app.presentation.system_vocab_api import router as system_vocab_router
 from app.presentation.destination_b2_api import router as destination_b2_router
 from app.presentation.tts_api import router as tts_router
 from app.presentation.study_buddy_api import router as study_buddy_router
+from app.presentation.tiktok_live_api import router as tiktok_live_router
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +108,7 @@ app.include_router(system_vocab_router)
 app.include_router(destination_b2_router)
 app.include_router(tts_router)
 app.include_router(study_buddy_router)
+app.include_router(tiktok_live_router)
 
 from urllib.parse import unquote
 
