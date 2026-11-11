@@ -35,7 +35,12 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
   });
 
   const [timeLeft, setTimeLeft] = useState(20);
-  const [viewMode, setViewMode] = useState("portrait"); // portrait (9:16) | landscape (16:9)
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+      return "landscape";
+    }
+    return "portrait";
+  });
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [firstWinner, setFirstWinner] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -300,30 +305,43 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
               <span className="live-dot" />
               <span>SHOTLANG LIVE CLASSROOM</span>
             </div>
-            <div className="tiktok-current-channel">
-              {session.unique_id ? `@${session.unique_id}` : "Test Mode"}
+            <div className="tiktok-header-mode-actions">
+              <button
+                type="button"
+                className={`btn-canvas-mode-toggle ${viewMode === "landscape" ? "active" : ""}`}
+                onClick={() => setViewMode(viewMode === "landscape" ? "portrait" : "landscape")}
+                title={viewMode === "landscape" ? "Chuyển sang chế độ dọc 9:16 (Điện thoại)" : "Chuyển sang chế độ ngang 16:9 (PC / Máy tính)"}
+              >
+                {viewMode === "landscape" ? "🖥️ Chế độ PC (16:9)" : "📱 Chế độ Mobile (9:16)"}
+              </button>
+              <div className="tiktok-current-channel">
+                {session.unique_id ? `@${session.unique_id}` : "Test Mode"}
+              </div>
             </div>
           </div>
 
-          {/* Interactive Question Card with Vote Bars */}
-          <TikTokLiveQuestionCard
-            question={session.current_question}
-            questionIndex={session.current_question_index}
-            totalQuestions={session.total_questions}
-            isRoundActive={session.is_round_active}
-            timeLeft={timeLeft}
-            voteCounts={session.vote_counts}
-            firstWinner={firstWinner}
-          />
+          {/* Canvas Body: 1 Column in 9:16 Portrait, 2 Columns in 16:9 Landscape */}
+          <div className="tiktok-canvas-body">
+            {/* Interactive Question Card with Vote Bars */}
+            <TikTokLiveQuestionCard
+              question={session.current_question}
+              questionIndex={session.current_question_index}
+              totalQuestions={session.total_questions}
+              isRoundActive={session.is_round_active}
+              timeLeft={timeLeft}
+              voteCounts={session.vote_counts}
+              firstWinner={firstWinner}
+            />
 
-          {/* Leaderboard & Comment Ticker */}
-          <TikTokLiveLeaderboard
-            leaderboard={session.leaderboard}
-            recentEvents={session.recent_events}
-            totalComments={session.total_comments}
-            totalLikes={session.total_likes}
-            totalGifts={session.total_gifts}
-          />
+            {/* Leaderboard & Comment Ticker */}
+            <TikTokLiveLeaderboard
+              leaderboard={session.leaderboard}
+              recentEvents={session.recent_events}
+              totalComments={session.total_comments}
+              totalLikes={session.total_likes}
+              totalGifts={session.total_gifts}
+            />
+          </div>
         </div>
 
         {/* Right / Bottom: Control & Simulation Dashboard (Hidden in Fullscreen for clean capture) */}
