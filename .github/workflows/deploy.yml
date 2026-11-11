@@ -53,8 +53,39 @@ jobs:
             # Build lại image và cập nhật containers
             docker compose up -d --build
             
-            # Chạy migration database (dùng cờ -T để tránh lỗi TTY trong môi trường CI/CD)
-            docker compose exec -T web python -m app.infrastructure.database.migrate
+            # Đợi container web sẵn sàng (tránh lỗi OCI procReady race condition khi exec tức thì)
+            echo "⏳ Đang đợi container web khởi động và sẵn sàng..."
+            for i in $(seq 1 15); do
+              STATUS=$(docker inspect --format='{{.State.Status}}' dailydictation_web 2>/dev/null || true)
+              if [ "$STATUS" = "running" ]; then
+                echo "🟢 Container dailydictation_web đang ở trạng thái: running"
+                break
+              fi
+              echo "⏳ Trạng thái container: ${STATUS:-khởi tạo}. Đợi thêm 2s (lần $i/15)..."
+              sleep 2
+            done
+            sleep 4
+            
+            # Chạy migration database (retry tối đa 10 lần)
+            echo "🔄 Bắt đầu chạy database migration..."
+            MIGRATION_OK=0
+            for i in $(seq 1 10); do
+              if docker compose exec -T web python -m app.infrastructure.database.migrate; then
+                MIGRATION_OK=1
+                echo "✅ Migration database hoàn tất thành công!"
+                break
+              else
+                echo "⚠️ Container web chưa sẵn sàng nhận lệnh exec (thử lại lần $i/10 sau 3s)..."
+                sleep 3
+              fi
+            done
+
+            if [ "$MIGRATION_OK" -ne 1 ]; then
+              echo "❌ Lỗi: Chạy migration database thất bại sau 10 lần thử!"
+              echo "📋 Log gần nhất của web container:"
+              docker compose logs --tail=100 web
+              exit 1
+            fi
             
             # Dọn dẹp images cũ không còn dùng để giải phóng ổ cứng VPS
             docker image prune -f
