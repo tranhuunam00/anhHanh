@@ -123,3 +123,23 @@ export function playWebAudioChime(type = "correct") {
   }
 }
 
+/**
+ * Format raw TikTokLive errors into user-friendly Vietnamese guidance.
+ */
+export function formatTikTokErrorMessage(rawError = "", uniqueId = "") {
+  if (!rawError) return "Không tìm thấy phòng Live. Hãy bật Chế độ Test bên dưới!";
+  const err = String(rawError);
+  const targetId = uniqueId ? `@${uniqueId.replace(/^@/, "")}` : "tài khoản này";
+
+  if (err.includes("UserOfflineError") || err.toLowerCase().includes("offline")) {
+    return `Tài khoản ${targetId} hiện chưa phát sóng Live trên TikTok. Hãy mở app TikTok và Bắt đầu Live trước, hoặc dùng Chế độ Test bên dưới!`;
+  }
+  if (err.includes("UserNotFound") || err.toLowerCase().includes("not found")) {
+    return `Không tìm thấy ${targetId} trên TikTok. Vui lòng kiểm tra lại username.`;
+  }
+  if (err.includes("InitialCursorMissing") || err.toLowerCase().includes("captcha")) {
+    return "TikTok yêu cầu kiểm tra xác thực. Vui lòng thử lại sau vài giây hoặc dùng Chế độ Test.";
+  }
+  return err;
+}
+

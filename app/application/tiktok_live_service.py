@@ -407,13 +407,19 @@ class TikTokLiveSession:
             await self.client.start()
         except Exception as e:
             self.status = "error"
-            self.error_message = str(e)
+            err_str = str(e)
+            if "UserOfflineError" in err_str or "offline" in err_str.lower():
+                self.error_message = f"Tài khoản @{self.unique_id} hiện chưa phát sóng Live trên TikTok. Hãy mở app TikTok Bắt đầu Live trước, hoặc bấm các nút Chế độ Test bên dưới!"
+            elif "UserNotFound" in err_str or "not found" in err_str.lower():
+                self.error_message = f"Không tìm thấy tài khoản @{self.unique_id} trên TikTok. Vui lòng kiểm tra lại ID."
+            else:
+                self.error_message = f"Lỗi kết nối ({err_str}). Bạn có thể dùng Chế độ Test bên dưới để trải nghiệm ngay!"
             logger.error(f"TikTokLive connection error for @{self.unique_id}: {e}")
             self.broadcast({
                 "type": "STATUS_CHANGE",
                 "status": self.status,
                 "unique_id": self.unique_id,
-                "error": str(e)
+                "error": self.error_message
             })
 
     async def disconnect_tiktok(self):

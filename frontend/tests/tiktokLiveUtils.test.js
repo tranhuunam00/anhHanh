@@ -5,6 +5,7 @@ import {
   calculateVotePercentages,
   formatViewerPoints,
   getRankBadge,
+  formatTikTokErrorMessage,
 } from "../src/utils/tiktokLiveUtils.js";
 
 test("normalizeTikTokAnswer extracts single letter or raw text", () => {
@@ -53,4 +54,27 @@ test("getRankBadge returns proper metadata for top 3 and others", () => {
   const top4 = getRankBadge(3);
   assert.equal(top4.label, "#4");
 });
+
+test("formatTikTokErrorMessage formats errors into clear Vietnamese guidance", () => {
+  // 1. UserOfflineError
+  const offlineErr = formatTikTokErrorMessage("TikTokLive v7.0.1 -> UserOfflineError", "te_namth");
+  assert.ok(offlineErr.includes("Tài khoản @te_namth hiện chưa phát sóng Live"));
+
+  // 2. UserNotFound
+  const notFoundErr = formatTikTokErrorMessage("UserNotFoundException: user not found", "@user123");
+  assert.ok(notFoundErr.includes("Không tìm thấy @user123 trên TikTok"));
+
+  // 3. Captcha / Cursor missing
+  const captchaErr = formatTikTokErrorMessage("InitialCursorMissingError", "test");
+  assert.ok(captchaErr.includes("TikTok yêu cầu kiểm tra xác thực"));
+
+  // 4. Fallback / generic error
+  const genericErr = formatTikTokErrorMessage("Network timeout error", "test");
+  assert.equal(genericErr, "Network timeout error");
+
+  // 5. Empty / null input fallback
+  const emptyErr = formatTikTokErrorMessage("", "test");
+  assert.ok(emptyErr.includes("Hãy bật Chế độ Test bên dưới"));
+});
+
 

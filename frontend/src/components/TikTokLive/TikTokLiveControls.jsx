@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Radio, Play, Check, FastForward, Sparkles, RotateCw } from "../Icons";
+import { formatTikTokErrorMessage } from "../../utils/tiktokLiveUtils";
 
 export const TikTokLiveControls = React.memo(({
   uniqueId = "",
@@ -80,7 +81,7 @@ export const TikTokLiveControls = React.memo(({
             {status === "connected" && `Đang lắng nghe Live từ @${inputUsername}`}
             {status === "connecting" && "Đang thiết lập kết nối Webcast TikTok..."}
             {status === "disconnected" && "Chưa kết nối. Bạn có thể dùng Chế độ Test bên dưới."}
-            {status === "error" && (errorMessage || "Không tìm thấy phòng Live. Hãy bật Chế độ Test!")}
+            {status === "error" && formatTikTokErrorMessage(errorMessage, inputUsername)}
           </span>
         </div>
       </div>
