@@ -295,3 +295,86 @@
   margin-left: 4px;
   font-size: 0.68rem;
 }
+
+/* Header & Fullscreen Actions */
+.tiktok-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-tiktok-back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-tiktok-back-home:hover {
+  background: var(--bg-secondary);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-fullscreen-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-fullscreen-toggle:hover {
+  background: var(--bg-secondary);
+  border-color: var(--primary);
+}
+
+.tiktok-fullscreen-floating-bar {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-fullscreen-back-home,
+.btn-fullscreen-exit-float {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-fullscreen-back-home:hover,
+.btn-fullscreen-exit-float:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #38bdf8;
+}

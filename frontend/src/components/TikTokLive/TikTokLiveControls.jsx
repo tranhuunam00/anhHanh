@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Radio, Play, Check, FastForward, Sparkles, RotateCw } from "../Icons";
 import { formatTikTokErrorMessage } from "../../utils/tiktokLiveUtils";
 
@@ -19,6 +19,12 @@ export const TikTokLiveControls = React.memo(({
 }) => {
   const [inputUsername, setInputUsername] = useState(uniqueId || "");
   const [customComment, setCustomComment] = useState("");
+
+  useEffect(() => {
+    if (uniqueId) {
+      setInputUsername(uniqueId);
+    }
+  }, [uniqueId]);
 
   const handleConnectSubmit = (e) => {
     e.preventDefault();
@@ -78,7 +84,7 @@ export const TikTokLiveControls = React.memo(({
         <div className="tiktok-status-bar">
           <span className={`tiktok-status-dot ${status}`} />
           <span className="tiktok-status-text">
-            {status === "connected" && `Đang lắng nghe Live từ @${inputUsername}`}
+            {status === "connected" && `Đang lắng nghe Live từ @${inputUsername || uniqueId}`}
             {status === "connecting" && "Đang thiết lập kết nối Webcast TikTok..."}
             {status === "disconnected" && "Chưa kết nối. Bạn có thể dùng Chế độ Test bên dưới."}
             {status === "error" && formatTikTokErrorMessage(errorMessage, inputUsername)}

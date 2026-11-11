@@ -348,7 +348,13 @@ class TikTokLiveSession:
     async def connect_tiktok(self, unique_id: str):
         """Connect live client to real TikTok room."""
         from TikTokLive import TikTokLiveClient
-        from TikTokLive.events import CommentEvent, LikeEvent, GiftEvent
+        from TikTokLive.events import (
+            CommentEvent,
+            LikeEvent,
+            GiftEvent,
+            ConnectEvent,
+            DisconnectEvent
+        )
 
         self.unique_id = unique_id.strip().lstrip("@")
         self.status = "connecting"
@@ -357,6 +363,19 @@ class TikTokLiveSession:
 
         try:
             self.client = TikTokLiveClient(unique_id=self.unique_id)
+
+            @self.client.on(ConnectEvent)
+            async def on_connect(event: ConnectEvent):
+                self.status = "connected"
+                self.error_message = ""
+                logger.info(f"Connected to TikTok Live @{self.unique_id} (Room ID: {self.client.room_id})")
+                self.broadcast({"type": "STATUS_CHANGE", "status": self.status, "unique_id": self.unique_id})
+
+            @self.client.on(DisconnectEvent)
+            async def on_disconnect(event: DisconnectEvent):
+                self.status = "disconnected"
+                logger.info(f"Disconnected from TikTok Live @{self.unique_id}")
+                self.broadcast({"type": "STATUS_CHANGE", "status": self.status, "unique_id": self.unique_id})
 
             @self.client.on(CommentEvent)
             async def on_comment(event: CommentEvent):
@@ -402,9 +421,7 @@ class TikTokLiveSession:
                 except Exception as ex:
                     logger.warning(f"Error processing TikTok gift event: {ex}")
 
-            self.status = "connected"
-            self.broadcast({"type": "STATUS_CHANGE", "status": self.status, "unique_id": self.unique_id})
-            await self.client.start()
+            await self.client.connect()
         except Exception as e:
             self.status = "error"
             err_str = str(e)

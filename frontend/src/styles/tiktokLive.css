@@ -62,25 +62,6 @@
   color: var(--text-muted);
 }
 
-.btn-fullscreen-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-fullscreen-toggle:hover {
-  background: var(--bg-secondary);
-  border-color: var(--primary);
-}
-
 /* Studio Layout */
 .tiktok-studio-layout {
   display: flex;

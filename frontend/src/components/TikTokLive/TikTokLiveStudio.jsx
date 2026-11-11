@@ -13,10 +13,10 @@ import { TikTokLiveQuestionCard } from "./TikTokLiveQuestionCard";
 import { TikTokLiveLeaderboard } from "./TikTokLiveLeaderboard";
 import { TikTokLiveControls } from "./TikTokLiveControls";
 import { playWebAudioChime } from "../../utils/tiktokLiveUtils";
-import { Radio, Maximize2, Minimize2 } from "../Icons";
+import { Radio, Maximize2, Minimize2, ArrowLeft, X } from "../Icons";
 import "../../styles/tiktokLive.css";
 
-export const TikTokLiveStudio = ({ isActive = true }) => {
+export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
   const [session, setSession] = useState({
     unique_id: "",
     status: "disconnected",
@@ -147,6 +147,17 @@ export const TikTokLiveStudio = ({ isActive = true }) => {
     return () => clearTimeout(timerRef.current);
   }, [session.is_round_active, timeLeft]);
 
+  // 4. Keyboard ESC listener to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isFullScreen) {
+        setIsFullScreen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isFullScreen]);
+
   // Actions
   const handleConnect = async (username) => {
     setIsConnecting(true);
@@ -197,6 +208,17 @@ export const TikTokLiveStudio = ({ isActive = true }) => {
         </div>
 
         <div className="tiktok-header-actions">
+          {onBackToHome && (
+            <button
+              type="button"
+              className="btn-tiktok-back-home"
+              onClick={onBackToHome}
+              title="Trở về màn hình chính"
+            >
+              <ArrowLeft size={16} />
+              <span>Trở về màn hình chính</span>
+            </button>
+          )}
           <button
             type="button"
             className="btn-fullscreen-toggle"
@@ -208,6 +230,32 @@ export const TikTokLiveStudio = ({ isActive = true }) => {
           </button>
         </div>
       </div>
+
+      {/* Floating Exit & Home Bar for Fullscreen mode */}
+      {isFullScreen && (
+        <div className="tiktok-fullscreen-floating-bar">
+          {onBackToHome && (
+            <button
+              type="button"
+              className="btn-fullscreen-back-home"
+              onClick={onBackToHome}
+              title="Trở về trang chủ"
+            >
+              <ArrowLeft size={14} />
+              <span>Trang chủ</span>
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn-fullscreen-exit-float"
+            onClick={() => setIsFullScreen(false)}
+            title="Thoát toàn màn hình (phím ESC)"
+          >
+            <X size={14} />
+            <span>Thoát Fullscreen (ESC)</span>
+          </button>
+        </div>
+      )}
 
       {/* Main Studio Work Area */}
       <div className={`tiktok-studio-layout ${viewMode}`}>

@@ -1396,7 +1396,10 @@ export default function App() {
         {/* TAB 14: TikTok LIVE Interactive Classroom */}
         <div style={{ display: activeTab === "tab-tiktok-live" ? "block" : "none" }}>
           {activeTab === "tab-tiktok-live" && (
-            <TikTokLiveStudio isActive={activeTab === "tab-tiktok-live"} />
+            <TikTokLiveStudio
+              isActive={activeTab === "tab-tiktok-live"}
+              onBackToHome={() => setActiveTab("tab-dictation")}
+            />
           )}
         </div>
       </main>
