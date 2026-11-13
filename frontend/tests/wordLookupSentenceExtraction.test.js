@@ -2,7 +2,8 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import {
   cleanTargetSentence,
-  resolveInitialContextSentence
+  resolveInitialContextSentence,
+  computePopoverCoords
 } from "../src/utils/wordLookupUtils.js";
 
 describe("WordLookup Sentence Extraction & Context Isolation Tests", () => {
@@ -45,6 +46,22 @@ describe("WordLookup Sentence Extraction & Context Isolation Tests", () => {
     assert.equal(cleanTargetSentence("", "solitary"), "");
     assert.equal(cleanTargetSentence(null, "solitary"), "");
     assert.equal(resolveInitialContextSentence("", null, ""), "");
+  });
+
+  test("computePopoverCoords flexibly flips to top when in lower half of screen", () => {
+    // Target element in lower half: top=420, bottom=450, viewportHeight=700
+    const coords = computePopoverCoords({ left: 300, top: 420, bottom: 450, width: 180, height: 30 }, 1000, 700);
+    assert.equal(coords.placement, "top");
+    assert.equal(coords.top, 412);
+    assert.ok(coords.maxHeight > 200);
+  });
+
+  test("computePopoverCoords stays at bottom when in upper half of screen", () => {
+    // Target element in upper half: top=120, bottom=140, viewportHeight=700
+    const coords = computePopoverCoords({ left: 300, top: 120, bottom: 140, width: 180, height: 20 }, 1000, 700);
+    assert.equal(coords.placement, "bottom");
+    assert.equal(coords.top, 148);
+    assert.ok(coords.maxHeight > 200);
   });
 });
 

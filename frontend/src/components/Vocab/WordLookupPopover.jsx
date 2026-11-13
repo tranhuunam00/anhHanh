@@ -61,12 +61,9 @@ export const WordLookupPopover = ({
 
   // Reset custom states when word token changes
   useEffect(() => {
-    setCustomMeaning("");
-    setInitialMeaning("");
-    setCustomPos("");
-    setInitialPos("");
-    setCustomContext("");
-    setInitialContext("");
+    setCustomMeaning(""); setInitialMeaning("");
+    setCustomPos(""); setInitialPos("");
+    setCustomContext(""); setInitialContext("");
     setAutoPlayedWord(null);
   }, [cleanWord]);
 
@@ -95,7 +92,8 @@ export const WordLookupPopover = ({
       const rect = typeof targetElement.getBoundingClientRect === "function"
         ? targetElement.getBoundingClientRect()
         : targetElement;
-      setCoords(computePopoverCoords(rect, window.innerWidth, window.innerHeight));
+      const measuredHeight = popoverRef.current ? popoverRef.current.offsetHeight : 0;
+      setCoords(computePopoverCoords(rect, window.innerWidth, window.innerHeight, measuredHeight));
     };
 
     updatePosition();
@@ -106,7 +104,7 @@ export const WordLookupPopover = ({
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };
-  }, [targetElement]);
+  }, [targetElement, loading, customMeaning, customContext]);
 
   // Fetch word details
   useEffect(() => {
@@ -389,9 +387,7 @@ export const WordLookupPopover = ({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (isSaved) {
-        if (hasChanges) {
-          handleUpdateSavedVocab();
-        }
+        if (hasChanges) handleUpdateSavedVocab();
       } else {
         handleSaveToNotebook();
       }
@@ -422,6 +418,7 @@ export const WordLookupPopover = ({
       style={{
         top: `${coords.top}px`,
         left: `${coords.left}px`,
+        maxHeight: coords.maxHeight ? `${coords.maxHeight}px` : undefined,
       }}
       onClick={(e) => e.stopPropagation()}
     >

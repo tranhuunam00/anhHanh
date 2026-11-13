@@ -188,13 +188,13 @@ export function calculateAutoTextareaHeight(scrollHeight, minHeight = 38, maxHei
  * @param {number} viewportHeight
  * @returns {{ top: number, left: number, placement: string, arrowLeft: number }}
  */
-export function computePopoverCoords(rect, viewportWidth = 1024, viewportHeight = 768) {
+export function computePopoverCoords(rect, viewportWidth = 1024, viewportHeight = 768, measuredHeight = 0) {
   if (!rect || ((rect.width === 0 || rect.width === undefined) && (rect.height === 0 || rect.height === undefined))) {
     return { top: 0, left: 12, placement: "bottom", arrowLeft: 140 };
   }
 
   const popoverWidth = Math.min(320, Math.max(200, viewportWidth - 24));
-  const popoverEstimatedHeight = 250;
+  const popoverActualHeight = Math.max(280, measuredHeight || 360);
 
   const targetCenterX = (rect.left || 0) + (rect.width || 0) / 2;
   let left = targetCenterX - popoverWidth / 2;
@@ -204,17 +204,28 @@ export function computePopoverCoords(rect, viewportWidth = 1024, viewportHeight 
     left = viewportWidth - 12 - popoverWidth;
   }
 
+  const spaceBelow = viewportHeight - (rect.bottom || 0) - 12;
+  const spaceAbove = (rect.top || 0) - 12;
+
   let placement = "bottom";
   let top = (rect.bottom || 0) + 8;
+  let maxHeight = Math.max(180, spaceBelow - 8);
 
-  if (top + popoverEstimatedHeight > viewportHeight && (rect.top || 0) > popoverEstimatedHeight + 10) {
+  // Flexible adaptive placement:
+  // If not enough room below but enough room above, or if above has more room, flip to top
+  if (spaceBelow < popoverActualHeight && spaceAbove >= popoverActualHeight) {
     placement = "top";
     top = (rect.top || 0) - 8;
+    maxHeight = Math.max(180, spaceAbove - 8);
+  } else if (spaceBelow < popoverActualHeight && spaceAbove > spaceBelow) {
+    placement = "top";
+    top = (rect.top || 0) - 8;
+    maxHeight = Math.max(180, spaceAbove - 8);
   }
 
-  const arrowLeft = Math.max(16, Math.min(popoverWidth - 16, targetCenterX - left));
+  const arrowLeft = Math.max(18, Math.min(popoverWidth - 18, targetCenterX - left));
 
-  return { top, left, placement, arrowLeft };
+  return { top, left, placement, arrowLeft, maxHeight };
 }
 
 /**
