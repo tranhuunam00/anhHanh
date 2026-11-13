@@ -198,4 +198,53 @@ class TestTikTokLiveApiEndpoints:
             assert data["type"] == "SNAPSHOT"
             assert "current_question" in data
 
+    def test_get_topics_api(self):
+        res = self.client.get("/api/tiktok-live/topics")
+        assert res.status_code == 200
+        data = res.json()
+        assert "topics" in data
+        assert len(data["topics"]) >= 5
+        topic_ids = [t["id"] for t in data["topics"]]
+        assert "ielts_vocab" in topic_ids
+        assert "destination_b2" in topic_ids
+
+    def test_set_topic_api(self):
+        res = self.client.post("/api/tiktok-live/set-topic", json={
+            "topic_id": "destination_b2"
+        })
+        assert res.status_code == 200
+        data = res.json()
+        assert data["status"] == "success"
+        assert data["event"]["current_topic"] == "destination_b2"
+        assert data["event"]["current_question"]["topic"] == "destination_b2"
+
+
+class TestTikTokLiveQuestionBank:
+    """Test filtering and retrieval from the diverse question bank."""
+
+    def test_get_all_questions(self):
+        from app.application.tiktok_live_question_bank import get_questions_by_topic
+        questions = get_questions_by_topic("all")
+        assert len(questions) >= 20
+
+    def test_get_ielts_questions(self):
+        from app.application.tiktok_live_question_bank import get_questions_by_topic
+        questions = get_questions_by_topic("ielts_vocab")
+        assert len(questions) >= 4
+        for q in questions:
+            assert q["topic"] == "ielts_vocab"
+
+    def test_get_phrasal_verbs_questions(self):
+        from app.application.tiktok_live_question_bank import get_questions_by_topic
+        questions = get_questions_by_topic("phrasal_verbs")
+        assert len(questions) >= 4
+        for q in questions:
+            assert q["topic"] == "phrasal_verbs"
+
+    def test_fallback_on_unknown_topic(self):
+        from app.application.tiktok_live_question_bank import get_questions_by_topic
+        questions = get_questions_by_topic("unknown_random_topic")
+        assert len(questions) >= 20
+
+
 

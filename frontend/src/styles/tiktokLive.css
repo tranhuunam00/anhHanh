@@ -220,6 +220,13 @@
   justify-content: space-between;
 }
 
+.tiktok-card-top-left-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .tiktok-badge-question-num {
   background: var(--primary);
   color: #ffffff;
@@ -227,6 +234,20 @@
   font-weight: 800;
   padding: 3px 10px;
   border-radius: 6px;
+}
+
+.tiktok-badge-category {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .tiktok-timer-pill {

@@ -8,75 +8,13 @@ import logging
 import re
 from typing import Dict, List, Optional, Any
 from datetime import datetime
+from app.application.tiktok_live_question_bank import (
+    DEFAULT_LIVE_QUESTIONS,
+    LIVE_QUESTION_TOPICS,
+    get_questions_by_topic
+)
 
 logger = logging.getLogger(__name__)
-
-# Sample question bank for interactive live sessions
-DEFAULT_LIVE_QUESTIONS = [
-    {
-        "id": "q1",
-        "type": "quiz",
-        "question": "Which word is a synonym for 'meticulous'?",
-        "options": ["A. Careless", "B. Thorough", "C. Fast", "D. Lazy"],
-        "answer": "B",
-        "explanation": "'Meticulous' có nghĩa là tỉ mỉ, cẩn thận từng chi tiết = 'Thorough'.",
-        "timer_seconds": 20
-    },
-    {
-        "id": "q2",
-        "type": "quiz",
-        "question": "Choose the correct preposition: 'She is capable ___ handling this project.'",
-        "options": ["A. with", "B. to", "C. of", "D. in"],
-        "answer": "C",
-        "explanation": "Cấu trúc: capable OF doing something (có khả năng làm gì).",
-        "timer_seconds": 20
-    },
-    {
-        "id": "q3",
-        "type": "quiz",
-        "question": "Find the OPPOSITE of 'ubiquitous':",
-        "options": ["A. Common", "B. Rare", "C. Popular", "D. Omnipresent"],
-        "answer": "B",
-        "explanation": "'Ubiquitous' = phổ biến khắp nơi. Trái nghĩa là 'Rare' (hiếm gặp).",
-        "timer_seconds": 20
-    },
-    {
-        "id": "q4",
-        "type": "quiz",
-        "question": "What does the idiom 'hit the sack' mean?",
-        "options": ["A. Go to sleep", "B. Punch someone", "C. Go shopping", "D. Start working"],
-        "answer": "A",
-        "explanation": "'Hit the sack' / 'Hit the hay' là thành ngữ chỉ việc đi ngủ.",
-        "timer_seconds": 20
-    },
-    {
-        "id": "q5",
-        "type": "quiz",
-        "question": "Destination B2: 'He was accused ___ committing the fraud.'",
-        "options": ["A. with", "B. for", "C. of", "D. about"],
-        "answer": "C",
-        "explanation": "Cấu trúc Collocation chuẩn: accused OF something / doing something.",
-        "timer_seconds": 20
-    },
-    {
-        "id": "q6",
-        "type": "quiz",
-        "question": "Which syllable is stressed in 'PHOTOGRAPH'?",
-        "options": ["A. 1st (PHO-)", "B. 2nd (-TO-)", "C. 3rd (-GRAPH)"],
-        "answer": "A",
-        "explanation": "Danh từ 'photograph' trọng âm rơi vào âm tiết thứ nhất: /ˈfoʊ.tə.ɡræf/.",
-        "timer_seconds": 15
-    },
-    {
-        "id": "q7",
-        "type": "quiz",
-        "question": "IELTS Academic: 'The government should take measures to ___ emissions.'",
-        "options": ["A. enlarge", "B. curb", "C. promote", "D. elevate"],
-        "answer": "B",
-        "explanation": "'Curb emissions' = kiểm soát, cắt giảm khí thải (Collocation Band 7.5+).",
-        "timer_seconds": 20
-    }
-]
 
 
 def normalize_answer_input(raw: str) -> str:
@@ -103,6 +41,7 @@ class TikTokLiveSession:
         self.listen_task: Optional[asyncio.Task] = None
 
         # Game state
+        self.current_topic: str = "all"
         self.questions: List[Dict[str, Any]] = list(DEFAULT_LIVE_QUESTIONS)
         self.current_question_index: int = 0
         self.is_round_active: bool = False
@@ -185,6 +124,25 @@ class TikTokLiveSession:
         else:
             self.current_question_index = len(self.questions) - 1
         return self.start_round()
+
+    def set_topic(self, topic_id: str) -> Dict[str, Any]:
+        """Filter questions by topic and restart deck."""
+        self.current_topic = topic_id
+        self.questions = get_questions_by_topic(topic_id)
+        self.current_question_index = 0
+        self.is_round_active = False
+        self.answered_users_this_round.clear()
+        self.vote_counts = {"A": 0, "B": 0, "C": 0, "D": 0}
+
+        event = {
+            "type": "TOPIC_CHANGE",
+            "current_topic": self.current_topic,
+            "total_questions": len(self.questions),
+            "current_question": self.get_current_question(),
+            "available_topics": LIVE_QUESTION_TOPICS
+        }
+        self.broadcast(event)
+        return event
 
     def process_comment(
         self,
@@ -333,6 +291,8 @@ class TikTokLiveSession:
             "unique_id": self.unique_id,
             "status": self.status,
             "error_message": self.error_message,
+            "current_topic": self.current_topic,
+            "available_topics": LIVE_QUESTION_TOPICS,
             "current_question": self.get_current_question(),
             "current_question_index": self.current_question_index,
             "total_questions": len(self.questions),

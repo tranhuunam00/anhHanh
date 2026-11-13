@@ -9,6 +9,7 @@ from app.application.tiktok_live_service import (
     active_live_session,
     normalize_answer_input
 )
+from app.application.tiktok_live_question_bank import LIVE_QUESTION_TOPICS
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,10 @@ router = APIRouter(prefix="/api/tiktok-live", tags=["TikTok Live Interactive"])
 
 class ConnectRequest(BaseModel):
     unique_id: str = Field(..., description="TikTok username without @")
+
+
+class SetTopicRequest(BaseModel):
+    topic_id: str = Field(..., description="Topic identifier: all, ielts_vocab, destination_b2, etc.")
 
 
 class SimulateCommentRequest(BaseModel):
@@ -96,6 +101,22 @@ async def prev_question():
     """Go back to previous question in the deck."""
     event = active_live_session.prev_question()
     return {"status": "prev", "event": event}
+
+
+@router.get("/topics")
+async def get_live_topics():
+    """List all available question topics and currently selected topic."""
+    return {
+        "topics": LIVE_QUESTION_TOPICS,
+        "current_topic": active_live_session.current_topic
+    }
+
+
+@router.post("/set-topic")
+async def set_live_topic(payload: SetTopicRequest):
+    """Switch active question deck to a specific topic."""
+    event = active_live_session.set_topic(payload.topic_id)
+    return {"status": "success", "event": event}
 
 
 @router.post("/simulate")

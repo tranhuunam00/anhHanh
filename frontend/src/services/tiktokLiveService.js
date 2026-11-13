@@ -51,6 +51,26 @@ export async function prevQuestion() {
   return res.json();
 }
 
+export async function fetchLiveTopics() {
+  const res = await fetch("/api/tiktok-live/topics");
+  if (!res.ok) {
+    throw new Error("Không thể tải danh sách chủ đề");
+  }
+  return res.json();
+}
+
+export async function setLiveTopic(topicId) {
+  const res = await fetch("/api/tiktok-live/set-topic", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic_id: topicId }),
+  });
+  if (!res.ok) {
+    throw new Error("Không thể chuyển chủ đề");
+  }
+  return res.json();
+}
+
 export async function simulateLiveEvent({ event_type, comment, gift_name, diamond_count, nickname, user_id }) {
   const res = await fetch("/api/tiktok-live/simulate", {
     method: "POST",

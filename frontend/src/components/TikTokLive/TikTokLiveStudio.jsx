@@ -7,6 +7,7 @@ import {
   endQuestionRound,
   nextQuestion,
   prevQuestion,
+  setLiveTopic,
   simulateLiveEvent,
   createTikTokLiveWebSocket,
 } from "../../services/tiktokLiveService";
@@ -22,6 +23,8 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
     unique_id: "",
     status: "disconnected",
     error_message: "",
+    current_topic: "all",
+    available_topics: [],
     current_question: null,
     current_question_index: 0,
     total_questions: 1,
@@ -98,6 +101,20 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
     const handleWsMessage = (msg) => {
       if (msg.type === "SNAPSHOT") {
         setSession(msg);
+      } else if (msg.type === "TOPIC_CHANGE") {
+        setSession((prev) => ({
+          ...prev,
+          current_topic: msg.current_topic,
+          current_question: msg.current_question,
+          total_questions: msg.total_questions,
+          current_question_index: 0,
+          is_round_active: false,
+          vote_counts: { A: 0, B: 0, C: 0, D: 0 },
+        }));
+        if (msg.current_question) {
+          setTimeLeft(msg.current_question.timer_seconds || 20);
+        }
+        setFirstWinner(null);
       } else if (msg.type === "ROUND_START") {
         setSession((prev) => ({
           ...prev,
@@ -226,6 +243,29 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
     if (isActive) playWebAudioChime("start");
     await prevQuestion();
   }, [isActive]);
+
+  const handleSelectTopic = useCallback(async (topicId) => {
+    try {
+      const res = await setLiveTopic(topicId);
+      if (res?.event) {
+        setSession((prev) => ({
+          ...prev,
+          current_topic: res.event.current_topic,
+          current_question: res.event.current_question,
+          total_questions: res.event.total_questions,
+          current_question_index: 0,
+          is_round_active: false,
+          vote_counts: { A: 0, B: 0, C: 0, D: 0 },
+        }));
+        if (res.event.current_question) {
+          setTimeLeft(res.event.current_question.timer_seconds || 20);
+        }
+        setFirstWinner(null);
+      }
+    } catch (err) {
+      console.warn("Error setting live topic:", err);
+    }
+  }, []);
 
   const handleSimulate = async (type, data) => {
     await simulateLiveEvent({ event_type: type, ...data });
@@ -381,6 +421,9 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
               errorMessage={session.error_message}
               isRoundActive={session.is_round_active}
               viewMode={viewMode}
+              currentTopic={session.current_topic || "all"}
+              availableTopics={session.available_topics || []}
+              onSelectTopic={handleSelectTopic}
               onToggleViewMode={setViewMode}
               onConnect={handleConnect}
               onDisconnect={handleDisconnect}

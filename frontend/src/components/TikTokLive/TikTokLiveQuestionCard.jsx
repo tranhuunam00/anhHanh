@@ -26,9 +26,16 @@ export const TikTokLiveQuestionCard = React.memo(({
     <div className="tiktok-question-card">
       {/* Top Header: Question Counter & Live Countdown */}
       <div className="tiktok-card-top-bar">
-        <span className="tiktok-badge-question-num">
-          CÂU {questionIndex + 1}/{totalQuestions}
-        </span>
+        <div className="tiktok-card-top-left-group">
+          <span className="tiktok-badge-question-num">
+            CÂU {questionIndex + 1}/{totalQuestions}
+          </span>
+          {question.category && (
+            <span className="tiktok-badge-category">
+              {question.category}
+            </span>
+          )}
+        </div>
         <div className={`tiktok-timer-pill ${timeLeft <= 5 && isRoundActive ? "urgent" : ""}`}>
           <Clock size={15} />
           <span>{isRoundActive ? `${timeLeft}s` : "HẾT GIỜ"}</span>

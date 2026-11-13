@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Radio, Play, Check, FastForward, Sparkles, RotateCw } from "../Icons";
+import { Radio, Play, Check, FastForward, Sparkles, RotateCw, BookOpen } from "../Icons";
 import { formatTikTokErrorMessage } from "../../utils/tiktokLiveUtils";
+
+const FALLBACK_TOPICS = [
+  { id: "all", name: "Tất cả chủ đề", icon: "✨" },
+  { id: "ielts_vocab", name: "IELTS 7.0+", icon: "🎓" },
+  { id: "destination_b2", name: "Destination B2", icon: "📘" },
+  { id: "idioms_slang", name: "Thành ngữ & Slang", icon: "💬" },
+  { id: "pronunciation_stress", name: "Trọng âm & Phát âm", icon: "🎙️" },
+  { id: "phrasal_verbs", name: "Phrasal Verbs", icon: "⚡" },
+];
 
 export const TikTokLiveControls = React.memo(({
   uniqueId = "",
@@ -8,6 +17,9 @@ export const TikTokLiveControls = React.memo(({
   errorMessage = "",
   isRoundActive = false,
   viewMode = "portrait", // portrait | landscape
+  currentTopic = "all",
+  availableTopics = [],
+  onSelectTopic,
   onToggleViewMode,
   onConnect,
   onDisconnect,
@@ -154,7 +166,32 @@ export const TikTokLiveControls = React.memo(({
         </div>
       </div>
 
-      {/* 3. Offline Test & Simulation Sandbox */}
+      {/* 3. Topic Selector */}
+      <div className="tiktok-control-card">
+        <h4 className="tiktok-ctrl-title">
+          <BookOpen size={16} color="var(--primary)" />
+          <span>CHỌN CHỦ ĐỀ CÂU HỎI</span>
+        </h4>
+        <p className="tiktok-ctrl-hint">
+          Chuyển đổi tức thì bộ câu hỏi theo chủ đề (IELTS, B2, Idiom, Trọng âm, Phrasal Verbs):
+        </p>
+        <div className="tiktok-topics-pills-row">
+          {(availableTopics && availableTopics.length > 0 ? availableTopics : FALLBACK_TOPICS).map((top) => (
+            <button
+              key={top.id}
+              type="button"
+              className={`btn-topic-selector ${currentTopic === top.id ? "active" : ""}`}
+              onClick={() => onSelectTopic && onSelectTopic(top.id)}
+              title={top.description || top.name}
+            >
+              <span className="topic-pill-icon">{top.icon}</span>
+              <span className="topic-pill-name">{top.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 4. Offline Test & Simulation Sandbox */}
       <div className="tiktok-control-card simulator">
         <h4 className="tiktok-ctrl-title">
           <Sparkles size={16} color="#eab308" />
