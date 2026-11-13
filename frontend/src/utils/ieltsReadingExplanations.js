@@ -8,12 +8,20 @@
 import { cam21Test2ReadingExplanations } from "../data/ielts/explanations/cam21Test2ReadingExplanations.js";
 import { cam21Test1ReadingExplanations } from "../data/ielts/explanations/cam21Test1ReadingExplanations.js";
 import { cam20Test1ReadingExplanations } from "../data/ielts/explanations/cam20Test1ReadingExplanations.js";
+import { cam19Test1ReadingExplanations } from "../data/ielts/explanations/cam19Test1ReadingExplanations.js";
+import { cam19Test2ReadingExplanations } from "../data/ielts/explanations/cam19Test2ReadingExplanations.js";
+import { cam19Test3ReadingExplanations } from "../data/ielts/explanations/cam19Test3ReadingExplanations.js";
+import { cam19Test4ReadingExplanations } from "../data/ielts/explanations/cam19Test4ReadingExplanations.js";
 
 // Test-specific curated explanation registries
 const EXPLANATION_REGISTRIES = {
   "cambridge-21-test-2": cam21Test2ReadingExplanations,
   "cambridge-21-test-1": cam21Test1ReadingExplanations,
   "cambridge-20-test-1": cam20Test1ReadingExplanations,
+  "cambridge-19-test-1": cam19Test1ReadingExplanations,
+  "cambridge-19-test-2": cam19Test2ReadingExplanations,
+  "cambridge-19-test-3": cam19Test3ReadingExplanations,
+  "cambridge-19-test-4": cam19Test4ReadingExplanations,
 };
 
 /**
