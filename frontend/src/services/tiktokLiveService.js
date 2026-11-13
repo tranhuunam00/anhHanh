@@ -71,6 +71,18 @@ export async function setLiveTopic(topicId) {
   return res.json();
 }
 
+export async function setLiveTimer(timerSeconds) {
+  const res = await fetch("/api/tiktok-live/set-timer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ timer_seconds: timerSeconds }),
+  });
+  if (!res.ok) {
+    throw new Error("Không thể cập nhật thời gian câu hỏi");
+  }
+  return res.json();
+}
+
 export async function simulateLiveEvent({ event_type, comment, gift_name, diamond_count, nickname, user_id }) {
   const res = await fetch("/api/tiktok-live/simulate", {
     method: "POST",

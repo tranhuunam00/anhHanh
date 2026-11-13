@@ -4,6 +4,7 @@ Covers IELTS 7.0+, Destination B2, Idioms/Slang, Word Stress, Phrasal Verbs, and
 """
 from typing import List, Dict, Any
 from app.application.tiktok_live_questions_vtv import VTV_PRACTICAL_QUESTIONS
+from app.application.tiktok_live_questions_slang_grammar import SLANG_AND_GRAMMAR_QUESTIONS
 
 LIVE_QUESTION_TOPICS: List[Dict[str, Any]] = [
     {
@@ -335,6 +336,7 @@ DEFAULT_LIVE_QUESTIONS: List[Dict[str, Any]] = [
 
 # Include real-world VTV News & practical daily topics
 DEFAULT_LIVE_QUESTIONS.extend(VTV_PRACTICAL_QUESTIONS)
+DEFAULT_LIVE_QUESTIONS.extend(SLANG_AND_GRAMMAR_QUESTIONS)
 
 
 def get_questions_by_topic(topic_id: str = "all") -> List[Dict[str, Any]]:

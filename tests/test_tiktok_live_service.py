@@ -268,4 +268,41 @@ class TestTikTokLiveQuestionBank:
         assert len(questions) >= 30
 
 
+class TestTikTokLiveTimerConfiguration:
+    """Test setting custom timer durations for questions."""
+
+    def test_set_timer_duration_normal(self):
+        session = TikTokLiveSession(room_id="timer_test")
+        evt = session.set_timer_duration(15)
+        assert session.custom_timer_seconds == 15
+        assert evt["type"] == "TIMER_SETTING_CHANGE"
+        assert evt["custom_timer_seconds"] == 15
+
+    def test_set_timer_clamps_boundaries(self):
+        session = TikTokLiveSession(room_id="timer_test")
+        # Below minimum 5s
+        session.set_timer_duration(2)
+        assert session.custom_timer_seconds == 5
+        # Above maximum 120s
+        session.set_timer_duration(300)
+        assert session.custom_timer_seconds == 120
+
+    def test_start_round_uses_custom_timer(self):
+        session = TikTokLiveSession(room_id="timer_test")
+        session.set_timer_duration(45)
+        evt = session.start_round()
+        assert evt["timer_seconds"] == 45
+
+    def test_set_timer_api(self):
+        from starlette.testclient import TestClient
+        from server import app
+        client = TestClient(app)
+        res = client.post("/api/tiktok-live/set-timer", json={"timer_seconds": 30})
+        assert res.status_code == 200
+        data = res.json()
+        assert data["status"] == "success"
+        assert data["event"]["custom_timer_seconds"] == 30
+
+
+
 

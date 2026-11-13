@@ -24,6 +24,10 @@ class SetTopicRequest(BaseModel):
     topic_id: str = Field(..., description="Topic identifier: all, ielts_vocab, destination_b2, etc.")
 
 
+class SetTimerRequest(BaseModel):
+    timer_seconds: int = Field(20, ge=5, le=120, description="Question countdown in seconds")
+
+
 class SimulateCommentRequest(BaseModel):
     user_id: str = Field("viewer_123", description="Mock TikTok user ID")
     nickname: str = Field("Học Viên Chăm Chỉ", description="Display name")
@@ -116,6 +120,13 @@ async def get_live_topics():
 async def set_live_topic(payload: SetTopicRequest):
     """Switch active question deck to a specific topic."""
     event = active_live_session.set_topic(payload.topic_id)
+    return {"status": "success", "event": event}
+
+
+@router.post("/set-timer")
+async def set_question_timer(payload: SetTimerRequest):
+    """Set countdown duration for questions."""
+    event = active_live_session.set_timer_duration(payload.timer_seconds)
     return {"status": "success", "event": event}
 
 

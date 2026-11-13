@@ -53,6 +53,56 @@ VTV_PRACTICAL_QUESTIONS: List[Dict[str, Any]] = [
         "explanation": "'Tighten one's belt' = thắt lưng buộc bụng, tiết kiệm chi tiêu tối đa trong thời kỳ khó khăn.",
         "timer_seconds": 20
     },
+    {
+        "id": "vtv_6",
+        "topic": "vtv_news",
+        "category": "Thị trường vàng & Tài chính",
+        "question": "VTV Khớp lệnh: 'Do biến động địa chính trị, giá vàng trong nước liên tục lập đỉnh mới: Gold prices hit an all-time ___.'",
+        "options": ["A. low", "B. high", "C. debt", "D. loss"],
+        "answer": "B",
+        "explanation": "'Hit an all-time high' = chạm mốc cao kỷ lục trong lịch sử. Trái nghĩa là 'hit an all-time low'.",
+        "timer_seconds": 20
+    },
+    {
+        "id": "vtv_7",
+        "topic": "vtv_news",
+        "category": "Bất động sản & Nhà ở",
+        "question": "VTV Tiêu điểm: Giá chung cư tại các đô thị lớn tăng phi mã, vượt quá khả năng chi trả của người trẻ: 'Housing ___.'",
+        "options": ["A. affordability crisis", "B. comfort zone", "C. luxury discount", "D. empty vacancy"],
+        "answer": "A",
+        "explanation": "'Housing affordability crisis' = cuộc khủng hoảng khả năng chi trả nhà ở của người dân.",
+        "timer_seconds": 20
+    },
+    {
+        "id": "vtv_8",
+        "topic": "vtv_news",
+        "category": "Thị trường lao động",
+        "question": "Ngành công nghiệp vi mạch bán dẫn đang khát nhân lực chất lượng cao: 'Facing an acute talent ___.'",
+        "options": ["A. surplus", "B. shortage", "C. leisure", "D. privilege"],
+        "answer": "B",
+        "explanation": "'Acute talent shortage' = tình trạng khan hiếm, thiếu hụt trầm trọng nguồn nhân lực tài năng.",
+        "timer_seconds": 20
+    },
+    {
+        "id": "vtv_9",
+        "topic": "vtv_news",
+        "category": "Xu hướng mua sắm MXH",
+        "question": "Livestream bán hàng kích thích tâm lý mua sắm bốc đồng không suy tính của khách hàng, gọi là: 'Impulse ___.'",
+        "options": ["A. buying", "B. selling", "C. lending", "D. refusing"],
+        "answer": "A",
+        "explanation": "'Impulse buying' = thói quen mua sắm theo cảm xúc nhất thời, chốt đơn bốc đồng không có kế hoạch.",
+        "timer_seconds": 20
+    },
+    {
+        "id": "vtv_10",
+        "topic": "vtv_news",
+        "category": "Lối sống & Tâm lý",
+        "question": "Trào lưu người trẻ tìm về thiên nhiên, yoga hoặc thiền để 'chữa lành' tâm hồn được gọi là:",
+        "options": ["A. Toxic hustle", "B. Mental healing", "C. Public shaming", "D. Bitter arguing"],
+        "answer": "B",
+        "explanation": "'Mental healing' = chữa lành sức khỏe tâm trí, xoa dịu những áp lực và tổn thương tinh thần.",
+        "timer_seconds": 20
+    },
 
     # --- TOPIC: MÔI TRƯỜNG & BIẾN ĐỔI KHÍ HẬU (climate_eco) ---
     {
@@ -156,5 +206,56 @@ VTV_PRACTICAL_QUESTIONS: List[Dict[str, Any]] = [
         "answer": "A",
         "explanation": "'Generative AI' (AI tạo sinh) = các mô hình như ChatGPT, Midjourney, Gemini có khả năng tự sinh nội dung mới.",
         "timer_seconds": 20
+    },
+    {
+        "id": "cyber_6",
+        "topic": "tech_cyber",
+        "category": "Mã độc tống tiền",
+        "question": "Loại mã độc nguy hiểm mã hóa toàn bộ dữ liệu máy tính của doanh nghiệp để đòi tiền chuộc được gọi là:",
+        "options": ["A. Freeware", "B. Ransomware", "C. Hardware", "D. Shareware"],
+        "answer": "B",
+        "explanation": "'Ransomware' = phần mềm độc hại tống tiền (ransom), bắt cóc dữ liệu và ép nạn nhân trả tiền chuộc.",
+        "timer_seconds": 20
+    },
+    {
+        "id": "cyber_7",
+        "topic": "tech_cyber",
+        "category": "Cảnh báo lừa đảo",
+        "question": "VTV Cảnh báo: Kẻ lừa đảo dụ người dân cài app giả mạo cơ quan thuế chứa mã độc chiếm quyền điều khiển: '___ app.'",
+        "options": ["A. Beneficial", "B. Malicious", "C. Transparent", "D. Wholesome"],
+        "answer": "B",
+        "explanation": "'Malicious app' = ứng dụng độc hại chứa mã độc (malware) nhằm đánh cắp tiền trong tài khoản.",
+        "timer_seconds": 20
+    },
+    {
+        "id": "eco_6",
+        "topic": "climate_eco",
+        "category": "Hiện tượng khí hậu đô thị",
+        "question": "Hiện tượng bê tông hóa khiến các đại đô thị nóng hơn nhiều so với vùng nông thôn ngoại thành gọi là: 'Urban heat ___ effect.'",
+        "options": ["A. island", "B. river", "C. cloud", "D. cave"],
+        "answer": "A",
+        "explanation": "'Urban heat island effect' = hiệu ứng đảo nhiệt đô thị, nhiệt độ trung tâm thành phố cao bất thường do bê tông hấp thụ nhiệt.",
+        "timer_seconds": 20
+    },
+    {
+        "id": "eco_7",
+        "topic": "climate_eco",
+        "category": "Xử lý rác thải công nghệ",
+        "question": "Pin hỏng, bo mạch và thiết bị điện tử cũ bị vứt bỏ tạo ra lượng rác thải nguy hại gọi là: '___-waste.'",
+        "options": ["A. A", "B. E", "C. I", "D. O"],
+        "answer": "B",
+        "explanation": "'E-waste' (Electronic waste) = rác thải điện tử chứa kim loại nặng cần quy trình xử lý chuyên biệt.",
+        "timer_seconds": 15
+    },
+    {
+        "id": "eco_8",
+        "topic": "climate_eco",
+        "category": "Cam kết bảo vệ trái đất",
+        "question": "Mục tiêu đưa lượng phát thải khí nhà kính về mức cân bằng bằng 0 đến năm 2050 được gọi là: 'Net-___ emissions.'",
+        "options": ["A. one", "B. zero", "C. ten", "D. full"],
+        "answer": "B",
+        "explanation": "'Net-zero emissions' = phát thải ròng bằng không, giảm thiểu tối đa khí nhà kính kết hợp hấp thụ carbon tương đương.",
+        "timer_seconds": 15
     }
 ]
+

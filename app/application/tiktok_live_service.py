@@ -44,6 +44,7 @@ class TikTokLiveSession:
         self.current_topic: str = "all"
         self.questions: List[Dict[str, Any]] = list(DEFAULT_LIVE_QUESTIONS)
         self.current_question_index: int = 0
+        self.custom_timer_seconds: int = 20
         self.is_round_active: bool = False
         self.round_start_time: Optional[datetime] = None
         self.answered_users_this_round: Dict[str, Dict[str, Any]] = {}  # user_id -> info
@@ -65,7 +66,7 @@ class TikTokLiveSession:
             return self.questions[self.current_question_index]
         return None
 
-    def start_round(self) -> Dict[str, Any]:
+    def start_round(self, timer_seconds: Optional[int] = None) -> Dict[str, Any]:
         """Start a new question round."""
         q = self.get_current_question()
         if not q:
@@ -75,12 +76,13 @@ class TikTokLiveSession:
         self.answered_users_this_round.clear()
         self.vote_counts = {"A": 0, "B": 0, "C": 0, "D": 0}
 
+        effective_timer = timer_seconds or self.custom_timer_seconds or q.get("timer_seconds", 20)
         event = {
             "type": "ROUND_START",
             "question": q,
             "question_index": self.current_question_index,
             "total_questions": len(self.questions),
-            "timer_seconds": q.get("timer_seconds", 20)
+            "timer_seconds": effective_timer
         }
         self.broadcast(event)
         return event
@@ -140,6 +142,17 @@ class TikTokLiveSession:
             "total_questions": len(self.questions),
             "current_question": self.get_current_question(),
             "available_topics": LIVE_QUESTION_TOPICS
+        }
+        self.broadcast(event)
+        return event
+
+    def set_timer_duration(self, seconds: int) -> Dict[str, Any]:
+        """Set custom countdown timer duration for question rounds (5 to 120s)."""
+        val = max(5, min(120, int(seconds)))
+        self.custom_timer_seconds = val
+        event = {
+            "type": "TIMER_SETTING_CHANGE",
+            "custom_timer_seconds": self.custom_timer_seconds
         }
         self.broadcast(event)
         return event
@@ -296,6 +309,7 @@ class TikTokLiveSession:
             "current_question": self.get_current_question(),
             "current_question_index": self.current_question_index,
             "total_questions": len(self.questions),
+            "custom_timer_seconds": self.custom_timer_seconds,
             "is_round_active": self.is_round_active,
             "vote_counts": dict(self.vote_counts),
             "leaderboard": self.get_leaderboard_sorted(10),

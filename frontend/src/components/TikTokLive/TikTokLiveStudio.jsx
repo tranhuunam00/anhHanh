@@ -8,6 +8,7 @@ import {
   nextQuestion,
   prevQuestion,
   setLiveTopic,
+  setLiveTimer,
   simulateLiveEvent,
   createTikTokLiveWebSocket,
 } from "../../services/tiktokLiveService";
@@ -28,6 +29,7 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
     current_question: null,
     current_question_index: 0,
     total_questions: 1,
+    custom_timer_seconds: 20,
     is_round_active: false,
     vote_counts: { A: 0, B: 0, C: 0, D: 0 },
     leaderboard: [],
@@ -55,14 +57,10 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
   const handleToggleFullScreen = useCallback(async () => {
     try {
       if (!isFullScreen) {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        }
+        if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
         setIsFullScreen(true);
       } else {
-        if (document.fullscreenElement && document.exitFullscreen) {
-          await document.exitFullscreen();
-        }
+        if (document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
         setIsFullScreen(false);
       }
     } catch {
@@ -72,9 +70,7 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
 
   // Sync fullscreen state with browser native ESC or gesture
   useEffect(() => {
-    const handleFsChange = () => {
-      setIsFullScreen(Boolean(document.fullscreenElement));
-    };
+    const handleFsChange = () => setIsFullScreen(Boolean(document.fullscreenElement));
     document.addEventListener("fullscreenchange", handleFsChange);
     return () => document.removeEventListener("fullscreenchange", handleFsChange);
   }, []);
@@ -170,6 +166,8 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
           error_message: msg.error || "",
         }));
         setIsConnecting(false);
+      } else if (msg.type === "TIMER_SETTING_CHANGE") {
+        setSession((prev) => ({ ...prev, custom_timer_seconds: msg.custom_timer_seconds }));
       }
     };
 
@@ -217,11 +215,7 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
   };
 
   const handleDisconnect = async () => {
-    try {
-      await disconnectTikTok();
-    } catch (err) {
-      console.warn("Disconnect error:", err);
-    }
+    try { await disconnectTikTok(); } catch (err) { console.warn("Disconnect error:", err); }
   };
 
   const handleStartRound = useCallback(async () => {
@@ -264,6 +258,16 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
       }
     } catch (err) {
       console.warn("Error setting live topic:", err);
+    }
+  }, []);
+
+  const handleSetTimer = useCallback(async (seconds) => {
+    try {
+      await setLiveTimer(seconds);
+      setSession((prev) => ({ ...prev, custom_timer_seconds: seconds }));
+      setTimeLeft(seconds);
+    } catch (err) {
+      console.warn("Error setting timer:", err);
     }
   }, []);
 
@@ -433,6 +437,8 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
               viewMode={viewMode}
               currentTopic={session.current_topic || "all"}
               availableTopics={session.available_topics || []}
+              customTimerSeconds={session.custom_timer_seconds || 20}
+              onSetTimer={handleSetTimer}
               onSelectTopic={handleSelectTopic}
               onToggleViewMode={setViewMode}
               onConnect={handleConnect}

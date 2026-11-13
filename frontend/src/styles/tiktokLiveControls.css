@@ -272,107 +272,34 @@
   line-height: 1.3;
 }
 
-.tiktok-ticker-item.correct {
-  color: #10b981;
-  font-weight: 700;
-}
-
-.tiktok-ticker-item.gift {
-  color: #ec4899;
-  font-weight: 700;
-}
-
-.ticker-user {
-  font-weight: 700;
-  color: var(--text-secondary);
-}
-
-.ticker-correct-badge {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-  padding: 1px 5px;
-  border-radius: 4px;
-  margin-left: 4px;
-  font-size: 0.68rem;
-}
+.tiktok-ticker-item.correct { color: #10b981; font-weight: 700; }
+.tiktok-ticker-item.gift { color: #ec4899; font-weight: 700; }
+.ticker-user { font-weight: 700; color: var(--text-secondary); }
+.ticker-correct-badge { background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 1px 5px; border-radius: 4px; margin-left: 4px; font-size: 0.68rem; }
 
 /* Header & Fullscreen Actions */
-.tiktok-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.tiktok-header-actions { display: flex; align-items: center; gap: 10px; }
+.btn-tiktok-back-home, .btn-fullscreen-toggle {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px;
+  background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary);
+  font-weight: 600; cursor: pointer; transition: all 0.15s ease;
 }
-
-.btn-tiktok-back-home {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-tiktok-back-home:hover {
-  background: var(--bg-secondary);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.btn-fullscreen-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-fullscreen-toggle:hover {
-  background: var(--bg-secondary);
-  border-color: var(--primary);
-}
+.btn-tiktok-back-home:hover { background: var(--bg-secondary); border-color: var(--primary); color: var(--primary); }
+.btn-fullscreen-toggle:hover { background: var(--bg-secondary); border-color: var(--primary); }
 
 .tiktok-fullscreen-floating-bar {
-  position: fixed;
-  top: 14px;
-  right: 18px;
-  z-index: 10001;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(8px);
-  padding: 4px 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  opacity: 0.35;
-  transition: opacity 0.2s ease;
+  position: fixed; top: 14px; right: 18px; z-index: 10001;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px);
+  padding: 4px 8px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.15);
+  opacity: 0.35; transition: opacity 0.2s ease;
 }
-
-.tiktok-fullscreen-floating-bar:hover,
-.tiktok-fullscreen-floating-bar:focus-within {
-  opacity: 1;
-}
+.tiktok-fullscreen-floating-bar:hover, .tiktok-fullscreen-floating-bar:focus-within { opacity: 1; }
 
 .tiktok-phone-live-tip {
-  margin-top: 10px;
-  padding: 8px 12px;
-  background: rgba(16, 185, 129, 0.1);
-  border-left: 3px solid #10b981;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  line-height: 1.45;
+  margin-top: 10px; padding: 8px 12px; background: rgba(16, 185, 129, 0.1);
+  border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.8rem;
+  color: var(--text-secondary); line-height: 1.45;
 }
 
 .btn-fullscreen-back-home,
@@ -475,4 +402,52 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Timer Duration Selector */
+.tiktok-timer-setting-wrap {
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.tiktok-timer-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.tiktok-timer-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btn-timer-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-timer-pill:hover {
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.btn-timer-pill.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
 }

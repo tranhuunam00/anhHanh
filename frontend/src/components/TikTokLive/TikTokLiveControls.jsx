@@ -16,7 +16,8 @@ import {
   Zap,
   Newspaper,
   Trees,
-  Shield
+  Shield,
+  Clock
 } from "../Icons";
 import { formatTikTokErrorMessage } from "../../utils/tiktokLiveUtils";
 
@@ -75,6 +76,8 @@ export const TikTokLiveControls = React.memo(({
   viewMode = "portrait", // portrait | landscape
   currentTopic = "all",
   availableTopics = [],
+  customTimerSeconds = 20,
+  onSetTimer,
   onSelectTopic,
   onToggleViewMode,
   onConnect,
@@ -166,6 +169,35 @@ export const TikTokLiveControls = React.memo(({
           <Play size={16} color="var(--primary)" />
           <span>ĐIỀU KHIỂN CÂU HỎI</span>
         </h4>
+
+        {/* Timer Duration Selection */}
+        <div className="tiktok-timer-setting-wrap">
+          <div className="tiktok-timer-label">
+            <Clock size={13} style={{ marginRight: 5, verticalAlign: "middle" }} />
+            <span>Thời gian trả lời mỗi câu:</span>
+          </div>
+          <div className="tiktok-timer-pills-row">
+            {[
+              { val: 10, label: "10s", tip: "Chớp nhoáng" },
+              { val: 15, label: "15s", tip: "Nhanh" },
+              { val: 20, label: "20s (Chuẩn)", tip: "Chuẩn" },
+              { val: 30, label: "30s", tip: "Vừa phải" },
+              { val: 45, label: "45s", tip: "Thong thả" },
+              { val: 60, label: "60s", tip: "Thảo luận" },
+            ].map((t) => (
+              <button
+                key={t.val}
+                type="button"
+                className={`btn-timer-pill ${customTimerSeconds === t.val ? "active" : ""}`}
+                onClick={() => onSetTimer && onSetTimer(t.val)}
+                title={t.tip}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="tiktok-round-btn-row">
           {isRoundActive ? (
             <button
