@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { WordLookupPopover } from "./WordLookupPopover";
+import { cleanTargetSentence } from "../../utils/wordLookupUtils";
 
 export const HighlightedVocabSentence = React.memo(({
   text,
@@ -193,7 +194,7 @@ export const HighlightedVocabSentence = React.memo(({
         <WordLookupPopover
           word={activeWordState.word}
           targetElement={activeWordState.targetEl}
-          contextSentence={contextSentence || text}
+          contextSentence={cleanTargetSentence(contextSentence || text, activeWordState.word)}
           contextTranslation={contextTranslation}
           videoId={videoId}
           timestamp={timestamp}

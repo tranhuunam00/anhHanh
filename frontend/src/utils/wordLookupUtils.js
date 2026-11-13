@@ -223,12 +223,12 @@ export function computePopoverCoords(rect, viewportWidth = 1024, viewportHeight 
  * @param {object|null} savedItem
  * @returns {string}
  */
-export function resolveInitialContextSentence(contextSentence = "", savedItem = null) {
+export function resolveInitialContextSentence(contextSentence = "", savedItem = null, cleanWord = "") {
   if (typeof contextSentence === "string" && contextSentence.trim()) {
-    return contextSentence.trim();
+    return cleanTargetSentence(contextSentence, cleanWord);
   }
   if (savedItem && typeof savedItem.context_sentence === "string" && savedItem.context_sentence.trim()) {
-    return savedItem.context_sentence.trim();
+    return cleanTargetSentence(savedItem.context_sentence, cleanWord);
   }
   return "";
 }

@@ -4,6 +4,7 @@ import {
   getReadingExplanation,
   extractQuestionNumbersFromGroup
 } from "../../utils/ieltsReadingExplanations.js";
+import { scrollToEvidenceMark } from "../../utils/ieltsEvidenceHighlightUtils.js";
 import "../../styles/ieltsReadingExplanation.css";
 
 /**
@@ -32,7 +33,13 @@ export const IeltsReadingSingleExplanation = ({
       <button
         type="button"
         className="ielts-explanation-card-header"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => {
+          setIsOpen((prev) => {
+            const next = !prev;
+            if (next) setTimeout(() => scrollToEvidenceMark(qNum), 100);
+            return next;
+          });
+        }}
         aria-expanded={isOpen}
       >
         <div className="ielts-explanation-card-title-left">
@@ -75,6 +82,16 @@ export const IeltsReadingSingleExplanation = ({
                 Dẫn chứng từ bài đọc (Passage Evidence):
               </span>
               "{data.evidence}"
+              <div>
+                <button
+                  type="button"
+                  className="ielts-view-evidence-btn"
+                  onClick={() => scrollToEvidenceMark(qNum)}
+                  title="Nhảy đến vị trí câu dẫn chứng trong bài đọc"
+                >
+                  <span>🔍 Xem trong bài đọc</span>
+                </button>
+              </div>
             </div>
           )}
 

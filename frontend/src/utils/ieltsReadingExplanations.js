@@ -7,11 +7,13 @@
 
 import { cam21Test2ReadingExplanations } from "../data/ielts/explanations/cam21Test2ReadingExplanations.js";
 import { cam21Test1ReadingExplanations } from "../data/ielts/explanations/cam21Test1ReadingExplanations.js";
+import { cam20Test1ReadingExplanations } from "../data/ielts/explanations/cam20Test1ReadingExplanations.js";
 
 // Test-specific curated explanation registries
 const EXPLANATION_REGISTRIES = {
   "cambridge-21-test-2": cam21Test2ReadingExplanations,
-  "cambridge-21-test-1": cam21Test1ReadingExplanations
+  "cambridge-21-test-1": cam21Test1ReadingExplanations,
+  "cambridge-20-test-1": cam20Test1ReadingExplanations,
 };
 
 /**

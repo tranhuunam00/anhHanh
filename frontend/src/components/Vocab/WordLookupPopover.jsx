@@ -121,7 +121,8 @@ export const WordLookupPopover = ({
       : null;
 
     const effectiveSource = isChinese ? "zh" : (sourceLang || "en");
-    quickLookupWord(cleanWord, contextSentence, token, targetLang, effectiveSource)
+    const isolatedContext = resolveInitialContextSentence(contextSentence, savedItem, cleanWord);
+    quickLookupWord(cleanWord, isolatedContext, token, targetLang, effectiveSource)
       .then((data) => {
         if (!isMounted) return;
         const resolved = resolveInitialMeaning(cleanWord, data, savedItem);
@@ -132,7 +133,7 @@ export const WordLookupPopover = ({
         setCustomPos(posResolved);
         setInitialPos(posResolved);
 
-        const resolvedContext = resolveInitialContextSentence(contextSentence, savedItem);
+        const resolvedContext = isolatedContext || resolveInitialContextSentence(contextSentence, savedItem, cleanWord);
         setCustomContext(resolvedContext);
         setInitialContext(resolvedContext);
 
@@ -163,7 +164,7 @@ export const WordLookupPopover = ({
         setCustomPos(posResolved);
         setInitialPos(posResolved);
 
-        const fallbackContext = resolveInitialContextSentence(contextSentence, savedItem);
+        const fallbackContext = resolveInitialContextSentence(contextSentence, savedItem, cleanWord);
         setCustomContext(fallbackContext);
         setInitialContext(fallbackContext);
 

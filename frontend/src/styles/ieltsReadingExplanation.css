@@ -226,3 +226,70 @@
   border-color: var(--primary);
 }
 
+/* --- Evidence Highlighting in Passage Text (Review Mode) --- */
+.ielts-evidence-mark {
+  background: rgba(245, 158, 11, 0.16);
+  border-bottom: 2px solid #f59e0b;
+  border-radius: 4px;
+  padding: 1px 4px;
+  margin: 0 1px;
+  display: inline;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.ielts-evidence-mark.is-incorrect {
+  background: rgba(239, 68, 68, 0.18);
+  border-bottom: 2px solid #ef4444;
+}
+
+.ielts-evidence-mark.is-focused,
+.ielts-evidence-mark:target {
+  background: rgba(37, 99, 235, 0.25) !important;
+  border-bottom: 2.5px solid var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.28);
+}
+
+.ielts-evidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-right: 4px;
+  background: #f59e0b;
+  color: #ffffff;
+  vertical-align: 1px;
+  user-select: none;
+  cursor: pointer;
+}
+
+.ielts-evidence-mark.is-incorrect .ielts-evidence-badge {
+  background: #ef4444;
+}
+
+.ielts-view-evidence-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.15s ease;
+}
+
+.ielts-view-evidence-btn:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+

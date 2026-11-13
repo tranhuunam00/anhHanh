@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { HighlightedVocabSentence } from "../Vocab/HighlightedVocabSentence.jsx";
 import { isSingleLetterLabel } from "./ieltsFeedbackHelpers.jsx";
 import { gradeReadingTest } from "../../utils/ieltsScoring.js";
+import { segmentParagraphWithEvidences } from "../../utils/ieltsEvidenceHighlightUtils.js";
 import { IeltsSplitPane } from "./IeltsSplitPane.jsx";
 import { IeltsQuestionPalette } from "./IeltsQuestionPalette.jsx";
 import {
@@ -117,6 +118,37 @@ export const IeltsReadingModule = ({
     handleInputChange(q2, updated[1] || "");
   };
 
+  const renderParagraphContent = (paraText) => {
+    if (!isReview) return paraText;
+    const qRange = leftPassage === 1 ? [1, 13] : leftPassage === 2 ? [14, 26] : [27, 40];
+    const segments = segmentParagraphWithEvidences(paraText, readingData?.testId, effectiveEval, qRange);
+
+    return segments.map((seg, sIdx) => {
+      if (seg.type === "evidence") {
+        return (
+          <mark
+            key={sIdx}
+            id={`ielts-evidence-${seg.qNum}`}
+            className={`ielts-evidence-mark ${seg.isCorrect ? "is-correct" : "is-incorrect"}`}
+            title={`Dẫn chứng Câu ${seg.qNum} (${seg.isCorrect ? "Đúng" : "Làm sai - Cần chú ý"})`}
+          >
+            <span
+              className="ielts-evidence-badge"
+              onClick={() => {
+                const el = document.getElementById(`ielts-q-${seg.qNum}`);
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+              }}
+            >
+              Câu {seg.qNum}
+            </span>
+            <HighlightedVocabSentence text={seg.text} contextSentence={seg.text} />
+          </mark>
+        );
+      }
+      return <HighlightedVocabSentence key={sIdx} text={seg.text} contextSentence={seg.text} />;
+    });
+  };
+
   // Left Pane: Passage Reading Text (Full vertical height)
   const leftPaneContent = (
     <div className="ielts-left-scroll-pane ielts-reading-text-pane">
@@ -155,11 +187,7 @@ export const IeltsReadingModule = ({
                       {para.id}
                     </span>
                     <p className="ielts-paragraph-text">
-                      {isReview ? (
-                        <HighlightedVocabSentence text={para.text} contextSentence={para.text} />
-                      ) : (
-                        para.text
-                      )}
+                      {renderParagraphContent(para.text)}
                     </p>
                   </div>
                 );
@@ -167,11 +195,7 @@ export const IeltsReadingModule = ({
             ) : (
               currentLeftPassage.text?.split("\n\n").map((para, idx) => (
                 <p key={idx} className="ielts-paragraph-text">
-                  {isReview ? (
-                    <HighlightedVocabSentence text={para} contextSentence={para} />
-                  ) : (
-                    para
-                  )}
+                  {renderParagraphContent(para)}
                 </p>
               ))
             )}
