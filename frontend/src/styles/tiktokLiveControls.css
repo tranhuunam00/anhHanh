@@ -429,34 +429,12 @@
   color: #ffffff;
 }
 
-.btn-dock-action.start {
-  background: #2563eb;
-}
-
-.btn-dock-action.start:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-}
-
-.btn-dock-action.end {
-  background: #ef4444;
-}
-
-.btn-dock-action.end:hover {
-  background: #dc2626;
-  transform: translateY(-1px);
-}
-
-.btn-dock-action.next {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.btn-dock-action.next:hover {
-  background: rgba(255, 255, 255, 0.3);
-  color: #38bdf8;
-  transform: translateY(-1px);
-}
+.btn-dock-action.start { background: #2563eb; }
+.btn-dock-action.start:hover { background: #1d4ed8; transform: translateY(-1px); }
+.btn-dock-action.end { background: #ef4444; }
+.btn-dock-action.end:hover { background: #dc2626; transform: translateY(-1px); }
+.btn-dock-action.next { background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.3); }
+.btn-dock-action.next:hover { background: rgba(255, 255, 255, 0.3); color: #38bdf8; transform: translateY(-1px); }
 
 /* Topics Selector Pills */
 .tiktok-topics-pills-row {
@@ -491,4 +469,10 @@
   color: #ffffff;
   border-color: var(--primary);
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+}
+
+.topic-pill-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

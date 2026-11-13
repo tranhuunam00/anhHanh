@@ -1076,6 +1076,14 @@ export const Smartphone = (props) => (
   </BaseIcon>
 );
 
+export const Monitor = (props) => (
+  <BaseIcon {...props}>
+    <rect width="20" height="14" x="2" y="3" rx="2" />
+    <line x1="8" x2="16" y1="21" y2="21" />
+    <line x1="12" x2="12" y1="17" y2="21" />
+  </BaseIcon>
+);
+
 export const Footprints = (props) => (
   <BaseIcon {...props}>
     <path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.5-2 8.5V16a2 2 0 0 1-2 2 2 2 0 0 1-2-2z" />

@@ -8,42 +8,42 @@ LIVE_QUESTION_TOPICS: List[Dict[str, Any]] = [
     {
         "id": "all",
         "name": "Tất cả chủ đề",
-        "icon": "✨",
+        "icon_key": "sparkles",
         "badge": "Tổng hợp",
         "description": "Tổng hợp đa dạng mọi dạng câu hỏi trắc nghiệm"
     },
     {
         "id": "ielts_vocab",
         "name": "Từ vựng IELTS 7.0+",
-        "icon": "🎓",
+        "icon_key": "graduation",
         "badge": "Band 7.0-8.5",
         "description": "Academic Vocabulary, Collocations & Cụm từ Band cao"
     },
     {
         "id": "destination_b2",
         "name": "Destination B2",
-        "icon": "📘",
+        "icon_key": "book",
         "badge": "Chuẩn B2",
         "description": "Ngữ pháp, Giới từ & Cấu tạo từ giáo trình quốc tế"
     },
     {
         "id": "idioms_slang",
         "name": "Thành ngữ & Giao tiếp",
-        "icon": "💬",
+        "icon_key": "message",
         "badge": "Native Slang",
         "description": "Idioms, Slangs và cách diễn đạt tự nhiên người bản xứ"
     },
     {
         "id": "pronunciation_stress",
         "name": "Trọng âm & Phát âm",
-        "icon": "🎙️",
+        "icon_key": "mic",
         "badge": "Phonology",
         "description": "Quy tắc trọng âm từ 2-4 âm tiết & âm câm dễ bẫy"
     },
     {
         "id": "phrasal_verbs",
         "name": "Phrasal Verbs",
-        "icon": "⚡",
+        "icon_key": "zap",
         "badge": "Core Verbs",
         "description": "Cụm động từ thông dụng trong giao tiếp & thi cử"
     }
@@ -318,3 +318,4 @@ def get_questions_by_topic(topic_id: str = "all") -> List[Dict[str, Any]]:
         return list(DEFAULT_LIVE_QUESTIONS)
     filtered = [q for q in DEFAULT_LIVE_QUESTIONS if q.get("topic") == topic_id]
     return filtered if filtered else list(DEFAULT_LIVE_QUESTIONS)
+

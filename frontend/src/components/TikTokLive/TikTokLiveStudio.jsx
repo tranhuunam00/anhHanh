@@ -15,7 +15,7 @@ import { TikTokLiveQuestionCard } from "./TikTokLiveQuestionCard";
 import { TikTokLiveLeaderboard } from "./TikTokLiveLeaderboard";
 import { TikTokLiveControls } from "./TikTokLiveControls";
 import { playWebAudioChime } from "../../utils/tiktokLiveUtils";
-import { Radio, Maximize2, Minimize2, ArrowLeft, X, Play, Check, FastForward } from "../Icons";
+import { Radio, Maximize2, Minimize2, ArrowLeft, X, Play, Check, FastForward, Smartphone, Monitor } from "../Icons";
 import "../../styles/tiktokLive.css";
 
 export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
@@ -380,7 +380,17 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
                 onClick={() => setViewMode(viewMode === "portrait" ? "landscape" : "portrait")}
                 title={viewMode === "portrait" ? "Đang ở chế độ Live Điện Thoại (9:16). Bấm để chuyển sang Máy Tính (16:9)" : "Đang ở chế độ Live Máy Tính (16:9). Bấm để chuyển sang Điện Thoại (9:16)"}
               >
-                {viewMode === "portrait" ? "📱 Live Điện Thoại (9:16)" : "🖥️ Live Máy Tính (16:9)"}
+                {viewMode === "portrait" ? (
+                  <>
+                    <Smartphone size={13} style={{ marginRight: 4, verticalAlign: "middle" }} />
+                    <span>Live Điện Thoại (9:16)</span>
+                  </>
+                ) : (
+                  <>
+                    <Monitor size={13} style={{ marginRight: 4, verticalAlign: "middle" }} />
+                    <span>Live Máy Tính (16:9)</span>
+                  </>
+                )}
               </button>
               <div className="tiktok-current-channel">
                 {session.unique_id ? `@${session.unique_id}` : "Test Mode"}

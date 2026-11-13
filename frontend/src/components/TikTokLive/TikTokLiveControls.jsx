@@ -1,15 +1,56 @@
 import React, { useState, useEffect } from "react";
-import { Radio, Play, Check, FastForward, Sparkles, RotateCw, BookOpen } from "../Icons";
+import {
+  Radio,
+  Play,
+  Check,
+  FastForward,
+  Sparkles,
+  RotateCw,
+  BookOpen,
+  Smartphone,
+  Monitor,
+  Lightbulb,
+  GraduationCap,
+  MessageCircle,
+  Mic,
+  Zap
+} from "../Icons";
 import { formatTikTokErrorMessage } from "../../utils/tiktokLiveUtils";
 
 const FALLBACK_TOPICS = [
-  { id: "all", name: "Tất cả chủ đề", icon: "✨" },
-  { id: "ielts_vocab", name: "IELTS 7.0+", icon: "🎓" },
-  { id: "destination_b2", name: "Destination B2", icon: "📘" },
-  { id: "idioms_slang", name: "Thành ngữ & Slang", icon: "💬" },
-  { id: "pronunciation_stress", name: "Trọng âm & Phát âm", icon: "🎙️" },
-  { id: "phrasal_verbs", name: "Phrasal Verbs", icon: "⚡" },
+  { id: "all", name: "Tất cả chủ đề", icon_key: "sparkles" },
+  { id: "ielts_vocab", name: "Từ vựng IELTS 7.0+", icon_key: "graduation" },
+  { id: "destination_b2", name: "Destination B2", icon_key: "book" },
+  { id: "idioms_slang", name: "Thành ngữ & Giao tiếp", icon_key: "message" },
+  { id: "pronunciation_stress", name: "Trọng âm & Phát âm", icon_key: "mic" },
+  { id: "phrasal_verbs", name: "Phrasal Verbs", icon_key: "zap" },
 ];
+
+function renderTopicIcon(top, isActive) {
+  const key = top.icon_key || top.id;
+  const size = 14;
+  switch (key) {
+    case "ielts_vocab":
+    case "graduation":
+      return <GraduationCap size={size} color={isActive ? "#ffffff" : "#3b82f6"} />;
+    case "destination_b2":
+    case "book":
+      return <BookOpen size={size} color={isActive ? "#ffffff" : "#6366f1"} />;
+    case "idioms_slang":
+    case "message":
+      return <MessageCircle size={size} color={isActive ? "#ffffff" : "#10b981"} />;
+    case "pronunciation_stress":
+    case "mic":
+      return <Mic size={size} color={isActive ? "#ffffff" : "#ec4899"} />;
+    case "phrasal_verbs":
+    case "zap":
+      return <Zap size={size} color={isActive ? "#ffffff" : "#f59e0b"} />;
+    case "all":
+    case "sparkles":
+    default:
+      return <Sparkles size={size} color={isActive ? "#ffffff" : "#eab308"} />;
+  }
+}
 
 export const TikTokLiveControls = React.memo(({
   uniqueId = "",
@@ -149,7 +190,8 @@ export const TikTokLiveControls = React.memo(({
             onClick={() => onToggleViewMode("portrait")}
             title="Tối ưu cho chia sẻ màn hình điện thoại hoặc livestream dạng dọc"
           >
-            📱 Live Điện Thoại (9:16 Dọc)
+            <Smartphone size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+            <span>Live Điện Thoại (9:16 Dọc)</span>
           </button>
           <button
             type="button"
@@ -157,12 +199,14 @@ export const TikTokLiveControls = React.memo(({
             onClick={() => onToggleViewMode("landscape")}
             title="Tối ưu cho máy tính, laptop hoặc TikTok LIVE Studio / OBS màn hình ngang"
           >
-            🖥️ Live Máy Tính (16:9 Ngang)
+            <Monitor size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+            <span>Live Máy Tính (16:9 Ngang)</span>
           </button>
         </div>
 
         <div className="tiktok-phone-live-tip">
-          <span>💡 <strong>Live trên Điện thoại:</strong> Chọn chế độ <em>"Live Điện Thoại"</em> và bấm <em>"Chế độ Livestream Full"</em> để ẩn hoàn toàn thanh địa chỉ web, đảm bảo không bị lộ link theo chính sách TikTok.</span>
+          <Lightbulb size={16} color="#eab308" style={{ marginRight: 6, verticalAlign: "middle", flexShrink: 0 }} />
+          <span><strong>Live trên Điện thoại:</strong> Chọn chế độ <em>"Live Điện Thoại"</em> và bấm <em>"Chế độ Livestream Full"</em> để ẩn hoàn toàn thanh địa chỉ web, đảm bảo không bị lộ link theo chính sách TikTok.</span>
         </div>
       </div>
 
@@ -184,7 +228,7 @@ export const TikTokLiveControls = React.memo(({
               onClick={() => onSelectTopic && onSelectTopic(top.id)}
               title={top.description || top.name}
             >
-              <span className="topic-pill-icon">{top.icon}</span>
+              <span className="topic-pill-icon">{renderTopicIcon(top, currentTopic === top.id)}</span>
               <span className="topic-pill-name">{top.name}</span>
             </button>
           ))}
