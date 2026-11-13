@@ -48,6 +48,34 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
   const wsRef = useRef(null);
   const timerRef = useRef(null);
 
+  // Native fullscreen toggle to completely hide browser URL/address bar
+  const handleToggleFullScreen = useCallback(async () => {
+    try {
+      if (!isFullScreen) {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+        setIsFullScreen(true);
+      } else {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+        setIsFullScreen(false);
+      }
+    } catch {
+      setIsFullScreen((prev) => !prev);
+    }
+  }, [isFullScreen]);
+
+  // Sync fullscreen state with browser native ESC or gesture
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullScreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener("fullscreenchange", handleFsChange);
+    return () => document.removeEventListener("fullscreenchange", handleFsChange);
+  }, []);
+
   // 1. Initial snapshot fetch
   const loadSnapshot = useCallback(async () => {
     try {
@@ -260,8 +288,8 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
           <button
             type="button"
             className="btn-fullscreen-toggle"
-            onClick={() => setIsFullScreen((prev) => !prev)}
-            title={isFullScreen ? "Thu nhỏ" : "Toàn màn hình OBS"}
+            onClick={handleToggleFullScreen}
+            title={isFullScreen ? "Thu nhỏ" : "Toàn màn hình (Ẩn thanh duyệt web)"}
           >
             {isFullScreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
             <span>{isFullScreen ? "Thoát toàn màn hình" : "Chế độ Livestream Full"}</span>
@@ -269,7 +297,7 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
         </div>
       </div>
 
-      {/* Floating Exit & Home Bar for Fullscreen mode */}
+      {/* Floating Exit Bar for Fullscreen mode (Clean, non-intrusive, zero website leakage) */}
       {isFullScreen && (
         <div className="tiktok-fullscreen-floating-bar">
           {onBackToHome && (
@@ -277,20 +305,20 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
               type="button"
               className="btn-fullscreen-back-home"
               onClick={onBackToHome}
-              title="Trở về trang chủ"
+              title="Thoát Live về màn hình chính"
             >
               <ArrowLeft size={14} />
-              <span>Trang chủ</span>
+              <span>Thoát Live</span>
             </button>
           )}
           <button
             type="button"
             className="btn-fullscreen-exit-float"
-            onClick={() => setIsFullScreen(false)}
+            onClick={handleToggleFullScreen}
             title="Thoát toàn màn hình (phím ESC)"
           >
             <X size={14} />
-            <span>Thoát Fullscreen (ESC)</span>
+            <span>Thu nhỏ (ESC)</span>
           </button>
         </div>
       )}
@@ -303,16 +331,16 @@ export const TikTokLiveStudio = ({ isActive = true, onBackToHome }) => {
           <div className="tiktok-canvas-header">
             <div className="tiktok-host-badge">
               <span className="live-dot" />
-              <span>SHOTLANG LIVE CLASSROOM</span>
+              <span>LỚP HỌC TƯƠNG TÁC TIẾNG ANH</span>
             </div>
             <div className="tiktok-header-mode-actions">
               <button
                 type="button"
-                className={`btn-canvas-mode-toggle ${viewMode === "landscape" ? "active" : ""}`}
-                onClick={() => setViewMode(viewMode === "landscape" ? "portrait" : "landscape")}
-                title={viewMode === "landscape" ? "Chuyển sang chế độ dọc 9:16 (Điện thoại)" : "Chuyển sang chế độ ngang 16:9 (PC / Máy tính)"}
+                className={`btn-canvas-mode-toggle ${viewMode === "portrait" ? "active" : ""}`}
+                onClick={() => setViewMode(viewMode === "portrait" ? "landscape" : "portrait")}
+                title={viewMode === "portrait" ? "Đang ở chế độ Live Điện Thoại (9:16). Bấm để chuyển sang Máy Tính (16:9)" : "Đang ở chế độ Live Máy Tính (16:9). Bấm để chuyển sang Điện Thoại (9:16)"}
               >
-                {viewMode === "landscape" ? "🖥️ Chế độ PC (16:9)" : "📱 Chế độ Mobile (9:16)"}
+                {viewMode === "portrait" ? "📱 Live Điện Thoại (9:16)" : "🖥️ Live Máy Tính (16:9)"}
               </button>
               <div className="tiktok-current-channel">
                 {session.unique_id ? `@${session.unique_id}` : "Test Mode"}

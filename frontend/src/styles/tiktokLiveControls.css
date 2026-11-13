@@ -350,11 +350,29 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(8px);
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+
+.tiktok-fullscreen-floating-bar:hover,
+.tiktok-fullscreen-floating-bar:focus-within {
+  opacity: 1;
+}
+
+.tiktok-phone-live-tip {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border-left: 3px solid #10b981;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
 }
 
 .btn-fullscreen-back-home,

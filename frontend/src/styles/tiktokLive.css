@@ -384,5 +384,47 @@
   color: #ca8a04;
 }
 
+/* Mobile Phone Live Responsive Mode */
+@media (max-width: 768px) {
+  .tiktok-studio-layout {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .tiktok-live-screen-canvas {
+    width: 100%;
+    max-width: 100%;
+    min-height: unset;
+    border-radius: 16px;
+  }
+
+  .is-fullscreen .tiktok-live-screen-canvas {
+    width: 100vw;
+    height: 100dvh;
+    max-width: 100vw;
+    max-height: 100dvh;
+    border: none;
+    border-radius: 0;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .tiktok-header-mode-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .btn-canvas-mode-toggle {
+    font-size: 0.74rem;
+    padding: 3px 8px;
+  }
+
+  .tiktok-host-badge span:last-child {
+    font-size: 0.8rem;
+  }
+}
+
 /* Leaderboard styles imported at top */
 

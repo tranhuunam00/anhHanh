@@ -135,16 +135,22 @@ export const TikTokLiveControls = React.memo(({
             type="button"
             className={`btn-viewmode-toggle ${viewMode === "portrait" ? "active" : ""}`}
             onClick={() => onToggleViewMode("portrait")}
+            title="Tối ưu cho chia sẻ màn hình điện thoại hoặc livestream dạng dọc"
           >
-            Dọc 9:16 (OBS / TikTok Studio)
+            📱 Live Điện Thoại (9:16 Dọc)
           </button>
           <button
             type="button"
             className={`btn-viewmode-toggle ${viewMode === "landscape" ? "active" : ""}`}
             onClick={() => onToggleViewMode("landscape")}
+            title="Tối ưu cho máy tính, laptop hoặc TikTok LIVE Studio / OBS màn hình ngang"
           >
-            Ngang 16:9 (Máy tính)
+            🖥️ Live Máy Tính (16:9 Ngang)
           </button>
+        </div>
+
+        <div className="tiktok-phone-live-tip">
+          <span>💡 <strong>Live trên Điện thoại:</strong> Chọn chế độ <em>"Live Điện Thoại"</em> và bấm <em>"Chế độ Livestream Full"</em> để ẩn hoàn toàn thanh địa chỉ web, đảm bảo không bị lộ link theo chính sách TikTok.</span>
         </div>
       </div>
 
