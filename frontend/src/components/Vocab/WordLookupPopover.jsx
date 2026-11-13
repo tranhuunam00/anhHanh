@@ -10,6 +10,7 @@ import {
 import {
   resolveInitialMeaning,
   resolveInitialContextSentence,
+  cleanTargetSentence,
   hasVocabChanges,
   getMeaningSavePayload,
   calculateAutoTextareaHeight,
@@ -133,7 +134,7 @@ export const WordLookupPopover = ({
         setCustomPos(posResolved);
         setInitialPos(posResolved);
 
-        const resolvedContext = isolatedContext || resolveInitialContextSentence(contextSentence, savedItem, cleanWord);
+        const resolvedContext = cleanTargetSentence(isolatedContext || resolveInitialContextSentence(contextSentence, savedItem, cleanWord), cleanWord);
         setCustomContext(resolvedContext);
         setInitialContext(resolvedContext);
 
@@ -164,7 +165,7 @@ export const WordLookupPopover = ({
         setCustomPos(posResolved);
         setInitialPos(posResolved);
 
-        const fallbackContext = resolveInitialContextSentence(contextSentence, savedItem, cleanWord);
+        const fallbackContext = cleanTargetSentence(resolveInitialContextSentence(contextSentence, savedItem, cleanWord), cleanWord);
         setCustomContext(fallbackContext);
         setInitialContext(fallbackContext);
 

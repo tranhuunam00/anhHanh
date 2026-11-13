@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Lightbulb, ChevronDown, ChevronUp, CheckCircle, Info, BookOpen } from "../../constants/icons.js";
+import { Lightbulb, ChevronDown, ChevronUp, CheckCircle, Info, BookOpen, Search, KeyRound } from "../../constants/icons.js";
 import {
   getReadingExplanation,
   extractQuestionNumbersFromGroup
@@ -89,7 +89,8 @@ export const IeltsReadingSingleExplanation = ({
                   onClick={() => scrollToEvidenceMark(qNum)}
                   title="Nhảy đến vị trí câu dẫn chứng trong bài đọc"
                 >
-                  <span>🔍 Xem trong bài đọc</span>
+                  <Search size={13} style={{ marginRight: 4, verticalAlign: "middle" }} />
+                  <span>Xem trong bài đọc</span>
                 </button>
               </div>
             </div>
@@ -108,7 +109,8 @@ export const IeltsReadingSingleExplanation = ({
           {Array.isArray(data.keywords) && data.keywords.length > 0 && (
             <div className="ielts-explanation-keywords-box">
               <span className="ielts-explanation-reason-label">
-                🔑 Từ khóa & Paraphrase tương đương:
+                <KeyRound size={13} style={{ marginRight: 4, verticalAlign: "middle" }} />
+                Từ khóa & Paraphrase tương đương:
               </span>
               {data.keywords.map((kw, idx) => (
                 <div key={idx} className="ielts-keyword-pair-item">

@@ -58,3 +58,4 @@ describe("ieltsEvidenceHighlightUtils Unit Tests", () => {
     assert.equal(segments[0].text, plainText);
   });
 });
+

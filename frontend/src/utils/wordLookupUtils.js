@@ -293,7 +293,10 @@ export function cleanTargetSentence(rawText = "", targetWord = "") {
 
   if (!clean) return "";
 
-  const cleanTarget = (targetWord || "").trim().toLowerCase();
+  const cleanTarget = (targetWord || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^[^a-zA-Z0-9\u4e00-\u9fff]+|[^a-zA-Z0-9\u4e00-\u9fff]+$/g, "");
   if (!cleanTarget) {
     return clean.replace(/^["'“‘]+|["'”’]+$/g, "").trim();
   }
@@ -317,13 +320,22 @@ export function cleanTargetSentence(rawText = "", targetWord = "") {
     }
   }
 
-  // 3. If clean still contains multiple sentences ending in . or ! or ?, isolate the specific sentence containing targetWord
-  const sentenceRegex = /(?<=[.!?]["'”’]?)\s+(?=[A-Z"“'‘0-9])/;
+  // 3. Sentence Isolation: split across sentence boundaries [.!?] followed by whitespace
+  const sentenceRegex = /(?<=[.!?]["'”’]?)\s+(?=[A-Z"“'‘\u4e00-\u9fff0-9])/;
   if (sentenceRegex.test(clean)) {
     const sentences = clean.split(sentenceRegex).map((s) => s.trim()).filter(Boolean);
     const sentWithTarget = sentences.find((s) => s.toLowerCase().includes(cleanTarget));
     if (sentWithTarget) {
       clean = sentWithTarget;
+    }
+  } else {
+    // Fallback: split by any terminator followed by space
+    const fallbackParts = clean.split(/[.!?]\s+/).map((s) => s.trim()).filter(Boolean);
+    if (fallbackParts.length > 1) {
+      const match = fallbackParts.find((s) => s.toLowerCase().includes(cleanTarget));
+      if (match) {
+        clean = match.endsWith(".") ? match : `${match}.`;
+      }
     }
   }
 
