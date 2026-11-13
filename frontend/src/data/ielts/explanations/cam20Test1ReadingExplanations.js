@@ -13,7 +13,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "It is the world's only flightless parrot, and is also possibly one of the world's longest-living birds, with a reported lifespan of up to 100 years.",
     explanation: "Bài đọc khẳng định kākāpō là 'loài vẹt DUY NHẤT trên thế giới không biết bay' (the world's only flightless parrot). Điều này mâu thuẫn trực tiếp với nhận định trong câu hỏi rằng có những loài vẹt khác cũng không biết bay ('other parrots that share... inability to fly'), do đó đáp án là FALSE.",
     keywords: [
-      { question: "other parrots share inability to fly", passage: "the world's only flightless parrot" }
+      { question: "inability to fly", passage: "flightless" },
+      { question: "other parrots share", passage: "the world's only flightless parrot" }
     ]
   },
   2: {
@@ -23,7 +24,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "Kākāpō breed in summer and autumn, but only in years when food is plentiful.",
     explanation: "Kākāpō chỉ sinh sản vào mùa hè và mùa thu trong những năm nguồn thức ăn dồi dào ('only in years when food is plentiful'), chứ không phải sinh sản hàng năm ('every year'). Do đó đáp án là FALSE.",
     keywords: [
-      { question: "produce chicks every year", passage: "only in years when food is plentiful" }
+      { question: "produce chicks", passage: "breed" },
+      { question: "every year", passage: "only in years when food is plentiful" }
     ]
   },
   3: {
@@ -33,7 +35,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "Males play no part in incubation or chick-rearing - females alone incubate eggs and feed the chicks.",
     explanation: "Chim trống hoàn toàn không tham gia vào việc ấp trứng hay nuôi con ('males play no part in incubation or chick-rearing - females alone... feed the chicks'). Nhận định cho rằng chim trống mang thức ăn về tổ cho chim mái là sai sự thật, do đó đáp án là FALSE.",
     keywords: [
-      { question: "Adult male kākāpō bring food back to nesting females", passage: "males play no part... females alone incubate eggs and feed the chicks" }
+      { question: "bring food back to nesting females", passage: "females alone incubate eggs and feed the chicks" },
+      { question: "male kākāpō help at nest", passage: "males play no part in incubation or chick-rearing" }
     ]
   },
   4: {
@@ -43,7 +46,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "For the early settlers, the flightless kākāpō was easy prey. They ate its meat and used its feathers to make soft cloaks. With them came the Polynesian dog and rat, which also preyed on kākāpō.",
     explanation: "Bài đọc cho biết cả người định cư Polynesia và chuột Polynesia đều săn bắt kākāpō, nhưng hoàn toàn không có thông tin so sánh xem chuột Polynesia có phải là mối đe dọa lớn hơn người định cư hay không ('a greater threat'). Do đó đáp án là NOT GIVEN.",
     keywords: [
-      { question: "rat was a greater threat than settlers", passage: "early settlers... easy prey... Polynesian rat also preyed" }
+      { question: "a greater threat than", passage: "không có thông tin so sánh mức độ nguy hiểm (Not Given)" },
+      { question: "hunted by settlers and rats", passage: "easy prey... ate meat... rat also preyed" }
     ]
   },
   5: {
@@ -53,7 +57,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "Unfortunately, predation by feral cats on Rakiura Island led to a rapid decline in kākāpō numbers. As a result, during 1980-97, the surviving population was evacuated to three island sanctuaries...",
     explanation: "Việc mèo hoang săn bắt trên đảo Rakiura khiến số lượng kākāpō sụt giảm nghiêm trọng, vì vậy quần thể sống sót đã được sơ tán tới 3 khu bảo tồn trên các hòn đảo khác. Thông tin này trùng khớp 100% với câu hỏi, do đó đáp án là TRUE.",
     keywords: [
-      { question: "transferred from Rakiura Island... at risk from feral cats", passage: "predation by feral cats on Rakiura Island... surviving population was evacuated" }
+      { question: "transferred to new locations", passage: "surviving population was evacuated to three island sanctuaries" },
+      { question: "at risk from feral cats", passage: "predation by feral cats... led to rapid decline" }
     ]
   },
   6: {
@@ -63,7 +68,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "This involved moving the birds between islands, supplementary feeding of adults and rescuing and hand-raising any failing chicks.",
     explanation: "Kế hoạch phục hồi bao gồm việc giải cứu và tự tay chăm sóc nuôi dưỡng những chim non gặp khó khăn ('rescuing and hand-raising any failing chicks' tương đương hoàn toàn với 'caring for struggling young birds'). Nhờ đó số lượng kākāpō đã tăng lên, do đó đáp án là TRUE.",
     keywords: [
-      { question: "caring for struggling young birds", passage: "rescuing and hand-raising any failing chicks" }
+      { question: "caring for young birds", passage: "hand-raising any chicks" },
+      { question: "struggling", passage: "failing" }
     ]
   },
   7: {
@@ -225,7 +231,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "'The beetles can just march in if we're not careful, as the threat is right on our doorstep,' says Bourne.",
     explanation: "Peter Bourne cảnh báo bọ cánh cứng mang mầm bệnh có thể tiến vào bất cứ lúc nào vì mối đe dọa đang ở ngay trước cửa ('right on our doorstep').",
     keywords: [
-      { question: "insects carrying disease are not very far away", passage: "threat is right on our doorstep" }
+      { question: "insects carrying disease", passage: "elm bark beetles" },
+      { question: "not very far away", passage: "threat is right on our doorstep" }
     ]
   },
   23: {
@@ -235,7 +242,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "'You look at old photographs from the 1960s and it's only then that you realise the impact [elms had] ... They were significant, large trees ... then they were gone,' says Matt Elliot.",
     explanation: "Matt Elliot chia sẻ rằng chỉ khi nhìn vào các bức ảnh cũ từ thập niên 1960 ta mới thực sự nhận thức được sự hiện diện nổi bật của loài cây này trước khi dịch bệnh xóa sổ chúng.",
     keywords: [
-      { question: "understand the effect when you see evidence of how prominent it was", passage: "look at old photographs... only then you realise the impact... were significant large trees" }
+      { question: "understand the effect", passage: "realise the impact" },
+      { question: "see evidence of how prominent it was", passage: "look at old photographs... realise they were significant, large trees" }
     ]
   },
   24: {
@@ -245,7 +253,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "For centuries, elm ran a close second to oak as the hardwood tree of choice in Britain...",
     explanation: "Trong nhiều thế kỷ, cây du đứng thứ hai sau cây sồi ('ran a close second to oak'), nghĩa là sồi (oak) là loài duy nhất được ưa chuộng hơn du. Từ cần điền là 'oak'.",
     keywords: [
-      { question: "only tree more popular than elm was [oak]", passage: "ran a close second to oak as the hardwood tree of choice" }
+      { question: "only tree more popular than elm", passage: "elm ran a close second to oak" },
+      { question: "tree of choice", passage: "most favored / popular timber" }
     ]
   },
   25: {
@@ -255,7 +264,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "In the 18th century, it was planted more widely and its wood was used for items such as storage crates and flooring.",
     explanation: "Vào thế kỷ 18, gỗ du được dùng làm thùng chứa (crates $\\leftrightarrow$ boxes) và ván lót sàn (flooring). Từ cần điền là 'flooring'.",
     keywords: [
-      { question: "provide wood for boxes and [flooring]", passage: "used for items such as storage crates and flooring" }
+      { question: "boxes", passage: "storage crates" },
+      { question: "provide wood for", passage: "its wood was used for items such as" }
     ]
   },
   26: {
@@ -265,7 +275,8 @@ export const cam20Test1ReadingExplanations = {
     evidence: "It was also suitable for items that experienced high levels of impact and was used to build the keel of the 19th-century sailing ship Cutty Sark...",
     explanation: "Gỗ du chịu lực va đập tốt nên được sử dụng để đóng sống tàu (keel) của con tàu Cutty Sark. Từ cần điền là 'keel'.",
     keywords: [
-      { question: "the Cutty Sark's [keel] was also constructed from elm", passage: "used to build the keel of the 19th-century sailing ship Cutty Sark" }
+      { question: "was constructed from elm", passage: "used to build the keel" },
+      { question: "high levels of impact", passage: "withstand heavy stress / forces" }
     ]
   },
 

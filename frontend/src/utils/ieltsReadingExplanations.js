@@ -43,7 +43,9 @@ const STOP_WORDS = new Set([
   "be", "it", "or", "not", "but", "they", "them", "their", "he", "she",
   "his", "her", "have", "has", "had", "do", "does", "did", "can", "could",
   "will", "would", "so", "than", "also", "into", "some", "more", "most",
-  "about", "been", "there", "what", "when", "where", "who", "how", "all"
+  "about", "been", "there", "what", "when", "where", "who", "how", "all",
+  "only", "very", "just", "much", "many", "other", "such", "then", "both",
+  "one", "two", "three", "first", "second", "well", "like", "even", "each"
 ]);
 
 /**
@@ -272,13 +274,21 @@ export function getReadingExplanation(testId, qNum, passageText = "", questionIt
 
   const locationText = detectedSentence ? estimateLocation(passageText, detectedSentence) : "Trong bài đọc";
 
+  const formattedKeywords = matchedKeywords
+    .filter((kw) => kw.length >= 4 && !STOP_WORDS.has(kw.toLowerCase()))
+    .slice(0, 3)
+    .map((kw) => ({
+      question: `Từ khóa định vị: "${kw}"`,
+      passage: `Khớp trực tiếp ngữ cảnh bài đọc`
+    }));
+
   return {
     qNum: num,
     answer: primaryAnswer || (evalResult?.accepted?.join(" / ") || ""),
     location: locationText,
     evidence: detectedSentence || "Vui lòng xem lại nội dung đoạn văn tương ứng với các từ khóa trong câu hỏi.",
     explanation: explanationText,
-    keywords: matchedKeywords.map((kw) => ({ question: kw, passage: kw }))
+    keywords: formattedKeywords
   };
 }
 
