@@ -13,12 +13,18 @@ import {
   GraduationCap,
   MessageCircle,
   Mic,
-  Zap
+  Zap,
+  Newspaper,
+  Trees,
+  Shield
 } from "../Icons";
 import { formatTikTokErrorMessage } from "../../utils/tiktokLiveUtils";
 
 const FALLBACK_TOPICS = [
   { id: "all", name: "Tất cả chủ đề", icon_key: "sparkles" },
+  { id: "vtv_news", name: "Thời sự VTV & Đời sống", icon_key: "newspaper" },
+  { id: "climate_eco", name: "Môi trường & Biến đổi khí hậu", icon_key: "trees" },
+  { id: "tech_cyber", name: "Công nghệ & Lừa đảo mạng", icon_key: "shield" },
   { id: "ielts_vocab", name: "Từ vựng IELTS 7.0+", icon_key: "graduation" },
   { id: "destination_b2", name: "Destination B2", icon_key: "book" },
   { id: "idioms_slang", name: "Thành ngữ & Giao tiếp", icon_key: "message" },
@@ -30,6 +36,15 @@ function renderTopicIcon(top, isActive) {
   const key = top.icon_key || top.id;
   const size = 14;
   switch (key) {
+    case "vtv_news":
+    case "newspaper":
+      return <Newspaper size={size} color={isActive ? "#ffffff" : "#ef4444"} />;
+    case "climate_eco":
+    case "trees":
+      return <Trees size={size} color={isActive ? "#ffffff" : "#10b981"} />;
+    case "tech_cyber":
+    case "shield":
+      return <Shield size={size} color={isActive ? "#ffffff" : "#3b82f6"} />;
     case "ielts_vocab":
     case "graduation":
       return <GraduationCap size={size} color={isActive ? "#ffffff" : "#3b82f6"} />;

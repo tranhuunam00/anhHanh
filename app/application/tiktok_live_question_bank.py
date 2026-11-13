@@ -3,6 +3,7 @@
 Covers IELTS 7.0+, Destination B2, Idioms/Slang, Word Stress, Phrasal Verbs, and Error ID.
 """
 from typing import List, Dict, Any
+from app.application.tiktok_live_questions_vtv import VTV_PRACTICAL_QUESTIONS
 
 LIVE_QUESTION_TOPICS: List[Dict[str, Any]] = [
     {
@@ -11,6 +12,27 @@ LIVE_QUESTION_TOPICS: List[Dict[str, Any]] = [
         "icon_key": "sparkles",
         "badge": "Tổng hợp",
         "description": "Tổng hợp đa dạng mọi dạng câu hỏi trắc nghiệm"
+    },
+    {
+        "id": "vtv_news",
+        "name": "Thời sự VTV & Đời sống",
+        "icon_key": "newspaper",
+        "badge": "Thời sự VTV",
+        "description": "Các vấn đề thời sự thực tiễn hàng ngày trên VTV, kinh tế, giao thông & giá cả"
+    },
+    {
+        "id": "climate_eco",
+        "name": "Môi trường & Biến đổi khí hậu",
+        "icon_key": "trees",
+        "badge": "Môi trường VTV",
+        "description": "Bụi mịn, bão lũ, thời tiết cực đoan & cam kết Net Zero xanh"
+    },
+    {
+        "id": "tech_cyber",
+        "name": "Công nghệ & Lừa đảo mạng",
+        "icon_key": "shield",
+        "badge": "VTV24 An ninh",
+        "description": "Cảnh báo lừa đảo mạng, deepfake, an toàn tài khoản & xu hướng AI"
     },
     {
         "id": "ielts_vocab",
@@ -310,6 +332,9 @@ DEFAULT_LIVE_QUESTIONS: List[Dict[str, Any]] = [
         "timer_seconds": 15
     }
 ]
+
+# Include real-world VTV News & practical daily topics
+DEFAULT_LIVE_QUESTIONS.extend(VTV_PRACTICAL_QUESTIONS)
 
 
 def get_questions_by_topic(topic_id: str = "all") -> List[Dict[str, Any]]:

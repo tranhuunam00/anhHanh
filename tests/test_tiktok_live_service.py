@@ -241,10 +241,31 @@ class TestTikTokLiveQuestionBank:
         for q in questions:
             assert q["topic"] == "phrasal_verbs"
 
+    def test_get_vtv_news_questions(self):
+        from app.application.tiktok_live_question_bank import get_questions_by_topic
+        questions = get_questions_by_topic("vtv_news")
+        assert len(questions) >= 5
+        for q in questions:
+            assert q["topic"] == "vtv_news"
+
+    def test_get_climate_eco_questions(self):
+        from app.application.tiktok_live_question_bank import get_questions_by_topic
+        questions = get_questions_by_topic("climate_eco")
+        assert len(questions) >= 5
+        for q in questions:
+            assert q["topic"] == "climate_eco"
+
+    def test_get_tech_cyber_questions(self):
+        from app.application.tiktok_live_question_bank import get_questions_by_topic
+        questions = get_questions_by_topic("tech_cyber")
+        assert len(questions) >= 5
+        for q in questions:
+            assert q["topic"] == "tech_cyber"
+
     def test_fallback_on_unknown_topic(self):
         from app.application.tiktok_live_question_bank import get_questions_by_topic
         questions = get_questions_by_topic("unknown_random_topic")
-        assert len(questions) >= 20
+        assert len(questions) >= 30
 
 
 
