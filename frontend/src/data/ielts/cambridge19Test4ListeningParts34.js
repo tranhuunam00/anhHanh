@@ -100,7 +100,7 @@ export const cambridge19Test4ListeningPart3 = {
         "F in a specially designed space",
         "G within the café"
       ],
-      answers: ["G"]
+      answers: ["F"]
     },
     {
       number: 28,
@@ -115,7 +115,7 @@ export const cambridge19Test4ListeningPart3 = {
         "F in a specially designed space",
         "G within the café"
       ],
-      answers: ["B"]
+      answers: ["A"]
     },
     {
       number: 29,
@@ -145,7 +145,7 @@ export const cambridge19Test4ListeningPart3 = {
         "F in a specially designed space",
         "G within the café"
       ],
-      answers: ["E"]
+      answers: ["G"]
     }
   ]
 };

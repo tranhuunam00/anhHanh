@@ -147,7 +147,7 @@ export const cambridge19Test4ListeningPart2 = {
         "D. It is difficult to stay motivated.",
         "E. There is a lack of individual support."
       ],
-      answers: ["C", "D"]
+      answers: ["C", "E"]
     },
     {
       number: 12,
@@ -161,7 +161,7 @@ export const cambridge19Test4ListeningPart2 = {
         "D. It is difficult to stay motivated.",
         "E. There is a lack of individual support."
       ],
-      answers: ["C", "D"]
+      answers: ["C", "E"]
     },
     {
       number: 13,
@@ -175,7 +175,7 @@ export const cambridge19Test4ListeningPart2 = {
         "D. listening to music during runs",
         "E. running very slowly"
       ],
-      answers: ["B", "E"]
+      answers: ["A", "D"]
     },
     {
       number: 14,
@@ -189,7 +189,7 @@ export const cambridge19Test4ListeningPart2 = {
         "D. listening to music during runs",
         "E. running very slowly"
       ],
-      answers: ["B", "E"]
+      answers: ["A", "D"]
     },
     {
       number: 15,
@@ -200,7 +200,7 @@ export const cambridge19Test4ListeningPart2 = {
         "B. a dislike of running",
         "C. a lack of time"
       ],
-      answers: ["C"]
+      answers: ["A"]
     },
     {
       number: 16,
@@ -222,7 +222,7 @@ export const cambridge19Test4ListeningPart2 = {
         "B. a dislike of running",
         "C. a lack of time"
       ],
-      answers: ["A"]
+      answers: ["C"]
     },
     {
       number: 18,
@@ -233,7 +233,7 @@ export const cambridge19Test4ListeningPart2 = {
         "B. a dislike of running",
         "C. a lack of time"
       ],
-      answers: ["C"]
+      answers: ["A"]
     },
     {
       number: 19,
@@ -244,7 +244,7 @@ export const cambridge19Test4ListeningPart2 = {
         "B. Her husband persuaded her to do it.",
         "C. She nearly gave up before the end."
       ],
-      answers: ["B"]
+      answers: ["C"]
     },
     {
       number: 20,
@@ -255,7 +255,7 @@ export const cambridge19Test4ListeningPart2 = {
         "B. within a few weeks of taking up running.",
         "C. after completing several practice runs."
       ],
-      answers: ["A"]
+      answers: ["B"]
     }
   ]
 };
