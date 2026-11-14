@@ -129,24 +129,24 @@ export const cam18Test4ReadingExplanations = {
   },
   12: {
     qNum: 12,
-    answer: "C",
+    answer: "A",
     location: "Đoạn E",
-    evidence: "Improvements in the science and technology underpinning green roof development have also led to new variations in the concept.",
-    explanation: "Dẫn chứng từ bài đọc: 'Improvements in the science and technology underpinning green roof development have also led to new variations in the co...' cho thấy lựa chọn (C) phản ánh chính xác nhất luận điểm và chi tiết được tác giả đưa ra.",
+    evidence: "Improvements in the science and technology underpinning green roof development have also led to new variations in the concept... provide habitats for a wide range of species and generate sustainable power.",
+    explanation: "Đoạn E đề cập đến các biến thể mới của mái nhà xanh nhằm tạo môi trường sống phong phú cho sinh vật (A) và sản xuất điện năng bền vững (D).",
     keywords: [
-      { question: "Which TWO aims of new variations on the conce", passage: "Improvements in the science and technology underpi" },
-      { question: "Which TWO aims of new variations on the conce", passage: "Improvements in the science and technology underpi" },
+      { question: "aims of new variations", passage: "variations in the concept" },
+      { question: "habitats for species", passage: "habitats for a wide range of species" },
     ]
   },
   13: {
     qNum: 13,
-    answer: "C",
+    answer: "D",
     location: "Đoạn E",
-    evidence: "Improvements in the science and technology underpinning green roof development have also led to new variations in the concept.",
-    explanation: "Dẫn chứng từ bài đọc: 'Improvements in the science and technology underpinning green roof development have also led to new variations in the co...' cho thấy lựa chọn (C) phản ánh chính xác nhất luận điểm và chi tiết được tác giả đưa ra.",
+    evidence: "combinations of green roofs with solar panels, known as biosolar roofs, which generate power from a sustainable source...",
+    explanation: "Đoạn E nêu rõ sự kết hợp với pin mặt trời (biosolar roofs) nhằm phát điện từ nguồn năng lượng bền vững (D) cùng với việc cung cấp môi trường sống cho sinh vật (A).",
     keywords: [
-      { question: "Which TWO aims of new variations on the conce", passage: "Improvements in the science and technology underpi" },
-      { question: "Which TWO aims of new variations on the conce", passage: "Improvements in the science and technology underpi" },
+      { question: "generate power from sustainable source", passage: "generate power from a sustainable source" },
+      { question: "biosolar roofs", passage: "solar panels known as biosolar roofs" },
     ]
   },
   // --- PASSAGE 2: The growth mindset ---
@@ -417,13 +417,13 @@ export const cam18Test4ReadingExplanations = {
   },
   38: {
     qNum: 38,
-    answer: "C",
-    location: "Đoạn P1",
-    evidence: "This is a book about the life and scientific work of Alfred Wegener, whose reputation today rests with his theory of continental displacements, better known as 'continental drift'.",
-    explanation: "Dẫn chứng từ bài đọc: 'This is a book about the life and scientific work of Alfred Wegener, whose reputation today rests with his theory of con...' cho thấy lựa chọn (C) phản ánh chính xác nhất luận điểm và chi tiết được tác giả đưa ra.",
+    answer: "A",
+    location: "Đoạn P5",
+    evidence: "Wegener was not a particularly ambitious person, nor did he obsessively seek status or institutional honors.",
+    explanation: "Đoạn 5 làm rõ Wegener không phải là người quá tham vọng về quyền lực hay danh vị học thuật (A - 'He was not a particularly ambitious person').",
     keywords: [
-      { question: "What is said about Wegener in the fifth and s", passage: "This is a book about the life and scientific work " },
-      { question: "sixth paragraphs", passage: "Alfred Wegener whose" },
+      { question: "What is said about Wegener", passage: "not a particularly ambitious person" },
+      { question: "ambitious", passage: "not particularly ambitious" },
     ]
   },
   39: {

@@ -30,8 +30,9 @@ export const cambridge17Test4ReadingPassage2 = {
   ],
   groups: [
     {
-      groupType: "matching_headings",
+      groupType: "matching_information",
       instructions: "Reading Passage 2 has six sections, A–F.\nWhich section contains the following information?\nWrite the correct letter, A–F, in boxes 14–18 on your answer sheet.",
+      options: ["A", "B", "C", "D", "E", "F"],
       numbers: [14, 15, 16, 17, 18],
       items: [
         {

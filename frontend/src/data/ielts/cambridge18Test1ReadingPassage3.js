@@ -35,6 +35,7 @@ export const cambridge18Test1ReadingPassage3 = {
     {
       groupType: "matching_paragraphs",
       instructions: "Reading Passage 3 has six sections, A–F.\nWhich section contains the following information?\nWrite the correct letter, A–F, in boxes 27–31 on your answer sheet.",
+      options: ["A", "B", "C", "D", "E", "F"],
       numbers: [27, 28, 29, 30, 31],
       items: [
         {

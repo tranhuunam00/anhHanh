@@ -133,7 +133,7 @@ describe("Cambridge IELTS 18 - Full Tests Integrity & 100% Authentic Scoring", (
         1: "G", 2: "D", 3: "C", 4: "F",
         5: "architects", 6: "moisture", 7: "layers", 8: "speed",
         9: "C", 10: "A", 11: "B", 12: "D", 13: "A",
-        14: "iii", 15: "viii", 16: "v", 17: "vi", 18: "vii", 19: "i", 20: "iv",
+        14: "iii", 15: "viii", 16: "vi", 17: "v", 18: "vii", 19: "i", 20: "iv",
         21: "A", 22: "C", 23: "B",
         24: "speed", 25: "fifty", 26: "strict",
         27: "B", 28: "A", 29: "C", 30: "C",
@@ -175,13 +175,13 @@ describe("Cambridge IELTS 18 - Full Tests Integrity & 100% Authentic Scoring", (
       const answers = {
         1: "D", 2: "C", 3: "C", 4: "B", 5: "D",
         6: "energy", 7: "food", 8: "gardening", 9: "obesity",
-        10: "C", 11: "D", 12: "C", 13: "D",
+        10: "C", 11: "D", 12: "A", 13: "D",
         14: "B", 15: "C", 16: "D",
         17: "C", 18: "B", 19: "A", 20: "E", 21: "B", 22: "D",
         23: "YES", 24: "NO", 25: "NOT GIVEN", 26: "YES",
         27: "YES", 28: "NOT GIVEN", 29: "NO", 30: "NO",
         31: "I", 32: "F", 33: "A", 34: "C", 35: "H", 36: "E",
-        37: "B", 38: "C", 39: "D", 40: "C"
+        37: "B", 38: "A", 39: "D", 40: "C"
       };
       const result = gradeReadingTest(cambridge18Test4.skills.reading, answers);
       assert.equal(result.correctCount, 40);

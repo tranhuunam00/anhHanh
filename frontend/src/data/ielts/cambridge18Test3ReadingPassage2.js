@@ -65,12 +65,12 @@ export const cambridge18Test3ReadingPassage2 = {
         {
           number: 16,
           question: "Paragraph C",
-          answers: ["v"]
+          answers: ["vi"]
         },
         {
           number: 17,
           question: "Paragraph D",
-          answers: ["vi"]
+          answers: ["v"]
         },
         {
           number: 18,

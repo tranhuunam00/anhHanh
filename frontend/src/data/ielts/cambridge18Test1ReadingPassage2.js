@@ -39,6 +39,7 @@ export const cambridge18Test1ReadingPassage2 = {
     {
       groupType: "matching_paragraphs",
       instructions: "Reading Passage 2 has seven paragraphs, A–G.\nWhich paragraph contains the following information?\nWrite the correct letter, A–G, in boxes 14–18 on your answer sheet.\nNB You may use any letter more than once.",
+      options: ["A", "B", "C", "D", "E", "F", "G"],
       numbers: [14, 15, 16, 17, 18],
       items: [
         {

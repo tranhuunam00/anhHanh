@@ -141,7 +141,7 @@ export const cambridge18Test4ReadingPassage3 = {
             "C He was an unconventional and adventurous figure across disciplines.",
             "D He enjoyed discussing new discoveries with other scientists."
           ],
-          answers: ["C"]
+          answers: ["A"]
         },
         {
           number: 39,

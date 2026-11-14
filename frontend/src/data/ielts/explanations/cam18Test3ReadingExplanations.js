@@ -174,24 +174,24 @@ export const cam18Test3ReadingExplanations = {
   },
   16: {
     qNum: 16,
-    answer: "v",
-    location: "Đoạn A",
-    evidence: "When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.",
-    explanation: "Nội dung trọng tâm xuyên suốt đoạn văn A thể hiện qua câu: 'When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.'. Tiêu đề phù hợp và bao quát nhất là (v).",
+    answer: "vi",
+    location: "Đoạn C",
+    evidence: "The Dobles' next car was the Model B... But it was the Model C that established the Doble reputation...",
+    explanation: "Đoạn C miêu tả sự công nhận rộng rãi và danh tiếng tích cực dành cho mẫu xe Model C êm ái, sạch và nhanh, phù hợp tiêu đề (vi) - 'Positive publicity at last for this quiet, clean, fast vehicle'.",
     keywords: [
-      { question: "stated condition", passage: "primitive automobiles began appear" },
-      { question: "key question statement", passage: "confirmed textual context" },
+      { question: "Paragraph C", passage: "established the Doble reputation" },
+      { question: "positive publicity", passage: "Model C established reputation" },
     ]
   },
   17: {
     qNum: 17,
-    answer: "vi",
-    location: "Đoạn A",
-    evidence: "When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.",
-    explanation: "Nội dung trọng tâm xuyên suốt đoạn văn A thể hiện qua câu: 'When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.'. Tiêu đề phù hợp và bao quát nhất là (vi).",
+    answer: "v",
+    location: "Đoạn D",
+    evidence: "The Dobles continued to improve their technology... commercial prospects improved and orders began to pour in...",
+    explanation: "Đoạn D tập trung vào các cải tiến công nghệ tiếp theo giúp nhận được nhiều đơn đặt hàng thương mại, phù hợp tiêu đề (v) - 'Further improvements lead to commercial orders'.",
     keywords: [
-      { question: "stated condition", passage: "primitive automobiles began appear" },
-      { question: "key question statement", passage: "confirmed textual context" },
+      { question: "Paragraph D", passage: "commercial prospects improved and orders" },
+      { question: "commercial orders", passage: "orders began to pour in" },
     ]
   },
   18: {

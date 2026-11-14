@@ -39,8 +39,9 @@ export const cambridge17Test4ReadingPassage3 = {
   ],
   groups: [
     {
-      groupType: "matching_headings",
+      groupType: "matching_information",
       instructions: "Reading Passage 3 has eight paragraphs, A–H.\nWhich paragraph contains the following information?\nWrite the correct letter, A–H, in boxes 27–32 on your answer sheet.\nNB You may use any letter more than once.",
+      options: ["A", "B", "C", "D", "E", "F", "G", "H"],
       numbers: [27, 28, 29, 30, 31, 32],
       items: [
         {

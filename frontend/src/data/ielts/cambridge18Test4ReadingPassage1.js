@@ -31,6 +31,7 @@ export const cambridge18Test4ReadingPassage1 = {
     {
       groupType: "matching_paragraphs",
       instructions: "Reading Passage 1 has five paragraphs, A–E.\nWhich paragraph contains the following information?\nWrite the correct letter, A–E, in boxes 1–5 on your answer sheet.\nNB You may use any letter more than once.",
+      options: ["A", "B", "C", "D", "E"],
       numbers: [1, 2, 3, 4, 5],
       items: [
         {
@@ -146,8 +147,8 @@ export const cambridge18Test4ReadingPassage1 = {
             "D to generate power from a sustainable source",
             "E to collect water to supply other buildings"
           ],
-          answers: ["C", "D"],
-          acceptedAnswers: ["C", "D"]
+          answers: ["A", "D"],
+          acceptedAnswers: ["A", "D"]
         },
         {
           number: 13,
@@ -161,8 +162,8 @@ export const cambridge18Test4ReadingPassage1 = {
             "D to generate power from a sustainable source",
             "E to collect water to supply other buildings"
           ],
-          answers: ["C", "D"],
-          acceptedAnswers: ["C", "D"]
+          answers: ["A", "D"],
+          acceptedAnswers: ["A", "D"]
         }
       ]
     }
