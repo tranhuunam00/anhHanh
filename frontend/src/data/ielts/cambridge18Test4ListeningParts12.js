@@ -157,6 +157,7 @@ export const listeningParts12 = [
       {
         number: 11,
         type: "multiple_choice",
+        groupHeader: "Questions 11–14: Choose the correct letter, A, B or C.",
         question: "The museum building was originally",
         options: [
           "A a factory.",
@@ -205,6 +206,7 @@ export const listeningParts12 = [
       {
         number: 15,
         type: "matching",
+        groupHeader: "Questions 15–20: What information does the speaker give about each of the following areas of the museum?\nChoose SIX answers from the box and write the correct letter, A–H, next to Questions 15–20.",
         question: "Four Seasons",
         answer: "F",
         answers: ["F"]

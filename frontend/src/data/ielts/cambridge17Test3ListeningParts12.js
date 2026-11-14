@@ -151,6 +151,7 @@ export const listeningParts12 = [
       {
         number: 11,
         type: "choose_two",
+        groupHeader: "Questions 11 and 12: Choose TWO letters, A–E.",
         pairNumber: 12,
         question: "Which TWO facts are given about the school's extended hours childcare service?",
         options: [
@@ -183,6 +184,7 @@ export const listeningParts12 = [
       {
         number: 13,
         type: "multiple_choice",
+        groupHeader: "Questions 13–15: Choose the correct letter, A, B or C.",
         question: "How much does childcare cost for a complete afternoon session per child?",
         options: [
           "A £3.50",
@@ -219,6 +221,7 @@ export const listeningParts12 = [
       {
         number: 16,
         type: "matching",
+        groupHeader: "Questions 16–20: What information is given about each of the following activities on offer?\nChoose FIVE answers from the box and write the correct letter, A–G, next to Questions 16–20.",
         question: "Spanish",
         answer: "E",
         answers: ["E"]

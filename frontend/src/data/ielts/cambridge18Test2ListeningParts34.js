@@ -18,6 +18,7 @@ export const listeningParts34 = [
       {
         number: 21,
         type: "multiple_choice",
+        groupHeader: "Questions 21–24: Choose the correct letter, A, B or C.",
         question: "Why do the students think the Laki eruption of 1783 is so important?",
         options: [
           "A It was the most severe eruption in modern times.",
@@ -67,6 +68,7 @@ export const listeningParts34 = [
         number: 25,
         type: "choose_two",
         pairNumber: 26,
+        groupHeader: "Questions 25 and 26: Choose TWO letters, A–E.",
         question: "Which TWO issues following the Laki eruption surprised the students?",
         options: [
           "A how widespread the effects were",
@@ -98,6 +100,7 @@ export const listeningParts34 = [
       {
         number: 27,
         type: "matching",
+        groupHeader: "Questions 27–30: What comment do the students make about the impact of the Laki eruption on the following countries? Choose FOUR answers from the box and write the correct letter, A–F, next to Questions 27–30.",
         question: "Iceland",
         answer: "D",
         answers: ["D"]

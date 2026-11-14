@@ -20,6 +20,7 @@ export const listeningParts34 = [
       {
         number: 21,
         type: "choose_two",
+        groupHeader: "Questions 21 and 22: Choose TWO letters, A–E.",
         pairNumber: 22,
         question: "Which TWO points do Thomas and Jeanne make about Thomas's sporting activities at school?",
         options: [
@@ -52,6 +53,7 @@ export const listeningParts34 = [
       {
         number: 23,
         type: "choose_two",
+        groupHeader: "Questions 23 and 24: Choose TWO letters, A–E.",
         pairNumber: 24,
         question: "Which TWO feelings did Thomas experience when he was in Kenya?",
         options: [
@@ -84,6 +86,7 @@ export const listeningParts34 = [
       {
         number: 25,
         type: "matching",
+        groupHeader: "Questions 25–30: What comment do the students make about the development of each of the following items of sporting equipment?\nChoose SIX answers from the box and write the correct letter, A–H, next to Questions 25–30.",
         question: "the table tennis bat",
         answer: "B",
         answers: ["B"]

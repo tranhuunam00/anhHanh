@@ -19,6 +19,7 @@ export const listeningParts34 = [
       {
         number: 21,
         type: "choose_two",
+        groupHeader: "Questions 21 and 22: Choose TWO letters, A–E.",
         pairNumber: 22,
         question: "Which TWO things do the students agree they need to include in their reviews of Romeo and Juliet?",
         options: [
@@ -51,6 +52,7 @@ export const listeningParts34 = [
       {
         number: 23,
         type: "matching",
+        groupHeader: "Questions 23–27: Which opinion do the speakers give about each of the following aspects of The Emporium's production of Romeo and Juliet?\nChoose FIVE answers from the box and write the correct letter, A–G, next to Questions 23–27.",
         question: "the set",
         answer: "D",
         answers: ["D"]
@@ -86,6 +88,7 @@ export const listeningParts34 = [
       {
         number: 28,
         type: "multiple_choice",
+        groupHeader: "Questions 28–30: Choose the correct letter, A, B or C.",
         question: "The students think the story of Romeo and Juliet is still relevant for young people today because",
         options: [
           "A it illustrates how easily conflict can start.",

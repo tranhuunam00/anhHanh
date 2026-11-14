@@ -155,6 +155,7 @@ export const listeningParts12 = [
       {
         number: 11,
         type: "multiple_choice",
+        groupHeader: "Questions 11–13: Choose the correct letter, A, B or C.",
         question: "Why does the speaker apologise about the seats?",
         options: [
           "A They are too small.",
@@ -192,6 +193,7 @@ export const listeningParts12 = [
         number: 14,
         type: "choose_two",
         pairNumber: 15,
+        groupHeader: "Questions 14 and 15: Choose TWO letters, A–E.",
         question: "Which TWO issues does the speaker ask the audience to consider before they apply to be volunteers?",
         options: [
           "A their financial situation",
@@ -223,6 +225,7 @@ export const listeningParts12 = [
       {
         number: 16,
         type: "matching",
+        groupHeader: "Questions 16–20: What does the speaker suggest would be helpful for each of the following areas of voluntary work? Choose FIVE answers from the box and write the correct letter, A–G, next to Questions 16–20.",
         question: "Fundraising",
         answer: "B",
         answers: ["B"]

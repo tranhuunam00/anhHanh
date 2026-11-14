@@ -19,6 +19,7 @@ export const listeningParts34 = [
       {
         number: 21,
         type: "choose_two",
+        groupHeader: "Questions 21 and 22: Choose TWO letters, A–E.",
         pairNumber: 22,
         question: "Which TWO educational skills were shown in the video of children doing origami?",
         options: [
@@ -28,9 +29,9 @@ export const listeningParts34 = [
           "D learning through play",
           "E developing hand-eye coordination"
         ],
-        answer: "D",
-        acceptedAnswers: ["D", "E", "B"],
-        answers: ["D", "E"]
+        answer: "B",
+        acceptedAnswers: ["B", "D", "E"],
+        answers: ["B", "D", "E"]
       },
       {
         number: 22,
@@ -44,13 +45,14 @@ export const listeningParts34 = [
           "D learning through play",
           "E developing hand-eye coordination"
         ],
-        answer: "E",
-        acceptedAnswers: ["D", "E", "B"],
-        answers: ["D", "E"]
+        answer: "D",
+        acceptedAnswers: ["B", "D", "E"],
+        answers: ["B", "D", "E"]
       },
       {
         number: 23,
         type: "matching",
+        groupHeader: "Questions 23–27: Which comment do the students make about each of the following children in the video?\nChoose FIVE answers from the box and write the correct letter, A–G, next to Questions 23–27.",
         question: "Sid",
         answer: "D",
         answers: ["D"]
@@ -86,6 +88,7 @@ export const listeningParts34 = [
       {
         number: 28,
         type: "multiple_choice",
+        groupHeader: "Questions 28–30: Choose the correct letter, A, B or C.",
         question: "Before starting an origami activity in class, the students think it is important for the teacher to",
         options: [
           "A make models that demonstrate the different stages.",

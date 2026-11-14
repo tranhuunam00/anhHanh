@@ -153,6 +153,7 @@ export const listeningParts12 = [
         number: 11,
         type: "choose_two",
         pairNumber: 12,
+        groupHeader: "Questions 11 and 12: Choose TWO letters, A–E.",
         question: "What are the TWO main reasons why this site has been chosen for the housing development?",
         options: [
           "A It has suitable geographical features.",
@@ -185,6 +186,7 @@ export const listeningParts12 = [
         number: 13,
         type: "choose_two",
         pairNumber: 14,
+        groupHeader: "Questions 13 and 14: Choose TWO letters, A–E.",
         question: "Which TWO aspects of the planned housing development have people given positive feedback about?",
         options: [
           "A the facilities for cyclists",

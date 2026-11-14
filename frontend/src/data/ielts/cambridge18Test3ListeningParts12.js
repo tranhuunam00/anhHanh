@@ -153,6 +153,7 @@ export const listeningParts12 = [
         number: 11,
         type: "choose_two",
         pairNumber: 12,
+        groupHeader: "Questions 11 and 12: Choose TWO letters, A–E.",
         question: "Which TWO warnings does Dan give about picking mushrooms?",
         options: [
           "A Don't pick more than one variety of mushroom at a time.",
@@ -185,6 +186,7 @@ export const listeningParts12 = [
         number: 13,
         type: "choose_two",
         pairNumber: 14,
+        groupHeader: "Questions 13 and 14: Choose TWO letters, A–E.",
         question: "Which TWO ideas about wild mushrooms does Dan say are correct?",
         options: [
           "A Mushrooms should always be peeled before eating.",
@@ -216,6 +218,7 @@ export const listeningParts12 = [
       {
         number: 15,
         type: "multiple_choice",
+        groupHeader: "Questions 15–20: Choose the correct letter, A, B or C.",
         question: "What advice does Dan give about picking mushrooms in parks?",
         options: [
           "A Choose wooded areas.",

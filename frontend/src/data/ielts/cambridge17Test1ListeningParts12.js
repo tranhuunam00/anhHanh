@@ -141,6 +141,7 @@ export const listeningParts12 = [
       {
         number: 11,
         type: "multiple_choice",
+        groupHeader: "Questions 11–14: Choose the correct letter, A, B or C.",
         question: "What is the maximum number of people who can stand on each side of the boat?",
         options: [
           "A 9",
@@ -189,6 +190,7 @@ export const listeningParts12 = [
       {
         number: 15,
         type: "choose_two",
+        groupHeader: "Questions 15 and 16: Choose TWO letters, A–E.",
         pairNumber: 16,
         question: "Which TWO features of the lighthouse does Lou mention?",
         options: [
@@ -221,6 +223,7 @@ export const listeningParts12 = [
       {
         number: 17,
         type: "choose_two",
+        groupHeader: "Questions 17 and 18: Choose TWO letters, A–E.",
         pairNumber: 18,
         question: "Which TWO types of creature might come close to the boat?",
         options: [
@@ -253,6 +256,7 @@ export const listeningParts12 = [
       {
         number: 19,
         type: "choose_two",
+        groupHeader: "Questions 19 and 20: Choose TWO letters, A–E.",
         pairNumber: 20,
         question: "Which TWO points does Lou make about the caves?",
         options: [

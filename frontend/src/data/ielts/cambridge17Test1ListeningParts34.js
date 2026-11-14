@@ -18,6 +18,7 @@ export const listeningParts34 = [
       {
         number: 21,
         type: "multiple_choice",
+        groupHeader: "Questions 21–26: Choose the correct letter, A, B or C.",
         question: "What problem did both Diana and Tim have when arranging their work experience?",
         options: [
           "A making initial contact with suitable farms",
@@ -90,6 +91,7 @@ export const listeningParts34 = [
       {
         number: 27,
         type: "matching",
+        groupHeader: "Questions 27–30: What opinion do the students give about each of the following modules on their veterinary science course?\nChoose FOUR answers from the box and write the correct letter, A–F, next to questions 27–30.",
         question: "Medical terminology",
         answer: "A",
         answers: ["A"]

@@ -166,6 +166,7 @@ export const listeningParts12 = [
       {
         number: 11,
         type: "multiple_choice",
+        groupHeader: "Questions 11–14: Choose the correct letter, A, B or C.",
         question: "Many past owners made changes to",
         options: [
           "A the gardens.",
@@ -214,6 +215,7 @@ export const listeningParts12 = [
       {
         number: 15,
         type: "matching",
+        groupHeader: "Questions 15–20: Which activity is offered at each of the following locations on the farm?\nChoose SIX answers from the box and write the correct letter, A–H, next to Questions 15–20.",
         question: "dairy",
         answer: "D",
         answers: ["D"]

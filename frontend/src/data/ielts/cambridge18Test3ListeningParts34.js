@@ -20,6 +20,7 @@ export const listeningParts34 = [
         number: 21,
         type: "choose_two",
         pairNumber: 22,
+        groupHeader: "Questions 21 and 22: Choose TWO letters, A–E.",
         question: "Which TWO opinions about the Luddites do the students express?",
         options: [
           "A Their actions were ineffective.",
@@ -52,6 +53,7 @@ export const listeningParts34 = [
         number: 23,
         type: "choose_two",
         pairNumber: 24,
+        groupHeader: "Questions 23 and 24: Choose TWO letters, A–E.",
         question: "Which TWO predictions about the future of work are the students doubtful about?",
         options: [
           "A Work will be more rewarding.",
@@ -83,6 +85,7 @@ export const listeningParts34 = [
       {
         number: 25,
         type: "matching",
+        groupHeader: "Questions 25–30: What comment do the students make about each of the following jobs? Choose SIX answers from the box and write the correct letter, A–G, next to Questions 25–30.",
         question: "Accountants",
         answer: "A",
         answers: ["A"]

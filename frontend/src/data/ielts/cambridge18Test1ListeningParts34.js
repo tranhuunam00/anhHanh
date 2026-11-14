@@ -9,6 +9,7 @@ export const listeningParts34 = [
       {
         number: 21,
         type: "multiple_choice",
+        groupHeader: "Questions 21–26: Choose the correct letter, A, B or C.",
         question: "What problem did Chantal have at the start of the talk?",
         options: [
           "A Her view of the speaker was blocked.",
@@ -82,6 +83,7 @@ export const listeningParts34 = [
         number: 27,
         type: "choose_two",
         pairNumber: 28,
+        groupHeader: "Questions 27 and 28: Choose TWO letters, A–E.",
         question: "Which TWO mistakes did the speaker admit she made in her first job?",
         options: [
           "A being dishonest to her employer",
@@ -114,6 +116,7 @@ export const listeningParts34 = [
         number: 29,
         type: "choose_two",
         pairNumber: 30,
+        groupHeader: "Questions 29 and 30: Choose TWO letters, A–E.",
         question: "Which TWO pieces of retail information do Hugo and Chantal agree would be useful?",
         options: [
           "A the reasons people return fashion items",

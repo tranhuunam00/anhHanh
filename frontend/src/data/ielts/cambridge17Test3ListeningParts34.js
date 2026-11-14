@@ -20,6 +20,7 @@ export const listeningParts34 = [
       {
         number: 21,
         type: "multiple_choice",
+        groupHeader: "Questions 21–24: Choose the correct letter, A, B or C.",
         question: "Holly has chosen the Orion Stadium placement because",
         options: [
           "A it involves children.",
@@ -68,6 +69,7 @@ export const listeningParts34 = [
       {
         number: 25,
         type: "matching",
+        groupHeader: "Questions 25–30: What do Holly and her tutor agree is an important aspect of each of the following events management skills?\nChoose SIX answers from the box and write the correct letter, A–H, next to Questions 25–30.",
         question: "Communication",
         answer: "C",
         answers: ["C"]

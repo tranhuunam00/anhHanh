@@ -150,6 +150,7 @@ export const listeningParts12 = [
       {
         number: 11,
         type: "multiple_choice",
+        groupHeader: "Questions 11–14: Choose the correct letter, A, B or C.",
         question: "Many hotel managers are unaware that their staff often leave because of",
         options: [
           "A a lack of training.",
@@ -198,6 +199,7 @@ export const listeningParts12 = [
       {
         number: 15,
         type: "matching",
+        groupHeader: "Questions 15–20: Which way of reducing staff turnover was used in each of the following hotels?\nWrite the correct letter, A, B or C, next to Questions 15–20.",
         question: "The Sun Club",
         answer: "A",
         answers: ["A"]
