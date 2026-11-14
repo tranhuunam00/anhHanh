@@ -98,17 +98,25 @@ export const cambridge19Test3ReadingPassage3 = {
     {
       groupType: "sentence_completion_endings",
       instructions: "Questions 31–34: Complete each sentence with the correct ending, A–F, below.\nWrite the correct letter, A–F, in boxes 31–34 on your answer sheet.\n\nList of Endings:\nA. but there are concerns about this.\nB. as systems do not need to conform to standard practices.\nC. but they are far from perfect.\nD. despite the noise issues.\nE. because translation is immediate.\nF. and have an awareness of good manners.",
+      options: [
+        "A. but there are concerns about this.",
+        "B. as systems do not need to conform to standard practices.",
+        "C. but they are far from perfect.",
+        "D. despite the noise issues.",
+        "E. because translation is immediate.",
+        "F. and have an awareness of good manners."
+      ],
       numbers: [31, 32, 33, 34],
       items: [
         {
           number: 31,
           question: "Speech translation methods are developing fast in Japan",
-          answers: ["E"]
+          answers: ["C"]
         },
         {
           number: 32,
           question: "TV interviews that use translation voiceover methods are successful",
-          answers: ["C"]
+          answers: ["E"]
         },
         {
           number: 33,

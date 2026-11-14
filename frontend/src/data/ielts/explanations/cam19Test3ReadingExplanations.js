@@ -140,42 +140,42 @@ export const cam19Test3ReadingExplanations = {
   // --- PASSAGE 2: The global importance of wetlands (Questions 14 - 26) ---
   14: {
     qNum: 14,
-    answer: "F",
-    location: "Đoạn F, Dòng 1-3",
-    evidence: "Silvius emphasises that conservation projects can only succeed if local communities derive tangible economic benefits and livelihood security from wetland protection.",
-    explanation: "Đoạn F nhấn mạnh cư dân sống quanh vùng đất ngập nước cần được hưởng lợi ích kinh tế và đảm bảo sinh kế khi tham gia bảo tồn.",
+    answer: "G",
+    location: "Đoạn G, Dòng 1-6",
+    evidence: "Silvius also acknowledges the importance of income generation... we recognise there's a need to provide an income for local people. 'The idea is that people in a developing country will only protect wetlands if they value and profit from them,' says McCartney.",
+    explanation: "Đoạn G nhấn mạnh cư dân sống quanh vùng đất ngập nước cần tiếp tục thu được lợi ích kinh tế và nguồn thu nhập từ các khu vực này (G: reference to the need to ensure that inhabitants of wetland regions continue to benefit from them).",
     keywords: [
-      { question: "inhabitants must benefit financially", passage: "local communities derive tangible economic benefits" }
+      { question: "inhabitants continue to benefit", passage: "provide an income for local people... profit from them" }
     ]
   },
   15: {
     qNum: 15,
     answer: "A",
-    location: "Đoạn A, Dòng 5-7",
-    evidence: "According to recent assessments, more than 64% of the world's wetlands have disappeared since 1900 alone.",
-    explanation: "Đoạn A đưa ra số liệu cụ thể: hơn 64% diện tích đất ngập nước trên thế giới đã bị xóa sổ chỉ kể từ năm 1900.",
+    location: "Đoạn A, Dòng 3-5",
+    evidence: "But according to the World Wide Fund for Nature (WWFN), half of the world's wetlands have disappeared since 1990 — converted or destroyed for commercial development...",
+    explanation: "Đoạn A nêu tỷ lệ diện tích đất ngập nước đã bị mất đi trên toàn cầu: một nửa (half / 50%) kể từ năm 1990.",
     keywords: [
-      { question: "proportion of wetlands already lost", passage: "more than 64% of wetlands have disappeared" }
+      { question: "proportion of wetlands already lost", passage: "half of the world's wetlands have disappeared since 1990" }
     ]
   },
   16: {
     qNum: 16,
     answer: "H",
-    location: "Đoạn H, Dòng 1-3",
-    evidence: "'Awareness of the importance of wetlands is growing,' McCartney says. 'Governments and public bodies are finally starting to value the ecological services they offer.'",
-    explanation: "Đoạn H khẳng định nhận thức của cộng đồng và các chính phủ về vai trò sinh thái của đất ngập nước đang bắt đầu được trân trọng và đánh giá cao hơn.",
+    location: "Đoạn H, Dòng 4-6",
+    evidence: "McCartney is cautiously optimistic, however. 'Awareness of the importance of wetlands is growing,' he says. 'It's true that wetland degradation still continues at a rapid pace, but my impression is that things are slowly changing.'",
+    explanation: "Đoạn H khẳng định nhận thức của mọi người về tầm quan trọng của đất ngập nước đang ngày càng gia tăng và bắt đầu trân trọng giá trị của chúng.",
     keywords: [
       { question: "people are beginning to appreciate value", passage: "awareness of the importance of wetlands is growing" }
     ]
   },
   17: {
     qNum: 17,
-    answer: "A",
-    location: "Đoạn A, Dòng 2-4",
-    evidence: "For millennia, human civilisations developed alongside marshes and floodplains, embedding them deeply into local folklore, religious rites, and cultural traditions.",
-    explanation: "Đoạn A nhắc tới ý nghĩa văn hóa và tâm linh lâu đời của đất ngập nước đối với sự phát triển của các nền văn minh nhân loại.",
+    answer: "B",
+    location: "Đoạn B, Dòng 1-3",
+    evidence: "Throughout history, humans have gathered around wetlands, and their fertile ecosystems have played an important part in human development. Consequently, they are of considerable religious, historical and archaeological value to many communities around the world.",
+    explanation: "Đoạn B nhắc tới ý nghĩa văn hóa, lịch sử, khảo cổ và tâm linh của đất ngập nước đối với nhiều cộng đồng người trên thế giới.",
     keywords: [
-      { question: "cultural significance of wetlands", passage: "embedded into local folklore, religious rites, and cultural traditions" }
+      { question: "cultural significance of wetlands", passage: "considerable religious, historical and archaeological value" }
     ]
   },
   18: {
@@ -230,42 +230,42 @@ export const cam19Test3ReadingExplanations = {
   },
   23: {
     qNum: 23,
-    answer: "C",
-    location: "Đoạn F, Dòng 1-3",
-    evidence: "Silvius argues that local indigenous communities must be active partners at the decision-making table for any wetland restoration initiative.",
-    explanation: "Marcel Silvius nhấn mạnh cộng đồng địa phương phải được tham gia trực tiếp vào các cuộc thảo luận và quyết định bảo tồn.",
+    answer: "A",
+    location: "Đoạn G, Dòng 4-6",
+    evidence: "'For sustainability, it's essential that local people are involved in wetland planning and decision making and have clear rights to use wetlands,' says McCartney.",
+    explanation: "Matthew McCartney (đáp án A) khẳng định cộng đồng địa phương phải được tham gia vào quy hoạch và ra quyết định về tương lai các vùng đất ngập nước.",
     keywords: [
-      { question: "communities must be included in discussions", passage: "local indigenous communities must be active partners at decision-making table" }
+      { question: "communities must be included in discussions", passage: "essential that local people are involved in wetland planning and decision making" }
     ]
   },
   24: {
     qNum: 24,
-    answer: "D",
-    location: "Đoạn G, Dòng 1-3",
-    evidence: "Tickner notes that legal protections and national policies vary wildly between jurisdictions, with some nations enforcing strict safeguards while others encourage conversion.",
-    explanation: "Dave Tickner nhận xét chính sách và luật pháp bảo vệ đất ngập nước có sự khác biệt rất lớn giữa các quốc gia.",
+    answer: "C",
+    location: "Đoạn H, Dòng 1-3",
+    evidence: "The fortunes of wetlands would be improved, Silvius suggests, if more governments recognised their long-term value. 'Different governments have different attitudes,' he says...",
+    explanation: "Marcel Silvius (đáp án C) nhận xét chính sách và thái độ của các chính phủ đối với đất ngập nước có sự khác biệt giữa các quốc gia.",
     keywords: [
-      { question: "official policies vary from nation to nation", passage: "policies vary wildly between jurisdictions" }
+      { question: "official policies vary from nation to nation", passage: "different governments have different attitudes" }
     ]
   },
   25: {
     qNum: 25,
-    answer: "B",
-    location: "Đoạn E, Dòng 2-4",
-    evidence: "Pieter van Eijk points out that ordinary consumers cause wetland destruction unknowingly through their everyday purchasing of everyday products containing uncertified palm oil.",
-    explanation: "Pieter van Eijk chỉ ra rằng nhiều người tiêu dùng vô tình gây hại cho đất ngập nước mà không hề hay biết do sử dụng các sản phẩm có nguồn gốc từ vùng bị phá hủy.",
+    answer: "D",
+    location: "Đoạn F, Dòng 7-10",
+    evidence: "Tickner does not blame anyone for deliberate damage, however. 'I've worked on wetland issues for 20 years and have never met anybody who wanted to damage a wetland,' he says. 'It isn't something that people generally set out to do. Quite often, the effects simply come from people trying to make a living.'",
+    explanation: "Dave Tickner (đáp án D) cho rằng mọi người gây hại cho đất ngập nước không phải do cố ý (without intention), mà thường chỉ vì mưu sinh.",
     keywords: [
-      { question: "harm wetlands without having any intention to", passage: "cause wetland destruction unknowingly through everyday purchasing" }
+      { question: "harm wetlands without having any intention to", passage: "never met anybody who wanted to damage a wetland... not something people set out to do" }
     ]
   },
   26: {
     qNum: 26,
-    answer: "A",
-    location: "Đoạn H, Dòng 4-6",
-    evidence: "Matthew McCartney suggests that simple, low-cost interventions, like blocking drainage ditches with wooden stakes, can successfully revive vast wetland areas.",
-    explanation: "Matthew McCartney cho rằng các giải pháp phục hồi môi trường không nhất thiết phải phức tạp hay đắt đỏ (chỉ cần các biện pháp ngăn rãnh thoát nước đơn giản).",
+    answer: "B",
+    location: "Đoạn C, Dòng 7-10",
+    evidence: "'It can be as simple as planting a few trees per hectare to create shade and substantially change a microclimate,' he says. 'Implementing climate change projects isn't so much about money.'",
+    explanation: "Pieter van Eijk (đáp án B) cho rằng các sáng kiến phục hồi môi trường không nhất thiết phải phức tạp hay tốn kém, đôi khi chỉ đơn giản là trồng vài cây mỗi hecta.",
     keywords: [
-      { question: "initiatives need not be complex or expensive", passage: "simple, low-cost interventions can successfully revive vast wetlands" }
+      { question: "initiatives need not be complex", passage: "can be as simple as planting a few trees per hectare" }
     ]
   },
 
@@ -312,22 +312,22 @@ export const cam19Test3ReadingExplanations = {
   },
   31: {
     qNum: 31,
-    answer: "E",
-    location: "Đoạn 6, Dòng 2-4",
-    evidence: "Voice translation is booming in Japan partly because real-time automated systems enable immediate cross-linguistic communication for tourism and transport.",
-    explanation: "Hệ thống dịch phát triển thần tốc tại Nhật Bản nhờ khả năng chuyển ngữ tức thời (E: because translation is immediate).",
+    answer: "C",
+    location: "Đoạn 6, Dòng 1-3",
+    evidence: "Waibel highlights the significance of certain Asian nations, noting that voice translation has really taken off in countries such as Japan with a range of systems. There is still a long way to go, though.",
+    explanation: "Phương pháp dịch giọng nói đang phát triển rất nhanh tại Nhật Bản nhưng vẫn còn một chặng đường dài phía trước, tức chưa hề hoàn hảo (C: but they are far from perfect).",
     keywords: [
-      { question: "because translation is immediate", passage: "real-time automated systems enable immediate communication" }
+      { question: "developing fast in Japan but far from perfect", passage: "voice translation has really taken off in countries such as Japan... There is still a long way to go, though" }
     ]
   },
   32: {
     qNum: 32,
-    answer: "C",
-    location: "Đoạn 7, Dòng 2-4",
-    evidence: "Broadcast voiceovers succeed in conveying basic meaning, but they remain far from perfect, often stripping nuanced inflections and emotional timbre.",
-    explanation: "Các chương trình truyền hình dùng lồng tiếng dịch thuật truyền tải được ý chính nhưng còn lâu mới đạt độ hoàn hảo (C: but they are far from perfect).",
+    answer: "E",
+    location: "Đoạn 6, Dòng 3-6",
+    evidence: "A translation system needs to be simultaneous, like the translator's voice speaking over the foreign politician being interviewed on the TV, rather than in sections that oblige speakers to pause after every few remarks...",
+    explanation: "Các cuộc phỏng vấn truyền hình sử dụng kỹ thuật lồng tiếng dịch thuật thành công là do quá trình dịch diễn ra đồng thời, tức thời (E: because translation is immediate).",
     keywords: [
-      { question: "far from perfect", passage: "remain far from perfect, stripping nuanced inflections" }
+      { question: "interviews that use voiceover successful because immediate", passage: "needs to be simultaneous, like translator's voice speaking over foreign politician on TV, rather than in sections" }
     ]
   },
   33: {

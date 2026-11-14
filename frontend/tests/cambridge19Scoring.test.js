@@ -122,11 +122,11 @@ describe("Cambridge IELTS 19 - Full Tests Integrity & 100% Authentic Scoring", (
       const answers = {
         1: "FALSE", 2: "FALSE", 3: "TRUE", 4: "NOT GIVEN", 5: "TRUE", 6: "NOT GIVEN", 7: "FALSE",
         8: "caves", 9: "stone", 10: "bones", 11: "beads", 12: "pottery", 13: "spices",
-        14: "G", 15: "B", 16: "H", 17: "A",
+        14: "G", 15: "A", 16: "H", 17: "B",
         18: "carbon", 19: "fires", 20: "biodiversity", 21: "ditches", 22: "subsidence",
-        23: "C", 24: "D", 25: "B", 26: "A",
+        23: "A", 24: "C", 25: "D", 26: "B",
         27: "D", 28: "A", 29: "C", 30: "B",
-        31: "E", 32: "C", 33: "F", 34: "B",
+        31: "C", 32: "E", 33: "F", 34: "B",
         35: "NO", 36: "YES", 37: "NO", 38: "NOT GIVEN", 39: "NOT GIVEN", 40: "YES"
       };
       const result = gradeReadingTest(cambridge19Test3.skills.reading, answers);
@@ -166,7 +166,7 @@ describe("Cambridge IELTS 19 - Full Tests Integrity & 100% Authentic Scoring", (
         1: "FALSE", 2: "TRUE", 3: "FALSE", 4: "NOT GIVEN", 5: "FALSE", 6: "TRUE",
         7: "colonies", 8: "spring", 9: "endangered", 10: "habitats", 11: "Europe", 12: "southern", 13: "diet",
         14: "B", 15: "D", 16: "C", 17: "F",
-        18: "D", 19: "B", 20: "A", 21: "E", 22: "C", 23: "C",
+        18: "D", 19: "B", 20: "A", 21: "E", 22: "B", 23: "C",
         24: "waste", 25: "machinery", 26: "caution",
         27: "C", 28: "C", 29: "B", 30: "A",
         31: "egalitarianism", 32: "status", 33: "hunting", 34: "domineering", 35: "autonomy",

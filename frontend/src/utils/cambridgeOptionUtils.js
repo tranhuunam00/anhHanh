@@ -44,9 +44,16 @@ export function parseOption(opt) {
   }
 
   // Single letter only or fallback
+  if (str.length === 1) {
+    return {
+      letter: str.toUpperCase(),
+      text: ""
+    };
+  }
+
   return {
     letter: str.charAt(0).toUpperCase(),
-    text: str.slice(1).trim() || str
+    text: str.slice(1).trim()
   };
 }
 

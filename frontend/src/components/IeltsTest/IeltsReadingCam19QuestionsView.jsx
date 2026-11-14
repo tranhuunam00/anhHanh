@@ -16,9 +16,15 @@ export function renderCam19ReadingPassageQuestions(
   evaluation,
   isReview,
   testId = "cambridge-19",
-  passageText = ""
+  passageText = "",
+  paragraphs = []
 ) {
   if (!groups || groups.length === 0) return null;
+
+  const paragraphLetterIds =
+    Array.isArray(paragraphs) && paragraphs.length > 0 && /^[A-Z]$/.test(paragraphs[0]?.id)
+      ? paragraphs.map((p) => p.id)
+      : null;
 
   return (
     <div className="ielts-questions-inner">
@@ -221,15 +227,14 @@ export function renderCam19ReadingPassageQuestions(
                   const matchOpts =
                     it.options ||
                     referenceOptions ||
-                    group.options || [
+                    group.options ||
+                    paragraphLetterIds || [
                       "A",
                       "B",
                       "C",
                       "D",
                       "E",
-                      "F",
-                      "G",
-                      "H"
+                      "F"
                     ];
 
                   return (
@@ -272,9 +277,13 @@ export function renderCam19ReadingPassageQuestions(
                           <option value="">Chọn đáp án...</option>
                           {matchOpts.map((opt) => {
                             const { letter, text } = parseOption(opt);
+                            const displayLabel =
+                              text && text.toUpperCase() !== letter.toUpperCase()
+                                ? `${letter} - ${text}`
+                                : letter;
                             return (
                               <option key={letter} value={letter}>
-                                {letter} {text ? `- ${text}` : ""}
+                                {displayLabel}
                               </option>
                             );
                           })}

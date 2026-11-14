@@ -41,7 +41,7 @@ test("cambridgeOptionUtils - Unit Tests", async (t) => {
     assert.deepEqual(parseOption({}), { letter: "", text: "" });
 
     // Standalone letter
-    assert.deepEqual(parseOption("A"), { letter: "A", text: "A" });
+    assert.deepEqual(parseOption("A"), { letter: "A", text: "" });
   });
 
   await t.test("extractMatchingOptions - precedence and fallbacks", () => {

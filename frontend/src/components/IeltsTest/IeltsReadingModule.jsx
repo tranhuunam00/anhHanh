@@ -220,7 +220,8 @@ export const IeltsReadingModule = ({
             effectiveEval,
             isReview,
             readingData?.testId,
-            currentRightPassageText
+            currentRightPassageText,
+            currentRightPassage?.paragraphs
           )
         ) : readingData?.testId === "cambridge-20-test-1" ? (
           <>

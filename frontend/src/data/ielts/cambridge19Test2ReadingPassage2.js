@@ -35,12 +35,13 @@ export const cambridge19Test2ReadingPassage2 = {
     {
       groupType: "matching_information",
       instructions: "Questions 14–18: Reading Passage 2 has six paragraphs, A–F.\nWhich paragraph contains the following information?\nWrite the correct letter, A–F, in boxes 14–18 on your answer sheet.\nNB You may use any letter more than once.",
+      options: ["A", "B", "C", "D", "E", "F"],
       numbers: [14, 15, 16, 17, 18],
       items: [
         {
           number: 14,
           question: "reference to two chemical compounds which impact on performance",
-          answers: ["C", "D"]
+          answers: ["C"]
         },
         {
           number: 15,

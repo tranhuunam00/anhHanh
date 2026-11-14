@@ -220,12 +220,12 @@ export const cam19Test4ReadingExplanations = {
   },
   22: {
     qNum: 22,
-    answer: "C",
-    location: "Đoạn E, Dòng 1-3",
-    evidence: "Dr Jon Copley remarked: 'We know more about the topography of Mars and the Moon than we do about the abyssal plains of our own planet.'",
-    explanation: "Tiến sĩ Jon Copley nhận xét con người hiểu biết về bề mặt Mặt Trăng và Sao Hỏa nhiều hơn cả đáy biển sâu của chính Trái Đất.",
+    answer: "B",
+    location: "Đoạn E & F, Dòng 1-3 & Dòng 8-11",
+    evidence: "The authors say that knowledge of the deep seabed remains extremely limited. 'The surface of the Moon, Mars and even Venus have all been mapped and studied in much greater detail... a paper, written by Julie Hunter and Julian Aguon, from Blue Ocean Law, and Pradeep Singh, from the Center for Marine Environmental Sciences, Bremen, argues.",
+    explanation: "Nhóm tác giả gồm Julie Hunter, Julian Aguon và Pradeep Singh (đáp án B) đưa ra nhận định rằng con người biết về không gian vũ trụ (Mặt Trăng, Sao Hỏa, Sao Kim) nhiều hơn đáy đại dương.",
     keywords: [
-      { question: "more is known about outer space than seabed", passage: "know more about topography of Mars and Moon than abyssal plains of our planet" }
+      { question: "more is known about outer space than seabed", passage: "surface of the Moon, Mars and even Venus mapped and studied in much greater detail... Julie Hunter, Julian Aguon and Pradeep Singh" }
     ]
   },
   23: {

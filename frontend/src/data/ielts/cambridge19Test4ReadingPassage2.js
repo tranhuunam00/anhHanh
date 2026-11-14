@@ -35,6 +35,7 @@ export const cambridge19Test4ReadingPassage2 = {
     {
       groupType: "matching_information",
       instructions: "Questions 14–17: Reading Passage 2 has six paragraphs, A–F.\nWhich paragraph contains the following information?\nWrite the correct letter, A–F, in boxes 14–17 on your answer sheet.",
+      options: ["A", "B", "C", "D", "E", "F"],
       numbers: [14, 15, 16, 17],
       items: [
         {
@@ -45,7 +46,7 @@ export const cambridge19Test4ReadingPassage2 = {
         {
           number: 15,
           question: "a rough estimate of the area of the Earth covered by the oceans",
-          answers: ["D", "A"]
+          answers: ["D"]
         },
         {
           number: 16,
@@ -62,6 +63,13 @@ export const cambridge19Test4ReadingPassage2 = {
     {
       groupType: "matching_people",
       instructions: "Questions 18–23: Look at the following statements (Questions 18–23) and the list of people below.\nMatch each statement with the correct person or people, A–E.\nWrite the correct letter, A–E, in boxes 18–23 on your answer sheet.\nNB You may use any letter more than once.\n\nList of People:\nA. Professor Mat Upton\nB. Julie Hunter, Julian Aguon and Pradeep Singh\nC. Dr Jon Copley\nD. Mike Johnston\nE. Verena Tunnicliffe",
+      options: [
+        "A. Professor Mat Upton",
+        "B. Julie Hunter, Julian Aguon and Pradeep Singh",
+        "C. Dr Jon Copley",
+        "D. Mike Johnston",
+        "E. Verena Tunnicliffe"
+      ],
       numbers: [18, 19, 20, 21, 22, 23],
       items: [
         {
@@ -87,7 +95,7 @@ export const cambridge19Test4ReadingPassage2 = {
         {
           number: 22,
           question: "More is known about outer space than about what lies beneath the oceans.",
-          answers: ["C", "B"]
+          answers: ["B"]
         },
         {
           number: 23,
