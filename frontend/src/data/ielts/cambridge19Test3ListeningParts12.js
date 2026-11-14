@@ -122,31 +122,32 @@ export const cambridge19Test3ListeningPart2 = {
   title: "Part 2: Children's Book Festival",
   instructions: "Questions 11–16: Choose SIX answers from the box and write the correct letter, A–H, next to Questions 11–16.\nQuestions 17–18: Choose TWO letters, A–E.\nQuestions 19–20: Choose TWO letters, A–E.",
   questionsRange: [11, 20],
-  boxTitle: "Festival Workshops Information (Questions 11–16)",
+  boxTitle: "Information (Questions 11–16)",
   boxOptions: [
-    "A It involves painting or drawing.",
-    "B It encourages children to consider new relationships.",
-    "C It features a character with a disability.",
-    "D It includes some drama or acting.",
-    "E It deals with unhappy feelings.",
-    "F It is suitable for a specific age group.",
-    "G It explores an aspect of a different culture.",
-    "H It is by a prize-winning author."
+    "A involves painting and drawing",
+    "B will be led by a prize-winning author",
+    "C is aimed at children with a disability",
+    "D involves a drama activity",
+    "E focuses on new relationships",
+    "F is aimed at a specific age group",
+    "G explores an unhappy feeling",
+    "H raises awareness of a particular culture"
   ],
   items: [
     {
       number: 11,
       type: "matching",
+      groupHeader: "Questions 11–16: What information is given about each of the following festival workshops? Choose SIX answers from the box and write the correct letter, A–H, next to Questions 11–16.",
       question: "Superheroes",
       options: [
-        "A It involves painting or drawing.",
-        "B It encourages children to consider new relationships.",
-        "C It features a character with a disability.",
-        "D It includes some drama or acting.",
-        "E It deals with unhappy feelings.",
-        "F It is suitable for a specific age group.",
-        "G It explores an aspect of a different culture.",
-        "H It is by a prize-winning author."
+        "A involves painting and drawing",
+        "B will be led by a prize-winning author",
+        "C is aimed at children with a disability",
+        "D involves a drama activity",
+        "E focuses on new relationships",
+        "F is aimed at a specific age group",
+        "G explores an unhappy feeling",
+        "H raises awareness of a particular culture"
       ],
       answers: ["C"]
     },
@@ -155,14 +156,14 @@ export const cambridge19Test3ListeningPart2 = {
       type: "matching",
       question: "Just do it",
       options: [
-        "A It involves painting or drawing.",
-        "B It encourages children to consider new relationships.",
-        "C It features a character with a disability.",
-        "D It includes some drama or acting.",
-        "E It deals with unhappy feelings.",
-        "F It is suitable for a specific age group.",
-        "G It explores an aspect of a different culture.",
-        "H It is by a prize-winning author."
+        "A involves painting and drawing",
+        "B will be led by a prize-winning author",
+        "C is aimed at children with a disability",
+        "D involves a drama activity",
+        "E focuses on new relationships",
+        "F is aimed at a specific age group",
+        "G explores an unhappy feeling",
+        "H raises awareness of a particular culture"
       ],
       answers: ["D"]
     },
@@ -171,14 +172,14 @@ export const cambridge19Test3ListeningPart2 = {
       type: "matching",
       question: "Count on me",
       options: [
-        "A It involves painting or drawing.",
-        "B It encourages children to consider new relationships.",
-        "C It features a character with a disability.",
-        "D It includes some drama or acting.",
-        "E It deals with unhappy feelings.",
-        "F It is suitable for a specific age group.",
-        "G It explores an aspect of a different culture.",
-        "H It is by a prize-winning author."
+        "A involves painting and drawing",
+        "B will be led by a prize-winning author",
+        "C is aimed at children with a disability",
+        "D involves a drama activity",
+        "E focuses on new relationships",
+        "F is aimed at a specific age group",
+        "G explores an unhappy feeling",
+        "H raises awareness of a particular culture"
       ],
       answers: ["F"]
     },
@@ -187,14 +188,14 @@ export const cambridge19Test3ListeningPart2 = {
       type: "matching",
       question: "Speak up",
       options: [
-        "A It involves painting or drawing.",
-        "B It encourages children to consider new relationships.",
-        "C It features a character with a disability.",
-        "D It includes some drama or acting.",
-        "E It deals with unhappy feelings.",
-        "F It is suitable for a specific age group.",
-        "G It explores an aspect of a different culture.",
-        "H It is by a prize-winning author."
+        "A involves painting and drawing",
+        "B will be led by a prize-winning author",
+        "C is aimed at children with a disability",
+        "D involves a drama activity",
+        "E focuses on new relationships",
+        "F is aimed at a specific age group",
+        "G explores an unhappy feeling",
+        "H raises awareness of a particular culture"
       ],
       answers: ["G"]
     },
@@ -203,14 +204,14 @@ export const cambridge19Test3ListeningPart2 = {
       type: "matching",
       question: "Jump for joy",
       options: [
-        "A It involves painting or drawing.",
-        "B It encourages children to consider new relationships.",
-        "C It features a character with a disability.",
-        "D It includes some drama or acting.",
-        "E It deals with unhappy feelings.",
-        "F It is suitable for a specific age group.",
-        "G It explores an aspect of a different culture.",
-        "H It is by a prize-winning author."
+        "A involves painting and drawing",
+        "B will be led by a prize-winning author",
+        "C is aimed at children with a disability",
+        "D involves a drama activity",
+        "E focuses on new relationships",
+        "F is aimed at a specific age group",
+        "G explores an unhappy feeling",
+        "H raises awareness of a particular culture"
       ],
       answers: ["B"]
     },
@@ -219,14 +220,14 @@ export const cambridge19Test3ListeningPart2 = {
       type: "matching",
       question: "Sticks and stones",
       options: [
-        "A It involves painting or drawing.",
-        "B It encourages children to consider new relationships.",
-        "C It features a character with a disability.",
-        "D It includes some drama or acting.",
-        "E It deals with unhappy feelings.",
-        "F It is suitable for a specific age group.",
-        "G It explores an aspect of a different culture.",
-        "H It is by a prize-winning author."
+        "A involves painting and drawing",
+        "B will be led by a prize-winning author",
+        "C is aimed at children with a disability",
+        "D involves a drama activity",
+        "E focuses on new relationships",
+        "F is aimed at a specific age group",
+        "G explores an unhappy feeling",
+        "H raises awareness of a particular culture"
       ],
       answers: ["H"]
     },
@@ -234,6 +235,7 @@ export const cambridge19Test3ListeningPart2 = {
       number: 17,
       type: "choose_two",
       pairNumber: 18,
+      groupHeader: "Questions 17–18: Choose TWO letters, A–E.",
       question: "Which TWO reasons does the speaker give for recommending Alive and Kicking? (First selection):",
       options: [
         "A. It will appeal to both boys and girls.",

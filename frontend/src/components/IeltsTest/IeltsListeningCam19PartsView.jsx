@@ -240,7 +240,8 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
             margin: "0 0 12px",
             fontWeight: 700,
             fontSize: "0.98rem",
-            color: "var(--text-primary)"
+            color: "var(--text-primary)",
+            whiteSpace: "pre-line"
           }}
         >
           {part.boxTitle || "Options / Bảng lựa chọn:"}
@@ -322,6 +323,22 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
             const shouldRenderBox = idx === targetIdx;
             return (
               <React.Fragment key={item.number || idx}>
+                {item.groupHeader && (
+                  <div
+                    className="ielts-group-header"
+                    style={{
+                      marginTop: idx === 0 ? "8px" : "24px",
+                      marginBottom: "12px",
+                      paddingBottom: "6px",
+                      borderBottom: "1px solid var(--border-color)",
+                      fontWeight: 700,
+                      fontSize: "0.98rem",
+                      color: "var(--text-primary)"
+                    }}
+                  >
+                    {item.groupHeader}
+                  </div>
+                )}
                 {shouldRenderBox && renderBoxOptions()}
                 {renderItem(item)}
               </React.Fragment>

@@ -77,7 +77,9 @@ export const cambridge19Test2ListeningPart1 = {
       type: "fill_notes",
       prefix: "Recommended website: 'The perfect ",
       suffix: "'",
-      answers: ["start"]
+      answer: "instrument",
+      acceptedAnswers: ["instrument"],
+      answers: ["instrument"]
     },
     {
       number: 7,

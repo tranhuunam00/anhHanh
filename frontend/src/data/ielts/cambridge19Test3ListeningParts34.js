@@ -60,7 +60,7 @@ export const cambridge19Test3ListeningPart3 = {
         "B. Does an increase in sugar lead to health problems?",
         "C. How much do supplements of different kinds affect health?"
       ],
-      answers: ["C"]
+      answers: ["A"]
     },
     {
       number: 25,
@@ -71,11 +71,12 @@ export const cambridge19Test3ListeningPart3 = {
         "B. different genetic strains of mice.",
         "C. varying amounts of exercise."
       ],
-      answers: ["A"]
+      answers: ["C"]
     },
     {
       number: 26,
       type: "matching",
+      groupHeader: "Questions 26–30: Complete the flowchart below. Choose FIVE answers from the box and write the correct letter, A–H, next to Questions 26–30.",
       question: "Choose mice which are all the same ...",
       options: [
         "A size",
@@ -103,7 +104,7 @@ export const cambridge19Test3ListeningPart3 = {
         "G changes",
         "H colour"
       ],
-      answers: ["A"]
+      answers: ["H"]
     },
     {
       number: 28,
@@ -119,7 +120,7 @@ export const cambridge19Test3ListeningPart3 = {
         "G changes",
         "H colour"
       ],
-      answers: ["D"]
+      answers: ["E"]
     },
     {
       number: 29,

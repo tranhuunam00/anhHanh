@@ -6,14 +6,14 @@ export const cambridge19Test2ListeningPart3 = {
   title: "Part 3: Footwear Recycling Project",
   instructions: "Questions 21–24: Choose the correct letter, A, B or C.\nQuestions 25–28: Choose FOUR answers from the box and write the correct letter, A–F.\nQuestions 29–30: Choose the correct letter, A, B or C.",
   questionsRange: [21, 30],
-  boxTitle: "Reasons shoes were rejected (Questions 25–28)",
+  boxTitle: "Reasons (Questions 25–28)",
   boxOptions: [
     "A one shoe was missing",
-    "B colour faded",
-    "C hole in it",
-    "D brand new",
-    "E too dirty",
-    "F stitching broken"
+    "B the colour of one shoe had faded",
+    "C one shoe had a hole in it",
+    "D the shoes were brand new",
+    "E the shoes were too dirty",
+    "F the stitching on the shoes was broken"
   ],
   items: [
     {
@@ -63,14 +63,15 @@ export const cambridge19Test2ListeningPart3 = {
     {
       number: 25,
       type: "matching",
+      groupHeader: "Questions 25–28: What reasons did the recycling manager give for rejecting footwear, according to the students? Choose FOUR answers from the box and write the correct letter, A–F, next to Questions 25–28.",
       question: "the high-heeled shoes",
       options: [
         "A one shoe was missing",
-        "B colour faded",
-        "C hole in it",
-        "D brand new",
-        "E too dirty",
-        "F stitching broken"
+        "B the colour of one shoe had faded",
+        "C one shoe had a hole in it",
+        "D the shoes were brand new",
+        "E the shoes were too dirty",
+        "F the stitching on the shoes was broken"
       ],
       answers: ["C"]
     },
@@ -80,11 +81,11 @@ export const cambridge19Test2ListeningPart3 = {
       question: "the ankle boots",
       options: [
         "A one shoe was missing",
-        "B colour faded",
-        "C hole in it",
-        "D brand new",
-        "E too dirty",
-        "F stitching broken"
+        "B the colour of one shoe had faded",
+        "C one shoe had a hole in it",
+        "D the shoes were brand new",
+        "E the shoes were too dirty",
+        "F the stitching on the shoes was broken"
       ],
       answers: ["F"]
     },
@@ -94,11 +95,11 @@ export const cambridge19Test2ListeningPart3 = {
       question: "the baby shoes",
       options: [
         "A one shoe was missing",
-        "B colour faded",
-        "C hole in it",
-        "D brand new",
-        "E too dirty",
-        "F stitching broken"
+        "B the colour of one shoe had faded",
+        "C one shoe had a hole in it",
+        "D the shoes were brand new",
+        "E the shoes were too dirty",
+        "F the stitching on the shoes was broken"
       ],
       answers: ["D"]
     },
@@ -108,17 +109,18 @@ export const cambridge19Test2ListeningPart3 = {
       question: "the trainers",
       options: [
         "A one shoe was missing",
-        "B colour faded",
-        "C hole in it",
-        "D brand new",
-        "E too dirty",
-        "F stitching broken"
+        "B the colour of one shoe had faded",
+        "C one shoe had a hole in it",
+        "D the shoes were brand new",
+        "E the shoes were too dirty",
+        "F the stitching on the shoes was broken"
       ],
       answers: ["A"]
     },
     {
       number: 29,
       type: "multiple_choice",
+      groupHeader: "Questions 29–30: Choose the correct letter, A, B or C.",
       question: "Why did the project to make 'new' shoes out of old shoes fail?",
       options: [
         "A. People believed the 'new' pairs of shoes were unhygienic.",

@@ -132,13 +132,20 @@ export const cambridge19Test4ListeningPart1 = {
 export const cambridge19Test4ListeningPart2 = {
   partNumber: 2,
   title: "Part 2: Compton Park Runners Club",
-  instructions: "Questions 11–12: Choose TWO letters, A–E.\nQuestions 13–14: Choose TWO letters, A–E.\nQuestions 15–18: Write the correct letter, A, B or C.\nQuestions 19–20: Choose the correct letter, A, B or C.",
+  instructions: "Questions 11–12: Choose TWO letters, A–E.\nQuestions 13–14: Choose TWO letters, A–E.\nQuestions 15–18: Write the correct letter, A, B or C, next to Questions 15–18.\nQuestions 19–20: Choose the correct letter, A, B or C.",
   questionsRange: [11, 20],
+  boxTitle: "Reasons (Questions 15–18)",
+  boxOptions: [
+    "A a lack of confidence",
+    "B a dislike of running",
+    "C a lack of time"
+  ],
   items: [
     {
       number: 11,
       type: "choose_two",
       pairNumber: 12,
+      groupHeader: "Questions 11–12: Choose TWO letters, A–E. Which TWO problems with some training programmes for new runners does Liz mention?",
       question: "Which TWO problems with some training programmes for new runners does Liz mention? (First selection):",
       options: [
         "A. There is a risk of serious injury.",
@@ -167,6 +174,7 @@ export const cambridge19Test4ListeningPart2 = {
       number: 13,
       type: "choose_two",
       pairNumber: 14,
+      groupHeader: "Questions 13–14: Choose TWO letters, A–E. Which TWO tips does Liz recommend for new runners?",
       question: "Which TWO tips does Liz recommend for new runners? (First selection):",
       options: [
         "A. doing two runs a week",
@@ -193,51 +201,53 @@ export const cambridge19Test4ListeningPart2 = {
     },
     {
       number: 15,
-      type: "multiple_choice",
-      question: "What reason prevented Ceri from joining until recently?",
+      type: "matching",
+      groupHeader: "Questions 15–18: What reason prevented each of the following members of the Compton Park Runners Club from joining until recently? Write the correct letter, A, B or C, next to Questions 15–18.",
+      question: "Ceri",
       options: [
-        "A. a lack of confidence",
-        "B. a dislike of running",
-        "C. a lack of time"
+        "A a lack of confidence",
+        "B a dislike of running",
+        "C a lack of time"
       ],
       answers: ["A"]
     },
     {
       number: 16,
-      type: "multiple_choice",
-      question: "What reason prevented James from joining until recently?",
+      type: "matching",
+      question: "James",
       options: [
-        "A. a lack of confidence",
-        "B. a dislike of running",
-        "C. a lack of time"
+        "A a lack of confidence",
+        "B a dislike of running",
+        "C a lack of time"
       ],
       answers: ["B"]
     },
     {
       number: 17,
-      type: "multiple_choice",
-      question: "What reason prevented Leo from joining until recently?",
+      type: "matching",
+      question: "Leo",
       options: [
-        "A. a lack of confidence",
-        "B. a dislike of running",
-        "C. a lack of time"
+        "A a lack of confidence",
+        "B a dislike of running",
+        "C a lack of time"
       ],
       answers: ["C"]
     },
     {
       number: 18,
-      type: "multiple_choice",
-      question: "What reason prevented Mark from joining until recently?",
+      type: "matching",
+      question: "Mark",
       options: [
-        "A. a lack of confidence",
-        "B. a dislike of running",
-        "C. a lack of time"
+        "A a lack of confidence",
+        "B a dislike of running",
+        "C a lack of time"
       ],
       answers: ["A"]
     },
     {
       number: 19,
       type: "multiple_choice",
+      groupHeader: "Questions 19–20: Choose the correct letter, A, B or C.",
       question: "What does Liz say about running her first marathon?",
       options: [
         "A. It had always been her ambition.",

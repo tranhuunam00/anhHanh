@@ -24,7 +24,7 @@ describe("Cambridge IELTS 19 - Full Tests Integrity & 100% Authentic Scoring", (
         6: "sounds", 7: "freedom", 8: "skills", 9: "4.95", 10: "leaders",
         11: "B", 12: "A", 13: "B", 14: "C", 15: "A",
         16: "G", 17: "C", 18: "B", 19: "D", 20: "A",
-        21: "B", 22: "D", 23: "A", 24: "E", 25: "D",
+        21: "B", 22: "D", 23: "A", 24: "D", 25: "D",
         26: "G", 27: "C", 28: "B", 29: "F", 30: "H",
         31: "walls", 32: "son", 33: "fuel", 34: "oxygen", 35: "rectangular",
         36: "lamps", 37: "family", 38: "winter", 39: "soil", 40: "rain"
@@ -62,7 +62,7 @@ describe("Cambridge IELTS 19 - Full Tests Integrity & 100% Authentic Scoring", (
 
     test("Listening: achieves 40/40 and Band 9.0 with authentic keys", () => {
       const answers = {
-        1: "Mathieson", 2: "beginners", 3: "college", 4: "New", 5: "11", 6: "start",
+        1: "Mathieson", 2: "beginners", 3: "college", 4: "New", 5: "11", 6: "instrument",
         7: "ear", 8: "clapping", 9: "recording", 10: "alone",
         11: "A", 12: "B", 13: "A", 14: "B", 15: "C", 16: "A",
         17: "C", 18: "E", 19: "B", 20: "D",
@@ -108,8 +108,8 @@ describe("Cambridge IELTS 19 - Full Tests Integrity & 100% Authentic Scoring", (
         7: "samphire", 8: "melon", 9: "coconut", 10: "strawberry",
         11: "C", 12: "D", 13: "F", 14: "G", 15: "B", 16: "H",
         17: "C", 18: "D", 19: "B", 20: "D",
-        21: "C", 22: "B", 23: "A", 24: "C", 25: "A",
-        26: "C", 27: "A", 28: "D", 29: "B", 30: "F",
+        21: "C", 22: "B", 23: "A", 24: "A", 25: "C",
+        26: "C", 27: "H", 28: "E", 29: "B", 30: "F",
         31: "clothing", 32: "mouths", 33: "salt", 34: "toothpaste", 35: "fertilisers",
         36: "nutrients", 37: "growth", 38: "weight", 39: "acid", 40: "society"
       };

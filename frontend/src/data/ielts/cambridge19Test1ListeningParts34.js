@@ -62,8 +62,8 @@ export const listeningParts34 = [
           "E to indicate the weight of certain foods"
         ],
         answer: "A",
-        acceptedAnswers: ["A", "E"],
-        answers: ["A", "E"]
+        acceptedAnswers: ["A", "D"],
+        answers: ["A", "D"]
       },
       {
         number: 24,
@@ -77,9 +77,9 @@ export const listeningParts34 = [
           "D to provide applications for blind people",
           "E to indicate the weight of certain foods"
         ],
-        answer: "E",
-        acceptedAnswers: ["A", "E"],
-        answers: ["A", "E"]
+        answer: "D",
+        acceptedAnswers: ["A", "D"],
+        answers: ["A", "D"]
       },
       {
         number: 25,
