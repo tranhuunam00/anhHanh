@@ -11,6 +11,7 @@ import {
   renderNoteBlock,
   renderFormBlock,
   renderTableBlock,
+  renderFlowchartBlock,
   extractAllHandledQuestionNumbers
 } from "./IeltsListeningBlockRenderer.jsx";
 
@@ -312,6 +313,11 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
       {!part.contentBlocks && part.tableBlock && (
         <div style={{ marginTop: "16px" }}>
           {renderTableBlock(part.tableBlock, answers, onChange, evaluation, isReview)}
+        </div>
+      )}
+      {!part.contentBlocks && part.flowchartBlock && (
+        <div style={{ marginTop: "16px" }}>
+          {renderFlowchartBlock(part.flowchartBlock, answers, onChange, evaluation, isReview)}
         </div>
       )}
 

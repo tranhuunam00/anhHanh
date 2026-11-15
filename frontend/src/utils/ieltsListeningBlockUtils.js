@@ -42,6 +42,21 @@ export function extractQuestionNumbersFromBlock(block) {
     }
   }
 
+  if (Array.isArray(block.steps)) {
+    for (const s of block.steps) {
+      if (s && typeof s.number === "number") {
+        nums.push(s.number);
+      }
+      if (Array.isArray(s?.lines)) {
+        for (const ln of s.lines) {
+          if (ln && typeof ln.number === "number") {
+            nums.push(ln.number);
+          }
+        }
+      }
+    }
+  }
+
   return nums;
 }
 
@@ -62,6 +77,9 @@ export function extractAllHandledQuestionNumbers(part) {
   }
   if (part.tableBlock) {
     extractQuestionNumbersFromBlock(part.tableBlock).forEach((n) => handled.add(n));
+  }
+  if (part.flowchartBlock) {
+    extractQuestionNumbersFromBlock(part.flowchartBlock).forEach((n) => handled.add(n));
   }
   if (Array.isArray(part.contentBlocks)) {
     for (const b of part.contentBlocks) {

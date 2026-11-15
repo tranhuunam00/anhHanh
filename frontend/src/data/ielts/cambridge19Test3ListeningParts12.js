@@ -16,15 +16,27 @@ export const cambridge19Test3ListeningPart1 = {
         {
           heading: "Where to go",
           lines: [
-            { text: "Fish market" },
-            { prefix: "Kite Place — near the ", number: 1, suffix: "" },
+            { prefix: "Kite Place — near the ", number: 1, suffix: "" }
+          ]
+        },
+        {
+          heading: "Fish market",
+          lines: [
             { prefix: "cross the ", number: 2, suffix: " and turn right" },
-            { prefix: "best to go before ", number: 3, suffix: " pm, earlier than closing time" },
-            { text: "Organic shop" },
+            { prefix: "best to go before ", number: 3, suffix: " pm, earlier than closing time" }
+          ]
+        },
+        {
+          heading: "Organic shop",
+          lines: [
             { prefix: "called '", number: 4, suffix: "'" },
             { text: "below a restaurant in the large, grey building" },
-            { prefix: "look for the large ", number: 5, suffix: " outside" },
-            { text: "Supermarket" },
+            { prefix: "look for the large ", number: 5, suffix: " outside" }
+          ]
+        },
+        {
+          heading: "Supermarket",
+          lines: [
             { prefix: "take a ", number: 6, suffix: " minibus, number 289" }
           ]
         }
@@ -47,7 +59,7 @@ export const cambridge19Test3ListeningPart1 = {
     {
       number: 1,
       type: "fill_notes",
-      prefix: "Where to go - Fish market: Kite Place — near the ",
+      prefix: "Where to go: Kite Place — near the ",
       suffix: "",
       answers: ["harbour", "harbor"]
     },

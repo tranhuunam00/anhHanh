@@ -6,17 +6,39 @@ export const cambridge19Test3ListeningPart3 = {
   title: "Part 3: Science Experiment for Year 12 Students",
   instructions: "Questions 21–25: Choose the correct letter, A, B or C.\nQuestions 26–30: Complete the flowchart below. Choose FIVE answers from the box and write the correct letter, A–H.",
   questionsRange: [21, 30],
-  boxTitle: "Flowchart Options (Questions 26–30)",
-  boxOptions: [
-    "A size",
-    "B escape",
-    "C age",
-    "D water",
-    "E cereal",
-    "F calculations",
-    "G changes",
-    "H colour"
-  ],
+  flowchartBlock: {
+    groupTitle: "Questions 26–30",
+    instructions: "Complete the flowchart below.\nChoose FIVE answers from the box and write the correct letter, A–H, next to Questions 26–30.",
+    boxTitle: "",
+    boxOptions: [
+      "A size",
+      "B escape",
+      "C age",
+      "D water",
+      "E cereal",
+      "F calculations",
+      "G changes",
+      "H colour"
+    ],
+    steps: [
+      { prefix: "Choose mice which are all the same ", number: 26, suffix: " ." },
+      { prefix: "Divide the mice into two groups, each with a different ", number: 27, suffix: " ." },
+      {
+        lines: [
+          { text: "Put each group in a separate cage." },
+          { text: "Feed group A commercial mouse food." },
+          { prefix: "Feed group B the same, but also sugar contained in ", number: 28, suffix: " ." }
+        ]
+      },
+      {
+        lines: [
+          { text: "Take measurements using an electronic scale." },
+          { prefix: "Place them in a weighing chamber to prevent ", number: 29, suffix: " ." }
+        ]
+      },
+      { prefix: "Do all necessary ", number: 30, suffix: " ." }
+    ]
+  },
   items: [
     {
       number: 21,
@@ -169,7 +191,7 @@ export const cambridge19Test3ListeningPart4 = {
         heading: "Where microplastics come from",
         lines: [
           { prefix: "fibres from some ", number: 31, suffix: " during washing" },
-          { text: "the breakdown of large pieces of plastic waste" },
+          { text: "the breakdown of large pieces of plastic" },
           { text: "waste from industry" },
           { text: "the action of vehicle tyres on roads" }
         ]
@@ -180,21 +202,21 @@ export const cambridge19Test3ListeningPart4 = {
           { prefix: "They cause injuries to the ", number: 32, suffix: " of wildlife and affect their digestive systems." },
           { prefix: "They enter the food chain, e.g., in bottled and tap water, ", number: 33, suffix: " and seafood." },
           { prefix: "They may not affect human health, but they are already banned in skin cleaning products and ", number: 34, suffix: " in some countries." },
-          { prefix: "Microplastics enter the soil through the air, rain and ", number: 35, suffix: " in the soil." }
+          { prefix: "Microplastics enter the soil through the air, rain and ", number: 35, suffix: " ." }
         ]
       },
       {
-        heading: "Microplastics in the soil — a study by Anglia Ruskin University",
+        heading: "Microplastics in the soil – a study by Anglia Ruskin University",
         lines: [
           { prefix: "Earthworms are important because they add ", number: 36, suffix: " to the soil." },
           { prefix: "The study aimed to find whether microplastics in earthworms affect the ", number: 37, suffix: " of plants." },
           { text: "The study found that microplastics caused:" },
-          { prefix: "— ", number: 38, suffix: " loss in earthworms" },
-          { text: "— fewer seeds to germinate" },
-          { prefix: "— a rise in the level of ", number: 39, suffix: "" },
-          { text: "The study concluded:" },
-          { text: "— soil should be seen as an important natural process." },
-          { prefix: "— changes to soil damage both ecosystems and ", number: 40, suffix: "" }
+          { prefix: "— ", number: 38, suffix: " loss in earthworms", isSubItem: true },
+          { text: "— fewer seeds to germinate", isSubItem: true },
+          { prefix: "— a rise in the level of ", number: 39, suffix: " in the soil.", isSubItem: true },
+          { text: "The study concluded:", isSubheading: true },
+          { text: "— soil should be seen as an important natural process.", isSubItem: true },
+          { prefix: "— changes to soil damage both ecosystems and ", number: 40, suffix: " .", isSubItem: true }
         ]
       }
     ]
@@ -232,7 +254,7 @@ export const cambridge19Test3ListeningPart4 = {
       number: 35,
       type: "fill_notes",
       prefix: "Microplastics enter the soil through the air, rain and ",
-      suffix: " in the soil.",
+      suffix: " .",
       answers: ["fertilisers", "fertilizers"]
     },
     {
@@ -260,14 +282,14 @@ export const cambridge19Test3ListeningPart4 = {
       number: 39,
       type: "fill_notes",
       prefix: "a rise in the level of ",
-      suffix: "",
+      suffix: " in the soil.",
       answers: ["acid"]
     },
     {
       number: 40,
       type: "fill_notes",
       prefix: "The study concluded: changes to soil damage both ecosystems and ",
-      suffix: "",
+      suffix: " .",
       answers: ["society"]
     }
   ]

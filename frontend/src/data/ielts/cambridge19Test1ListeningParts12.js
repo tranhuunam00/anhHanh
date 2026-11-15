@@ -7,6 +7,7 @@ export const listeningParts12 = [
     questionsRange: [1, 10],
     noteBlock: {
       title: "Hinchingbrooke Country Park",
+      noBullets: true,
       sections: [
         {
           heading: "The park",

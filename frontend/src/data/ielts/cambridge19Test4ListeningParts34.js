@@ -26,7 +26,7 @@ export const cambridge19Test4ListeningPart3 = {
         "B. hard to follow.",
         "C. over-protective."
       ],
-      answers: ["C"]
+      answers: ["A"]
     },
     {
       number: 22,
@@ -171,7 +171,7 @@ export const cambridge19Test4ListeningPart4 = {
       {
         heading: "Large-scale reforestation projects",
         lines: [
-          { prefix: "Base planning decisions on information from accurate ", number: 35, suffix: "" },
+          { prefix: "Base planning decisions on information from accurate ", number: 35, suffix: " ." },
           { prefix: "Drones are useful for identifying areas in Brazil which are endangered by keeping ", number: 36, suffix: " and illegal logging." }
         ]
       },
@@ -180,19 +180,19 @@ export const cambridge19Test4ListeningPart4 = {
         lines: [
           { text: "A forest was restored in an area damaged by mining." },
           { text: "A variety of native fig trees were planted, which are important for" },
-          { text: "— supporting many wildlife species" },
-          { prefix: "— increasing the ", number: 37, suffix: " of recovery by attracting animals and birds," },
-          { prefix: "e.g., ", number: 38, suffix: " were soon attracted to the area." }
+          { text: "— supporting many wildlife species", isSubItem: true },
+          { prefix: "— increasing the ", number: 37, suffix: " of recovery by attracting animals and birds,", isSubItem: true },
+          { prefix: "e.g., ", number: 38, suffix: " were soon attracted to the area.", isSubItem: true }
         ]
       },
       {
         heading: "Involving local communities",
         lines: [
-          { prefix: "Destruction of mangrove forests in Madagascar made it difficult for people to make a living from ", number: 39, suffix: "" },
+          { prefix: "Destruction of mangrove forests in Madagascar made it difficult for people to make a living from ", number: 39, suffix: " ." },
           { text: "The mangrove reforestation project:" },
-          { text: "— provided employment for local people" },
-          { text: "— restored a healthy ecosystem" },
-          { prefix: "— protects against the higher risk of ", number: 40, suffix: "" }
+          { text: "— provided employment for local people", isSubItem: true },
+          { text: "— restored a healthy ecosystem", isSubItem: true },
+          { prefix: "— protects against the higher risk of ", number: 40, suffix: " .", isSubItem: true }
         ]
       }
     ]
@@ -230,7 +230,7 @@ export const cambridge19Test4ListeningPart4 = {
       number: 35,
       type: "fill_notes",
       prefix: "Large-scale projects: Base planning decisions on information from accurate ",
-      suffix: "",
+      suffix: " .",
       answers: ["maps"]
     },
     {
@@ -258,14 +258,14 @@ export const cambridge19Test4ListeningPart4 = {
       number: 39,
       type: "fill_notes",
       prefix: "Destruction of mangrove forests in Madagascar made it difficult for people to make a living from ",
-      suffix: "",
+      suffix: " .",
       answers: ["fishing"]
     },
     {
       number: 40,
       type: "fill_notes",
       prefix: "The mangrove reforestation project protects against the higher risk of ",
-      suffix: "",
+      suffix: " .",
       answers: ["flooding"]
     }
   ]

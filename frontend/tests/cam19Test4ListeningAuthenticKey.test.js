@@ -54,7 +54,7 @@ describe("Cambridge 19 Test 4 Listening - 100% Authentic PDF Answer Key Verifica
   it("Part 3: Questions 21 to 30 match authentic Cambridge 19.pdf answer key", () => {
     const items = cambridge19Test4ListeningPart3.items;
     assert.equal(items.length, 10);
-    assert.deepEqual(items[0].answers, ["C"]); // Q21
+    assert.deepEqual(items[0].answers, ["A"]); // Q21
     assert.deepEqual(items[1].answers, ["C"]); // Q22
     assert.deepEqual(items[2].answers, ["A"]); // Q23
     assert.deepEqual(items[3].answers, ["B"]); // Q24

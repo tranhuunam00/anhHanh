@@ -13,12 +13,13 @@ export const cambridge19Test2ListeningPart1 = {
       instructions: "Complete the form below. Write ONE WORD AND/OR A NUMBER for each answer.",
       title: "Guitar Group",
       fields: [
-        { label: "Coordinator: Gary", number: 1, prefix: "", suffix: "" },
+        { label: "Coordinator:", prefix: "Gary ", number: 1, suffix: "" },
         { label: "Level:", number: 2, prefix: "", suffix: "" },
-        { label: "Place: the", number: 3, prefix: "", suffix: "" },
-        { label: "Address:", number: 4, prefix: "", suffix: " Street, First floor, Room T347" },
-        { label: "Time: Thursday morning at", number: 5, prefix: "", suffix: "" },
-        { label: "Recommended website: 'The perfect", number: 6, prefix: "", suffix: "'" }
+        { label: "Place:", prefix: "the ", number: 3, suffix: "" },
+        { label: "", number: 4, prefix: "", suffix: " Street" },
+        { text: "First floor, Room T347" },
+        { label: "Time:", prefix: "Thursday morning at ", number: 5, suffix: "" },
+        { label: "Recommended website:", prefix: "'The perfect ", number: 6, suffix: "'" }
       ]
     },
     {
@@ -31,7 +32,7 @@ export const cambridge19Test2ListeningPart1 = {
         ["5 minutes", "tuning guitars", { prefix: "using an app or by ", number: 7, suffix: "" }],
         ["10 minutes", "strumming chords using our thumbs", { prefix: "keeping time while the teacher is ", number: 8, suffix: "" }],
         ["15 minutes", "playing songs", { prefix: "often listening to a ", number: 9, suffix: " of a song" }],
-        ["10 minutes", "playing single notes and simple tunes", { prefix: "playing together, then playing ", number: 10, suffix: "" }],
+        ["10 minutes", "playing single notes and simple tunes", { prefix: "playing together, then ", number: 10, suffix: "" }],
         ["5 minutes", "noting things to practise at home", "-"]
       ]
     }
@@ -224,7 +225,7 @@ export const cambridge19Test2ListeningPart2 = {
         "D. the fact that it keeps him fit",
         "E. the chance to develop new equipment"
       ],
-      answers: ["B", "D"]
+      answers: ["A", "B"]
     },
     {
       number: 20,
@@ -238,7 +239,7 @@ export const cambridge19Test2ListeningPart2 = {
         "D. the fact that it keeps him fit",
         "E. the chance to develop new equipment"
       ],
-      answers: ["B", "D"]
+      answers: ["A", "B"]
     }
   ]
 };

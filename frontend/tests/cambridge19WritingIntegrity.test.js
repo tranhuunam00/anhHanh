@@ -53,3 +53,4 @@ test("Cambridge 19 Writing - Full Task 1 & Task 2 Authentic Integrity", () => {
   assert.ok(cambridge19Test4Writing.tasks[0].prompt.includes("dance classes"));
   assert.ok(cambridge19Test4Writing.tasks[1].prompt.includes("consumers can go to a supermarket"));
 });
+

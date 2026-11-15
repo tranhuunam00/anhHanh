@@ -48,9 +48,9 @@ describe("Cambridge IELTS 19 - All 4 Listening Tests Complete 160-Question Integ
         1: "Mathieson", 2: "beginners", 3: "college", 4: "New", 5: "11", 6: "instrument",
         7: "ear", 8: "clapping", 9: "recording", 10: "alone",
         11: "A", 12: "B", 13: "A", 14: "B", 15: "C", 16: "A",
-        17: "C", 18: "E", 19: "B", 20: "D",
-        21: "A", 22: "C", 23: "B", 24: "B",
-        25: "C", 26: "F", 27: "D", 28: "A", 29: "C", 30: "C",
+        17: "C", 18: "E", 19: "A", 20: "B",
+        21: "A", 22: "B", 23: "B", 24: "B",
+        25: "E", 26: "B", 27: "A", 28: "C", 29: "C", 30: "A",
         31: "move", 32: "short", 33: "discs", 34: "oxygen", 35: "tube",
         36: "temperatures", 37: "protein", 38: "space", 39: "seaweed", 40: "endangered"
       };
@@ -127,7 +127,7 @@ describe("Cambridge IELTS 19 - All 4 Listening Tests Complete 160-Question Integ
         11: "C", 12: "E", 13: "A", 14: "D",
         15: "A", 16: "B", 17: "C", 18: "A",
         19: "C", 20: "B",
-        21: "C", 22: "C", 23: "A", 24: "B", 25: "C",
+        21: "A", 22: "C", 23: "A", 24: "B", 25: "C",
         26: "D", 27: "F", 28: "A", 29: "C", 30: "G",
         31: "competition", 32: "food", 33: "disease", 34: "agriculture", 35: "maps",
         36: "cattle", 37: "speed", 38: "monkeys", 39: "fishing", 40: "flooding"

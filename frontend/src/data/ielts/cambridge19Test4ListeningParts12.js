@@ -19,8 +19,8 @@ export const cambridge19Test4ListeningPart1 = {
             { prefix: "Name of supervisor: ", number: 1, suffix: "" },
             { prefix: "Where to leave coat and bag: use ", number: 2, suffix: " in staffroom" },
             { text: "See Tiffany in HR:" },
-            { prefix: "— to give ", number: 3, suffix: "" },
-            { prefix: "— to collect ", number: 4, suffix: "" },
+            { prefix: "to give ", number: 3, suffix: " number", isSubItem: true },
+            { prefix: "to collect ", number: 4, suffix: "", isSubItem: true },
             { prefix: "Location of HR office: on ", number: 5, suffix: " floor" },
             { prefix: "Supervisor's mobile number: ", number: 6, suffix: "" }
           ]
@@ -74,7 +74,7 @@ export const cambridge19Test4ListeningPart1 = {
       number: 3,
       type: "fill_notes",
       prefix: "See Tiffany in HR: to give ",
-      suffix: "",
+      suffix: " number",
       answers: ["passport"]
     },
     {

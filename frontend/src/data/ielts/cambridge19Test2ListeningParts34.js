@@ -36,7 +36,7 @@ export const cambridge19Test2ListeningPart3 = {
         "B. how suitable they are for school.",
         "C. how quickly they wear out."
       ],
-      answers: ["C"]
+      answers: ["B"]
     },
     {
       number: 23,
@@ -73,7 +73,7 @@ export const cambridge19Test2ListeningPart3 = {
         "E the shoes were too dirty",
         "F the stitching on the shoes was broken"
       ],
-      answers: ["C"]
+      answers: ["E"]
     },
     {
       number: 26,
@@ -87,7 +87,7 @@ export const cambridge19Test2ListeningPart3 = {
         "E the shoes were too dirty",
         "F the stitching on the shoes was broken"
       ],
-      answers: ["F"]
+      answers: ["B"]
     },
     {
       number: 27,
@@ -101,7 +101,7 @@ export const cambridge19Test2ListeningPart3 = {
         "E the shoes were too dirty",
         "F the stitching on the shoes was broken"
       ],
-      answers: ["D"]
+      answers: ["A"]
     },
     {
       number: 28,
@@ -115,7 +115,7 @@ export const cambridge19Test2ListeningPart3 = {
         "E the shoes were too dirty",
         "F the stitching on the shoes was broken"
       ],
-      answers: ["A"]
+      answers: ["C"]
     },
     {
       number: 29,
@@ -138,7 +138,7 @@ export const cambridge19Test2ListeningPart3 = {
         "B. with relevant images.",
         "C. in a straightforward way."
       ],
-      answers: ["C"]
+      answers: ["A"]
     }
   ]
 };
@@ -161,7 +161,7 @@ export const cambridge19Test2ListeningPart4 = {
       {
         heading: "Physical appearance",
         lines: [
-          { prefix: "a ", number: 32, suffix: ", round body and four pairs of legs" },
+          { prefix: "a ", number: 32, suffix: " round body and four pairs of legs" },
           { prefix: "claws or ", number: 33, suffix: " for gripping" },
           { text: "absence of respiratory organs" },
           { prefix: "body filled with a liquid that carries both ", number: 34, suffix: " and blood" },
@@ -181,7 +181,7 @@ export const cambridge19Test2ListeningPart4 = {
           { text: "In dry conditions, they roll into a ball called a 'tun'." },
           { text: "They stay alive with a much lower metabolism than usual." },
           { prefix: "A type of ", number: 37, suffix: " ensures their DNA is not damaged." },
-          { prefix: "Research is underway to find out how many days they can stay alive in ", number: 38, suffix: "" }
+          { prefix: "Research is underway to find out how many days they can stay alive in ", number: 38, suffix: " ." }
         ]
       },
       {
@@ -194,7 +194,7 @@ export const cambridge19Test2ListeningPart4 = {
       {
         heading: "Conservation status",
         lines: [
-          { prefix: "They are not considered to be ", number: 40, suffix: "" }
+          { prefix: "They are not considered to be ", number: 40, suffix: " ." }
         ]
       }
     ]
@@ -211,7 +211,7 @@ export const cambridge19Test2ListeningPart4 = {
       number: 32,
       type: "fill_notes",
       prefix: "Physical appearance: a ",
-      suffix: ", round body and four pairs of legs",
+      suffix: " round body and four pairs of legs",
       answers: ["short"]
     },
     {
@@ -253,7 +253,7 @@ export const cambridge19Test2ListeningPart4 = {
       number: 38,
       type: "fill_notes",
       prefix: "Research is underway to find out how many days they can stay alive in ",
-      suffix: "",
+      suffix: " .",
       answers: ["space"]
     },
     {
@@ -267,7 +267,7 @@ export const cambridge19Test2ListeningPart4 = {
       number: 40,
       type: "fill_notes",
       prefix: "Conservation status: They are not considered to be ",
-      suffix: "",
+      suffix: " .",
       answers: ["endangered"]
     }
   ]
