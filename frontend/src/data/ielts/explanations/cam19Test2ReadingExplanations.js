@@ -1,414 +1,333 @@
 /**
  * Cambridge IELTS 19 - Test 2 Reading Explanations & Evidence
- * Full authentic breakdown for all 40 questions across Passages 1, 2, and 3.
- * Adheres to <= 500 lines rule.
+ * 100% Authentic Verbatim Evidence from Cambridge 19.pdf (Pages 40-51).
+ * Adheres strictly to <= 500 lines rule.
  */
 
 export const cam19Test2ReadingExplanations = {
-  // --- PASSAGE 1: The Industrial Revolution in Britain (Questions 1 - 13) ---
+  // --- PASSAGE 1: The Industrial Revolution in Britain (Q1 - 13) ---
   1: {
     qNum: 1,
     answer: "piston",
-    location: "Đoạn 2, Dòng 4-6",
-    evidence: "Called the 'atmospheric engine', Newcomen's steam engine was rather inefficient, but it was used to pump water out of deep coal mines by driving a pump piston up and down.",
-    explanation: "Động cơ hơi nước của Newcomen được dùng để bơm nước khỏi các mỏ than bằng cách đẩy một pít-tông (piston) chuyển động lên xuống. Từ cần điền là 'piston'.",
-    keywords: [
-      { question: "used to remove water by driving a [piston]", passage: "used to pump water out... by driving a pump piston up and down" }
-    ]
+    location: "Đoạn 2, Dòng 7-9",
+    evidence: "invent a new steam engine driven by both the forward and backward strokes of the piston, while the gear mechanism it was connected to produced rotary motion.",
+    explanation: "Từ cần điền là 'piston'. Động cơ hơi nước mới của Watt và Boulton được vận hành nhờ cả hành trình tiến và lùi của pít-tông ('strokes of the piston').",
+    keywords: [{ question: "backward and forward movement of a", passage: "forward and backward strokes of the piston" }]
   },
   2: {
     qNum: 2,
     answer: "coal",
     location: "Đoạn 3, Dòng 1-3",
-    evidence: "The demand for coal, which was a relatively cheap energy source, grew rapidly during the Industrial Revolution, as it was needed to run not only the factories used to produce goods, but also the steam-powered engines...",
-    explanation: "Nhu cầu về than đá (coal) tăng vọt vì đây là nguồn năng lượng cần thiết để vận hành nhà máy và động cơ hơi nước. Từ cần điền là 'coal'.",
-    keywords: [
-      { question: "greater supply of [coal] was needed", passage: "demand for coal grew rapidly... needed to run factories and engines" }
-    ]
+    evidence: "The demand for coal, which was a relatively cheap energy source, grew rapidly during the Industrial Revolution, as it was needed to run not only the factories used to produce manufactured goods, but also steam-powered transportation.",
+    explanation: "Từ cần điền là 'coal'. Than đá là nguồn năng lượng tương đối rẻ ('relatively cheap energy source') và nhu cầu tăng vọt trong Cách mạng Công nghiệp.",
+    keywords: [{ question: "greater demand for ... because it was a cheap energy source", passage: "demand for coal, which was a relatively cheap energy source, grew rapidly" }]
   },
   3: {
     qNum: 3,
     answer: "workshops",
     location: "Đoạn 4, Dòng 2-4",
-    evidence: "...prior to the Industrial Revolution, the British textile business was a true 'cottage industry', with the work performed in small workshops or even homes by individual spinners and weavers.",
-    explanation: "Trước Cách mạng Công nghiệp, thợ dệt và thợ kéo sợi làm việc thủ công trong các xưởng nhỏ (workshops) hoặc ngay tại nhà. Từ cần điền là 'workshops'.",
-    keywords: [
-      { question: "worked at home or in [workshops]", passage: "work performed in small workshops or even homes" }
-    ]
+    evidence: "prior to the Industrial Revolution, the British textile business was a true 'cottage industry', with the work performed in small workshops or even homes by individual spinners, weavers and dyers.",
+    explanation: "Từ cần điền là 'workshops'. Trước cách mạng, việc sản xuất vải sợi diễn ra trong các xưởng nhỏ ('small workshops') hoặc tại nhà riêng.",
+    keywords: [{ question: "cloth had been produced in homes and", passage: "work performed in small workshops or even homes" }]
   },
   4: {
     qNum: 4,
     answer: "labour",
-    location: "Đoạn 4, Dòng 7-9",
-    evidence: "The flying shuttle, the spinning jenny, and the water frame made weaving cloth much easier, dramatically reducing the amount of human labour and time required...",
-    explanation: "Các phát minh cơ khí mới giúp giảm đáng kể lượng sức người / lao động (human labour) và thời gian dệt vải. Từ cần điền là 'labour' (hoặc 'labor').",
-    keywords: [
-      { question: "not as much [labour] was required", passage: "dramatically reducing the amount of human labour" }
-    ]
+    location: "Đoạn 4, Dòng 6-8",
+    evidence: "With these machines, relatively little labour was required to produce cloth, and the new, mechanised textile factories that opened around the country were quickly able to meet customer demand for cloth both at home and abroad.",
+    explanation: "Từ cần điền là 'labour' (hoặc 'labor'). Máy móc mới giúp sản xuất vải mà chỉ cần tương đối ít nhân công lao động ('relatively little labour was required').",
+    keywords: [{ question: "factories required much less", passage: "relatively little labour was required to produce cloth" }]
   },
   5: {
     qNum: 5,
     answer: "quality",
-    location: "Đoạn 5, Dòng 2-4",
-    evidence: "Chief among the new techniques was the smelting of iron ore with coke... This produced a much higher quality of wrought iron and pig iron than traditional methods.",
-    explanation: "Kỹ thuật nấu quặng sắt bằng than cốc tạo ra sắt rèn và gang có chất lượng (quality) vượt trội so với phương pháp truyền thống. Từ cần điền là 'quality'.",
-    keywords: [
-      { question: "material with a higher [quality]", passage: "produced a much higher quality of wrought iron" }
-    ]
+    location: "Đoạn 5, Dòng 3-5",
+    evidence: "This method was cheaper and produced metals that were of a higher quality, enabling Britain's iron and steel production to expand in response to demand created by the Napoleonic Wars (1803–15) and the expansion of the railways from the 1830s.",
+    explanation: "Từ cần điền là 'quality'. Phương pháp luyện sắt bằng than cốc rẻ hơn và tạo ra kim loại có chất lượng cao hơn ('of a higher quality').",
+    keywords: [{ question: "produced iron that was of a better", passage: "produced metals that were of a higher quality" }]
   },
   6: {
     qNum: 6,
     answer: "railways",
-    location: "Đoạn 5, Dòng 7-9",
-    evidence: "The demand for iron exploded during the mid-19th century, particularly with the rapid expansion of railways across Britain and worldwide.",
-    explanation: "Nhu cầu về sắt bùng nổ mạnh mẽ nhờ vào sự phát triển nhanh chóng của mạng lưới đường sắt (railways). Từ cần điền là 'railways' (hoặc 'railway').",
-    keywords: [
-      { question: "growth of the [railways]", passage: "rapid expansion of railways across Britain" }
-    ]
+    location: "Đoạn 5, Dòng 4-6",
+    evidence: "enabling Britain's iron and steel production to expand in response to demand created by the Napoleonic Wars (1803–15) and the expansion of the railways from the 1830s.",
+    explanation: "Từ cần điền là 'railways' (hoặc 'railway'). Nhu cầu về sắt thép gia tăng mạnh mẽ do chiến tranh và sự mở rộng của mạng lưới đường sắt ('expansion of the railways').",
+    keywords: [{ question: "due to wars and the growth of the", passage: "demand created by the Napoleonic Wars ... and the expansion of the railways" }]
   },
   7: {
     qNum: 7,
     answer: "sanitation",
-    location: "Đoạn 7, Dòng 4-6",
-    evidence: "However, this rapid urban growth led to dire living conditions: widespread pollution, terrible housing, and a lack of clean water or basic sanitation.",
-    explanation: "Sự đô thị hóa nhanh chóng khiến các thành phố thiếu nước sạch và hệ thống vệ sinh (sanitation) cơ bản. Từ cần điền là 'sanitation'.",
-    keywords: [
-      { question: "problems with pollution and [sanitation]", passage: "widespread pollution... and lack of basic sanitation" }
-    ]
+    location: "Đoạn 7, Dòng 4-5",
+    evidence: "This rapid urbanisation brought significant challenges, as overcrowded cities suffered from pollution and inadequate sanitation.",
+    explanation: "Từ cần điền là 'sanitation'. Các đô thị quá đông đúc phải đối mặt với ô nhiễm và hệ thống vệ sinh không đảm bảo ('inadequate sanitation').",
+    keywords: [{ question: "suffered from poor ... and from pollution", passage: "overcrowded cities suffered from pollution and inadequate sanitation" }]
   },
   8: {
     qNum: 8,
     answer: "NOT GIVEN",
-    location: "Đoạn 6, Dòng 1-3",
-    evidence: "Transport networks also expanded significantly, with thousands of miles of new canals, roads, and later railways connecting industrial hubs.",
-    explanation: "Bài đọc cho biết mạng lưới kênh đào mở rộng đáng kể nhưng không hề đề cập thông tin liệu việc này có nhằm mục đích xuất khẩu nhiều hàng hóa ra nước ngoài hay không.",
-    keywords: [
-      { question: "goods could be exported abroad", passage: "không có thông tin về mục đích xuất khẩu ra nước ngoài (Not Given)" }
-    ]
+    location: "Đoạn 3, Dòng 4-6",
+    evidence: "In addition, steam-powered boats and ships were widely used to carry goods along Britain's canals as well as across the Atlantic.",
+    explanation: "Bài đọc cho biết tàu thuyền chạy bằng hơi nước được sử dụng để chở hàng hóa dọc theo các kênh đào của Anh, nhưng hoàn toàn không đề cập đến việc mạng lưới kênh đào có phát triển nhanh chóng hay không ('canal network grew rapidly').",
+    keywords: [{ question: "canal network grew rapidly so that more goods could be transported", passage: "steam-powered boats and ships were widely used to carry goods along Britain's canals" }]
   },
   9: {
     qNum: 9,
     answer: "FALSE",
-    location: "Đoạn 5, Dòng 4-6",
-    evidence: "Crucially, this method was both cheaper and more efficient than using charcoal, which allowed British ironmasters to drastically lower their production costs.",
-    explanation: "Phương pháp nấu sắt bằng than cốc rẻ hơn và hiệu quả hơn, giúp hạ thấp chi phí sản xuất ('drastically lower production costs'), mâu thuẫn với nhận định 'Costs... rose' (chi phí tăng).",
-    keywords: [
-      { question: "costs rose", passage: "drastically lower their production costs" }
-    ]
+    location: "Đoạn 5, Dòng 3-5",
+    evidence: "This method was cheaper and produced metals that were of a higher quality, enabling Britain's iron and steel production to expand",
+    explanation: "Bài đọc khẳng định phương pháp luyện quặng sắt bằng than cốc rẻ hơn ('This method was cheaper'), mâu thuẫn trực tiếp với nhận định trong câu hỏi rằng chi phí tăng lên ('Costs in the iron industry rose').",
+    keywords: [{ question: "Costs in the iron industry rose", passage: "This method was cheaper and produced metals that were of a higher quality" }]
   },
   10: {
     qNum: 10,
     answer: "NOT GIVEN",
-    location: "Đoạn 6, Dòng 4-6",
-    evidence: "In communication, the invention of the commercial electrical telegraph by William Fothergill Cooke and Charles Wheatstone, followed by Samuel Morse's telegraph in the US, transformed rapid communication.",
-    explanation: "Bài đọc chỉ liệt kê hệ thống điện báo của Cooke/Wheatstone và Samuel Morse, hoàn toàn không so sánh xem hệ thống của Morse có đáng tin cậy hơn (more reliable) hay không.",
-    keywords: [
-      { question: "more reliable than Cooke and Wheatstone's", passage: "không có so sánh độ tin cậy giữa hai hệ thống (Not Given)" }
-    ]
+    location: "Đoạn 6, Dòng 2-5",
+    evidence: "In 1837, British inventors William Cooke and Charles Wheatstone patented the first commercial telegraphy system. In the 1830s and 1840s, Samuel Morse and other inventors worked on their own versions in the United States.",
+    explanation: "Đoạn 6 nhắc tới cả hai hệ thống điện báo của Cooke - Wheatstone và Samuel Morse, nhưng không hề đưa ra so sánh nào về độ tin cậy giữa hai hệ thống ('more reliable').",
+    keywords: [{ question: "Samuel Morse's communication system was more reliable", passage: "không có thông tin so sánh độ tin cậy giữa hai hệ thống (Not Given)" }]
   },
   11: {
     qNum: 11,
     answer: "TRUE",
-    location: "Đoạn 7, Dòng 7-9",
-    evidence: "While industrialists and the burgeoning middle class amassed vast wealth, the working classes endured meager wages and perilous working environments.",
-    explanation: "Lợi ích kinh tế chỉ tập trung vào giới chủ công nghiệp và tầng lớp trung lưu, trong khi tầng lớp lao động phải chịu cảnh lương bèo bọt, trùng khớp với nhận định 'economic benefits were limited to certain groups'.",
-    keywords: [
-      { question: "benefits were limited to certain groups", passage: "industrialists and middle class amassed wealth while working classes endured meager wages" }
-    ]
+    location: "Đoạn 7, Dòng 5-8",
+    evidence: "Although industrialisation increased the country's economic output overall and improved the standard of living for the middle and upper classes, many poor people continued to struggle.",
+    explanation: "Công nghiệp hóa nâng cao mức sống cho tầng lớp trung lưu và thượng lưu nhưng người nghèo vẫn chật vật, xác nhận lợi ích kinh tế chỉ giới hạn ở một số bộ phận nhất định trong xã hội ('limited to certain sectors of society').",
+    keywords: [{ question: "benefits of industrialisation were limited to certain sectors of society", passage: "improved the standard of living for middle and upper classes, many poor people continued to struggle" }]
   },
   12: {
     qNum: 12,
     answer: "TRUE",
     location: "Đoạn 8, Dòng 2-4",
-    evidence: "They feared that the introduction of automated machines would undermine their status as skilled craftsmen and destroy their livelihoods by reducing wages.",
-    explanation: "Những người thợ dệt lành nghề lo ngại rằng máy móc tự động sẽ hủy hoại sinh kế và hạ thấp tay nghề của họ, đúng với phát biểu trong câu hỏi.",
-    keywords: [
-      { question: "new machines would damage their livelihoods", passage: "automated machines would undermine their status and destroy their livelihoods" }
-    ]
+    evidence: "Many had spent years learning their craft, and they feared that unskilled machine operators were robbing them of their livelihood.",
+    explanation: "Nhiều thợ dệt có tay nghề lo sợ những người vận hành máy không có kỹ năng đang cướp đi sinh kế ('robbing them of their livelihood') của họ, đồng nghĩa với niềm tin rằng máy dệt mới sẽ dẫn đến mất việc làm ('lead to job losses').",
+    keywords: [{ question: "new textile machines would lead to job losses", passage: "feared that unskilled machine operators were robbing them of their livelihood" }]
   },
   13: {
     qNum: 13,
     answer: "NOT GIVEN",
-    location: "Đoạn 8, Dòng 5-7",
-    evidence: "The government responded forcefully to the unrest, deploying troops to quell riots and imposing severe penalties, including execution and exile.",
-    explanation: "Bài đọc chỉ nói về phản ứng trấn áp mạnh tay của chính quyền, hoàn toàn không đề cập người dân địa phương có đồng cảm (sympathy) với phong trào Luddite hay không.",
-    keywords: [
-      { question: "sympathy among local people", passage: "không có thông tin về thái độ người dân địa phương (Not Given)" }
-    ]
+    location: "Đoạn 8, Dòng 10-13",
+    evidence: "The unrest finally reached its peak in April 1812, when a few Luddites were shot during an attack on a mill near Huddersfield. In the days that followed, other Luddites were arrested, and dozens were hanged or transported to Australia.",
+    explanation: "Bài đọc cho biết nhiều người theo phong trào Luddite đã bị bắt giữ sau cuộc tấn công nhà máy gần Huddersfield, nhưng hoàn toàn không nói người dân địa phương có đồng cảm ('sympathy') với họ hay không.",
+    keywords: [{ question: "some sympathy among local people for the Luddites who were arrested", passage: "không có thông tin về sự đồng cảm của người dân địa phương (Not Given)" }]
   },
 
-  // --- PASSAGE 2: Athletes and stress (Questions 14 - 26) ---
+  // --- PASSAGE 2: Athletes and stress (Q14 - 26) ---
   14: {
     qNum: 14,
-    answer: "C",
-    location: "Đoạn C & D, Dòng 1-4",
-    evidence: "Our challenge and threat responses essentially influence how our body responds to stressful situations, as both affect the production of adrenaline and cortisol.",
-    explanation: "Đoạn D (và C) nhắc tới hai hợp chất hóa học ảnh hưởng đến phong độ thể thao là adrenaline và cortisol.",
-    keywords: [
-      { question: "two chemical compounds", passage: "adrenaline and cortisol" }
-    ]
+    answer: "D",
+    location: "Đoạn D, Dòng 1-3",
+    evidence: "both affect the production of adrenaline and cortisol — also known as 'stress hormones'.",
+    explanation: "Đoạn D đề cập trực tiếp tới hai hợp chất hóa học ảnh hưởng đến phong độ thể thao là hormone adrenaline và cortisol.",
+    keywords: [{ question: "two chemical compounds which impact on performance", passage: "production of adrenaline and cortisol — also known as 'stress hormones'" }]
   },
   15: {
     qNum: 15,
     answer: "F",
-    location: "Đoạn F, Dòng 2-6",
-    evidence: "Techniques like mental rehearsal, mindfulness, and reframing negative self-talk can significantly lower debilitating stress and improve competitive execution.",
-    explanation: "Đoạn F liệt kê các chiến lược cụ thể giúp vận động viên giảm thiểu tác động tiêu cực của căng thẳng (tập dượt tâm lý, chánh niệm, điều chỉnh độc thoại nội tâm).",
-    keywords: [
-      { question: "strategies for minimising stress", passage: "mental rehearsal, mindfulness, and reframing negative self-talk" }
-    ]
+    location: "Đoạn F, Dòng 5-7",
+    evidence: "Developing psychological skills, such as visualisation, can also help decrease physiological responses to threat.",
+    explanation: "Đoạn F đưa ra các ví dụ về chiến lược giảm thiểu tác động của căng thẳng như kỹ năng tâm lý hình dung ('visualisation') và ngôn ngữ tích cực từ huấn luyện viên.",
+    keywords: [{ question: "examples of strategies for minimising the effects of stress", passage: "Developing psychological skills, such as visualisation, can also help decrease physiological responses" }]
   },
   16: {
     qNum: 16,
     answer: "A",
-    location: "Đoạn A, Dòng 5-7",
-    evidence: "Following her withdrawal from Wimbledon, Emma Raducanu explained that 'the whole experience caught up with me' and that she had difficulty managing her breathing under such intense scrutiny.",
-    explanation: "Đoạn A dẫn lời chính vận động viên Emma Raducanu giải thích nguyên nhân trải nghiệm căng thẳng áp lực khiến cô phải rút khỏi giải Wimbledon.",
-    keywords: [
-      { question: "sportsperson accounted for their own experience", passage: "Raducanu explained that the whole experience caught up with me" }
-    ]
+    location: "Đoạn A, Dòng 4-7",
+    evidence: "Though the young player had been doing well in the tournament, she began having difficulty regulating her breathing and heart rate during a match, which she later attributed to 'the accumulation of the excitement and the buzz'.",
+    explanation: "Đoạn A giải thích cách tay vợt Emma Raducanu tự lý giải trải nghiệm căng thẳng của mình trên mạng xã hội là do sự tích tụ của phấn khích và áp lực.",
+    keywords: [{ question: "how a sportsperson accounted for their own experience of stress", passage: "Emma Raducanu wrote about ... attributed to 'the accumulation of the excitement and the buzz'" }]
   },
   17: {
     qNum: 17,
-    answer: "D",
-    location: "Đoạn D, Dòng 6-8",
-    evidence: "A recent study found that when athletes experience a threat state accompanied by elevated cortisol levels, their fine motor control and decision-making deteriorate by up to 30%.",
-    explanation: "Đoạn D nêu kết quả nghiên cứu chỉ ra mối liên hệ trực tiếp giữa phản ứng căng thẳng (nồng độ cortisol tăng cao) và việc suy giảm phong độ thi đấu.",
-    keywords: [
-      { question: "study results indicating links between stress and performance", passage: "study found that when athletes experience threat state... motor control deteriorate" }
-    ]
+    answer: "C",
+    location: "Đoạn C, Dòng 3-5",
+    evidence: "Research shows that the challenge states lead to good performance, while threat states lead to poorer performance.",
+    explanation: "Đoạn C trích dẫn kết quả nghiên cứu chỉ ra mối liên hệ giữa các phản ứng căng thẳng (trạng thái thách thức vs đe dọa) và kết quả thi đấu.",
+    keywords: [{ question: "study results indicating links between stress responses and performance", passage: "Research shows that the challenge states lead to good performance, while threat states lead to poorer performance" }]
   },
   18: {
     qNum: 18,
     answer: "F",
     location: "Đoạn F, Dòng 1-3",
-    evidence: "Positive stress responses can be promoted through the language that they and those around them — like parents or coaches — use.",
-    explanation: "Đoạn F nhắc tới những người xung quanh như cha mẹ hoặc huấn luyện viên (parents or coaches) có thể tác động đến cách vận động viên nhìn nhận áp lực.",
-    keywords: [
-      { question: "people who can influence athletes' perceptions", passage: "those around them — like parents or coaches" }
-    ]
+    evidence: "Positive stress responses can be promoted through the language that they and others — such as coaches or parents — use.",
+    explanation: "Đoạn F đề cập đến những người có thể định hình nhận thức căng thẳng của vận động viên, cụ thể là cha mẹ và huấn luyện viên ('coaches or parents').",
+    keywords: [{ question: "mention of people who can influence how athletes perceive their stress responses", passage: "language that they and others — such as coaches or parents — use" }]
   },
   19: {
     qNum: 19,
     answer: "injury",
-    location: "Đoạn B, Dòng 3-5",
-    evidence: "Athletes face many demands, ranging from the risk of physical injury to meeting the high expectations of fans and sponsors.",
-    explanation: "Căng thẳng thi đấu bao gồm nhiều áp lực đối với vận động viên, ví dụ như nguy cơ chấn thương (injury). Từ cần điền là 'injury'.",
-    keywords: [
-      { question: "demands, for example the risk of [injury]", passage: "demands, ranging from the risk of physical injury" }
-    ]
+    location: "Đoạn B, Dòng 4-6",
+    evidence: "These demands include the high level of physical and mental effort required to succeed, and also the athlete's concerns about the difficulty of the event, their chance of succeeding, and any potential dangers such as injury.",
+    explanation: "Từ cần điền là 'injury'. Yêu cầu thi đấu bao gồm cả nỗi lo về những mối nguy hiểm tiềm tàng như nguy cơ chấn thương ('potential dangers such as injury').",
+    keywords: [{ question: "possible risk of", passage: "potential dangers such as injury" }]
   },
   20: {
     qNum: 20,
     answer: "serves",
-    location: "Đoạn D, Dòng 8-10",
-    evidence: "In tennis, higher cortisol levels under threat stress have been shown to directly cause players to deliver fewer successful first serves.",
-    explanation: "Cortisol tăng cao khiến các tay vợt thực hiện ít cú giao bóng (serves) ăn điểm thành công hơn. Từ cần điền là 'serves'.",
-    keywords: [
-      { question: "produce fewer good [serves]", passage: "deliver fewer successful first serves" }
-    ]
+    location: "Đoạn D, Dòng 9-11",
+    evidence: "In tennis players, cortisol has been associated with more unsuccessful serves and greater anxiety.",
+    explanation: "Từ cần điền là 'serves'. Ở các tay vợt tennis, cortisol liên quan đến việc tạo ra nhiều cú giao bóng hỏng hơn, tức là ít cú giao bóng tốt hơn ('fewer good serves').",
+    keywords: [{ question: "produce fewer good", passage: "cortisol has been associated with more unsuccessful serves" }]
   },
   21: {
     qNum: 21,
     answer: "excitement",
-    location: "Đoạn F, Dòng 4-6",
-    evidence: "Sports psychologists often guide performers to relabel nervous physical sensations as excitement rather than fear.",
-    explanation: "Các nhà tâm lý học hướng dẫn vận động viên nhìn nhận các phản ứng sinh lý hồi hộp như sự phấn khích (excitement) thay vì nỗi sợ hãi. Từ cần điền là 'excitement'.",
-    keywords: [
-      { question: "view physiological symptoms as [excitement]", passage: "relabel nervous physical sensations as excitement" }
-    ]
+    location: "Đoạn F, Dòng 3-5",
+    evidence: "Psychologists can also help athletes change how they see their physiological responses — such as helping them see a higher heart rate as excitement, rather than nerves.",
+    explanation: "Từ cần điền là 'excitement'. Chuyên gia tâm lý giúp vận động viên xem nhịp tim tăng như một cảm xúc tích cực là sự hào hứng phấn chấn ('excitement') thay vì lo lắng.",
+    keywords: [{ question: "positive feeling such as", passage: "see a higher heart rate as excitement, rather than nerves" }]
   },
   22: {
     qNum: 22,
     answer: "Visualisation",
-    location: "Đoạn F, Dòng 7-8",
-    evidence: "Visualisation is another key strategy, where athletes mentally rehearse successful outcomes to prime their bodies for high pressure.",
-    explanation: "Hình dung / tưởng tượng (Visualisation / Visualization) là phương pháp giúp vận động viên tập dượt tâm trí cho các tình huống áp lực cao. Từ cần điền là 'Visualisation'.",
-    keywords: [
-      { question: "[Visualisation] is another key strategy", passage: "Visualisation is another key strategy, where athletes mentally rehearse" }
-    ]
+    location: "Đoạn F, Dòng 5-7",
+    evidence: "Developing psychological skills, such as visualisation, can also help decrease physiological responses to threat.",
+    explanation: "Từ cần điền là 'Visualisation' (hoặc 'Visualization'). Kỹ thuật tưởng tượng/hình dung là một ví dụ về kỹ năng tâm lý giúp giảm phản ứng tiêu cực.",
+    keywords: [{ question: "example of a psychological technique", passage: "Developing psychological skills, such as visualisation" }]
   },
   23: {
     qNum: 23,
     answer: "B",
-    location: "Đoạn A, Dòng 3-5",
-    evidence: "Raducanu retired during the fourth round of the championship, citing breathing difficulties and dizziness amidst massive media attention.",
-    explanation: "Raducanu phải dừng thi đấu vì các triệu chứng thể chất (khó thở và chóng mặt) dưới áp lực chú ý quá lớn của truyền thông.",
-    keywords: [
-      { question: "physical symptoms forced her to stop playing", passage: "breathing difficulties and dizziness caused her to retire" }
-    ]
+    location: "Đoạn A, Dòng 4-6",
+    evidence: "she began having difficulty regulating her breathing and heart rate during a match, which she later attributed to 'the accumulation of the excitement and the buzz'.",
+    explanation: "Lựa chọn B (symptoms of her performance stress): Bài đọc nêu rõ các triệu chứng của cô khi căng thẳng là khó điều hòa nhịp thở và nhịp tim.",
+    keywords: [{ question: "symptoms of her performance stress", passage: "difficulty regulating her breathing and heart rate during a match" }]
   },
   24: {
     qNum: 24,
     answer: "D",
-    location: "Đoạn A, Dòng 7-9",
-    evidence: "Her withdrawal sparked intense public debate about the psychological toll modern elite sport places on young athletes.",
-    explanation: "Việc cô rút lui đã châm ngòi cho cuộc tranh luận công khai rộng khắp về áp lực tâm lý đối với các vận động viên trẻ tuổi.",
-    keywords: [
-      { question: "led to public discussion on athletes' mental health", passage: "sparked intense public debate about psychological toll" }
-    ]
+    location: "Đoạn C, Dòng 5-8",
+    evidence: "So, in Emma Raducanu's case, a much larger audience, higher expectations and facing a more skilful opponent, may all have led her to feel there were greater demands being placed on her at Wimbledon",
+    explanation: "Lựa chọn D (aspects of the Wimbledon tournament which increased her stress levels): Đoạn C liệt kê khán giả đông hơn, kỳ vọng cao hơn và đối thủ giỏi hơn là những yếu tố tại giải đấu làm gia tăng áp lực.",
+    keywords: [{ question: "aspects of Wimbledon tournament which increased stress", passage: "much larger audience, higher expectations and facing a more skilful opponent" }]
   },
   25: {
     qNum: 25,
     answer: "A",
-    location: "Đoạn E, Dòng 2-4",
-    evidence: "Anxiety can manifest both cognitively, through racing thoughts and worry, and somatically, through elevated heart rate, sweating, and shaking.",
-    explanation: "Sự lo âu biểu hiện ở cả hai mặt: tâm trí (suy nghĩ dồn dập, lo lắng) và thể chất (tim đập nhanh, toát mồ hôi, run rẩy).",
-    keywords: [
-      { question: "anxiety has both psychological and physical signs", passage: "manifest both cognitively (thoughts) and somatically (heart rate, sweating)" }
-    ]
+    location: "Đoạn E, Dòng 5-6",
+    evidence: "The intensity with which a person experiences anxiety depends on the demands and resources they have.",
+    explanation: "Lựa chọn A (the factors which determine how severe it may be): Mức độ nghiêm trọng của sự lo âu phụ thuộc vào các đòi hỏi và nguồn lực mà cá nhân đó sở hữu ('depends on the demands and resources they have').",
+    keywords: [{ question: "factors which determine how severe it may be", passage: "intensity with which a person experiences anxiety depends on the demands and resources" }]
   },
   26: {
     qNum: 26,
     answer: "E",
-    location: "Đoạn E, Dòng 5-7",
-    evidence: "While high levels of anxiety are usually detrimental, mild levels can sometimes sharpen focus and enhance situational awareness.",
-    explanation: "Mặc dù mức độ lo âu cao gây hại, mức độ lo âu vừa phải đôi khi lại giúp tăng cường sự tập trung và nhận thức tình huống.",
-    keywords: [
-      { question: "mild anxiety can sometimes be helpful", passage: "mild levels can sometimes sharpen focus and enhance awareness" }
-    ]
+    location: "Đoạn E, Dòng 7-9",
+    evidence: "and repeated episodes of anxiety coupled with negative responses can increase risk of heart disease and depression.",
+    explanation: "Lựa chọn E (the harm that can result if athletes experience it too often): Nếu trải qua lo âu lặp đi lặp lại nhiều lần, vận động viên có thể bị tăng nguy cơ mắc bệnh tim và trầm cảm.",
+    keywords: [{ question: "harm that can result if athletes experience it too often", passage: "repeated episodes of anxiety ... can increase risk of heart disease and depression" }]
   },
 
-  // --- PASSAGE 3: An inquiry into the existence of the gifted child (Questions 27 - 40) ---
+  // --- PASSAGE 3: An inquiry into the existence of the gifted child (Q27 - 40) ---
   27: {
     qNum: 27,
     answer: "H",
     location: "Đoạn 1, Dòng 2-4",
-    evidence: "She was the only woman to win the Fields Medal — the mathematical equivalent of the Nobel prize.",
-    explanation: "Mirzakhani được xem là nhân vật độc nhất vô nhị (H: unique) vì bà là người phụ nữ duy nhất từng giành giải Fields danh giá.",
-    keywords: [
-      { question: "regarded as unique", passage: "the only woman to win the Fields Medal" }
-    ]
+    evidence: "She was the only woman to win the Fields Medal — the mathematical equivalent of a Nobel prize.",
+    explanation: "Bà là người phụ nữ duy nhất đoạt huy chương Fields, giữ kỷ lục độc nhất vô nhị ('unique' = H).",
+    keywords: [{ question: "regarded as ... in the field of mathematics", passage: "only woman to win the Fields Medal" }]
   },
   28: {
     qNum: 28,
     answer: "A",
     location: "Đoạn 1, Dòng 5-7",
-    evidence: "Yet as a child, Mirzakhani showed no early spark in arithmetic, finding mathematics dull and uninspiring compared to reading novels.",
-    explanation: "Khi còn nhỏ, toán học không có mấy sức lôi cuốn (A: appeal) đối với bà so với niềm say mê đọc tiểu thuyết.",
-    keywords: [
-      { question: "maths held little appeal", passage: "finding mathematics dull and uninspiring" }
-    ]
+    evidence: "She went to a highly selective girls' school but maths wasn't her interest — reading was.",
+    explanation: "Khi còn nhỏ toán học ít có sức hấp dẫn đối với bà ('maths held little appeal' = A).",
+    keywords: [{ question: "maths held little", passage: "maths wasn't her interest — reading was" }]
   },
   29: {
     qNum: 29,
     answer: "C",
     location: "Đoạn 1, Dòng 8-10",
-    evidence: "It was only when her older brother showed her a famous math problem that she became deeply fascinated by the subject.",
-    explanation: "Chỉ khi được anh trai cho xem một bài toán nổi tiếng, bà mới thực sự bị cuốn hút và tò mò (C: intrigued / fascinated).",
-    keywords: [
-      { question: "intrigued by a problem", passage: "deeply fascinated by the subject when shown a problem" }
-    ]
+    evidence: "He shared a famous maths problem from a magazine that fascinated her — and she was hooked.",
+    explanation: "Bà bị cuốn hút và kích thích trí tò mò ('intrigued' = C) bởi một câu đố khó mà anh trai chia sẻ.",
+    keywords: [{ question: "until she was ... by a difficult puzzle", passage: "famous maths problem from a magazine that fascinated her — and she was hooked" }]
   },
   30: {
     qNum: 30,
     answer: "B",
     location: "Đoạn 2, Dòng 1-3",
     evidence: "In adult life it is clear that she was curious, excited by what she did and also resolute in the face of setbacks.",
-    explanation: "Khi trưởng thành, bà là nhà toán học vô cùng kiên định và quyết tâm (B: determined / resolute) trước mọi thất bại.",
-    keywords: [
-      { question: "determined in the face of setbacks", passage: "resolute in the face of setbacks" }
-    ]
+    explanation: "Bà thể hiện sự kiên định, quyết tâm ('resolute' / 'determined' = B) khi gặp trắc trở.",
+    keywords: [{ question: "proved herself to be ... when things did not go smoothly", passage: "resolute in the face of setbacks" }]
   },
   31: {
     qNum: 31,
-    answer: "D",
-    location: "Đoạn 2, Dòng 4-6",
-    evidence: "'Of course, the most rewarding part is the 'Aha' moment, the excitement of discovery and enjoying being on top of the hill...'",
-    explanation: "Bà chia sẻ rằng niềm thỏa mãn và hài lòng lớn nhất (D: satisfaction $\\leftrightarrow$ rewarding part) chính là khoảnh khắc thốt lên 'Aha' khi tìm ra phát kiến mới.",
-    keywords: [
-      { question: "greatest satisfaction", passage: "the most rewarding part is the 'Aha' moment" }
-    ]
+    answer: "J",
+    location: "Đoạn 2, Dòng 3-5",
+    evidence: "'Of course, the most rewarding part is the \"Aha\" moment, the excitement of discovery and enjoyment of understanding something new",
+    explanation: "Phần đáng giá nhất đem lại sự thỏa mãn lớn nhất ('greatest satisfaction' = J) là khoảnh khắc phấn khích khi khám phá ra điều mới mẻ.",
+    keywords: [{ question: "got the greatest", passage: "most rewarding part is the 'Aha' moment, the excitement of discovery" }]
   },
   32: {
     qNum: 32,
-    answer: "F",
-    location: "Đoạn 2, Dòng 7-9",
-    evidence: "Her approach was notably creative and novel; she would draw large doodles and diagrams on giant sheets of paper spread out on the floor.",
-    explanation: "Phương pháp làm việc của bà mang tính đổi mới và sáng tạo cao (F: innovative / novel), vẽ phác thảo các hình khối khổng lồ trên sàn nhà.",
-    keywords: [
-      { question: "innovative approach", passage: "notably creative and novel approach" }
-    ]
+    answer: "I",
+    location: "Đoạn 2, Dòng 6-8",
+    evidence: "That trail took her to the heights of original research into mathematics.",
+    explanation: "Các nghiên cứu toán học của bà mang tính sáng tạo, đột phá ('original research' = 'innovative' = I).",
+    keywords: [{ question: "responsible for some extremely ... mathematical studies", passage: "heights of original research into mathematics" }]
   },
   33: {
     qNum: 33,
     answer: "YES",
-    location: "Đoạn 3, Dòng 2-4",
-    evidence: "Most Nobel prize winners were unexceptional in childhood. Einstein was slow to talk as a baby. He failed the general entrance exam to Zurich Polytechnic...",
-    explanation: "Đa số những người đoạt giải Nobel đều không có gì đặc biệt khi còn nhỏ ('unexceptional in childhood'), đúng với nhận định rằng nhiều người đoạt giải không có biểu hiện tài năng xuất chúng lúc thơ ấu.",
-    keywords: [
-      { question: "did not show exceptional ability when young", passage: "unexceptional in childhood... slow to talk as baby" }
-    ]
+    location: "Đoạn 3, Dòng 1-3",
+    evidence: "Most Nobel prize winners were unexceptional in childhood.",
+    explanation: "Đa số người đoạt giải Nobel đều không có gì nổi trội khi còn nhỏ ('unexceptional in childhood'), đồng tình với khẳng định nhiều người đoạt giải thưởng trí tuệ danh giá chỉ đạt mức trung bình lúc trẻ ('only reached an average standard when young').",
+    keywords: [{ question: "only reached an average standard when young", passage: "Most Nobel prize winners were unexceptional in childhood" }]
   },
   34: {
     qNum: 34,
     answer: "NOT GIVEN",
-    location: "Đoạn 3, Dòng 4-6",
-    evidence: "He struggled against academic rejection and had disputes with professors who disliked his questioning nature.",
-    explanation: "Bài đọc có nhắc tới việc Einstein từng trượt kỳ thi đầu vào và mâu thuẫn với giáo sư, nhưng không hề khẳng định thất bại đó là do ông thiếu tự tin ('lack of confidence').",
-    keywords: [
-      { question: "due to his lack of confidence", passage: "không có thông tin về việc thiếu tự tin (Not Given)" }
-    ]
+    location: "Đoạn 3, Dòng 3-6",
+    evidence: "He failed the general part of the entry test to Zurich Polytechnic — though they let him in because of high physics and maths scores. He struggled at work initially, but he kept plugging away and eventually rewrote the laws of Newtonian mechanics with his theory of relativity.",
+    explanation: "Đoạn văn kể về những thất bại và khó khăn ban đầu của Einstein, nhưng hoàn toàn không nói rằng thất bại đó là do thiếu tự tin ('due to his lack of confidence').",
+    keywords: [{ question: "failures as a young man were due to his lack of confidence", passage: "không có thông tin về sự thiếu tự tin (Not Given)" }]
   },
   35: {
     qNum: 35,
     answer: "YES",
-    location: "Đoạn 4, Dòng 3-5",
-    evidence: "Scholars continue to fiercely debate what constitutes innate 'giftedness' and whether such a trait truly exists independently of training.",
-    explanation: "Các học giả vẫn đang tranh luận gay gắt về khái niệm năng khiếu bẩm sinh, trùng khớp với ý kiến 'rất khó để đạt được sự đồng thuận chung' ('difficult to reach agreement').",
-    keywords: [
-      { question: "difficult to reach agreement", passage: "fiercely debate what constitutes innate giftedness" }
-    ]
+    location: "Đoạn 4, Dòng 5-7",
+    evidence: "While the jury is out on giftedness being innate and other factors potentially making the difference, what is certain is that the behaviours associated with high levels of performance are replicable and most can be taught — even traits such as curiosity.",
+    explanation: "Cụm 'the jury is out' có nghĩa là vấn đề vẫn đang tranh cãi chưa ngã ngũ, tương đồng với 'difficult to reach agreement on whether some children are actually born gifted'.",
+    keywords: [{ question: "difficult to reach agreement on whether some children are actually born gifted", passage: "the jury is out on giftedness being innate" }]
   },
   36: {
     qNum: 36,
     answer: "NOT GIVEN",
-    location: "Đoạn 9, Dòng 1-3",
-    evidence: "Einstein himself dismissed the mystical notions that grew around his persona, famously remarking that he had 'no special talents, only passionate curiosity.'",
-    explanation: "Einstein phủ nhận những lời tán dương thần thánh hóa về mình, nhưng không có thông tin nói rằng ông cảm thấy phiền lòng hay tức giận ('upset') trước cái nhìn của công chúng.",
-    keywords: [
-      { question: "Einstein was upset by the public's view", passage: "không có thông tin về việc ông bị khó chịu/tức giận (Not Given)" }
-    ]
+    location: "Đoạn 9, Dòng 4-6",
+    evidence: "Most people say it is the intellect which makes a great scientist. They are wrong: it is character.",
+    explanation: "Einstein phản bác quan niệm của mọi người về trí tuệ và tính cách, nhưng không có thông tin nào cho thấy ông buồn bã hay khó chịu ('upset') trước cái nhìn của công chúng về sự nghiệp của mình.",
+    keywords: [{ question: "Einstein was upset by the public's view of his life's work", passage: "không có thông tin về việc ông bị khó chịu hay buồn lòng (Not Given)" }]
   },
   37: {
     qNum: 37,
     answer: "NO",
-    location: "Đoạn 9, Dòng 3-5",
-    evidence: "He attributed his insights not to lightning-fast thinking, but to the fact that he was willing to persist with problems longer than anyone else.",
-    explanation: "Einstein cho rằng thành công của ông không phải nhờ vào tốc độ tư duy nhanh ('not to lightning-fast thinking'), mà là nhờ sự kiên trì theo đuổi vấn đề lâu hơn người khác, trái ngược hoàn toàn với phát biểu.",
-    keywords: [
-      { question: "speed at which he dealt with problems", passage: "not to lightning-fast thinking, but willing to persist longer" }
-    ]
+    location: "Đoạn 9, Dòng 3-4",
+    evidence: "It's not that I'm so smart, it's just that I stay with problems longer.",
+    explanation: "Einstein cho rằng thành công là nhờ ông 'ở lại với vấn đề lâu hơn' (tính kiên trì bền bỉ), mâu thuẫn trực tiếp với câu hỏi cho rằng thành công là do tốc độ giải quyết nhanh ('speed at which he dealt with scientific questions').",
+    keywords: [{ question: "success down to the speed at which he dealt with scientific questions", passage: "It's not that I'm so smart, it's just that I stay with problems longer" }]
   },
   38: {
     qNum: 38,
     answer: "C",
-    location: "Đoạn 5, Dòng 3-5",
-    evidence: "Eyre believes that high intellectual performance is an acquired skill that can be developed systematically through the right pedagogy and mindset in all children.",
-    explanation: "Giáo sư Eyre tin rằng thành tích trí tuệ cao không phải thiên bẩm mà là kỹ năng có thể rèn luyện thông qua phương pháp giảng dạy và rèn luyện thói quen tư duy đúng đắn.",
-    keywords: [
-      { question: "proper pedagogical guidance and training", passage: "developed systematically through right pedagogy and mindset" }
-    ]
+    location: "Đoạn 5, Dòng 3-6",
+    evidence: "However, they must be taught the right attitudes and approaches to their learning and develop the attributes of high performers — curiosity, persistence and hard work, for example — an approach Eyre calls 'high performance learning'.",
+    explanation: "Giáo sư Eyre cho rằng học sinh cần được rèn luyện tính tò mò ('curiosity') và cách tiếp cận học tập đúng đắn, tương ứng với việc phát triển tinh thần ham học hỏi đối với việc học ('development of a spirit of inquiry towards their studies').",
+    keywords: [{ question: "development of a spirit of inquiry towards their studies", passage: "develop the attributes of high performers — curiosity, persistence and hard work" }]
   },
   39: {
     qNum: 39,
     answer: "B",
-    location: "Đoạn 6, Dòng 3-6",
-    evidence: "Ericsson's decades of research demonstrated that deliberate practice — structured, focused training designed to overcome weaknesses — is the single most decisive factor in reaching elite mastery.",
-    explanation: "Nghiên cứu của Ericsson chứng minh luyện tập có chủ đích (deliberate practice) là yếu tố quyết định hàng đầu để đạt tới trình độ bậc thầy.",
-    keywords: [
-      { question: "deliberate practice is the key factor", passage: "deliberate practice is the single most decisive factor" }
-    ]
+    location: "Đoạn 6, Dòng 3-5",
+    evidence: "he doesn't think unique and innate talents are at the heart of performance. Deliberate practice, that stretches you every step of the way, and around 10,000 hours of it, is what produces the goods.",
+    explanation: "Nghiên cứu của Ericsson kết luận năng khiếu bẩm sinh không phải yếu tố cốt lõi mà là do luyện tập có chủ đích, tương đương với 'Being born with a special gift is not the key factor in becoming expert'.",
+    keywords: [{ question: "Being born with a special gift is not the key factor in becoming expert", passage: "doesn't think unique and innate talents are at the heart of performance ... Deliberate practice ... is what produces the goods" }]
   },
   40: {
     qNum: 40,
     answer: "D",
-    location: "Đoạn 8, Dòng 2-4",
-    evidence: "The evidence reveals that schools which adopt these practices see high numbers of students from average backgrounds achieving top-tier academic success.",
-    explanation: "Bằng chứng chỉ ra rằng việc áp dụng các phương pháp này giúp đông đảo học sinh xuất thân bình thường vẫn có thể vươn tới thành công học thuật đỉnh cao.",
-    keywords: [
-      { question: "enables ordinary students to achieve high results", passage: "students from average backgrounds achieving top-tier academic success" }
-    ]
+    location: "Đoạn 8, Dòng 5-7",
+    evidence: "Interviews uncovered strong evidence of an adult or adults in the child's life who valued and supported education, either in the immediate or extended family or in the child's wider community.",
+    explanation: "Nghiên cứu chỉ ra chìa khóa thành công của trẻ em có hoàn cảnh khó khăn là sự có mặt của một người lớn coi trọng và ủng hộ giáo dục ('valued and supported education'), tương đương 'guidance of someone who recognises the benefits of learning'.",
+    keywords: [{ question: "guidance of someone who recognises the benefits of learning", passage: "adult or adults in the child's life who valued and supported education" }]
   }
 };
-

@@ -45,7 +45,20 @@ export const cambridge19Test2ReadingPassage3 = {
   groups: [
     {
       groupType: "summary_with_options",
-      instructions: "Questions 27–32: Complete the summary using the list of phrases, A–K, below.\nWrite the correct letter, A–K, in boxes 27–32 on your answer sheet.\n\nList of Phrases:\nA. appeal\nB. determined\nC. intrigued\nD. satisfaction\nE. devoted\nF. innovative\nG. involved\nH. unique\nI. intent\nJ. achievement\nK. innovative",
+      instructions: "Questions 27–32: Complete the summary using the list of phrases, A–K, below.\nWrite the correct letter, A–K, in boxes 27–32 on your answer sheet.\n\nList of Phrases:\nA. appeal\nB. determined\nC. intrigued\nD. single\nE. achievement\nF. devoted\nG. involved\nH. unique\nI. innovative\nJ. satisfaction\nK. intent",
+      options: [
+        "A. appeal",
+        "B. determined",
+        "C. intrigued",
+        "D. single",
+        "E. achievement",
+        "F. devoted",
+        "G. involved",
+        "H. unique",
+        "I. innovative",
+        "J. satisfaction",
+        "K. intent"
+      ],
       title: "Maryam Mirzakhani",
       numbers: [27, 28, 29, 30, 31, 32],
       items: [
@@ -58,14 +71,14 @@ export const cambridge19Test2ReadingPassage3 = {
         {
           number: 28,
           prefix: "However, maths held little ",
-          suffix: " for her as a child and in fact her performance was below average until she was",
+          suffix: " for her as a child and in fact her performance was below average until she was ",
           answers: ["A"]
         },
         {
           number: 29,
           prefix: "",
           suffix: " by a difficult puzzle that one of her siblings showed her.",
-          answers: ["F", "C"]
+          answers: ["C"]
         },
         {
           number: 30,
@@ -76,14 +89,14 @@ export const cambridge19Test2ReadingPassage3 = {
         {
           number: 31,
           prefix: "She said she got the greatest ",
-          suffix: " from making ground-breaking discoveries and in fact she was responsible for some extremely",
-          answers: ["D"]
+          suffix: " from making ground-breaking discoveries and in fact she was responsible for some extremely ",
+          answers: ["J"]
         },
         {
           number: 32,
           prefix: "",
           suffix: " mathematical studies.",
-          answers: ["K", "F"]
+          answers: ["I"]
         }
       ]
     },

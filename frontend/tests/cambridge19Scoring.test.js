@@ -80,10 +80,10 @@ describe("Cambridge IELTS 19 - Full Tests Integrity & 100% Authentic Scoring", (
       const answers = {
         1: "piston", 2: "coal", 3: "workshops", 4: "labour", 5: "quality", 6: "railways", 7: "sanitation",
         8: "NOT GIVEN", 9: "FALSE", 10: "NOT GIVEN", 11: "TRUE", 12: "TRUE", 13: "NOT GIVEN",
-        14: "C", 15: "F", 16: "A", 17: "D", 18: "F",
+        14: "D", 15: "F", 16: "A", 17: "C", 18: "F",
         19: "injury", 20: "serves", 21: "excitement", 22: "Visualisation",
         23: "B", 24: "D", 25: "A", 26: "E",
-        27: "H", 28: "A", 29: "F", 30: "B", 31: "D", 32: "K",
+        27: "H", 28: "A", 29: "C", 30: "B", 31: "J", 32: "I",
         33: "YES", 34: "NOT GIVEN", 35: "YES", 36: "NOT GIVEN", 37: "NO",
         38: "C", 39: "B", 40: "D"
       };
@@ -165,7 +165,7 @@ describe("Cambridge IELTS 19 - Full Tests Integrity & 100% Authentic Scoring", (
       const answers = {
         1: "FALSE", 2: "TRUE", 3: "FALSE", 4: "NOT GIVEN", 5: "FALSE", 6: "TRUE",
         7: "colonies", 8: "spring", 9: "endangered", 10: "habitats", 11: "Europe", 12: "southern", 13: "diet",
-        14: "B", 15: "D", 16: "C", 17: "F",
+        14: "C", 15: "F", 16: "E", 17: "D",
         18: "D", 19: "B", 20: "A", 21: "E", 22: "B", 23: "C",
         24: "waste", 25: "machinery", 26: "caution",
         27: "C", 28: "C", 29: "B", 30: "A",

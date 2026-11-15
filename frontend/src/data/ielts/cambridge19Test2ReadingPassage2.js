@@ -41,7 +41,7 @@ export const cambridge19Test2ReadingPassage2 = {
         {
           number: 14,
           question: "reference to two chemical compounds which impact on performance",
-          answers: ["C"]
+          answers: ["D"]
         },
         {
           number: 15,
@@ -56,7 +56,7 @@ export const cambridge19Test2ReadingPassage2 = {
         {
           number: 17,
           question: "study results indicating links between stress responses and performance",
-          answers: ["D"]
+          answers: ["C"]
         },
         {
           number: 18,

@@ -1,414 +1,333 @@
 /**
  * Cambridge IELTS 19 - Test 4 Reading Explanations & Evidence
- * Full authentic breakdown for all 40 questions across Passages 1, 2, and 3.
- * Adheres to <= 500 lines rule.
+ * 100% Authentic Verbatim Evidence from Cambridge 19.pdf (Pages 84-95).
+ * Adheres strictly to <= 500 lines rule.
  */
 
 export const cam19Test4ReadingExplanations = {
-  // --- PASSAGE 1: The impact of climate change on butterflies in Britain (Questions 1 - 13) ---
+  // --- PASSAGE 1: The impact of climate change on butterflies in Britain (Q1 - 13) ---
   1: {
     qNum: 1,
     answer: "FALSE",
     location: "Đoạn 1, Dòng 1-3",
-    evidence: "According to conservationists, populations of around two thirds of butterfly species have declined in Britain over the past 40 years.",
-    explanation: "Bài đọc cho biết 2/3 các loài bướm tại Anh đã suy giảm số lượng trong 40 năm qua, nghĩa là 40 năm trước số lượng bướm nhiều hơn hiện tại chứ không phải ít hơn ('fewer butterflies... than now').",
-    keywords: [
-      { question: "fewer butterflies forty years ago", passage: "populations of two thirds of butterfly species have declined over past 40 years" }
-    ]
+    evidence: "populations of around two thirds of butterfly species have declined in Britain over the past 40 years.",
+    explanation: "Bài đọc nêu rõ quần thể khoảng 2/3 loài bướm tại Anh đã suy giảm trong 40 năm qua. Điều này có nghĩa 40 năm trước số lượng bướm nhiều hơn hiện tại, mâu thuẫn với nhận định 'Forty years ago, there were fewer butterflies in Britain than at present'.",
+    keywords: [{ question: "fewer butterflies forty years ago", passage: "populations of around two thirds of butterfly species have declined over the past 40 years" }]
   },
   2: {
     qNum: 2,
     answer: "TRUE",
-    location: "Đoạn 2, Dòng 3-5",
-    evidence: "Caterpillars are a vital link in terrestrial food webs, serving as a primary food source for a wide variety of birds, small mammals, and predatory insects.",
-    explanation: "Sâu bướm là nguồn thức ăn chủ yếu của nhiều loài chim, thú có vú và côn trùng ăn thịt, khẳng định sâu bướm bị săn bắt bởi nhiều loài săn mồi khác nhau.",
-    keywords: [
-      { question: "caterpillars are eaten by a number of predators", passage: "primary food source for a wide variety of birds, mammals, and predatory insects" }
-    ]
+    location: "Đoạn 1, Dòng 4-6",
+    evidence: "consume vast quantities of plant material, and in turn act as prey for birds as well as bats and other small mammals.",
+    explanation: "Sâu bướm đóng vai trò làm con mồi ('act as prey') cho chim, dơi và nhiều loài thú nhỏ khác, xác nhận chúng bị săn bắt bởi nhiều loài săn mồi ('eaten by a number of different predators').",
+    keywords: [{ question: "eaten by a number of different predators", passage: "act as prey for birds as well as bats and other small mammals" }]
   },
   3: {
     qNum: 3,
     answer: "FALSE",
-    location: "Đoạn 3, Dòng 2-4",
-    evidence: "'Phenology' refers to the study of cyclic and seasonal natural phenomena, especially in relation to climate and plant and animal life cycles.",
-    explanation: "'Hiện tượng học' (Phenology) là nghiên cứu về chu kỳ mùa tự nhiên theo thời gian trong năm, không phải là thuật ngữ mô tả khả năng thích nghi với môi trường sống mới.",
-    keywords: [
-      { question: "ability to adapt to new habitat", passage: "study of cyclic and seasonal natural phenomena" }
-    ]
+    location: "Đoạn 2, Dòng 4-7",
+    evidence: "Scientists refer to the timing of such lifecycle events as 'phenology', so when an animal or plant starts to do something earlier in the year than it usually does, it is said to be 'advancing its phenology'.",
+    explanation: "Thuật ngữ 'phenology' chỉ thời điểm diễn ra các sự kiện trong chu kỳ sống (như sinh sản hay hoạt động sớm hơn), không phải chỉ khả năng thích nghi với môi trường sống mới.",
+    keywords: [{ question: "ability of butterflies to adapt to a new habitat", passage: "timing of such lifecycle events as 'phenology'" }]
   },
   4: {
     qNum: 4,
     answer: "NOT GIVEN",
-    location: "Đoạn 3 & 4, Dòng 5-8",
-    evidence: "Researchers noted that warmer springs caused adult butterflies to emerge up to several weeks earlier in the year than historically observed.",
-    explanation: "Bài đọc cho biết mùa xuân ấm hơn khiến bướm trưởng thành xuất hiện sớm hơn vài tuần, nhưng hoàn toàn không nói việc này có làm giảm tuổi thọ (reduced lifespan) của chúng hay không.",
-    keywords: [
-      { question: "reduced lifespan due to spring temperatures", passage: "không có thông tin về việc bị giảm tuổi thọ (Not Given)" }
-    ]
+    location: "Đoạn 2, Dòng 7-11",
+    evidence: "In Britain, as the average spring temperature has increased by roughly 0.5 °C over the past 20 years, species have advanced by between three days and a week on average, to keep in line with cooler temperatures.",
+    explanation: "Bài đọc cho biết các loài bướm xuất hiện sớm hơn 3 ngày đến 1 tuần do nhiệt độ mùa xuân tăng, nhưng hoàn toàn không đề cập đến việc tuổi thọ của chúng có bị rút ngắn hơn so với các loài khác hay không.",
+    keywords: [{ question: "shorter lifespan than other butterflies", passage: "không có thông tin về tuổi thọ (Not Given)" }]
   },
   5: {
     qNum: 5,
     answer: "FALSE",
-    location: "Đoạn 5, Dòng 4-6",
-    evidence: "The evolutionary mechanisms triggering these rapid developmental shifts remain largely enigmatic and subject to ongoing scientific inquiry.",
-    explanation: "Cơ chế tiến hóa thúc đẩy các thích ứng phát triển này vẫn còn là bí ẩn lớn chưa có lời giải rõ ràng ('remain largely enigmatic'), trái ngược với 'clear reason' (lý do rõ ràng).",
-    keywords: [
-      { question: "clear reason for adaptations", passage: "mechanisms remain largely enigmatic and subject to ongoing inquiry" }
-    ]
+    location: "Đoạn 3, Dòng 1-4",
+    evidence: "Is this a sign that butterflies are well equipped to cope with climate change, and readily adjust to new temperatures? Or are these populations under stress, being dragged along unwillingly by unnaturally fast changes? The answer is still unknown, but a new study is seeking to answer these questions.",
+    explanation: "Tác giả nêu rõ 'The answer is still unknown' (câu trả lời vẫn chưa được biết), trái ngược hoàn toàn với nhận định rằng đã có lý do rõ ràng ('clear reason').",
+    keywords: [{ question: "clear reason for the developmental shifts", passage: "The answer is still unknown" }]
   },
   6: {
     qNum: 6,
     answer: "TRUE",
-    location: "Đoạn 6, Dòng 4-6",
-    evidence: "The study relied on extensive historical datasets contributed by thousands of citizen scientists and amateur naturalists recording sightings across Britain.",
-    explanation: "Bộ dữ liệu của nghiên cứu được thu thập từ hàng nghìn nhà tự nhiên học nghiệp dư và người dân tình nguyện tham gia ghi nhận số liệu trên khắp nước Anh.",
-    keywords: [
-      { question: "data taken from work of amateur naturalists", passage: "datasets contributed by citizen scientists and amateur naturalists" }
-    ]
+    location: "Đoạn 3, Dòng 4-7",
+    evidence: "First, the researchers pulled together data from millions of records that had been submitted by butterfly enthusiasts — people who spend their free time observing the activities of different species.",
+    explanation: "Dữ liệu được thu thập từ những người đam mê bướm tự nguyện quan sát trong thời gian rảnh rỗi, tức là những người trong cộng đồng công chúng ('members of the public').",
+    keywords: [{ question: "collected by members of the public", passage: "submitted by butterfly enthusiasts — people who spend their free time observing" }]
   },
   7: {
     qNum: 7,
     answer: "colonies",
-    location: "Đoạn 4, Dòng 3-5",
-    evidence: "The Small Blue butterfly typically gathers in dense colonies in sheltered grassland habitats.",
-    explanation: "Loài bướm Small Blue sống tập trung thành các quần thể / bầy đàn lớn (colonies). Từ cần điền là 'colonies'.",
-    keywords: [
-      { question: "lives in large [colonies]", passage: "gathers in dense colonies in sheltered grassland" }
-    ]
+    location: "Đoạn 4, Dòng 7-9",
+    evidence: "For these species, such as Britain's tiniest butterfly, the dainty Small Blue, whose colonies are up to a hundred strong",
+    explanation: "Từ cần điền là 'colonies'. Cụm 'whose colonies are up to a hundred strong' tương đương với 'forms colonies of up to a hundred individuals'.",
+    keywords: [{ question: "forms ... of up to a hundred individuals", passage: "whose colonies are up to a hundred strong" }]
   },
   8: {
     qNum: 8,
     answer: "spring",
-    location: "Đoạn 4, Dòng 5-6",
-    evidence: "Adult butterflies begin emerging at the very start of spring as temperatures rise.",
-    explanation: "Bướm trưởng thành xuất hiện lần đầu tiên vào đầu mùa xuân (spring). Từ cần điền là 'spring'.",
-    keywords: [
-      { question: "first appears at the start of [spring]", passage: "begin emerging at the very start of spring" }
-    ]
+    location: "Đoạn 4, Dòng 9-11",
+    evidence: "some develop into butterflies early in spring, allowing their summer generations to complete another reproductive cycle by autumn so that more population growth occurs.",
+    explanation: "Từ cần điền là 'spring'. Bài đọc nêu rõ một số cá thể phát triển thành bướm trưởng thành vào đầu mùa xuân ('early in spring').",
+    keywords: [{ question: "develops into an adult butterfly in early", passage: "develop into butterflies early in spring" }]
   },
   9: {
     qNum: 9,
     answer: "endangered",
-    location: "Đoạn 5, Dòng 2-4",
-    evidence: "The High Brown Fritillary has become critically endangered across Britain due to strict specialized breeding requirements.",
-    explanation: "Loài High Brown Fritillary hiện đang bị đe dọa tuyệt chủng nghiêm trọng (endangered). Từ cần điền là 'endangered'.",
-    keywords: [
-      { question: "considered to be more [endangered]", passage: "has become critically endangered across Britain" }
-    ]
+    location: "Đoạn 5, Dòng 5-6",
+    evidence: "The beautiful High Brown Fritillary, often described as Britain's most endangered butterfly, is in this group.",
+    explanation: "Từ cần điền là 'endangered'. Cụm 'often described as Britain's most endangered butterfly' khớp với 'considered to be the most endangered butterfly in Britain'.",
+    keywords: [{ question: "considered to be the most ... butterfly in Britain", passage: "often described as Britain's most endangered butterfly" }]
   },
   10: {
     qNum: 10,
     answer: "habitats",
-    location: "Đoạn 5, Dòng 4-5",
-    evidence: "Its caterpillars are highly selective and survive only within specialized woodland habitats containing wild violets.",
-    explanation: "Sâu bướm của loài này chỉ sinh sống trong một phạm vi môi trường sống (habitats / habitat) rừng thưa có hoa vi-ô-lét dại. Từ cần điền là 'habitats' (hoặc 'habitat').",
-    keywords: [
-      { question: "occupy a limited range of [habitats]", passage: "survive only within specialized woodland habitats" }
-    ]
+    location: "Đoạn 5, Dòng 3-7",
+    evidence: "It is found only in coppiced woodland and limestone pavement habitats.",
+    explanation: "Từ cần điền là 'habitats' (hoặc 'habitat'). Loài này đòi hỏi các sinh cảnh rất cụ thể ('specific habitat types'), chỉ sống ở rừng cây chồi và đá vôi.",
+    keywords: [{ question: "requires very specific", passage: "specialise in very specific habitat types / limestone pavement habitats" }]
   },
   11: {
     qNum: 11,
     answer: "Europe",
     location: "Đoạn 6, Dòng 1-3",
-    evidence: "In warmer regions of continental Europe, the Silver-studded Blue produces two generations per year instead of just one.",
-    explanation: "Ở lục địa châu Âu (Europe), loài bướm này có khả năng sinh sản 2 lứa mỗi năm. Từ cần điền là 'Europe'.",
-    keywords: [
-      { question: "reproduce twice a year in parts of [Europe]", passage: "in continental Europe, produces two generations per year" }
-    ]
+    evidence: "Many of Britain's single-generation species show the capacity, in continental Europe, to add a second generation in years that are sufficiently warm.",
+    explanation: "Từ cần điền là 'Europe'. Tại vùng lục địa châu Âu ('continental Europe'), loài này có thể sinh sản thêm thế hệ thứ hai trong những năm đủ ấm.",
+    keywords: [{ question: "parts of", passage: "in continental Europe" }]
   },
   12: {
     qNum: 12,
     answer: "southern",
-    location: "Đoạn 6, Dòng 5-6",
-    evidence: "The White Admiral was previously confined to southern England but has begun expanding northward.",
-    explanation: "Loài White Admiral trước đây chủ yếu chỉ được tìm thấy ở miền nam (southern) nước Anh. Từ cần điền là 'southern'.",
-    keywords: [
-      { question: "found in [southern] parts of the country", passage: "previously confined to southern England" }
-    ]
+    location: "Đoạn 6, Dòng 6-8",
+    evidence: "The White Admiral of southern England, a much sought-after butterfly, experienced a significant increase in numbers from the 1920s but has shown a considerable decline in the past 20 years.",
+    explanation: "Từ cần điền là 'southern'. Loài bướm White Admiral sinh sống tại miền nam nước Anh ('southern England').",
+    keywords: [{ question: "a butterfly found in ... England", passage: "The White Admiral of southern England" }]
   },
   13: {
     qNum: 13,
     answer: "diet",
-    location: "Đoạn 6, Dòng 7-8",
-    evidence: "The eventual range expansion depends on both climatic suitability and the availability of their specialized caterpillar diet.",
-    explanation: "Sự mở rộng địa bàn sinh sống của bướm phụ thuộc vào khí hậu và chế độ ăn / nguồn thức ăn (diet) của sâu bướm. Từ cần điền là 'diet'.",
-    keywords: [
-      { question: "climate change and the caterpillars' [diet]", passage: "climatic suitability and the availability of their caterpillar diet" }
-    ]
+    location: "Đoạn 6, Dòng 8-10",
+    evidence: "This may be because the caterpillar exists solely on a diet of a plant called honeysuckle.",
+    explanation: "Từ cần điền là 'diet'. Sâu bướm chỉ sống dựa trên chế độ ăn cây kim ngân ('exists solely on a diet of a plant called honeysuckle').",
+    keywords: [{ question: "has a ... restricted to honeysuckle", passage: "exists solely on a diet of a plant called honeysuckle" }]
   },
 
-  // --- PASSAGE 2: Deep-sea mining (Questions 14 - 26) ---
+  // --- PASSAGE 2: Deep-sea mining (Q14 - 26) ---
   14: {
     qNum: 14,
-    answer: "B",
-    location: "Đoạn B, Dòng 4-6",
-    evidence: "Automakers and tech companies require unprecedented volumes of cobalt and nickel for electric vehicle batteries, driving surging global demand.",
-    explanation: "Đoạn B nhắc tới nhu cầu tăng vọt về các nguyên liệu thô (cobalt, niken) phục vụ ngành sản xuất pin xe điện.",
-    keywords: [
-      { question: "rapidly increasing need for one raw material", passage: "require unprecedented volumes of cobalt and nickel... surging global demand" }
-    ]
+    answer: "C",
+    location: "Đoạn C, Dòng 3-6",
+    evidence: "Mining corporations argue that deep-sea exploration could help diversify the supply of metals and point to the fact that demand for resources such as copper, aluminium, cobalt for electric car batteries and other metals to power technology and smartphones, is soaring.",
+    explanation: "Đoạn C nhắc tới nhu cầu tăng vọt của cobalt dùng cho pin xe điện trong ngành vận tải ('cobalt for electric car batteries ... is soaring').",
+    keywords: [{ question: "rapidly increasing need for one raw material in the transport industry", passage: "demand for resources such as ... cobalt for electric car batteries ... is soaring" }]
   },
   15: {
     qNum: 15,
-    answer: "D",
-    location: "Đoạn D, Dòng 1-2",
-    evidence: "The oceans occupy around 70% of the planet and are relatively unexplored, says Mike Johnston...",
-    explanation: "Đoạn D đưa ra ước tính sơ bộ diện tích đại dương bao phủ khoảng 70% bề mặt Trái Đất.",
-    keywords: [
-      { question: "rough estimate of area covered by ocean", passage: "oceans occupy around 70% of the planet" }
-    ]
+    answer: "F",
+    location: "Đoạn F, Dòng 1-2",
+    evidence: "The oceans occupy around 70% of the planet and are relatively unexplored, says Mike Johnston, chief executive of Nautilus, a Canadian underwater exploration company:",
+    explanation: "Đoạn F đưa ra ước tính sơ bộ diện tích bề mặt Trái Đất được bao phủ bởi đại dương là khoảng 70% ('The oceans occupy around 70% of the planet').",
+    keywords: [{ question: "rough estimate of the area of the Earth covered by the oceans", passage: "The oceans occupy around 70% of the planet" }]
   },
   16: {
     qNum: 16,
-    answer: "C",
-    location: "Đoạn C, Dòng 1-4",
-    evidence: "Hydrothermal vents form where tectonic plates pull apart, creating mineral spires that support bizarre ecosystems thriving on chemical energy rather than sunlight.",
-    explanation: "Đoạn C giải thích cách các miệng phun thủy nhiệt hình thành dưới đáy biển sâu và nuôi dưỡng một hệ sinh thái độc đáo.",
-    keywords: [
-      { question: "how an underwater habitat is formed", passage: "hydrothermal vents form where tectonic plates pull apart" }
-    ]
+    answer: "E",
+    location: "Đoạn E, Dòng 1-3",
+    evidence: "Scientific research — including a recent paper in Marine Policy journal — has suggested the deep seabed, and hydrothermal vents, which are created when seawater meets volcanic magma, have crucial impacts upon biodiversity and the global climate.",
+    explanation: "Đoạn E mô tả sự hình thành của các miệng phun thủy nhiệt khi nước biển gặp magma núi lửa ('created when seawater meets volcanic magma'), nơi khoáng sản và sinh vật cùng tồn tại.",
+    keywords: [{ question: "how a particular underwater habitat, where minerals and organisms co-exist, is formed", passage: "hydrothermal vents, which are created when seawater meets volcanic magma" }]
   },
   17: {
     qNum: 17,
-    answer: "F",
-    location: "Đoạn F, Dòng 2-4",
-    evidence: "Member states of the International Seabed Authority have yet to agree on a final environmental code or binding exploitation regulations.",
-    explanation: "Đoạn F đề cập các quốc gia trên thế giới đến nay vẫn chưa thống nhất được bộ quy tắc pháp lý chung về khai thác khoáng sản đáy biển.",
-    keywords: [
-      { question: "countries have yet to agree on mining rules", passage: "have yet to agree on a final environmental code or binding regulations" }
-    ]
+    answer: "D",
+    location: "Đoạn D, Dòng 1-3",
+    evidence: "But environmental and legal groups have urged caution, arguing there are potentially massive and unknown ramifications for the environment and for nearby communities, and that the global regulatory framework is not yet drafted.",
+    explanation: "Đoạn D nhắc tới việc khung pháp lý toàn cầu về khai thác đáy biển vẫn chưa được soạn thảo ('global regulatory framework is not yet drafted'), tức các quốc gia chưa thống nhất quy tắc.",
+    keywords: [{ question: "countries of the world have yet to agree on rules for the exploration of the seabed", passage: "global regulatory framework is not yet drafted" }]
   },
   18: {
     qNum: 18,
     answer: "D",
-    location: "Đoạn D, Dòng 3-5",
-    evidence: "Mike Johnston argues that terrestrial mining is reaching its ecological limits and that seabed extraction offers far less social displacement than land-based operations.",
-    explanation: "Mike Johnston cho rằng cần chuyển dịch khỏi các mỏ đất liền đã bị khai thác cạn kiệt vì khai thác đáy biển ít gây xung đột xã hội hơn.",
-    keywords: [
-      { question: "move away from heavily mined land reserves", passage: "terrestrial mining reaching limits... seabed extraction offers less displacement" }
-    ]
+    location: "Đoạn F, Dòng 2-5",
+    evidence: "'It makes sense to explore this untapped potential in an environmentally sustainable way, instead of continually looking at the fast depleting land resources of the planet to meet society's rising needs.'",
+    explanation: "Mike Johnston (D) cho rằng chuyển dịch khỏi khai thác các mỏ đang cạn kiệt trên đất liền sang đáy biển là hướng đi hợp lý ('instead of continually looking at the fast depleting land resources').",
+    keywords: [{ question: "move away from exploration of heavily mined reserves on land is a good idea", passage: "instead of continually looking at the fast depleting land resources" }]
   },
   19: {
     qNum: 19,
     answer: "B",
-    location: "Đoạn F, Dòng 5-7",
-    evidence: "Legal researchers Julie Hunter, Julian Aguon and Pradeep Singh warned that deep dredging could permanently devastate fisheries relied on by Pacific island communities.",
-    explanation: "Nhóm tác giả Hunter, Aguon và Singh cảnh báo tác động tiêu cực của khai thác biển đối với nguồn lợi thủy hải sản của cư dân các đảo Thái Bình Dương.",
-    keywords: [
-      { question: "negative effects on local areas and livelihoods", passage: "permanently devastate fisheries relied on by Pacific island communities" }
-    ]
+    location: "Đoạn D, Dòng 3-7",
+    evidence: "'Despite arising in the last half century, the \"new global gold rush\" of deep-sea mining shares many features with past resource scrambles — including a general disregard for environmental and social impacts, and the marginalisation of indigenous peoples and their rights,' a paper, written by Julie Hunter and Julian Aguon, from Blue Ocean Law, and Pradeep Singh, from the Center for Marine Environmental Sciences, Bremen, argues.",
+    explanation: "Hunter, Aguon và Singh (B) chỉ trích hoạt động này xem nhẹ tác động xã hội và môi trường, gạt bỏ người dân bản địa ('marginalisation of indigenous peoples and their rights').",
+    keywords: [{ question: "negative effects on local areas and their inhabitants are being ignored", passage: "disregard for environmental and social impacts, and the marginalisation of indigenous peoples" }]
   },
   20: {
     qNum: 20,
     answer: "A",
-    location: "Đoạn A, Dòng 3-5",
-    evidence: "Professor Upton believes deep ocean microbes and marine sponge metabolites offer invaluable medical potential for novel antibiotics, vastly exceeding the value of raw rocks.",
-    explanation: "Giáo sư Upton khẳng định các vi sinh vật và hợp chất sinh học biển sâu có giá trị to lớn hơn nhiều (để chế tạo thuốc kháng sinh mới) so với việc khai thác khoáng sản thô.",
-    keywords: [
-      { question: "more worthwhile things to extract (medicines)", passage: "invaluable medical potential for antibiotics vastly exceeding value of raw rocks" }
-    ]
+    location: "Đoạn B, Dòng 4-5",
+    evidence: "'In sustainability terms, this could be a better way of exploiting the economic potential of the deep sea,' he argues.",
+    explanation: "Giáo sư Mat Upton (A) cho rằng tiềm năng sinh học tìm kiếm thuốc chữa bệnh quý giá và bền vững hơn nhiều so với việc đào bới khoáng sản kim loại.",
+    keywords: [{ question: "more worthwhile things to extract from the sea than minerals", passage: "bioactive potential of marine resources ... better way of exploiting economic potential" }]
   },
   21: {
     qNum: 21,
     answer: "E",
-    location: "Đoạn F, Dòng 7-9",
-    evidence: "Biologist Verena Tunnicliffe stated that no human industrial footprint in history has ever inflicted such widespread, permanent destruction on pristine wilderness.",
-    explanation: "Verena Tunnicliffe cảnh báo chưa từng có hoạt động công nghiệp nào của con người gây ra sự tàn phá vĩnh viễn và khốc liệt đối với thiên nhiên như khai thác biển sâu.",
-    keywords: [
-      { question: "no other human exploration will have such destructive impact", passage: "no human industrial footprint in history has ever inflicted such permanent destruction" }
-    ]
+    location: "Đoạn F, Dòng 8-10",
+    evidence: "'Mining will be the greatest assault on deep-sea ecosystems ever inflicted by humans,' according to hydrothermal vent expert Verena Tunnicliffe, at the University of Victoria in Canada.",
+    explanation: "Verena Tunnicliffe (E) nhận định khai mỏ biển sâu sẽ là cuộc tấn công tàn phá nặng nề nhất vào hệ sinh thái mà con người từng gây ra ('greatest assault on deep-sea ecosystems').",
+    keywords: [{ question: "destructive impact on marine life as deep-sea mining", passage: "Mining will be the greatest assault on deep-sea ecosystems ever inflicted by humans" }]
   },
   22: {
     qNum: 22,
     answer: "B",
-    location: "Đoạn E & F, Dòng 1-3 & Dòng 8-11",
-    evidence: "The authors say that knowledge of the deep seabed remains extremely limited. 'The surface of the Moon, Mars and even Venus have all been mapped and studied in much greater detail... a paper, written by Julie Hunter and Julian Aguon, from Blue Ocean Law, and Pradeep Singh, from the Center for Marine Environmental Sciences, Bremen, argues.",
-    explanation: "Nhóm tác giả gồm Julie Hunter, Julian Aguon và Pradeep Singh (đáp án B) đưa ra nhận định rằng con người biết về không gian vũ trụ (Mặt Trăng, Sao Hỏa, Sao Kim) nhiều hơn đáy đại dương.",
-    keywords: [
-      { question: "more is known about outer space than seabed", passage: "surface of the Moon, Mars and even Venus mapped and studied in much greater detail... Julie Hunter, Julian Aguon and Pradeep Singh" }
-    ]
+    location: "Đoạn D, Dòng 7-10",
+    evidence: "The authors say that knowledge of the deep seabed remains extremely limited. 'The surface of the Moon, Mars and even Venus have all been mapped and studied in much greater detail, leading marine scientists to commonly remark that, with respect to the deep sea, \"We don't yet know what we need to know\".'",
+    explanation: "Bài báo của nhóm Hunter, Aguon và Singh (B) nêu rõ bề mặt Mặt Trăng, Sao Hỏa và Sao Kim đã được nghiên cứu chi tiết hơn đáy biển rất nhiều.",
+    keywords: [{ question: "More is known about outer space than about what lies beneath the oceans", passage: "surface of the Moon, Mars and even Venus have all been mapped and studied in much greater detail" }]
   },
   23: {
     qNum: 23,
     answer: "C",
-    location: "Đoạn C, Dòng 4-6",
-    evidence: "Copley stresses that scientists unanimously concur active hydrothermal vents are fragile, irreplaceable ecosystems that must be declared off-limits to heavy machinery.",
-    explanation: "Copley cho biết các chuyên gia đều nhất trí rằng các miệng phun thủy nhiệt là môi trường sinh thái độc nhất vô nhị tuyệt đối không được phép khai thác.",
-    keywords: [
-      { question: "experts agree mining should not take place", passage: "unanimously concur active hydrothermal vents must be declared off-limits" }
-    ]
+    location: "Đoạn E, Dòng 7-9",
+    evidence: "'On deep sea vents, scientists are clear,' says Dr Jon Copley of the National Oceanography Centre, Southampton: 'we don't want mining on them.'",
+    explanation: "Tiến sĩ Jon Copley (C) khẳng định các nhà khoa học đồng thuận miệng phun đáy biển là nơi không được phép khai mỏ ('we don't want mining on them').",
+    keywords: [{ question: "one marine life habitat where experts agree mining should not take place", passage: "On deep sea vents, scientists are clear ... we don't want mining on them" }]
   },
   24: {
     qNum: 24,
     answer: "waste",
-    location: "Đoạn D, Dòng 5-7",
-    evidence: "Mining companies emphasize that deep-sea mineral nodules produce virtually zero toxic overburden or solid chemical waste compared to land strip-mining.",
-    explanation: "Các công ty khai khoáng lập luận việc khai thác quặng đáy biển hầu như không thải ra rác thải / chất thải (waste) rắn độc hại. Từ cần điền là 'waste'.",
-    keywords: [
-      { question: "produce zero chemical [waste]", passage: "produce virtually zero toxic overburden or solid chemical waste" }
-    ]
+    location: "Đoạn C, Dòng 6-7",
+    evidence: "They say that deep-sea mining could yield far superior ore to land mining with little, if any, waste.",
+    explanation: "Từ cần điền là 'waste'. Khai mỏ biển sâu được cho là mang lại quặng vượt trội mà hầu như không tạo ra chất thải ('with little, if any, waste').",
+    keywords: [{ question: "removed without producing much", passage: "with little, if any, waste" }]
   },
   25: {
     qNum: 25,
     answer: "machinery",
-    location: "Đoạn D, Dòng 7-8",
-    evidence: "Commercial operations rely on adapting heavy robotic machinery previously developed for offshore petroleum extraction.",
-    explanation: "Việc khai thác được thực hiện bằng cách cải tiến các cỗ máy (machinery) robot hạng nặng từ ngành dầu khí ngoài khơi. Từ cần điền là 'machinery'.",
-    keywords: [
-      { question: "adapting heavy [machinery]", passage: "adapting heavy robotic machinery previously developed" }
-    ]
+    location: "Đoạn C, Dòng 7-9",
+    evidence: "most involve employing some form of converted machinery previously used in terrestrial mining to excavate materials from the sea floor",
+    explanation: "Từ cần điền là 'machinery'. Phương pháp khai khoáng áp dụng các máy móc cải tiến từng dùng trên đất liền ('converted machinery previously used in terrestrial mining').",
+    keywords: [{ question: "adapting the ... that has already been used to work on land", passage: "converted machinery previously used in terrestrial mining" }]
   },
   26: {
     qNum: 26,
     answer: "caution",
-    location: "Đoạn F, Dòng 1-2",
-    evidence: "Marine ecologists and international legal scholars have overwhelmingly urged caution before licensing commercial deep-sea dredging.",
-    explanation: "Các nhà sinh thái học đã khẩn thiết kêu gọi sự thận trọng (caution) trước khi cấp phép hoạt động khai thác quy mô thương mại. Từ cần điền là 'caution'.",
-    keywords: [
-      { question: "urged extreme [caution]", passage: "overwhelmingly urged caution before licensing" }
-    ]
+    location: "Đoạn D, Dòng 1-3",
+    evidence: "But environmental and legal groups have urged caution, arguing there are potentially massive and unknown ramifications for the environment and for nearby communities",
+    explanation: "Từ cần điền là 'caution'. Các nhóm môi trường và luật pháp thúc giục sự cẩn trọng ('urged caution') trước những hậu quả chưa thể lường trước.",
+    keywords: [{ question: "concerned groups strongly believe that ... is necessary", passage: "environmental and legal groups have urged caution" }]
   },
 
-  // --- PASSAGE 3: The Unselfish Gene (Questions 27 - 40) ---
+  // --- PASSAGE 3: The Unselfish Gene (Q27 - 40) ---
   27: {
     qNum: 27,
     answer: "C",
-    location: "Đoạn 1, Dòng 1-4",
-    evidence: "The author begins by critiquing the widely held orthodox view that human beings are inherently aggressive, competitive, and driven by purely selfish motives.",
-    explanation: "Trong đoạn 1, tác giả phản biện quan niệm phổ biến xưa nay cho rằng con người về bản chất là ích kỷ và hung hãn.",
-    keywords: [
-      { question: "critiquing the assumption of inherent selfishness", passage: "critiquing widely held orthodox view that humans are inherently selfish and ruthless" }
-    ]
+    location: "Đoạn 1, Dòng 1-2",
+    evidence: "There has long been a general assumption that human beings are essentially selfish.",
+    explanation: "Tác giả mở đầu bằng việc mô tả quan niệm lâu đời rằng con người vốn ích kỷ ('general assumption that human beings are essentially selfish'), tương ứng với 'describing a commonly held belief about people's behaviour'.",
+    keywords: [{ question: "describing a commonly held belief about people's behaviour", passage: "There has long been a general assumption that human beings are essentially selfish" }]
   },
   28: {
     qNum: 28,
     answer: "C",
-    location: "Đoạn 2, Dòng 2-5",
-    evidence: "Dawkins' The Selfish Gene popularized a bleak vision of biological destiny that was eagerly adopted by neoliberal economists to justify cut-throat competitive markets.",
-    explanation: "Tác phẩm của Dawkins đã củng cố lý thuyết của các nhà kinh tế học để biện minh cho sự cạnh tranh khốc liệt trên thương trường.",
-    keywords: [
-      { question: "used to justify competitive social systems", passage: "eagerly adopted by economists to justify cut-throat competitive markets" }
-    ]
+    location: "Đoạn 2, Dòng 1-4",
+    evidence: "whose 1976 book The Selfish Gene became popular because it fitted so well with — and helped to justify — the competitive and individualistic ethos that was so prevalent in late 20th-century societies.",
+    explanation: "Cuốn sách The Selfish Gene thành công vì nó phù hợp hoàn hảo ('fitted so well with') với tinh thần cạnh tranh và cá nhân thịnh hành cuối thế kỷ 20 ('in line with the attitudes of its time').",
+    keywords: [{ question: "in line with the attitudes of its time", passage: "fitted so well with ... the competitive and individualistic ethos that was so prevalent in late 20th-century societies" }]
   },
   29: {
     qNum: 29,
     answer: "B",
-    location: "Đoạn 3, Dòng 2-4",
-    evidence: "Archaeological findings indicate that early human foraging bands lived in relative abundance with low population density, making violent conflict rare and unnecessary.",
-    explanation: "Tác giả chỉ ra rằng trong thời tiền sử, con người sống thành các nhóm săn bắt hái lượm trong môi trường dồi dào tài nguyên, do đó bạo lực chiến tranh là hiếm thấy.",
-    keywords: [
-      { question: "violent conflict was rare in prehistory", passage: "low population density making violent conflict rare and unnecessary" }
-    ]
+    location: "Đoạn 4, Dòng 4-7",
+    evidence: "With such small population densities, it seems unlikely that prehistoric hunter-gatherer groups had to compete against each other for resources or had any need to develop ruthlessness and competitiveness, or to go to war.",
+    explanation: "Trong đoạn 4, tác giả lập luận rằng với mật độ dân số rất thấp, người tiền sử không cần tranh giành tài nguyên, chứng tỏ nguồn tài nguyên thiên nhiên tương đối dồi dào so với dân số ít ỏi ('plentiful').",
+    keywords: [{ question: "Supplies of natural resources were probably relatively plentiful", passage: "unlikely that prehistoric hunter-gatherer groups had to compete against each other for resources" }]
   },
   30: {
     qNum: 30,
     answer: "A",
-    location: "Đoạn 4, Dòng 2-4",
-    evidence: "Bruce Knauft's anthropological fieldwork provides empirical evidence that egalitarian cooperation was the defining social norm of ancient hunter-gatherers.",
-    explanation: "Nghiên cứu của Bruce Knauft là minh chứng thực tế ủng hộ quan điểm rằng sự hợp tác bình đẳng mới là chuẩn mực tự nhiên của xã hội loài người nguyên thủy.",
-    keywords: [
-      { question: "egalitarian cooperation was defining norm", passage: "empirical evidence that egalitarian cooperation was defining social norm" }
-    ]
+    location: "Đoạn 5, Dòng 1-3",
+    evidence: "There is significant evidence to back this notion from contemporary hunter-gatherer groups, who live in the same way as prehistoric humans did. As the anthropologist Bruce Knauft has remarked, hunter-gatherers are characterised by 'extreme political and sexual egalitarianism'.",
+    explanation: "Nghiên cứu của Bruce Knauft về các bộ tộc săn bắt hái lượm sống bình đẳng ủng hộ quan điểm rằng tính ích kỷ là hiện tượng mới phát triển gần đây trong xã hội loài người ('selfishness is a relatively recent development').",
+    keywords: [{ question: "selfishness is a relatively recent development in human societies", passage: "contemporary hunter-gatherer groups, who live in the same way as prehistoric humans did ... extreme political and sexual egalitarianism" }]
   },
   31: {
     qNum: 31,
     answer: "egalitarianism",
-    location: "Đoạn 4, Dòng 5-6",
-    evidence: "These tribes practice rigorous egalitarianism, ensuring resources are distributed equally without hierarchy.",
-    explanation: "Các bộ tộc duy trì chế độ bình đẳng (egalitarianism) nghiêm ngặt để phân chia tài nguyên đồng đều. Từ cần điền là 'egalitarianism'.",
-    keywords: [
-      { question: "societies practice [egalitarianism]", passage: "practice rigorous egalitarianism, ensuring resources distributed equally" }
-    ]
+    location: "Đoạn 5, Dòng 2-3",
+    evidence: "hunter-gatherers are characterised by 'extreme political and sexual egalitarianism'.",
+    explanation: "Từ cần điền là 'egalitarianism'. Các bộ tộc săn bắt hái lượm có đặc trưng là bình đẳng giới và chính trị triệt để ('extreme political and sexual egalitarianism').",
+    keywords: [{ question: "exhibit a high level of", passage: "characterised by 'extreme political and sexual egalitarianism'" }]
   },
   32: {
     qNum: 32,
     answer: "status",
-    location: "Đoạn 5, Dòng 1-3",
-    evidence: "They employ cultural leveling mechanisms to prevent any individual from accumulating excessive power or social status.",
-    explanation: "Họ áp dụng các quy chuẩn văn hóa để ngăn chặn sự chênh lệch về địa vị xã hội (status) hay quyền lực. Từ cần điền là 'status'.",
-    keywords: [
-      { question: "prevent differences in [status]", passage: "prevent any individual from accumulating excessive status" }
-    ]
+    location: "Đoạn 5, Dòng 4-5",
+    evidence: "They also have methods of preserving egalitarianism by ensuring that disparities of status don't arise.",
+    explanation: "Từ cần điền là 'status'. Họ duy trì bình đẳng bằng cách đảm bảo không nảy sinh sự chênh lệch về địa vị ('disparities of status don't arise').",
+    keywords: [{ question: "prevent differences in ... occurring", passage: "ensuring that disparities of status don't arise" }]
   },
   33: {
     qNum: 33,
     answer: "hunting",
-    location: "Đoạn 5, Dòng 3-5",
-    evidence: "Among the !Kung, hunters trade arrows before embarking on hunting expeditions so that no single hunter can claim solitary bragging rights.",
-    explanation: "Thợ săn đổi tên cho nhau trước khi đi săn (hunting) để không một cá nhân nào có thể tự cao tự đại. Từ cần điền là 'hunting'.",
-    keywords: [
-      { question: "before going [hunting]", passage: "trade arrows before embarking on hunting expeditions" }
-    ]
+    location: "Đoạn 6, Dòng 1-3",
+    evidence: "The !Kung people of southern Africa, for example, swap arrows before going hunting and when an animal is killed, the acclaim does not go to the person who fired the arrow, but to the person the arrow belongs to.",
+    explanation: "Từ cần điền là 'hunting'. Người !Kung đổi mũi tên trước khi đi săn và công lao hạ con mồi thuộc về người sở hữu mũi tên.",
+    keywords: [{ question: "success at", passage: "swap arrows before going hunting and when an animal is killed" }]
   },
   34: {
     qNum: 34,
     answer: "domineering",
-    location: "Đoạn 5, Dòng 6-8",
-    evidence: "Anyone displaying domineering or arrogant behavior is swiftly subjected to ridicule or social ostracism.",
-    explanation: "Bất kỳ ai có hành vi độc đoán / hống hách (domineering) đều lập tức bị cả nhóm chế giễu hoặc tẩy chay. Từ cần điền là 'domineering'.",
-    keywords: [
-      { question: "individuals who behave in a [domineering] manner", passage: "anyone displaying domineering or arrogant behavior is ridiculed" }
-    ]
+    location: "Đoạn 6, Dòng 3-4",
+    evidence: "And if a person becomes too domineering, the other members of the group ostracise them, exiling the offender from society.",
+    explanation: "Từ cần điền là 'domineering'. Ai cư xử độc đoán, lấn lướt sẽ bị trừng phạt bằng cách bị tẩy chay và lưu đày.",
+    keywords: [{ question: "behave in a ... manner are punished", passage: "if a person becomes too domineering, the other members of the group ostracise them" }]
   },
   35: {
     qNum: 35,
     answer: "autonomy",
-    location: "Đoạn 5, Dòng 9-10",
-    evidence: "In sharp contrast to later agrarian states, women in hunter-gatherer bands retain immense personal autonomy and equal decision-making authority.",
-    explanation: "Phụ nữ trong các nhóm săn bắt có quyền tự chủ (autonomy) cá nhân rất lớn và bình đẳng trong mọi quyết định. Từ cần điền là 'autonomy'.",
-    keywords: [
-      { question: "women enjoy considerable [autonomy]", passage: "women retain immense personal autonomy and equal authority" }
-    ]
+    location: "Đoạn 6, Dòng 5-7",
+    evidence: "Women in hunter-gatherer groups worldwide often benefit from a high level of autonomy, being able to select their own marriage partners, decide what work they do and work whenever they choose to.",
+    explanation: "Từ cần điền là 'autonomy'. Phụ nữ được hưởng quyền tự chủ cao ('high level of autonomy') trong hôn nhân và công việc.",
+    keywords: [{ question: "considerable amount of ... in choices regarding work and marriage", passage: "high level of autonomy, being able to select their own marriage partners, decide what work they do" }]
   },
   36: {
     qNum: 36,
     answer: "NOT GIVEN",
-    location: "Đoạn 6, Dòng 1-3",
-    evidence: "Scholars continue to study the archaeological transition between nomadic foraging and sedentary agricultural settlements.",
-    explanation: "Bài đọc có nhắc tới giai đoạn chuyển đổi giữa săn bắt hái lượm và nông nghiệp định cư, nhưng không hề nói các nhà nhân chủng học có nhầm lẫn thời điểm hay không.",
-    keywords: [
-      { question: "anthropologists are mistaken about the timing", passage: "không có thông tin về việc bị sai lầm thời điểm (Not Given)" }
-    ]
+    location: "Đoạn 7, Dòng 1-3",
+    evidence: "Many anthropologists believe that societies such as the !Kung were normal until a few thousand years ago, when population growth led to the development of agriculture and a settled lifestyle.",
+    explanation: "Bài đọc cho biết nhiều nhà nhân chủng học tin rằng các xã hội như !Kung phổ biến cho tới vài nghìn năm trước, nhưng hoàn toàn không nói có ai bị sai lầm ('mistaken') về thời điểm này hay không.",
+    keywords: [{ question: "anthropologists are mistaken about the point", passage: "không có thông tin về việc bị sai lầm (Not Given)" }]
   },
   37: {
     qNum: 37,
     answer: "NO",
-    location: "Đoạn 6, Dòng 4-6",
-    evidence: "Far from offering survival advantages, hyper-aggressive individuals in ancestral bands would have faced exclusion and lower reproductive success.",
-    explanation: "Những cá nhân hiếu chiến trong xã hội nguyên thủy sẽ bị tẩy chay và giảm cơ hội duy trì nòi giống chứ không hề có lợi thế sinh tồn, trái ngược hoàn toàn với nhận định.",
-    keywords: [
-      { question: "warlike traits provided evolutionary advantage", passage: "far from offering advantages, hyper-aggressive individuals faced exclusion" }
-    ]
+    location: "Đoạn 8, Dòng 3-5",
+    evidence: "Individuals who behaved selfishly and ruthlessly would be less likely to survive, since they would have been ostracised from their groups.",
+    explanation: "Những cá nhân hiếu chiến và tàn nhẫn thời tiền sử ít có khả năng sống sót hơn vì bị cộng đồng tẩy chay, trái ngược với nhận định rằng họ có lợi thế ('would have had an advantage').",
+    keywords: [{ question: "warlike traits in prehistory would have had an advantage", passage: "behaved selfishly and ruthlessly would be less likely to survive" }]
   },
   38: {
     qNum: 38,
     answer: "YES",
-    location: "Đoạn 7, Dòng 1-3",
-    evidence: "Our deepest evolutionary heritage is rooted in prosocial harmony, mutual aid, and cooperative coexistence.",
-    explanation: "Bản năng tiến hóa sâu sắc nhất của con người bắt nguồn từ sự hòa hợp, tương trợ và hợp tác, trùng khớp 100% với nhận định 'hòa bình và hợp tác là bản tính tự nhiên của con người'.",
-    keywords: [
-      { question: "being peaceful and cooperative is natural", passage: "evolutionary heritage is rooted in prosocial harmony and mutual aid" }
-    ]
+    location: "Đoạn 8, Dòng 5-7",
+    evidence: "It makes more sense, then, to see traits such as cooperation, egalitarianism, altruism and peacefulness as innate characteristics of human beings.",
+    explanation: "Tác giả khẳng định hòa bình và hợp tác là những đặc tính bẩm sinh tự nhiên của con người ('innate characteristics of human beings'), đồng nghĩa với 'Being peaceful and cooperative is a natural way for people to behave'.",
+    keywords: [{ question: "natural way for people to behave", passage: "traits such as cooperation, egalitarianism, altruism and peacefulness as innate characteristics" }]
   },
   39: {
     qNum: 39,
     answer: "NOT GIVEN",
-    location: "Đoạn 7, Dòng 4-6",
-    evidence: "Modern structural inequalities and institutional hierarchies often bring out anti-social competitiveness in individuals.",
-    explanation: "Tác giả chỉ nói áp lực xã hội hiện đại dễ làm nảy sinh tính cạnh tranh tiêu cực, nhưng không so sánh xem tính xấu này có biểu hiện rõ rệt ở nền văn hóa này hơn nền văn hóa khác hay không.",
-    keywords: [
-      { question: "traits more apparent in some modern cultures than others", passage: "không có so sánh giữa các nền văn hóa hiện đại (Not Given)" }
-    ]
+    location: "Đoạn 9, Dòng 1-3",
+    evidence: "Perhaps these negative traits should be seen as a later development, the result of environmental and psychological factors.",
+    explanation: "Tác giả bàn về các tính tiêu cực của con người nói chung, nhưng không có sự so sánh rằng các tính xấu này rõ rệt ở một số nền văn hóa hơn các nền văn hóa khác ('more apparent in some modern cultures than in others').",
+    keywords: [{ question: "more apparent in some modern cultures than in others", passage: "không có thông tin so sánh các nền văn hóa (Not Given)" }]
   },
   40: {
     qNum: 40,
     answer: "NO",
-    location: "Đoạn 7, Dòng 7-9",
-    evidence: "Primatological studies have repeatedly demonstrated direct physiological and neurological links between social grooming, cooperation, and longevity in primates.",
-    explanation: "Nghiên cứu ở linh trưởng đã chứng minh rõ ràng mối liên kết sinh học thần kinh giữa hành vi hợp tác với tuổi thọ, trái ngược với nhận định 'Animal research has failed to reveal a link'.",
-    keywords: [
-      { question: "animal research failed to reveal a link", passage: "studies have repeatedly demonstrated direct links between cooperation and longevity" }
-    ]
+    location: "Đoạn 9, Dòng 3-5",
+    evidence: "Research has shown repeatedly that when the natural habitats of primates such as apes and gorillas are disrupted, they tend to become more violent and hierarchical.",
+    explanation: "Nghiên cứu đã nhiều lần chứng minh ('has shown repeatedly') môi trường sống bị xáo trộn dẫn đến hành vi hung dữ, trái ngược với nhận định rằng nghiên cứu thất bại trong việc phát hiện mối liên hệ ('failed to reveal a link').",
+    keywords: [{ question: "Animal research has failed to reveal a link", passage: "Research has shown repeatedly that when the natural habitats ... are disrupted, they tend to become more violent" }]
   }
 };
-

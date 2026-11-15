@@ -1,414 +1,333 @@
 /**
  * Cambridge IELTS 19 - Test 3 Reading Explanations & Evidence
- * Full authentic breakdown for all 40 questions across Passages 1, 2, and 3.
- * Adheres to <= 500 lines rule.
+ * 100% Authentic Verbatim Evidence from Cambridge 19.pdf (Pages 62-75).
+ * Adheres strictly to <= 500 lines rule.
  */
 
 export const cam19Test3ReadingExplanations = {
-  // --- PASSAGE 1: Archaeologists discover evidence of prehistoric island settlers (Questions 1 - 13) ---
+  // --- PASSAGE 1: Archaeologists discover evidence of prehistoric island settlers (Q1 - 13) ---
   1: {
     qNum: 1,
     answer: "FALSE",
     location: "Đoạn 1, Dòng 1-3",
-    evidence: "In early April 2019, Dr Ceri Shipton and his colleagues from Australian National University became the first archaeologists to explore Obi, one of many Wallacean islands...",
-    explanation: "Đoàn của Tiến sĩ Shipton là những nhà khảo cổ học đầu tiên đặt chân thám hiểm đảo Obi ('became the first archaeologists to explore Obi'), mâu thuẫn với nhận định rằng trước năm 2019 đã có nghiên cứu khảo cổ học tại đây.",
-    keywords: [
-      { question: "research had taken place before 2019", passage: "became the first archaeologists to explore Obi in 2019" }
-    ]
+    evidence: "became the first archaeologists to explore Obi, one of many tropical islands in Indonesia's Maluku Utara province.",
+    explanation: "Tiến sĩ Shipton và các đồng nghiệp là những nhà khảo cổ học đầu tiên khám phá đảo Obi, trái ngược với nhận định rằng trước đó đã có nghiên cứu khảo cổ diễn ra trên đảo này.",
+    keywords: [{ question: "Archaeological research had taken place ... before", passage: "became the first archaeologists to explore Obi" }]
   },
   2: {
     qNum: 2,
     answer: "FALSE",
     location: "Đoạn 3, Dòng 4-6",
-    evidence: "However, earlier examples of clam shell adzes had already been discovered elsewhere in the Pacific and Southeast Asia, meaning the Kelo finds were not the first of their kind.",
-    explanation: "Các nhà khảo cổ học trước đó đã tìm thấy lưỡi rìu vỏ sò ở các địa điểm khác trong khu vực, do đó phát hiện tại Kelo không phải là đầu tiên, trái ngược với nhận định trong câu hỏi.",
-    keywords: [
-      { question: "found the first clam shell adzes ever discovered", passage: "earlier examples had already been discovered elsewhere" }
-    ]
+    evidence: "Axes made from clam shells from roughly the same time had also previously been found elsewhere in this region, including on the nearby island of Gebe to the northeast.",
+    explanation: "Rìu làm từ vỏ sò điệp khổng lồ đã từng được phát hiện từ trước tại vùng này (ở đảo Gebe lân cận), do đó rìu ở Kelo không phải là những chiếc đầu tiên được tìm thấy ở vùng Bắc Maluku.",
+    keywords: [{ question: "found the first clam shell axes to be discovered in northern Maluku", passage: "Axes made from clam shells ... had also previously been found elsewhere in this region" }]
   },
   3: {
     qNum: 3,
     answer: "TRUE",
-    location: "Đoạn 4, Dòng 3-5",
-    evidence: "At that time, sea levels were approximately 120 metres lower than they are now, meaning that Obi was roughly twice its current size.",
-    explanation: "Thời điểm 18.000 năm trước mực nước biển thấp hơn 120m và diện tích đảo Obi lớn gấp đôi hiện tại ('roughly twice its current size'), nghĩa là kích thước ngày nay nhỏ hơn trước kia, đúng với nhận định.",
-    keywords: [
-      { question: "size today is less than 18,000 years ago", passage: "Obi was roughly twice its current size 18,000 years ago" }
-    ]
+    location: "Đoạn 4, Dòng 4-6",
+    evidence: "Sea levels were about 120 metres lower, meaning Obi was a much larger island, encompassing what is today the separate island of Bisa, as well as several other small islands nearby.",
+    explanation: "Vào 18.000 năm trước khi mực nước biển thấp hơn 120 mét, đảo Obi lớn hơn ngày nay rất nhiều ('Obi was a much larger island'), đồng nghĩa diện tích ngày nay nhỏ hơn 18.000 năm trước.",
+    keywords: [{ question: "size of Obi today is less than it was 18,000 years ago", passage: "meaning Obi was a much larger island" }]
   },
   4: {
     qNum: 4,
     answer: "NOT GIVEN",
     location: "Đoạn 5, Dòng 1-3",
     evidence: "Roughly 11,700 years ago, as the most recent ice age ended, the climate became significantly warmer and wetter, no doubt making Obi's jungle much thicker.",
-    explanation: "Bài đọc nêu khí hậu ấm và ẩm hơn làm rừng rậm trên đảo Obi rậm rạp hơn, nhưng hoàn toàn không so sánh tác động giữa đảo Obi với các đảo lân cận khác.",
-    keywords: [
-      { question: "greater impact on Obi than on neighbouring islands", passage: "không có thông tin so sánh tác động giữa các đảo (Not Given)" }
-    ]
+    explanation: "Bài đọc miêu tả biến đổi khí hậu ấm hơn và ẩm hơn khiến rừng nhiệt đới tại Obi rậm rạp hơn, nhưng hoàn toàn không so sánh mức độ ảnh hưởng của khí hậu lên đảo Obi với các đảo xung quanh.",
+    keywords: [{ question: "greater impact on Obi than on the surrounding islands", passage: "không có thông tin so sánh với các đảo lân cận (Not Given)" }]
   },
   5: {
     qNum: 5,
     answer: "TRUE",
-    location: "Đoạn 5, Dòng 5-7",
-    evidence: "The researchers believe that the denser forest, driven by warmer and wetter conditions, made stone axes essential for clearing vegetation and creating pathways.",
-    explanation: "Khí hậu ấm ẩm khiến cây cối rậm rạp, từ đó thúc đẩy nhu cầu sử dụng rìu đá nặng để dọn dẹp thảm thực vật, khẳng định mối liên hệ giữa khí hậu ấm lên và việc chế tạo công cụ đá.",
-    keywords: [
-      { question: "connection between warmer climate and axe production", passage: "denser forest driven by warmer conditions made axes essential" }
-    ]
+    location: "Đoạn 5, Dòng 3-6",
+    evidence: "According to the researchers, it is no coincidence that around this time the first axes crafted from stone rather than sea shells appear, likely in response to their heavy-duty use for clearing and modification of the increasingly dense rainforest.",
+    explanation: "Các nhà nghiên cứu tin rằng không phải ngẫu nhiên ('no coincidence') mà rìu đá xuất hiện cùng thời điểm khí hậu ấm hơn làm rừng rậm phát triển, tức là có mối liên hệ giữa thời tiết ấm và rìu đá.",
+    keywords: [{ question: "connection between warmer weather and the appearance of stone axes", passage: "no coincidence that around this time the first axes crafted from stone ... appear" }]
   },
   6: {
     qNum: 6,
     answer: "NOT GIVEN",
     location: "Đoạn 6, Dòng 1-3",
-    evidence: "Judging by the bones which the researchers unearthed in the Kelo caves, people living there mainly hunted the Rothschild's cuscus...",
-    explanation: "Bài đọc cho biết người cổ đại chủ yếu săn bắt loài thú có túi cuscus, nhưng không đề cập cảm xúc của nhóm nghiên cứu Shipton (có ngạc nhiên hay không).",
-    keywords: [
-      { question: "team were surprised to find evidence of cuscus hunting", passage: "chỉ nêu bằng chứng săn cuscus, không nói về sự ngạc nhiên (Not Given)" }
-    ]
+    evidence: "Judging by the bones which the researchers unearthed in the Kelo caves, people living there mainly hunted the Rothschild's cuscus, a possum-like creature that still lives on Obi today.",
+    explanation: "Đoạn văn nêu rõ nhóm nghiên cứu khai quật được xương và nhận định cư dân chủ yếu săn bắt loài cuscus, nhưng không đề cập liệu nhóm nghiên cứu có ngạc nhiên ('surprised') khi tìm thấy số xương này hay không.",
+    keywords: [{ question: "Shipton's team were surprised to find so many bones", passage: "không có thông tin về thái độ ngạc nhiên của nhóm (Not Given)" }]
   },
   7: {
     qNum: 7,
     answer: "FALSE",
-    location: "Đoạn 7, Dòng 1-3",
-    evidence: "The excavations suggest people used the two Kelo shelters intermittently over thousands of years, with long gaps between occupations rather than living there continuously.",
-    explanation: "Người tiền sử chỉ cư trú ngắt quãng (intermittently) với các khoảng trống kéo dài, chứ không hề sinh sống liên tục ('rather than living there continuously').",
-    keywords: [
-      { question: "occupied continuously", passage: "occupied intermittently with long gaps rather than continuously" }
-    ]
+    location: "Đoạn 7, Dòng 1-7",
+    evidence: "Whatever the reason for the departure, there is no evidence for use of the Kelo shelters after this time, until about 1,000 years ago, when they were re-occupied by people who owned pottery as well as items made out of gold and silver.",
+    explanation: "Nơi trú ẩn bị bỏ hoang từ 8.000 năm trước và không có dấu vết sử dụng cho đến khi được tái định cư khoảng 1.000 năm trước, mâu thuẫn với nhận định nơi đây được định cư liên tục ('occupied continuously').",
+    keywords: [{ question: "occupied continuously until about 1,000 years ago", passage: "abandoned ... no evidence for use ... until about 1,000 years ago, when they were re-occupied" }]
   },
   8: {
     qNum: 8,
     answer: "caves",
-    location: "Đoạn 3, Dòng 2-3",
+    location: "Đoạn 3, Dòng 1-3",
     evidence: "Shipton and his colleagues found two caves containing prehistoric rock shelters that were suitable for excavation.",
-    explanation: "Các mái che đá tiền sử được phát hiện bên trong hai hang động (caves). Từ cần điền là 'caves'.",
-    keywords: [
-      { question: "rock shelters inside [caves]", passage: "found two caves containing prehistoric rock shelters" }
-    ]
+    explanation: "Từ cần điền là 'caves'. Nhóm nghiên cứu đã tìm thấy hai hang động chứa các nơi trú ẩn bằng đá thời tiền sử.",
+    keywords: [{ question: "rock shelters inside", passage: "found two caves containing prehistoric rock shelters" }]
   },
   9: {
     qNum: 9,
     answer: "stone",
-    location: "Đoạn 5, Dòng 4-5",
-    evidence: "They began fashioning heavy-duty axes made out of volcanic stone rather than shell.",
-    explanation: "Để chặt cây mở đường trong rừng rậm, cư dân bắt đầu đẽo rìu bằng đá (stone). Từ cần điền là 'stone'.",
-    keywords: [
-      { question: "axes made out of [stone]", passage: "heavy-duty axes made out of volcanic stone" }
-    ]
+    location: "Đoạn 5, Dòng 3-6",
+    evidence: "the first axes crafted from stone rather than sea shells appear, likely in response to their heavy-duty use for clearing and modification of the increasingly dense rainforest.",
+    explanation: "Từ cần điền là 'stone'. Rìu được chế tác từ đá ('crafted from stone') thay vì từ vỏ sò.",
+    keywords: [{ question: "axes made out of", passage: "axes crafted from stone rather than sea shells" }]
   },
   10: {
     qNum: 10,
     answer: "bones",
-    location: "Đoạn 6, Dòng 1-2",
-    evidence: "Judging by the animal bones which the researchers unearthed in the Kelo caves, the inhabitants were skilled hunters.",
-    explanation: "Dấu vết về nguồn thức ăn được xác định dựa trên số lượng lớn xương động vật (bones). Từ cần điền là 'bones' (hoặc 'bone').",
-    keywords: [
-      { question: "evidence from [bones] found in the caves", passage: "judging by the animal bones unearthed" }
-    ]
+    location: "Đoạn 6, Dòng 1-3",
+    evidence: "Judging by the bones which the researchers unearthed in the Kelo caves, people living there mainly hunted the Rothschild's cuscus, a possum-like creature that still lives on Obi today.",
+    explanation: "Từ cần điền là 'bones' (hoặc 'bone'). Dựa trên các mẩu xương đào được, cư dân ở đây chủ yếu săn bắt loài cuscus của Rothschild.",
+    keywords: [{ question: "... of Rothschild's cuscus", passage: "Judging by the bones which the researchers unearthed in the Kelo caves" }]
   },
   11: {
     qNum: 11,
     answer: "beads",
     location: "Đoạn 6, Dòng 5-7",
-    evidence: "They also found obsidian flakes and decorative shell beads, which indicate maritime trade and travel between islands.",
-    explanation: "Các nhà khảo cổ tìm thấy chuỗi hạt (beads) trang trí bằng vỏ sò và mảnh đá vỏ chai obsidian chứng minh sự giao thương giữa các hòn đảo. Từ cần điền là 'beads'.",
-    keywords: [
-      { question: "decorative shell [beads]", passage: "decorative shell beads, which indicate maritime trade" }
-    ]
+    evidence: "It also revealed particular types of beads, similar to those previously found on islands in southern Wallacea.",
+    explanation: "Từ cần điền là 'beads'. Khai quật còn phát hiện các loại hạt chuỗi ('beads') tương tự như ở vùng nam Wallacea, chứng minh sự giao thương giữa các đảo.",
+    keywords: [{ question: "obsidian ... and", passage: "substance called obsidian ... also revealed particular types of beads" }]
   },
   12: {
     qNum: 12,
     answer: "pottery",
-    location: "Đoạn 7, Dòng 4-6",
-    evidence: "Layers dating from around 8,000 years ago revealed the sudden arrival of decorated pottery and domestic animal remains.",
-    explanation: "Khoảng 8.000 năm trước có sự xuất hiện của đồ gốm sứ (pottery) có hoa văn. Từ cần điền là 'pottery'.",
-    keywords: [
-      { question: "arrival of decorated [pottery]", passage: "sudden arrival of decorated pottery and animal remains" }
-    ]
+    location: "Đoạn 7, Dòng 5-7",
+    evidence: "when they were re-occupied by people who owned pottery as well as items made out of gold and silver.",
+    explanation: "Từ cần điền là 'pottery'. Những người tái định cư sở hữu đồ gốm ('pottery') cùng với các vật dụng bằng vàng và bạc.",
+    keywords: [{ question: "Obi islanders had", passage: "re-occupied by people who owned pottery as well as items made out of gold and silver" }]
   },
   13: {
     qNum: 13,
     answer: "spices",
-    location: "Đoạn 7, Dòng 8-10",
-    evidence: "Obi's location in the Maluku islands placed it at the crossroads of early maritime trade networks in valuable spices like nutmeg and cloves.",
-    explanation: "Đảo Obi nằm trên tuyến đường buôn bán các loại hương liệu / gia vị (spices) quý giá. Từ cần điền là 'spices'.",
-    keywords: [
-      { question: "trade in valuable [spices]", passage: "maritime trade networks in valuable spices like nutmeg and cloves" }
-    ]
+    location: "Đoạn 7, Dòng 7-10",
+    evidence: "It seems likely, in view of Obi's location, that this final phase of occupation also saw the Kelo shelters used by people involved in the historic trade in spices between the Maluku islands and the rest of the world.",
+    explanation: "Từ cần điền là 'spices'. Cư dân thời kỳ này tham gia vào hoạt động buôn bán gia vị ('trade in spices') lịch sử giữa quần đảo Maluku và thế giới.",
+    keywords: [{ question: "production and sale of", passage: "involved in the historic trade in spices" }]
   },
 
-  // --- PASSAGE 2: The global importance of wetlands (Questions 14 - 26) ---
+  // --- PASSAGE 2: The global importance of wetlands (Q14 - 26) ---
   14: {
     qNum: 14,
     answer: "G",
-    location: "Đoạn G, Dòng 1-6",
-    evidence: "Silvius also acknowledges the importance of income generation... we recognise there's a need to provide an income for local people. 'The idea is that people in a developing country will only protect wetlands if they value and profit from them,' says McCartney.",
-    explanation: "Đoạn G nhấn mạnh cư dân sống quanh vùng đất ngập nước cần tiếp tục thu được lợi ích kinh tế và nguồn thu nhập từ các khu vực này (G: reference to the need to ensure that inhabitants of wetland regions continue to benefit from them).",
-    keywords: [
-      { question: "inhabitants continue to benefit", passage: "provide an income for local people... profit from them" }
-    ]
+    location: "Đoạn G, Dòng 1-3",
+    evidence: "'It's not that we just want to restore the biodiversity of wetlands — which we do — but we recognise there's a need to provide an income for local people.'",
+    explanation: "Đoạn G nhấn mạnh sự cần thiết phải đảm bảo nguồn thu nhập cho người dân địa phương tại vùng ngập nước ('provide an income for local people').",
+    keywords: [{ question: "ensure that inhabitants of wetland regions continue to benefit", passage: "need to provide an income for local people" }]
   },
   15: {
     qNum: 15,
     answer: "A",
-    location: "Đoạn A, Dòng 3-5",
-    evidence: "But according to the World Wide Fund for Nature (WWFN), half of the world's wetlands have disappeared since 1990 — converted or destroyed for commercial development...",
-    explanation: "Đoạn A nêu tỷ lệ diện tích đất ngập nước đã bị mất đi trên toàn cầu: một nửa (half / 50%) kể từ năm 1990.",
-    keywords: [
-      { question: "proportion of wetlands already lost", passage: "half of the world's wetlands have disappeared since 1990" }
-    ]
+    location: "Đoạn A, Dòng 2-4",
+    evidence: "half of the world's wetlands have disappeared since 1990 — converted or destroyed for commercial development, drainage schemes and the extraction of minerals and peat*.",
+    explanation: "Đoạn A nêu tỷ lệ diện tích đất ngập nước trên thế giới đã biến mất kể từ năm 1990 là một nửa ('half of the world's wetlands have disappeared').",
+    keywords: [{ question: "proportion of wetlands which have already been lost", passage: "half of the world's wetlands have disappeared since 1990" }]
   },
   16: {
     qNum: 16,
     answer: "H",
     location: "Đoạn H, Dòng 4-6",
-    evidence: "McCartney is cautiously optimistic, however. 'Awareness of the importance of wetlands is growing,' he says. 'It's true that wetland degradation still continues at a rapid pace, but my impression is that things are slowly changing.'",
-    explanation: "Đoạn H khẳng định nhận thức của mọi người về tầm quan trọng của đất ngập nước đang ngày càng gia tăng và bắt đầu trân trọng giá trị của chúng.",
-    keywords: [
-      { question: "people are beginning to appreciate value", passage: "awareness of the importance of wetlands is growing" }
-    ]
+    evidence: "'Awareness of the importance of wetlands is growing,' he says. 'It's true that wetland degradation still continues at a rapid pace, but my impression is that things are slowly changing.'",
+    explanation: "Đoạn H đề cập đến việc nhận thức của mọi người về tầm quan trọng của vùng đất ngập nước đang dần tăng lên ('Awareness of the importance of wetlands is growing').",
+    keywords: [{ question: "people are beginning to appreciate the value of wetlands", passage: "Awareness of the importance of wetlands is growing ... things are slowly changing" }]
   },
   17: {
     qNum: 17,
     answer: "B",
-    location: "Đoạn B, Dòng 1-3",
-    evidence: "Throughout history, humans have gathered around wetlands, and their fertile ecosystems have played an important part in human development. Consequently, they are of considerable religious, historical and archaeological value to many communities around the world.",
-    explanation: "Đoạn B nhắc tới ý nghĩa văn hóa, lịch sử, khảo cổ và tâm linh của đất ngập nước đối với nhiều cộng đồng người trên thế giới.",
-    keywords: [
-      { question: "cultural significance of wetlands", passage: "considerable religious, historical and archaeological value" }
-    ]
+    location: "Đoạn B, Dòng 2-3",
+    evidence: "Consequently, they are of considerable religious, historical and archaeological value to many communities around the world.",
+    explanation: "Đoạn B nhắc tới giá trị tôn giáo, lịch sử và khảo cổ to lớn của vùng đất ngập nước đối với các cộng đồng, tức là ý nghĩa văn hóa ('cultural significance').",
+    keywords: [{ question: "cultural significance of wetlands", passage: "considerable religious, historical and archaeological value to many communities" }]
   },
   18: {
     qNum: 18,
     answer: "carbon",
-    location: "Đoạn C, Dòng 5-7",
-    evidence: "When peatlands are drained, the dried vegetation begins to decompose rapidly, releasing vast quantities of stored carbon into the atmosphere as carbon dioxide.",
-    explanation: "Đất than bùn khi bị tháo khô sẽ bắt đầu giải phóng lượng carbon tích trữ khổng lồ ra khí quyển. Từ cần điền là 'carbon'.",
-    keywords: [
-      { question: "drained peatlands begin to release [carbon]", passage: "drained peatlands... releasing vast quantities of stored carbon" }
-    ]
+    location: "Đoạn D, Dòng 2-4",
+    evidence: "When peatlands are drained for cultivation, they become net carbon emitters instead of active carbon stores",
+    explanation: "Từ cần điền là 'carbon'. Khi than bùn bị thoát nước, chúng trở thành nguồn phát thải carbon ('net carbon emitters') thay vì nơi lưu trữ.",
+    keywords: [{ question: "drained begin to release", passage: "drained for cultivation, they become net carbon emitters" }]
   },
   19: {
     qNum: 19,
     answer: "fires",
-    location: "Đoạn D, Dòng 5-7",
-    evidence: "The dry peat becomes highly flammable, leading to subterranean fires that can burn uncontrollably for months.",
-    explanation: "Khi đất than bùn bị khô hạn, các vụ cháy (fires / fire) ngầm dưới lòng đất có thể bùng phát âm ỉ suốt nhiều tháng. Từ cần điền là 'fires' (hoặc 'fire').",
-    keywords: [
-      { question: "risk of subterranean [fires]", passage: "leading to subterranean fires that burn uncontrollably" }
-    ]
+    location: "Đoạn D, Dòng 4-6",
+    evidence: "The clearance of peatlands for planting also increases the risk of forest fires, which release huge amounts of CO2.",
+    explanation: "Từ cần điền là 'fires' (hoặc 'fire'). Việc phát quang đất than bùn làm gia tăng nguy cơ cháy rừng ('risk of forest fires').",
+    keywords: [{ question: "... become more likely", passage: "increases the risk of forest fires" }]
   },
   20: {
     qNum: 20,
     answer: "biodiversity",
-    location: "Đoạn C, Dòng 3-5",
-    evidence: "Converting pristine wetlands into monoculture plantations results in catastrophic losses of local biodiversity and wildlife habitats.",
-    explanation: "Việc chuyển đổi rừng ngập nước thành đồn điền cọ dầu gây thiệt hại nặng nề cho tính đa dạng sinh học (biodiversity). Từ cần điền là 'biodiversity'.",
-    keywords: [
-      { question: "loss of [biodiversity] in peatland forests", passage: "results in catastrophic losses of local biodiversity" }
-    ]
+    location: "Đoạn D, Dòng 6-7",
+    evidence: "'We're seeing huge peatland forests with extremely high biodiversity value being lost for a few decades of oil palm revenues,' says Silvius.",
+    explanation: "Từ cần điền là 'biodiversity'. Việc dọn rừng để trồng cọ dầu phá hủy các khu vực có giá trị đa dạng sinh học cực kỳ cao ('extremely high biodiversity value').",
+    keywords: [{ question: "destroys areas of high", passage: "peatland forests with extremely high biodiversity value being lost" }]
   },
   21: {
     qNum: 21,
     answer: "ditches",
-    location: "Đoạn D, Dòng 1-3",
-    evidence: "Loggers and developers dig thousands of kilometres of drainage ditches to siphon water away from the saturated ground.",
-    explanation: "Nước được rút cạn khỏi các đầm than bùn thông qua hệ thống mương/rãnh thoát nước (ditches). Từ cần điền là 'ditches'.",
-    keywords: [
-      { question: "drained through the excavation of [ditches]", passage: "dig drainage ditches to siphon water away" }
-    ]
+    location: "Đoạn E, Dòng 1-3",
+    evidence: "They dig ditches to enter the peat swamps by boat and then float the logs out the same way. These are then used to drain water out of the peatlands",
+    explanation: "Từ cần điền là 'ditches'. Các công ty đào mương rãnh ('ditches') để đưa thuyền vào và sau đó các rãnh này dùng để rút nước.",
+    keywords: [{ question: "drained out of peatlands through the", passage: "dig ditches ... used to drain water out of the peatlands" }]
   },
   22: {
     qNum: 22,
     answer: "subsidence",
-    location: "Đoạn D, Dòng 7-9",
-    evidence: "As the organic matter shrinks and decomposes without water, the land suffers severe subsidence, sinking by several metres over a few decades.",
-    explanation: "Việc tháo nước làm đất co rút và sụt lún nghiêm trọng (subsidence), mặt đất bị hạ thấp nhiều mét. Từ cần điền là 'subsidence'.",
-    keywords: [
-      { question: "draining leads to [subsidence]", passage: "land suffers severe subsidence, sinking by several metres" }
-    ]
+    location: "Đoạn E, Dòng 5-6",
+    evidence: "Meanwhile, the remainder of the solid matter in the peat starts to move downwards, in a process known as subsidence*.",
+    explanation: "Từ cần điền là 'subsidence'. Quá trình sụt lún mặt đất diễn ra khi chất rắn trong than bùn dịch chuyển xuống dưới ('a process known as subsidence').",
+    keywords: [{ question: "Draining peatlands leads to", passage: "starts to move downwards, in a process known as subsidence" }]
   },
   23: {
     qNum: 23,
     answer: "A",
     location: "Đoạn G, Dòng 4-6",
-    evidence: "'For sustainability, it's essential that local people are involved in wetland planning and decision making and have clear rights to use wetlands,' says McCartney.",
-    explanation: "Matthew McCartney (đáp án A) khẳng định cộng đồng địa phương phải được tham gia vào quy hoạch và ra quyết định về tương lai các vùng đất ngập nước.",
-    keywords: [
-      { question: "communities must be included in discussions", passage: "essential that local people are involved in wetland planning and decision making" }
-    ]
+    evidence: "'For sustainability, it's essential that local people are involved in wetland planning and decision making and have clear rights to use wetlands.'",
+    explanation: "Tiến sĩ Matthew McCartney (A) nhấn mạnh sự tham gia của người dân địa phương vào quy hoạch và ra quyết định là điều cốt yếu.",
+    keywords: [{ question: "included in discussions about the future of these areas", passage: "local people are involved in wetland planning and decision making" }]
   },
   24: {
     qNum: 24,
     answer: "C",
     location: "Đoạn H, Dòng 1-3",
-    evidence: "The fortunes of wetlands would be improved, Silvius suggests, if more governments recognised their long-term value. 'Different governments have different attitudes,' he says...",
-    explanation: "Marcel Silvius (đáp án C) nhận xét chính sách và thái độ của các chính phủ đối với đất ngập nước có sự khác biệt giữa các quốc gia.",
-    keywords: [
-      { question: "official policies vary from nation to nation", passage: "different governments have different attitudes" }
-    ]
+    evidence: "'Different governments have different attitudes,' he says, and goes on to explain that some countries place a high priority on restoring wetlands, while others still deny the issue.",
+    explanation: "Marcel Silvius (C) nêu rõ mỗi chính phủ có thái độ khác nhau, nước thì ưu tiên phục hồi, nước thì vẫn phủ nhận vấn đề.",
+    keywords: [{ question: "Official policies towards wetlands vary from one nation to the next", passage: "Different governments have different attitudes ... some countries place a high priority ... while others still deny" }]
   },
   25: {
     qNum: 25,
     answer: "D",
-    location: "Đoạn F, Dòng 7-10",
-    evidence: "Tickner does not blame anyone for deliberate damage, however. 'I've worked on wetland issues for 20 years and have never met anybody who wanted to damage a wetland,' he says. 'It isn't something that people generally set out to do. Quite often, the effects simply come from people trying to make a living.'",
-    explanation: "Dave Tickner (đáp án D) cho rằng mọi người gây hại cho đất ngập nước không phải do cố ý (without intention), mà thường chỉ vì mưu sinh.",
-    keywords: [
-      { question: "harm wetlands without having any intention to", passage: "never met anybody who wanted to damage a wetland... not something people set out to do" }
-    ]
+    location: "Đoạn F, Dòng 5-7",
+    evidence: "'I've worked on wetland issues for 20 years and have never met anybody who wanted to damage a wetland,' he says. 'It isn't something that people generally set out to do. Quite often, the effects simply come from people trying to make a living.'",
+    explanation: "Tiến sĩ Dave Tickner (D) giải thích mọi người không hề cố ý phá hoại vùng ngập nước ('never met anybody who wanted to damage a wetland'), tác hại chỉ phát sinh do nỗ lực mưu sinh.",
+    keywords: [{ question: "harm to wetlands without having any intention to do so", passage: "never met anybody who wanted to damage a wetland ... isn't something that people generally set out to do" }]
   },
   26: {
     qNum: 26,
     answer: "B",
-    location: "Đoạn C, Dòng 7-10",
+    location: "Đoạn C, Dòng 8-10",
     evidence: "'It can be as simple as planting a few trees per hectare to create shade and substantially change a microclimate,' he says. 'Implementing climate change projects isn't so much about money.'",
-    explanation: "Pieter van Eijk (đáp án B) cho rằng các sáng kiến phục hồi môi trường không nhất thiết phải phức tạp hay tốn kém, đôi khi chỉ đơn giản là trồng vài cây mỗi hecta.",
-    keywords: [
-      { question: "initiatives need not be complex", passage: "can be as simple as planting a few trees per hectare" }
-    ]
+    explanation: "Pieter van Eijk (B) cho biết các biện pháp phục hồi có thể rất đơn giản (chỉ cần trồng vài cây) và không quá tốn kém tiền bạc ('isn't so much about money').",
+    keywords: [{ question: "need not be complex or expensive", passage: "as simple as planting a few trees ... isn't so much about money" }]
   },
 
-  // --- PASSAGE 3: Is the era of artificial speech translation upon us? (Questions 27 - 40) ---
+  // --- PASSAGE 3: Is the era of artificial speech translation upon us? (Q27 - 40) ---
   27: {
     qNum: 27,
     answer: "D",
-    location: "Đoạn 1 & 2, Dòng 4-7",
-    evidence: "The conversation between the author and Waibel had to take place in English rather than Waibel's native German because background restaurant noise overwhelmed the device.",
-    explanation: "Cuộc đối thoại buộc phải diễn ra bằng tiếng Anh vì tiếng ồn xung quanh đã làm gián đoạn và vô hiệu hóa thiết bị dịch nhân tạo.",
-    keywords: [
-      { question: "conversation took place in English because of noise", passage: "spoke in English rather than German because noise overwhelmed the device" }
-    ]
+    location: "Đoạn 1, Dòng 4-6",
+    evidence: "I'm struggling to follow him in English, on a scratchy line that reminds me we are nearly 10,000 kilometres apart — and that distance is still an obstacle to communication even if you're speaking the same language, as we are.",
+    explanation: "Người viết gặp khó khăn khi nghe do đường truyền bị rè và tiếng ồn xung quanh ('scratchy line', 'struggling to follow'), chứng tỏ cuộc trò chuyện bị cản trở bởi sự can nhiễu ('interference').",
+    keywords: [{ question: "Communication was affected by interference", passage: "struggling to follow him ... on a scratchy line ... distance is still an obstacle" }]
   },
   28: {
     qNum: 28,
     answer: "A",
-    location: "Đoạn 4, Dòng 5-7",
-    evidence: "At Karlsruhe Institute of Technology, the system is aided by the fact that lecture presentations are predictable, with slides and specialized course terminology provided beforehand.",
-    explanation: "Hệ thống dịch tại giảng đường được hỗ trợ đắc lực nhờ bài giảng có giáo án và danh mục thuật ngữ học thuật được tải lên từ trước ('materials provided beforehand').",
-    keywords: [
-      { question: "assisted by materials provided beforehand", passage: "aided by predictable presentations with slides and course terminology provided" }
-    ]
+    location: "Đoạn 2, Dòng 6-7",
+    evidence: "It helps that lecturers speak clearly, don't have to compete with background chatter, and say much the same thing each year.",
+    explanation: "Việc giảng viên nói rõ ràng và 'say much the same thing each year' (nói nội dung tương tự nhau qua từng năm) giúp máy dịch hoạt động trơn tru, tương đương 'repetitive content of the lectures'.",
+    keywords: [{ question: "repetitive content of the lectures", passage: "say much the same thing each year" }]
   },
   29: {
     qNum: 29,
     answer: "C",
     location: "Đoạn 3, Dòng 3-5",
-    evidence: "The author mentions the fictional Babel fish to illustrate the long-standing dream of seamless universal translation, contrasting sci-fi fantasy with real-world technological limits.",
-    explanation: "Tác giả nhắc đến 'cá Babel' trong truyện viễn tưởng để chỉ ra sự tương phản giữa giấc mơ dịch thuật tức thời và những giới hạn công nghệ thực tế hiện nay.",
-    keywords: [
-      { question: "contrasting fantasy with real technological limits", passage: "long-standing dream... contrasting sci-fi fantasy with real-world limits" }
-    ]
+    evidence: "It came to represent one of those devices that technology enthusiasts dream of long before they become practically realisable",
+    explanation: "Tác giả chỉ ra rằng con người mơ ước và hình dung ra các thiết bị từ rất lâu trước khi chúng thực sự có thể chế tạo được ('conceive of technology before they have the skills to produce it').",
+    keywords: [{ question: "conceive of technology before they have the skills to produce it", passage: "devices that technology enthusiasts dream of long before they become practically realisable" }]
   },
   30: {
     qNum: 30,
     answer: "B",
-    location: "Đoạn 5, Dòng 3-5",
-    evidence: "'We find that there's a psychological and hygiene barrier with sharing earpieces with a stranger,' explains the developer.",
-    explanation: "Việc đeo chung tai nghe dịch thuật với người lạ vấp phải rào cản tâm lý và lo ngại về vấn đề vệ sinh của người dùng.",
-    keywords: [
-      { question: "concerns about hygiene and comfort", passage: "psychological and hygiene barrier with sharing earpieces" }
-    ]
+    location: "Đoạn 5, Dòng 2-3",
+    evidence: "'We find that there's a barrier with sharing one of the earphones with a stranger,' says Ochoa. That can't have been totally unexpected.",
+    explanation: "Việc người dùng ngần ngại chia sẻ tai nghe với người lạ là điều 'can't have been totally unexpected' (hoàn toàn không bất ngờ), tức 'Reluctance to do it should not come as a surprise'.",
+    keywords: [{ question: "Reluctance to do it should not come as a surprise", passage: "barrier with sharing one of the earphones with a stranger ... That can't have been totally unexpected" }]
   },
   31: {
     qNum: 31,
     answer: "C",
-    location: "Đoạn 6, Dòng 1-3",
-    evidence: "Waibel highlights the significance of certain Asian nations, noting that voice translation has really taken off in countries such as Japan with a range of systems. There is still a long way to go, though.",
-    explanation: "Phương pháp dịch giọng nói đang phát triển rất nhanh tại Nhật Bản nhưng vẫn còn một chặng đường dài phía trước, tức chưa hề hoàn hảo (C: but they are far from perfect).",
-    keywords: [
-      { question: "developing fast in Japan but far from perfect", passage: "voice translation has really taken off in countries such as Japan... There is still a long way to go, though" }
-    ]
+    location: "Đoạn 6, Dòng 1-2",
+    evidence: "voice translation has really taken off in countries such as Japan with a range of systems.",
+    explanation: "Tại Nhật Bản, dịch giọng nói phát triển mạnh mẽ với nhiều hệ thống đa dạng ('a range of systems' = C: different systems).",
+    keywords: [{ question: "developing fast in Japan ... C", passage: "taken off in countries such as Japan with a range of systems" }]
   },
   32: {
     qNum: 32,
     answer: "E",
-    location: "Đoạn 6, Dòng 3-6",
-    evidence: "A translation system needs to be simultaneous, like the translator's voice speaking over the foreign politician being interviewed on the TV, rather than in sections that oblige speakers to pause after every few remarks...",
-    explanation: "Các cuộc phỏng vấn truyền hình sử dụng kỹ thuật lồng tiếng dịch thuật thành công là do quá trình dịch diễn ra đồng thời, tức thời (E: because translation is immediate).",
-    keywords: [
-      { question: "interviews that use voiceover successful because immediate", passage: "needs to be simultaneous, like translator's voice speaking over foreign politician on TV, rather than in sections" }
-    ]
+    location: "Đoạn 6, Dòng 3-5",
+    evidence: "A translation system needs to be simultaneous, like the translator's voice speaking over the foreign politician being interviewed on the TV",
+    explanation: "Phương pháp dịch lồng tiếng trên truyền hình thành công nhờ tính chất dịch đồng thời ('simultaneous' = E).",
+    keywords: [{ question: "translation voiceover methods are successful because they are ... E", passage: "translation system needs to be simultaneous, like the translator's voice speaking over" }]
   },
   33: {
     qNum: 33,
     answer: "F",
-    location: "Đoạn 7, Dòng 4-6",
-    evidence: "Future translation engines must navigate politeness levels and social hierarchies, addressing individuals with proper cultural decorum and etiquette.",
-    explanation: "Hệ thống tương lai cần biết cách xưng hô chuẩn mực theo đúng quy tắc ứng xử và phép lịch sự (F: and have an awareness of good manners).",
-    keywords: [
-      { question: "awareness of good manners", passage: "proper cultural decorum, etiquette and politeness levels" }
-    ]
+    location: "Đoạn 7, Dòng 1-3",
+    evidence: "Systems not only need to cope with physical challenges such as noise, they will also need to be socially aware by addressing people in the right way. Some cultural traditions demand solemn respect for academic status, for example, and it is only polite to respect this.",
+    explanation: "Hệ thống cần xưng hô phù hợp với địa vị xã hội ('academic status' = F: social status) theo các chuẩn mực văn hóa.",
+    keywords: [{ question: "address people appropriately according to their ... F", passage: "addressing people in the right way ... solemn respect for academic status" }]
   },
   34: {
     qNum: 34,
     answer: "B",
-    location: "Đoạn 7, Dòng 7-9",
-    evidence: "By adapting to personalized dialects, devices will allow users to preserve regional speech habits without being forced to adopt standardized norms.",
-    explanation: "Người dùng có thể giữ nguyên bản sắc văn hóa địa phương mà không cần phải gượng ép tuân theo các quy chuẩn thông thường (B: as systems do not need to conform to standard practices).",
-    keywords: [
-      { question: "do not need to conform to standard practices", passage: "preserve regional speech habits without being forced into standardized norms" }
-    ]
+    location: "Đoạn 7, Dòng 3-6",
+    evidence: "Etiquette-sensitive artificial translators could relieve people of the need to know these differing cultural norms. At the same time, they might help to preserve local customs, slowing the spread of habits associated with international English, such as its readiness to get on first-name terms.",
+    explanation: "Hệ thống dịch tinh tế theo phép lịch thiệp ('Etiquette-sensitive' = B) giúp làm chậm lại thói quen gọi tên thân mật của tiếng Anh, bảo tồn phong tục địa phương.",
+    keywords: [{ question: "maintain their local customs because ... B", passage: "Etiquette-sensitive artificial translators ... help to preserve local customs" }]
   },
   35: {
     qNum: 35,
     answer: "NO",
-    location: "Đoạn 8, Dòng 1-3",
-    evidence: "However, seasoned diplomats and business executives will never rely exclusively on translation gadgets, viewing human nuance as indispensable.",
-    explanation: "Các nhà ngoại giao và chuyên gia hàng đầu sẽ không phụ thuộc hoàn toàn vào máy dịch, mâu thuẫn với nhận định cho rằng thiết bị này sẽ được mọi tầng lớp coi là hữu ích trong mọi hoàn cảnh.",
-    keywords: [
-      { question: "useful throughout professional society", passage: "seasoned diplomats will never rely exclusively on gadgets" }
-    ]
+    location: "Đoạn 8, Dòng 1-2",
+    evidence: "Professors and other professionals will not outsource language awareness to software, though.",
+    explanation: "Các giáo sư và giới chuyên môn sẽ không giao phó nhận thức ngôn ngữ cho phần mềm, mâu thuẫn với nhận định công nghệ này được xem là rất hữu ích trong mọi ngành nghề ('throughout all professions').",
+    keywords: [{ question: "useful throughout all professions", passage: "Professors and other professionals will not outsource language awareness to software" }]
   },
   36: {
     qNum: 36,
     answer: "YES",
-    location: "Đoạn 8, Dòng 4-6",
-    evidence: "In multilingual households, these tools have already proven profoundly transformative, bridging intergenerational communication gaps between grandparents and grandchildren.",
-    explanation: "Công nghệ dịch hỗ trợ đắc lực cho đời sống gia đình khi kết nối ngôn ngữ giữa các thế hệ ông bà và con cháu, khẳng định giá trị tích cực đối với đời sống gia đình.",
-    keywords: [
-      { question: "value to family life is positive", passage: "profoundly transformative, bridging intergenerational gaps in households" }
-    ]
+    location: "Đoạn 8, Dòng 3-4",
+    evidence: "Whether it will help people conduct their family lives or relationships is open to question",
+    explanation: "Tác giả nêu rõ việc công nghệ dịch tự động có giúp ích cho đời sống gia đình hay không vẫn là dấu hỏi ('open to question'), đồng nghĩa với 'not yet clear'.",
+    keywords: [{ question: "overall value of automated translation to family life is not yet clear", passage: "Whether it will help people conduct their family lives ... is open to question" }]
   },
   37: {
     qNum: 37,
     answer: "NO",
-    location: "Đoạn 8, Dòng 7-9",
-    evidence: "Far from complicating life, automated translation facilitates smoother integration for new immigrants navigating essential services like healthcare and schooling.",
-    explanation: "Máy dịch tự động giúp người nhập cư hòa nhập cuộc sống thuận lợi hơn chứ không hề khiến cuộc sống của họ khó khăn hơn ('Far from complicating life, it facilitates integration').",
-    keywords: [
-      { question: "make life more difficult for immigrants", passage: "far from complicating life, it facilitates smoother integration" }
-    ]
+    location: "Đoạn 8, Dòng 4-6",
+    evidence: "though one noteworthy possibility is that it could overcome the language barriers that often arise between generations after migration, leaving children and their grandparents without a shared language.",
+    explanation: "Công nghệ dịch có thể giúp vượt qua rào cản ngôn ngữ giữa các thế hệ sau khi nhập cư ('overcome language barriers'), tức là giúp ích chứ không làm cuộc sống khó khăn hơn ('make life more difficult').",
+    keywords: [{ question: "make life more difficult for immigrant families", passage: "could overcome the language barriers that often arise between generations after migration" }]
   },
   38: {
     qNum: 38,
     answer: "NOT GIVEN",
     location: "Đoạn 9, Dòng 1-3",
-    evidence: "Even if voice-morphing technology simulates the speaker's voice, their facial gestures and body language remain unadapted.",
-    explanation: "Bài đọc có nhắc tới việc cử chỉ cơ thể và nét mặt chưa được điều chỉnh, nhưng không hề nói liệu các khía cạnh thị giác có đang được các nhà nghiên cứu ưu tiên phát triển hay không.",
-    keywords: [
-      { question: "visual aspects are prioritized in ongoing research", passage: "không có thông tin về việc ưu tiên nghiên cứu thị giác (Not Given)" }
-    ]
+    evidence: "Even if voice-morphing technology simulates the speaker's voice, their lip movements won't match, and they will look like they are in a dubbed movie.",
+    explanation: "Bài đọc nói rằng cử động môi sẽ không khớp với giọng lồng tiếng, nhưng không có thông tin nào cho thấy các nhà thiết kế phần mềm đang xem xét khía cạnh hình ảnh này ('being considered by software designers').",
+    keywords: [{ question: "Visual aspects ... are being considered by software designers", passage: "không có thông tin về việc nhà thiết kế đang xem xét khía cạnh hình ảnh (Not Given)" }]
   },
   39: {
     qNum: 39,
     answer: "NOT GIVEN",
-    location: "Đoạn 8, Dòng 3-5",
-    evidence: "While English remains the dominant global lingua franca in scientific literature, translation tools are increasingly handling diverse language pairs.",
-    explanation: "Bài đọc chỉ nói tiếng Anh là ngôn ngữ chung trong khoa học, hoàn toàn không có thông tin các nhà khoa học quốc tế thấy tiếng Anh dễ dịch hơn các thứ tiếng khác.",
-    keywords: [
-      { question: "English is easier to translate than other languages", passage: "không có thông tin về độ khó dễ khi dịch tiếng Anh (Not Given)" }
-    ]
+    location: "Đoạn 9, Dòng 4-6",
+    evidence: "Sharing a language can promote a sense of belonging and community, as with the international scientists who use English as a lingua franca, where their predecessors used Latin.",
+    explanation: "Đoạn văn chỉ ra rằng các nhà khoa học quốc tế dùng tiếng Anh như một ngôn ngữ chung, hoàn toàn không so sánh liệu tiếng Anh có dễ dịch sang hơn các ngôn ngữ khác hay không ('easier to translate into than other languages').",
+    keywords: [{ question: "found English easier to translate into than other languages", passage: "không có thông tin so sánh độ dễ dịch của tiếng Anh (Not Given)" }]
   },
   40: {
     qNum: 40,
     answer: "YES",
-    location: "Đoạn 9, Dòng 4-6",
-    evidence: "There remains an immense chasm between merely understanding the transactional information in words and truly appreciating the emotional soul of a language.",
-    explanation: "Có sự khác biệt to lớn giữa việc chỉ hiểu thông tin bề mặt của từ ngữ với việc thấu cảm cái hồn cảm xúc của ngôn ngữ, hoàn toàn đồng tình với quan điểm của tác giả.",
-    keywords: [
-      { question: "difference between understanding words and feeling the language", passage: "chasm between understanding transactional information and appreciating the emotional soul" }
-    ]
+    location: "Đoạn 9, Dòng 7-8",
+    evidence: "And software will never be a substitute for the subtle but vital understanding that comes with knowledge of a language.",
+    explanation: "Phần mềm chỉ có thể dịch bề mặt câu chữ chứ không thể thay thế sự thấu hiểu tinh tế và sống động về con người và văn hóa, đồng nghĩa với nhận định có sự khác biệt giữa hiểu ngôn từ và hiểu con người ('difference between understanding words and understanding people').",
+    keywords: [{ question: "difference between understanding words and understanding people", passage: "software will never be a substitute for the subtle but vital understanding that comes with knowledge of a language" }]
   }
 };
-
