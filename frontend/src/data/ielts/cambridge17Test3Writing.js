@@ -10,6 +10,7 @@ export const cambridge17Test3Writing = {
       prompt: "The chart below gives information about how families in one country spent their weekly income in 1968 and 2018.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
       diagramTitle: "1968 and 2018: average weekly spending by families (% of weekly income)",
+      image: "/images/ielts/cam17_test3_writing_task1.png",
       diagramImage: "/images/ielts/cam17_test3_writing_task1.png"
     },
     {

@@ -10,6 +10,7 @@ export const cambridge17Test2Writing = {
       prompt: "The table and charts below give information on the police budget for 2017 and 2018 in one area of Britain.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
       diagramTitle: "Police Budget 2017–2018 (in £m)",
+      image: "/images/ielts/cam17_test2_writing_task1.png",
       diagramImage: "/images/ielts/cam17_test2_writing_task1.png"
     },
     {

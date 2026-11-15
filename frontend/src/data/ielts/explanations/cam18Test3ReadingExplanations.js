@@ -164,100 +164,100 @@ export const cam18Test3ReadingExplanations = {
   15: {
     qNum: 15,
     answer: "viii",
-    location: "Đoạn A",
-    evidence: "When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.",
-    explanation: "Nội dung trọng tâm xuyên suốt đoạn văn A thể hiện qua câu: 'When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.'. Tiêu đề phù hợp và bao quát nhất là (viii).",
+    location: "Đoạn B",
+    evidence: "But in 1912 General Motors introduced the electric starter, and over the following few years steam power was gradually phased out.",
+    explanation: "Đoạn B miêu tả sự xuất hiện của động cơ đốt trong với bộ khởi động điện của General Motors vượt trội hơn và dần thay thế động cơ hơi nước, phù hợp tiêu đề (viii) - 'A better option than the steam car arises'.",
     keywords: [
-      { question: "Paragraph B", passage: "When primitive automobiles first began to appear i" },
-      { question: "key question statement", passage: "confirmed textual context" },
+      { question: "Paragraph B", passage: "steam power was gradually phased out" },
+      { question: "better option", passage: "General Motors introduced the electric starter" },
     ]
   },
   16: {
     qNum: 16,
     answer: "vi",
     location: "Đoạn C",
-    evidence: "The Dobles' next car was the Model B... But it was the Model C that established the Doble reputation...",
-    explanation: "Đoạn C miêu tả sự công nhận rộng rãi và danh tiếng tích cực dành cho mẫu xe Model C êm ái, sạch và nhanh, phù hợp tiêu đề (vi) - 'Positive publicity at last for this quiet, clean, fast vehicle'.",
+    evidence: "Though the Doble boys' third prototype, nicknamed the Model B, still lacked the convenience of an internal combustion engine, it drew the attention of automobile trade magazines due to its numerous improvements over previous steam cars.",
+    explanation: "Đoạn C miêu tả sự công nhận rộng rãi và danh tiếng tích cực dành cho mẫu xe Model B êm ái, sạch và nhanh trên các tạp chí ô tô, phù hợp tiêu đề (vi) - 'Positive publicity at last for this quiet, clean, fast vehicle'.",
     keywords: [
-      { question: "Paragraph C", passage: "established the Doble reputation" },
-      { question: "positive publicity", passage: "Model C established reputation" },
+      { question: "Paragraph C", passage: "drew the attention of automobile trade magazines" },
+      { question: "positive publicity", passage: "remarkable acceleration by Automobile magazine" },
     ]
   },
   17: {
     qNum: 17,
     answer: "v",
     location: "Đoạn D",
-    evidence: "The Dobles continued to improve their technology... commercial prospects improved and orders began to pour in...",
-    explanation: "Đoạn D tập trung vào các cải tiến công nghệ tiếp theo giúp nhận được nhiều đơn đặt hàng thương mại, phù hợp tiêu đề (v) - 'Further improvements lead to commercial orders'.",
+    evidence: "By the following April, the General Engineering Company had received 5,390 deposits for Doble Detroits, which were scheduled for delivery in early 1918.",
+    explanation: "Đoạn D tập trung vào các cải tiến công nghệ mới giúp công ty nhận được tới 5,390 đơn đặt cọc mua xe thương mại, phù hợp tiêu đề (v) - 'Further improvements lead to commercial orders'.",
     keywords: [
-      { question: "Paragraph D", passage: "commercial prospects improved and orders" },
-      { question: "commercial orders", passage: "orders began to pour in" },
+      { question: "Paragraph D", passage: "General Engineering Company had received 5,390 deposits" },
+      { question: "commercial orders", passage: "deposits for Doble Detroits" },
     ]
   },
   18: {
     qNum: 18,
     answer: "vii",
-    location: "Đoạn A",
-    evidence: "When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.",
-    explanation: "Nội dung trọng tâm xuyên suốt đoạn văn A thể hiện qua câu: 'When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.'. Tiêu đề phù hợp và bao quát nhất là (vii).",
+    location: "Đoạn E",
+    evidence: "Those buyers who received the handful of completed cars complained that the vehicles were sluggish and erratic, sometimes going in reverse when they should go forward.",
+    explanation: "Đoạn E thuật lại việc những khách hàng nhận được xe phàn nàn xe chạy chậm chạp, thất thường, thậm chí lùi lại khi muốn tiến, phù hợp tiêu đề (vii) - 'A disappointing outcome for customers'.",
     keywords: [
-      { question: "Paragraph E", passage: "When primitive automobiles first began to appear i" },
-      { question: "key question statement", passage: "confirmed textual context" },
+      { question: "Paragraph E", passage: "buyers who received the handful of completed cars complained" },
+      { question: "disappointing outcome", passage: "vehicles were sluggish and erratic" },
     ]
   },
   19: {
     qNum: 19,
     answer: "i",
-    location: "Đoạn A",
-    evidence: "When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.",
-    explanation: "Nội dung trọng tâm xuyên suốt đoạn văn A thể hiện qua câu: 'When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.'. Tiêu đề phù hợp và bao quát nhất là (i).",
+    location: "Đoạn F",
+    evidence: "After sitting overnight in freezing temperatures, the car was pushed out into the road and left to sit for over an hour in the frosty morning air.",
+    explanation: "Đoạn F miêu tả bài kiểm tra xe hơi nước trong điều kiện thời tiết băng giá qua đêm trước khi được đánh giá khả năng vận hành, phù hợp tiêu đề (i) - 'A period in cold conditions before the technology is assessed'.",
     keywords: [
-      { question: "stated condition", passage: "primitive automobiles began appear" },
-      { question: "key question statement", passage: "confirmed textual context" },
+      { question: "Paragraph F", passage: "After sitting overnight in freezing temperatures" },
+      { question: "cold conditions", passage: "frosty morning air" },
     ]
   },
   20: {
     qNum: 20,
     answer: "iv",
-    location: "Đoạn A",
-    evidence: "When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.",
-    explanation: "Nội dung trọng tâm xuyên suốt đoạn văn A thể hiện qua câu: 'When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.'. Tiêu đề phù hợp và bao quát nhất là (iv).",
+    location: "Đoạn G",
+    evidence: "Under the current pressure to improve automotive performance and reduce emissions, it is not unthinkable that the steam car may rise again.",
+    explanation: "Đoạn G kết luận rằng trước áp lực cải thiện hiệu suất và giảm khí thải hiện nay, xe hơi nước hoàn toàn có thể trở lại thành một giải pháp khả thi, phù hợp tiêu đề (iv) - 'A possible solution to the issues of today'.",
     keywords: [
-      { question: "stated condition", passage: "primitive automobiles began appear" },
-      { question: "key question statement", passage: "confirmed textual context" },
+      { question: "Paragraph G", passage: "reduce emissions, it is not unthinkable that the steam car may rise again" },
+      { question: "solution to issues of today", passage: "current pressure to improve automotive performance" },
     ]
   },
   21: {
     qNum: 21,
     answer: "A",
-    location: "Đoạn A",
-    evidence: "When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.",
-    explanation: "Dẫn chứng từ bài đọc: 'When primitive automobiles first began to appear in the 1800s, their engines were based on steam power.' cho thấy lựa chọn (A) phản ánh chính xác nhất luận điểm và chi tiết được tác giả đưa ra.",
+    location: "Đoạn B",
+    evidence: "At first, these noisy gasoline cars were unpopular because they were more complicated to operate and they had difficult hand-crank starters, which were known to break arms when the engines backfired.",
+    explanation: "Đoạn B chỉ ra rằng ban đầu xe chạy xăng không được ưa chuộng vì khó khởi động bằng cần quay tay và phức tạp, chứng minh xe hơi nước có những ưu điểm ban đầu (A - 'They were more easily driven than gasoline-powered cars').",
     keywords: [
-      { question: "What point does the writer make about the ste", passage: "their engines were based on steam power" },
-      { question: "steam car", passage: "primitive automobiles began" },
+      { question: "What point does the writer make about the steam car", passage: "gasoline cars were unpopular because they were more complicated" },
+      { question: "hand-crank starters", passage: "difficult hand-crank starters" },
     ]
   },
   22: {
     qNum: 22,
     answer: "C",
     location: "Đoạn C",
-    evidence: "Between 1906 and 1909, Abner Doble and his three brothers built their first steam car in their parents' basement.",
-    explanation: "Dẫn chứng từ bài đọc: 'Between 1906 and 1909, Abner Doble and his three brothers built their first steam car in their parents' basement.' cho thấy lựa chọn (C) phản ánh chính xác nhất luận điểm và chi tiết được tác giả đưa ra.",
+    evidence: "Between 1906 and 1909, while still attending high school, Abner Doble and his three brothers built their first steam car in their parents' basement.",
+    explanation: "Dẫn chứng từ bài đọc: 'Between 1906 and 1909, while still attending high school, Abner Doble and his three brothers built their first steam car in their parents' basement.' cho thấy lựa chọn (C) phản ánh chính xác nhất (họ làm khi vẫn đang đi học).",
     keywords: [
-      { question: "When building their first steam car", passage: "Abner Doble and his three brothers built their fir" },
-      { question: "the Doble brothers", passage: "Abner Doble and his three brothers built their fir" },
+      { question: "When building their first steam car", passage: "while still attending high school" },
+      { question: "the Doble brothers", passage: "built their first steam car in their parents' basement" },
     ]
   },
   23: {
     qNum: 23,
     answer: "B",
     location: "Đoạn D",
-    evidence: "By 1914, the brothers had designed the Doble Model B, which incorporated significant innovations including a newly invented electric ignition system that lit the burner with a spark plug.",
-    explanation: "Dẫn chứng từ bài đọc: 'By 1914, the brothers had designed the Doble Model B, which incorporated significant innovations including a newly inven...' cho thấy lựa chọn (B) phản ánh chính xác nhất luận điểm và chi tiết được tác giả đưa ra.",
+    evidence: "He and his brothers immediately began working on the Model C, which was intended to expand upon the innovations of the Model B.",
+    explanation: "Dẫn chứng từ bài đọc: 'He and his brothers immediately began working on the Model C, which was intended to expand upon the innovations of the Model B.' cho thấy lựa chọn (B) phản ánh chính xác nhất luận điểm (tìm kiếm đầu tư và phát triển trên nền tảng Model B).",
     keywords: [
-      { question: "In order to produce the Model C", passage: "the brothers had designed the Doble Model B" },
-      { question: "the Doble brothers", passage: "the brothers had designed the Doble Model B" },
+      { question: "In order to produce the Model C", passage: "intended to expand upon the innovations of the Model B" },
+      { question: "the Doble brothers", passage: "working on the Model C" },
     ]
   },
   24: {
@@ -275,22 +275,22 @@ export const cam18Test3ReadingExplanations = {
     qNum: 25,
     answer: "fifty",
     location: "Đoạn G",
-    evidence: "By the time the company folded in 1931, fewer than fifty cars were produced.",
-    explanation: "Căn cứ vào ngữ cảnh bài đọc: 'By the time the company folded in 1931, fewer than fifty cars were produced.', từ/cụm từ chính xác cần điền vào chỗ trống theo đúng cấu trúc ngữ pháp và ý nghĩa là 'fifty'.",
+    evidence: "By the time the company folded in 1931, fewer than fifty of the amazing Model E steam cars had been produced.",
+    explanation: "Căn cứ vào ngữ cảnh bài đọc: 'By the time the company folded in 1931, fewer than fifty of the amazing Model E steam cars had been produced.', từ chính xác cần điền vào chỗ trống là 'fifty'.",
     keywords: [
-      { question: "Under [fifty] cars were produc", passage: "in 1931, fewer than fifty cars were produced." },
-      { question: "Under [fifty] cars were produced before the c", passage: "fewer than fifty cars were produced" },
+      { question: "Under [fifty] cars were produced", passage: "fewer than fifty of the amazing Model E steam cars had been produced" },
+      { question: "before the company folded", passage: "By the time the company folded in 1931" },
     ]
   },
   26: {
     qNum: 26,
     answer: "strict",
     location: "Đoạn G",
-    evidence: "They are straightforward to maintain, and they satisfy California's strict emissions laws.",
-    explanation: "Căn cứ vào ngữ cảnh bài đọc: 'They are straightforward to maintain, and they satisfy California's strict emissions laws.', từ/cụm từ chính xác cần điền vào chỗ trống theo đúng cấu trúc ngữ pháp và ý nghĩa là 'strict'.",
+    evidence: "Astonishingly, an unmodified Doble Model E runs clean enough to pass the emissions laws in California today, and they are pretty strict.",
+    explanation: "Căn cứ vào ngữ cảnh bài đọc: 'Astonishingly, an unmodified Doble Model E runs clean enough to pass the emissions laws in California today, and they are pretty strict.', từ bổ nghĩa chính xác là 'strict'.",
     keywords: [
-      { question: "sfy California's [strict] emissions laws.", passage: "atisfy California's strict emissions laws." },
-      { question: "and they satisfy California's [strict] emissi", passage: "and they satisfy California's strict emissions law" },
+      { question: "satisfy California's [strict] emissions laws", passage: "pass the emissions laws in California today, and they are pretty strict" },
+      { question: "emissions laws", passage: "strict emissions laws" },
     ]
   },
   // --- PASSAGE 3: The case for mixed-ability classes ---

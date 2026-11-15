@@ -131,22 +131,22 @@ export const cam18Test4ReadingExplanations = {
     qNum: 12,
     answer: "A",
     location: "Đoạn E",
-    evidence: "Improvements in the science and technology underpinning green roof development have also led to new variations in the concept... provide habitats for a wide range of species and generate sustainable power.",
-    explanation: "Đoạn E đề cập đến các biến thể mới của mái nhà xanh nhằm tạo môi trường sống phong phú cho sinh vật (A) và sản xuất điện năng bền vững (D).",
+    evidence: "Improvements in the science and technology underpinning green roof development have also led to new variations in the concept.",
+    explanation: "Đoạn E đề cập đến các cải tiến khoa học và công nghệ dẫn đến những biến thể mới nhằm mở rộng lợi ích môi trường và đa dạng sinh học (A).",
     keywords: [
       { question: "aims of new variations", passage: "variations in the concept" },
-      { question: "habitats for species", passage: "habitats for a wide range of species" },
+      { question: "improvements science technology", passage: "Improvements in the science and technology" },
     ]
   },
   13: {
     qNum: 13,
     answer: "D",
     location: "Đoạn E",
-    evidence: "combinations of green roofs with solar panels, known as biosolar roofs, which generate power from a sustainable source...",
-    explanation: "Đoạn E nêu rõ sự kết hợp với pin mặt trời (biosolar roofs) nhằm phát điện từ nguồn năng lượng bền vững (D) cùng với việc cung cấp môi trường sống cho sinh vật (A).",
+    evidence: "There are also combinations of green roofs with solar panels, known as biosolar roofs, which generate power from a sustainable source while the underlying vegetation cools the panels, enhancing their photovoltaic efficiency.",
+    explanation: "Đoạn E nêu rõ sự kết hợp với pin mặt trời (biosolar roofs) nhằm phát điện từ nguồn năng lượng bền vững (D).",
     keywords: [
       { question: "generate power from sustainable source", passage: "generate power from a sustainable source" },
-      { question: "biosolar roofs", passage: "solar panels known as biosolar roofs" },
+      { question: "biosolar roofs", passage: "combinations of green roofs with solar panels" },
     ]
   },
   // --- PASSAGE 2: The growth mindset ---
@@ -352,12 +352,12 @@ export const cam18Test4ReadingExplanations = {
   32: {
     qNum: 32,
     answer: "F",
-    location: "Đoạn P3",
-    evidence: "As important as Wegener's work on continental drift has turned out to be, it was largely a sideline to his interest in atmospheric physics, geophysics, and paleoclimatology; and thus I have been at great pains to put Wegener's work on continental drift in the larger context of his other scientific work, and in the even larger context of atmospheric sciences in his lifetime.",
-    explanation: "Căn cứ vào ngữ cảnh bài đọc: 'As important as Wegener's work on continental drift has turned out to be, it was largely a sideline to his interest in a...', từ/cụm từ chính xác cần điền vào chỗ trống theo đúng cấu trúc ngữ pháp và ý nghĩa là 'F'.",
+    location: "Đoạn P4",
+    evidence: "it was largely a sideline to his interest in atmospheric physics, geophysics, and paleoclimatology",
+    explanation: "Đoạn 4 chỉ ra rằng công trình về trôi dạt lục địa chủ yếu là một lĩnh vực phụ bên cạnh mối quan tâm chuyên môn chính của ông về vật lý khí quyển (F - 'professional interests').",
     keywords: [
-      { question: "His [F] were limited to atmospheric physics", passage: "it was largely a sideline to his interest in atmos" },
-      { question: "key question statement", passage: "confirmed textual context" },
+      { question: "His [F] were limited to atmospheric physics", passage: "it was largely a sideline to his interest in atmospheric physics" },
+      { question: "professional interests", passage: "atmospheric physics, geophysics, and paleoclimatology" },
     ]
   },
   33: {
@@ -385,45 +385,45 @@ export const cam18Test4ReadingExplanations = {
   35: {
     qNum: 35,
     answer: "H",
-    location: "Đoạn P6",
-    evidence: "Ultimately, Wegener's tragic early death in 1930 during an expedition on the Greenland ice sheet underscores how fragile and contingent human endeavors can be.",
-    explanation: "Căn cứ vào ngữ cảnh bài đọc: 'Ultimately, Wegener's tragic early death in 1930 during an expedition on the Greenland ice sheet underscores how fragile...', từ/cụm từ chính xác cần điền vào chỗ trống theo đúng cấu trúc ngữ pháp và ý nghĩa là 'H'.",
+    location: "Đoạn P3",
+    evidence: "Between 1906 and 1908 he had taken part in a highly publicized and extremely dangerous expedition to the coast of northeast Greenland.",
+    explanation: "Đoạn 3 chỉ ra rằng sau kỷ lục khinh khí cầu, ông tham gia chuyến thám hiểm bờ biển Greenland đầy hiểm nguy (H - 'hazardous exploration').",
     keywords: [
-      { question: "followed by his well-publicised but [H] of Gr", passage: "Wegener's tragic early death in 1930 during an exp" },
-      { question: "Greenland coast", passage: "Ultimately expedition Greenland" },
+      { question: "followed by his well-publicised but [H] of Greenland's coast", passage: "highly publicized and extremely dangerous expedition to the coast of northeast Greenland" },
+      { question: "hazardous exploration", passage: "extremely dangerous expedition" },
     ]
   },
   36: {
     qNum: 36,
     answer: "E",
     location: "Đoạn P3",
-    evidence: "My treatment of his other scientific work is no less detailed, though I certainly have devoted more attention to the reception of his ideas on continental displacement, as they were much more controversial than his other work.",
-    explanation: "Căn cứ vào ngữ cảnh bài đọc: 'My treatment of his other scientific work is no less detailed, though I certainly have devoted more attention to the rec...', từ/cụm từ chính xác cần điền vào chỗ trống theo đúng cấu trúc ngữ pháp và ý nghĩa là 'E'.",
+    evidence: "He had also made a name for himself amongst a small circle of meteorologists and atmospheric physicists in Germany as the author of a textbook, Thermodynamics of the Atmosphere (1911), and of a number of interesting scientific papers.",
+    explanation: "Đoạn 3 nêu rõ cuốn sách giáo trình đã giúp ông được một nhóm chọn lọc các nhà khoa học Đức chú ý (E - 'select group').",
     keywords: [
-      { question: "he had also come to the attention of a [E] of", passage: "though I certainly have devoted more attention to " },
-      { question: "publication textbook thermodynamics", passage: "treatment scientific work" },
+      { question: "he had also come to the attention of a [E] of German scientists", passage: "made a name for himself amongst a small circle of meteorologists and atmospheric physicists in Germany" },
+      { question: "select group", passage: "small circle of meteorologists and atmospheric physicists" },
     ]
   },
   37: {
     qNum: 37,
     answer: "B",
     location: "Đoạn P5",
-    evidence: "Greene explains that understanding Wegener requires understanding the broader landscape of late 19th and early 20th century European natural science, where boundaries between disciplines were far more porous than they are today.",
-    explanation: "Dẫn chứng từ bài đọc: 'Greene explains that understanding Wegener requires understanding the broader landscape of late 19th and early 20th cent...' cho thấy lựa chọn (B) phản ánh chính xác nhất luận điểm và chi tiết được tác giả đưa ra.",
+    evidence: "My own feeling, however, is that the parts do not make as much sense on their own as do all of his activities taken together. In this respect I urge readers to try to experience Wegener's life as he lived it, with all the interruptions, changes of mind, and renewed efforts this entailed.",
+    explanation: "Trong đoạn 5, tác giả giải thích rằng từng phần cuộc đời của Wegener không thể hiện hết ý nghĩa nếu tách riêng, và khuyên người đọc nên trải nghiệm toàn bộ cuộc đời ông, tức là giải thích lý do nên đọc toàn bộ cuốn sách (B - 'explaining why it is desirable to read the whole book').",
     keywords: [
-      { question: "What is Mott T Greene doing in the fifth para", passage: "Greene explains that understanding Wegener require" },
-      { question: "key question statement", passage: "confirmed textual context" },
+      { question: "What is Mott T Greene doing in the fifth paragraph", passage: "parts do not make as much sense on their own as do all of his activities taken together" },
+      { question: "read the whole book", passage: "urge readers to try to experience Wegener's life as he lived it" },
     ]
   },
   38: {
     qNum: 38,
     answer: "A",
-    location: "Đoạn P5",
-    evidence: "Wegener was not a particularly ambitious person, nor did he obsessively seek status or institutional honors.",
-    explanation: "Đoạn 5 làm rõ Wegener không phải là người quá tham vọng về quyền lực hay danh vị học thuật (A - 'He was not a particularly ambitious person').",
+    location: "Đoạn P6",
+    evidence: "He was not active (with a few exceptions) in scientific societies, and did not seek to find influence or advance his ideas through professional contacts and politics, spending most of his time at home in his study reading and writing, or in the field collecting observations.",
+    explanation: "Đoạn 6 nêu rõ Wegener không tích cực tham gia các hội khoa học và không tìm kiếm ảnh hưởng hay thăng tiến quan điểm qua các mối quan hệ hay chính trị học thuật, chứng minh ông không phải là người quá tham vọng (A - 'He was not a particularly ambitious person').",
     keywords: [
-      { question: "What is said about Wegener", passage: "not a particularly ambitious person" },
-      { question: "ambitious", passage: "not particularly ambitious" },
+      { question: "What is said about Wegener", passage: "did not seek to find influence or advance his ideas" },
+      { question: "not ambitious", passage: "not active in scientific societies" },
     ]
   },
   39: {

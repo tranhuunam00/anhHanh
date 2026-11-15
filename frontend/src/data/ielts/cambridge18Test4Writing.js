@@ -10,6 +10,7 @@ export const cambridge18Test4Writing = {
       prompt: "The graph below shows the average monthly change in the prices of three metals during 2014.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
       diagramTitle: "Average monthly change in prices of copper, nickel and zinc (2014)",
+      image: "/images/ielts/cam18_test4_writing_task1.png",
       diagramImage: "/images/ielts/cam18_test4_writing_task1.png"
     },
     {

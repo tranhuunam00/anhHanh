@@ -9,7 +9,8 @@ export const cambridge18Test2Writing = {
       timeSuggestion: "You should spend about 20 minutes on this task.",
       prompt: "The chart below shows the number of households in the US by their annual income in 2007, 2011 and 2015.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
-      diagramTitle: "Number of US households (in millions), by annual income (2007, 2011, 2015)",
+      diagramTitle: "Number of US households (in millions), by annual income",
+      image: "/images/ielts/cam18_test2_writing_task1.png",
       diagramImage: "/images/ielts/cam18_test2_writing_task1.png"
     },
     {

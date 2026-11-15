@@ -10,6 +10,7 @@ export const cambridge17Test4Writing = {
       prompt: "The graph below shows the number of shops that closed and the number of new shops that opened in one country between 2011 and 2018.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
       diagramTitle: "Number of shop closures and openings (2011–2018)",
+      image: "/images/ielts/cam17_test4_writing_task1.png",
       diagramImage: "/images/ielts/cam17_test4_writing_task1.png"
     },
     {

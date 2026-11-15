@@ -10,6 +10,7 @@ export const cambridge17Test1Writing = {
       prompt: "The maps below show an industrial area in the town of Norbiton, and planned future development for the site.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
       diagramTitle: "Norbiton industrial area: now and planned future development",
+      image: "/images/ielts/cam17_test1_writing_task1.png",
       diagramImage: "/images/ielts/cam17_test1_writing_task1.png"
     },
     {

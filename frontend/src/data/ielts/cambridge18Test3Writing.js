@@ -9,7 +9,8 @@ export const cambridge18Test3Writing = {
       timeSuggestion: "You should spend about 20 minutes on this task.",
       prompt: "The diagram below shows the floor plan of a public library 20 years ago and how it looks now.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
-      diagramTitle: "Central Library floor plan (20 years ago and today)",
+      diagramTitle: "Central Library 20 years ago & Central Library today",
+      image: "/images/ielts/cam18_test3_writing_task1.png",
       diagramImage: "/images/ielts/cam18_test3_writing_task1.png"
     },
     {
