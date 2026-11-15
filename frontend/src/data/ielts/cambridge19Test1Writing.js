@@ -10,7 +10,7 @@ export const cambridge19Test1Writing = {
       prompt: "The graph below gives information on the numbers of participants for different activities at one social centre in Melbourne, Australia for the period 2000 to 2020.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.",
       minWords: 150,
       image: "/images/ielts/cam19_test1_writing_task1.png",
-      diagramTitle: "Participants by activity at a Melbourne social centre (2000 - 2020)"
+      diagramTitle: "Number of participants, by activity 2000–2020"
     },
     {
       taskNumber: 2,
