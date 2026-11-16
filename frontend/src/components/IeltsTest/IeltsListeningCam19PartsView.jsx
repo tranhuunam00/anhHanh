@@ -12,6 +12,7 @@ import {
   renderFormBlock,
   renderTableBlock,
   renderFlowchartBlock,
+  extractQuestionNumbersFromBlock,
   extractAllHandledQuestionNumbers
 } from "./IeltsListeningBlockRenderer.jsx";
 
@@ -20,12 +21,8 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
 
   const handledQuestionNumbers = extractAllHandledQuestionNumbers(part);
   const isMapPart = Boolean(part.mapImage);
-  const mapItems = isMapPart
-    ? (part.items?.filter((it) => it.type === "map_labeling") || [])
-    : [];
-  const regularItems = isMapPart
-    ? (part.items?.filter((it) => !mapItems.includes(it) && !handledQuestionNumbers.has(it.number)) || [])
-    : (part.items?.filter((it) => !handledQuestionNumbers.has(it.number)) || []);
+  const mapItems = isMapPart ? (part.items?.filter((it) => it.type === "map_labeling") || []) : [];
+  const regularItems = part.items?.filter((it) => (!isMapPart || it.type !== "map_labeling") && !handledQuestionNumbers.has(it.number)) || [];
 
   const renderItem = (item) => {
     // 1. Fill Notes / Table completion
@@ -280,50 +277,82 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
     );
   };
 
-  return (
-    <div className="ielts-part-content">
-      {/* Header Banner */}
-      <div className="ielts-instructions-banner">
-        <h4>{part.title}</h4>
-        <p className="ielts-instructions-text" style={{ whiteSpace: "pre-line" }}>
-          {part.instructions}
-        </p>
-      </div>
+  const getMinQ = (b) => {
+    const nums = extractQuestionNumbersFromBlock(b);
+    return nums.length > 0 ? Math.min(...nums) : 999;
+  };
 
-      {/* Structured Content Blocks (Notes, Forms, Tables) */}
-      {part.contentBlocks && Array.isArray(part.contentBlocks) && (
-        <div className="ielts-content-blocks" style={{ marginTop: "16px" }}>
-          {part.contentBlocks.map((b, idx) => (
-            <React.Fragment key={idx}>
-              {renderBlock(b, answers, onChange, evaluation, isReview)}
-            </React.Fragment>
-          ))}
-        </div>
-      )}
-      {!part.contentBlocks && part.noteBlock && (
-        <div style={{ marginTop: "16px" }}>
+  const sectionsToRender = [];
+
+  // Content Blocks
+  if (part.contentBlocks && Array.isArray(part.contentBlocks)) {
+    part.contentBlocks.forEach((b, idx) => {
+      sectionsToRender.push({
+        order: getMinQ(b),
+        node: (
+          <div key={`cb-${idx}`} className="ielts-content-block-wrapper" style={{ marginTop: "16px" }}>
+            {renderBlock(b, answers, onChange, evaluation, isReview)}
+          </div>
+        )
+      });
+    });
+  }
+
+  // Standalone Note Block
+  if (!part.contentBlocks && part.noteBlock) {
+    sectionsToRender.push({
+      order: getMinQ(part.noteBlock),
+      node: (
+        <div key="noteblock" style={{ marginTop: "16px" }}>
           {renderNoteBlock(part.noteBlock, answers, onChange, evaluation, isReview)}
         </div>
-      )}
-      {!part.contentBlocks && part.formBlock && (
-        <div style={{ marginTop: "16px" }}>
+      )
+    });
+  }
+
+  // Standalone Form Block
+  if (!part.contentBlocks && part.formBlock) {
+    sectionsToRender.push({
+      order: getMinQ(part.formBlock),
+      node: (
+        <div key="formblock" style={{ marginTop: "16px" }}>
           {renderFormBlock(part.formBlock, answers, onChange, evaluation, isReview)}
         </div>
-      )}
-      {!part.contentBlocks && part.tableBlock && (
-        <div style={{ marginTop: "16px" }}>
+      )
+    });
+  }
+
+  // Standalone Table Block
+  if (!part.contentBlocks && part.tableBlock) {
+    sectionsToRender.push({
+      order: getMinQ(part.tableBlock),
+      node: (
+        <div key="tableblock" style={{ marginTop: "16px" }}>
           {renderTableBlock(part.tableBlock, answers, onChange, evaluation, isReview)}
         </div>
-      )}
-      {!part.contentBlocks && part.flowchartBlock && (
-        <div style={{ marginTop: "16px" }}>
+      )
+    });
+  }
+
+  // Standalone Flowchart Block
+  if (!part.contentBlocks && part.flowchartBlock) {
+    sectionsToRender.push({
+      order: getMinQ(part.flowchartBlock),
+      node: (
+        <div key="flowchartblock" style={{ marginTop: "16px" }}>
           {renderFlowchartBlock(part.flowchartBlock, answers, onChange, evaluation, isReview)}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Regular Questions (MCQ, Choose Two, Notes, Matching) */}
-      {regularItems.length > 0 && (
-        <div className="ielts-questions-inner" style={{ marginTop: "16px" }}>
+  // Regular Items (MCQ, Choose Two, Notes, Matching)
+  if (regularItems.length > 0) {
+    const minRegularQ = Math.min(...regularItems.map((it) => it.number || 999));
+    sectionsToRender.push({
+      order: minRegularQ,
+      node: (
+        <div key="regular-items" className="ielts-questions-inner" style={{ marginTop: "16px" }}>
           {regularItems.map((item, idx) => {
             const targetIdx = firstMatchingIdx !== -1 ? firstMatchingIdx : 0;
             const shouldRenderBox = idx === targetIdx;
@@ -351,11 +380,17 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
             );
           })}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Map Labeling Questions (Interactive 2-column sticky split layout) */}
-      {isMapPart && mapItems.length > 0 && (
-        <div className="ielts-question-group" style={{ marginTop: "24px" }}>
+  // Map Labeling Questions (Interactive 2-column sticky split layout)
+  if (isMapPart && mapItems.length > 0) {
+    const minMapQ = Math.min(...mapItems.map((it) => it.number || 999));
+    sectionsToRender.push({
+      order: minMapQ,
+      node: (
+        <div key="map-items" className="ielts-question-group" style={{ marginTop: "24px" }}>
           <h5 style={{ fontWeight: 700, marginBottom: "8px", color: "var(--text-primary)" }}>
             Questions {mapItems[0]?.number}–{mapItems[mapItems.length - 1]?.number}
           </h5>
@@ -439,7 +474,24 @@ export function renderCam19ListeningPart(part, answers, onChange, onChooseTwoTog
             </div>
           </div>
         </div>
-      )}
+      )
+    });
+  }
+
+  // Sort sections strictly in ascending question number order!
+  sectionsToRender.sort((a, b) => a.order - b.order);
+
+  return (
+    <div className="ielts-part-content">
+      {/* Header Banner */}
+      <div className="ielts-instructions-banner">
+        <h4>{part.title}</h4>
+        <p className="ielts-instructions-text" style={{ whiteSpace: "pre-line" }}>
+          {part.instructions}
+        </p>
+      </div>
+
+      {sectionsToRender.map((s) => s.node)}
     </div>
   );
 }

@@ -57,6 +57,10 @@ export function extractQuestionNumbersFromBlock(block) {
     }
   }
 
+  if (nums.length === 0 && Array.isArray(block.questionsRange) && typeof block.questionsRange[0] === "number") {
+    nums.push(block.questionsRange[0]);
+  }
+
   return nums;
 }
 
