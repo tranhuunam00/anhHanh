@@ -353,39 +353,6 @@ export const IeltsWritingModule = ({
         </div>
       </div>
 
-      {/* Khi đã nộp bài / review mode: hiển thị bản xem lại có highlight từ vựng học thuật */}
-      {isReview && currentEssay && (
-        <div
-          className="ielts-review-essay-highlight-card"
-          style={{
-            marginTop: "16px",
-            padding: "16px 18px",
-            background: "var(--bg-secondary)",
-            borderRadius: "10px",
-            border: "1px solid var(--border-color)",
-            lineHeight: "1.75"
-          }}
-        >
-          <h5
-            style={{
-              margin: "0 0 10px 0",
-              fontSize: "0.95rem",
-              fontWeight: 700,
-              color: "var(--text-primary)"
-            }}
-          >
-            Xem lại bài viết & Từ vựng của bạn:
-          </h5>
-          <div className="ielts-review-essay-paragraphs">
-            {currentEssay.split("\n\n").map((para, pIdx) => (
-              <p key={pIdx} style={{ marginBottom: "12px", color: "var(--text-primary)" }}>
-                <HighlightedVocabSentence text={para} contextSentence={para} />
-              </p>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* AI Evaluation Result Card (Chỉ chấm điểm 4 tiêu chí chuẩn IELTS và nhận xét mức điểm) */}
       {evalData && (
         <div className="ielts-ai-result-card">
