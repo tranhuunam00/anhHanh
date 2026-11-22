@@ -4,6 +4,10 @@
  */
 
 import {
+  CAMBRIDGE_16_LESSONS,
+  CAMBRIDGE_16_FULL_LESSONS
+} from "./ieltsCambridge16Presets.js";
+import {
   CAMBRIDGE_17_LESSONS,
   CAMBRIDGE_17_FULL_LESSONS
 } from "./ieltsCambridge17Presets.js";
@@ -25,6 +29,8 @@ import {
 } from "./ieltsCambridge21Presets.js";
 
 export {
+  CAMBRIDGE_16_LESSONS,
+  CAMBRIDGE_16_FULL_LESSONS,
   CAMBRIDGE_17_LESSONS,
   CAMBRIDGE_17_FULL_LESSONS,
   CAMBRIDGE_18_LESSONS,

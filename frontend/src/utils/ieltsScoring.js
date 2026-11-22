@@ -221,7 +221,7 @@ export const gradeListeningTest = (listeningData, answers = {}) => {
     });
 
     part?.groups?.forEach((g) => {
-      if (g.groupType === "choose_two" && Array.isArray(g.numbers) && g.numbers.length >= 2) {
+      if ((g.groupType === "choose_two" || g.groupType === "pick_multiple") && Array.isArray(g.numbers) && g.numbers.length >= 2) {
         const pairAnswers = g.answers || g.items?.[0]?.answers || g.items?.[0]?.acceptedAnswers || [];
         evaluatePair(g.numbers[0], g.numbers[1], pairAnswers);
       } else if (g.groupType === "choose_three" && Array.isArray(g.numbers) && g.numbers.length >= 3) {
@@ -245,12 +245,18 @@ export const gradeListeningTest = (listeningData, answers = {}) => {
         (g.steps || g.items || []).forEach((it) => checkItem(it.number, it.answers || [it.answer]));
       } else if (g.steps) {
         g.steps.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+        if (g.items) {
+          g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+        }
       } else if (g.sections) {
         g.sections.forEach((sec) => {
           sec?.items?.forEach((it) => {
             if (it?.number) checkItem(it.number, it.answers || [it.answer]);
           });
         });
+        if (g.items) {
+          g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+        }
       } else if (g.items) {
         g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
       }
@@ -321,7 +327,7 @@ export const gradeReadingTest = (readingData, answers = {}) => {
     });
 
     p?.groups?.forEach((g) => {
-      if (g.groupType === "choose_two" && Array.isArray(g.numbers) && g.numbers.length >= 2) {
+      if ((g.groupType === "choose_two" || g.groupType === "pick_multiple") && Array.isArray(g.numbers) && g.numbers.length >= 2) {
         const pairAnswers = g.answers || g.items?.[0]?.answers || g.items?.[0]?.acceptedAnswers || [];
         evaluatePair(g.numbers[0], g.numbers[1], pairAnswers);
       } else if (g.groupType === "choose_three" && Array.isArray(g.numbers) && g.numbers.length >= 3) {
@@ -355,12 +361,18 @@ export const gradeReadingTest = (readingData, answers = {}) => {
         });
       } else if (g.steps) {
         g.steps.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+        if (g.items) {
+          g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+        }
       } else if (g.sections) {
         g.sections.forEach((sec) => {
           sec?.items?.forEach((it) => {
             if (it?.number) checkItem(it.number, it.answers || [it.answer]);
           });
         });
+        if (g.items) {
+          g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
+        }
       } else if (g.items) {
         g.items.forEach((it) => checkItem(it.number, it.answers || [it.answer]));
       }

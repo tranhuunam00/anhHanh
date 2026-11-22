@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
 import {
   IELTS_TASK_TABS,
+  CAMBRIDGE_16_LESSONS,
+  CAMBRIDGE_16_FULL_LESSONS,
   CAMBRIDGE_17_LESSONS,
   CAMBRIDGE_17_FULL_LESSONS,
   CAMBRIDGE_18_LESSONS,
@@ -26,6 +28,7 @@ import {
 } from "../Icons";
 
 const CAMBRIDGE_BOOKS = [
+  { id: "cam16", title: "Cambridge IELTS 16", split: CAMBRIDGE_16_LESSONS, full: CAMBRIDGE_16_FULL_LESSONS },
   { id: "cam17", title: "Cambridge IELTS 17", split: CAMBRIDGE_17_LESSONS, full: CAMBRIDGE_17_FULL_LESSONS },
   { id: "cam18", title: "Cambridge IELTS 18", split: CAMBRIDGE_18_LESSONS, full: CAMBRIDGE_18_FULL_LESSONS },
   { id: "cam19", title: "Cambridge IELTS 19", split: CAMBRIDGE_19_LESSONS, full: CAMBRIDGE_19_FULL_LESSONS },

@@ -1,4 +1,5 @@
 import {
+  CAMBRIDGE_16_LESSONS,
   CAMBRIDGE_17_LESSONS,
   CAMBRIDGE_18_LESSONS,
   CAMBRIDGE_19_LESSONS,
@@ -30,7 +31,8 @@ export function getIeltsSpotlightLessons(customList = null, limit = 4) {
     CAMBRIDGE_20_LESSONS?.[0],
     CAMBRIDGE_19_LESSONS?.[0],
     CAMBRIDGE_18_LESSONS?.[0],
-    CAMBRIDGE_17_LESSONS?.[0]
+    CAMBRIDGE_17_LESSONS?.[0],
+    CAMBRIDGE_16_LESSONS?.[0]
   ].filter(Boolean);
 
   return defaultPool.slice(0, safeLimit);

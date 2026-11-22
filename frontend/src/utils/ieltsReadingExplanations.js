@@ -5,6 +5,10 @@
  * Adheres to <= 500 lines rule.
  */
 
+import { cam16Test4ReadingExplanations } from "../data/ielts/explanations/cam16Test4ReadingExplanations.js";
+import { cam16Test3ReadingExplanations } from "../data/ielts/explanations/cam16Test3ReadingExplanations.js";
+import { cam16Test2ReadingExplanations } from "../data/ielts/explanations/cam16Test2ReadingExplanations.js";
+import { cam16Test1ReadingExplanations } from "../data/ielts/explanations/cam16Test1ReadingExplanations.js";
 import { cam21Test4ReadingExplanations } from "../data/ielts/explanations/cam21Test4ReadingExplanations.js";
 import { cam21Test3ReadingExplanations } from "../data/ielts/explanations/cam21Test3ReadingExplanations.js";
 import { cam21Test2ReadingExplanations } from "../data/ielts/explanations/cam21Test2ReadingExplanations.js";
@@ -48,6 +52,10 @@ const EXPLANATION_REGISTRIES = {
   "cambridge-17-test-2": cam17Test2ReadingExplanations,
   "cambridge-17-test-3": cam17Test3ReadingExplanations,
   "cambridge-17-test-4": cam17Test4ReadingExplanations,
+  "cambridge-16-test-4": cam16Test4ReadingExplanations,
+  "cambridge-16-test-3": cam16Test3ReadingExplanations,
+  "cambridge-16-test-2": cam16Test2ReadingExplanations,
+  "cambridge-16-test-1": cam16Test1ReadingExplanations,
 };
 
 /**

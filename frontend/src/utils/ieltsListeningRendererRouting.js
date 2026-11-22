@@ -3,7 +3,7 @@
  * Cambridge 17, 18 & 19 are rendered by the data-driven renderer (layout comes from the test data),
  * so each test shows its own notes/tables instead of a hard-coded layout of another test.
  */
-const DATA_DRIVEN_LISTENING_PREFIXES = ["cambridge-17-", "cambridge-18-", "cambridge-19-"];
+const DATA_DRIVEN_LISTENING_PREFIXES = ["cambridge-16-", "cambridge-17-", "cambridge-18-", "cambridge-19-"];
 
 export function usesDataDrivenListeningRenderer(testId) {
   if (!testId || typeof testId !== "string") return false;
