@@ -5,7 +5,30 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    minify: false,
+    minify: 'oxc',
+    cssMinify: true,
+    chunkSizeWarningLimit: 2000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('three')) {
+              return 'vendor-three';
+            }
+            if (id.includes('pdfjs-dist') || id.includes('pdf-lib')) {
+              return 'vendor-pdf';
+            }
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor-react';
+            }
+            return 'vendor';
+          }
+          if (id.includes('/data/ielts/')) {
+            return 'data-ielts';
+          }
+        }
+      }
+    }
   },
   server: {
     port: 5101,

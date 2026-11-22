@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from "react";
 import { Header } from "./components/Header/Header";
 import { PlayerCard } from "./components/Player/PlayerCard";
 import { DictationStudio } from "./components/Dictation/DictationStudio";
@@ -13,29 +13,30 @@ import { FeedbackModal } from "./components/Modals/FeedbackModal";
 import { LessonCompleteModal } from "./components/Modals/LessonCompleteModal";
 import { MicrophonePermissionModal } from "./components/Modals/MicrophonePermissionModal";
 import { VideoErrorModal } from "./components/Modals/VideoErrorModal";
-import { AdminPortal } from "./components/Admin/AdminPortal";
 import { VocabTab } from "./components/Vocab/VocabTab";
 import { HistoryTab } from "./components/History/HistoryTab";
 import { FloatingVocabSaver } from "./components/Vocab/FloatingVocabSaver";
 
 import { Footer } from "./components/Footer/Footer";
-import { TranscriptPage } from "./pages/TranscriptPage";
-import { AudioStudioPage } from "./pages/AudioStudioPage";
-import { SmartReaderPage } from "./pages/SmartReaderPage";
-import { WritingPage } from "./pages/WritingPage";
-import { DestinationB2Page } from "./components/DestinationB2/DestinationB2Page";
-import { VisualVocabPage } from "./components/VisualVocab";
-import { RootWordsPage } from "./components/RootWords";
-import { IeltsTestPage } from "./pages/IeltsTestPage";
-import { PrimaryKidsPage } from "./components/PrimaryKids";
 import { GraduationCap } from "./constants/icons";
-import { Users } from "./components/Icons";
+import { Users, Radio } from "./components/Icons";
 import { AuthGateScreen } from "./components/Auth/AuthGateScreen";
-import { StudyBuddyView } from "./components/StudyBuddy/StudyBuddyView";
-import { TikTokLiveStudio } from "./components/TikTokLive/TikTokLiveStudio";
-import { Radio } from "./components/Icons";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
 import "./styles/admin-and-feedback.css";
+
+// Dynamic imports to achieve bundle splitting and instant initial page load
+const TranscriptPage = React.lazy(() => import("./pages/TranscriptPage").then(m => ({ default: m.TranscriptPage })));
+const AudioStudioPage = React.lazy(() => import("./pages/AudioStudioPage"));
+const SmartReaderPage = React.lazy(() => import("./pages/SmartReaderPage").then(m => ({ default: m.SmartReaderPage })));
+const WritingPage = React.lazy(() => import("./pages/WritingPage").then(m => ({ default: m.WritingPage })));
+const DestinationB2Page = React.lazy(() => import("./components/DestinationB2/DestinationB2Page").then(m => ({ default: m.DestinationB2Page })));
+const VisualVocabPage = React.lazy(() => import("./components/VisualVocab/VisualVocabPage").then(m => ({ default: m.VisualVocabPage })));
+const RootWordsPage = React.lazy(() => import("./components/RootWords/RootWordsPage").then(m => ({ default: m.RootWordsPage })));
+const IeltsTestPage = React.lazy(() => import("./pages/IeltsTestPage").then(m => ({ default: m.IeltsTestPage })));
+const PrimaryKidsPage = React.lazy(() => import("./components/PrimaryKids/PrimaryKidsPage").then(m => ({ default: m.PrimaryKidsPage })));
+const StudyBuddyView = React.lazy(() => import("./components/StudyBuddy/StudyBuddyView").then(m => ({ default: m.StudyBuddyView || m.default })));
+const TikTokLiveStudio = React.lazy(() => import("./components/TikTokLive/TikTokLiveStudio").then(m => ({ default: m.TikTokLiveStudio })));
+const AdminPortal = React.lazy(() => import("./components/Admin/AdminPortal").then(m => ({ default: m.AdminPortal })));
 
 import { useTheme } from "./hooks/useTheme";
 import { useSettings } from "./hooks/useSettings";
@@ -49,7 +50,6 @@ import {
   updateLessonProgress,
 } from "./services/authVocabService";
 import { UnifiedPlayerController } from "./services/unifiedPlayerController";
-import { buildIeltsAudioLesson } from "./utils/ieltsDictationChallengeBuilder";
 import { resolveAudioPresetFromUrl } from "./utils/ieltsPresetResolver";
 import { SpeechRecognitionService } from "./services/speechRecognition";
 
@@ -110,6 +110,18 @@ export default function App() {
   const activeTabRef = useRef(activeTab);
   useEffect(() => {
     activeTabRef.current = activeTab;
+  }, [activeTab]);
+
+  // Keep track of visited tabs to lazy-load & preserve tab state without eagerly mounting unvisited tabs
+  const [visitedTabs, setVisitedTabs] = useState(() => new Set([getTabFromPath()]));
+
+  useEffect(() => {
+    setVisitedTabs((prev) => {
+      if (prev.has(activeTab)) return prev;
+      const next = new Set(prev);
+      next.add(activeTab);
+      return next;
+    });
   }, [activeTab]);
 
   const setActiveTab = useCallback((tabOrFn) => {
@@ -514,9 +526,20 @@ export default function App() {
     );
   };
 
-  const handleSelectLocalAudioPreset = (preset, mode = "dictation") => {
-    const lesson = buildIeltsAudioLesson(preset);
-    if (!lesson) return;
+  const handleSelectLocalAudioPreset = async (preset, mode = "dictation") => {
+    if (!preset) return;
+    setIsLoading(true);
+    let lesson = null;
+    try {
+      const { buildIeltsAudioLesson } = await import("./utils/ieltsDictationChallengeBuilder");
+      lesson = buildIeltsAudioLesson(preset);
+    } catch (err) {
+      console.error("Failed to build IELTS audio lesson:", err);
+    }
+    if (!lesson) {
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(false);
     setIsEmbedRestricted(false);
@@ -1290,16 +1313,18 @@ export default function App() {
         {/* TAB 2: Transcript & Full Audio */}
         <div style={{ display: activeTab === "tab-transcript" ? "block" : "none" }}>
           {activeTab === "tab-transcript" && (
-            <TranscriptPage
-              lesson={currentLesson}
-              playerController={playerController}
-              isActive={activeTab === "tab-transcript"}
-              onGoToChallenge={(pos) => {
-                activeTabRef.current = "tab-dictation";
-                setActiveTab("tab-dictation");
-                goToChallenge(pos - 1);
-              }}
-            />
+            <Suspense fallback={<div className="p-8 text-center" style={{ color: "var(--text-muted)" }}>Đang tải transcript...</div>}>
+              <TranscriptPage
+                lesson={currentLesson}
+                playerController={playerController}
+                isActive={activeTab === "tab-transcript"}
+                onGoToChallenge={(pos) => {
+                  activeTabRef.current = "tab-dictation";
+                  setActiveTab("tab-dictation");
+                  goToChallenge(pos - 1);
+                }}
+              />
+            </Suspense>
           )}
         </div>
 
@@ -1311,97 +1336,120 @@ export default function App() {
           />
         </div>
 
-        {/* TAB: Smart News & Vocab Reader */}
-        <div style={{ display: activeTab === "tab-reader" ? "block" : "none" }}>
-          <SmartReaderPage isActive={activeTab === "tab-reader"} />
-        </div>
-
-        {/* TAB 4: Study History */}
-        <div style={{ display: activeTab === "tab-history" ? "block" : "none" }}>
-          <HistoryTab
-            isActive={activeTab === "tab-history"}
-            onSelectLesson={(videoId, targetPos, srcLang, tgtLang) => {
-              setActiveTab("tab-dictation");
-              executeLoadLesson(videoId, srcLang, tgtLang, targetPos);
-            }}
-            onOpenAuth={() => setIsAuthOpen(true)}
-          />
-        </div>
-
-        {/* TAB 5: Admin Management Portal */}
-        <div style={{ display: activeTab === "tab-admin" ? "block" : "none" }}>
-          <AdminPortal
-            user={user}
-            token={token}
-            showToast={showToast}
-            onOpenAuth={() => setIsAuthOpen(true)}
-          />
-        </div>
-
-        {/* TAB 6: Audio & Phonology Studio (Isolated Screen) */}
-        <div style={{ display: activeTab === "tab-audio-studio" ? "block" : "none" }}>
-          <AudioStudioPage isActive={activeTab === "tab-audio-studio"} />
-        </div>
-
-        {/* TAB 7: AI Writing Studio */}
-        <div style={{ display: activeTab === "tab-writing" ? "block" : "none" }}>
-          <WritingPage isActive={activeTab === "tab-writing"} />
-        </div>
-
-        {/* TAB 8: Destination B2 (Unit 1 & 2) */}
-        <div style={{ display: activeTab === "tab-destination-b2" ? "block" : "none" }}>
-          <DestinationB2Page isActive={activeTab === "tab-destination-b2"} token={token} />
-        </div>
-
-        {/* TAB 9: Visual Diagram Vocabulary (Mountain & University) */}
-        <div style={{ display: activeTab === "tab-visual-vocab" ? "block" : "none" }}>
-          <VisualVocabPage isActive={activeTab === "tab-visual-vocab"} token={token} />
-        </div>
-
-        {/* TAB 10: 100 Gốc Từ Tiếng Anh (Word Roots) */}
-        <div style={{ display: activeTab === "tab-root-words" ? "block" : "none" }}>
-          <RootWordsPage isActive={activeTab === "tab-root-words"} />
-        </div>
-
-        {/* TAB 11: Đề thi thật IELTS (Cambridge Practice Tests) */}
-        <div
-          style={{
-            display: activeTab === "tab-ielts-test" ? "block" : "none",
-            height: activeTab === "tab-ielts-test" ? "calc(100vh - 56px)" : "auto",
-            overflow: "hidden"
-          }}
-        >
-          <IeltsTestPage
-            isActive={activeTab === "tab-ielts-test"}
-            user={user}
-            token={token}
-            onOpenAuth={() => setIsAuthOpen(true)}
-          />
-        </div>
-
-        {/* TAB 12: Tiểu Học - Global English 4 Gamified Safari */}
-        <div style={{ display: activeTab === "tab-primary" ? "block" : "none" }}>
-          <PrimaryKidsPage isActive={activeTab === "tab-primary"} />
-        </div>
-
-        {/* TAB 13: Bạn học quanh đây (GPS Study Buddies) */}
-        <div style={{ display: activeTab === "tab-buddy" ? "block" : "none" }}>
-          <StudyBuddyView
-            token={token}
-            currentUser={user}
-            showToast={showToast}
-          />
-        </div>
-
-        {/* TAB 14: TikTok LIVE Interactive Classroom */}
-        <div style={{ display: activeTab === "tab-tiktok-live" ? "block" : "none" }}>
-          {activeTab === "tab-tiktok-live" && (
-            <TikTokLiveStudio
-              isActive={activeTab === "tab-tiktok-live"}
-              onBackToHome={() => setActiveTab("tab-dictation")}
-            />
+        {/* Suspense wrapper for lazy-loaded tabs */}
+        <Suspense fallback={<div className="p-8 text-center" style={{ color: "var(--text-muted)" }}>Đang tải giao diện...</div>}>
+          {/* TAB: Smart News & Vocab Reader */}
+          {visitedTabs.has("tab-reader") && (
+            <div style={{ display: activeTab === "tab-reader" ? "block" : "none" }}>
+              <SmartReaderPage isActive={activeTab === "tab-reader"} />
+            </div>
           )}
-        </div>
+
+          {/* TAB 4: Study History */}
+          <div style={{ display: activeTab === "tab-history" ? "block" : "none" }}>
+            <HistoryTab
+              isActive={activeTab === "tab-history"}
+              onSelectLesson={(videoId, targetPos, srcLang, tgtLang) => {
+                setActiveTab("tab-dictation");
+                executeLoadLesson(videoId, srcLang, tgtLang, targetPos);
+              }}
+              onOpenAuth={() => setIsAuthOpen(true)}
+            />
+          </div>
+
+          {/* TAB 5: Admin Management Portal */}
+          {(user?.role === "ADMIN" || activeTab === "tab-admin") && activeTab === "tab-admin" && (
+            <div style={{ display: activeTab === "tab-admin" ? "block" : "none" }}>
+              <AdminPortal
+                user={user}
+                token={token}
+                showToast={showToast}
+                onOpenAuth={() => setIsAuthOpen(true)}
+              />
+            </div>
+          )}
+
+          {/* TAB 6: Audio & Phonology Studio (Isolated Screen) */}
+          {visitedTabs.has("tab-audio-studio") && (
+            <div style={{ display: activeTab === "tab-audio-studio" ? "block" : "none" }}>
+              <AudioStudioPage isActive={activeTab === "tab-audio-studio"} />
+            </div>
+          )}
+
+          {/* TAB 7: AI Writing Studio */}
+          {visitedTabs.has("tab-writing") && (
+            <div style={{ display: activeTab === "tab-writing" ? "block" : "none" }}>
+              <WritingPage isActive={activeTab === "tab-writing"} />
+            </div>
+          )}
+
+          {/* TAB 8: Destination B2 (Unit 1 & 2) */}
+          {visitedTabs.has("tab-destination-b2") && (
+            <div style={{ display: activeTab === "tab-destination-b2" ? "block" : "none" }}>
+              <DestinationB2Page isActive={activeTab === "tab-destination-b2"} token={token} />
+            </div>
+          )}
+
+          {/* TAB 9: Visual Diagram Vocabulary (Mountain & University) */}
+          {visitedTabs.has("tab-visual-vocab") && (
+            <div style={{ display: activeTab === "tab-visual-vocab" ? "block" : "none" }}>
+              <VisualVocabPage isActive={activeTab === "tab-visual-vocab"} token={token} />
+            </div>
+          )}
+
+          {/* TAB 10: 100 Gốc Từ Tiếng Anh (Word Roots) */}
+          {visitedTabs.has("tab-root-words") && (
+            <div style={{ display: activeTab === "tab-root-words" ? "block" : "none" }}>
+              <RootWordsPage isActive={activeTab === "tab-root-words"} />
+            </div>
+          )}
+
+          {/* TAB 11: Đề thi thật IELTS (Cambridge Practice Tests) */}
+          {visitedTabs.has("tab-ielts-test") && (
+            <div
+              style={{
+                display: activeTab === "tab-ielts-test" ? "block" : "none",
+                height: activeTab === "tab-ielts-test" ? "calc(100vh - 56px)" : "auto",
+                overflow: "hidden"
+              }}
+            >
+              <IeltsTestPage
+                isActive={activeTab === "tab-ielts-test"}
+                user={user}
+                token={token}
+                onOpenAuth={() => setIsAuthOpen(true)}
+              />
+            </div>
+          )}
+
+          {/* TAB 12: Tiểu Học - Global English 4 Gamified Safari */}
+          {visitedTabs.has("tab-primary") && (
+            <div style={{ display: activeTab === "tab-primary" ? "block" : "none" }}>
+              <PrimaryKidsPage isActive={activeTab === "tab-primary"} />
+            </div>
+          )}
+
+          {/* TAB 13: Bạn học quanh đây (GPS Study Buddies) */}
+          {visitedTabs.has("tab-buddy") && (
+            <div style={{ display: activeTab === "tab-buddy" ? "block" : "none" }}>
+              <StudyBuddyView
+                token={token}
+                currentUser={user}
+                showToast={showToast}
+              />
+            </div>
+          )}
+
+          {/* TAB 14: TikTok LIVE Interactive Classroom */}
+          <div style={{ display: activeTab === "tab-tiktok-live" ? "block" : "none" }}>
+            {activeTab === "tab-tiktok-live" && (
+              <TikTokLiveStudio
+                isActive={activeTab === "tab-tiktok-live"}
+                onBackToHome={() => setActiveTab("tab-dictation")}
+              />
+            )}
+          </div>
+        </Suspense>
       </main>
       )}
 

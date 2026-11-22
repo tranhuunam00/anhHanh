@@ -2,8 +2,9 @@
 import os
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from slowapi import _rate_limit_exceeded_handler
@@ -94,7 +95,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 4. Include Clean Architecture API Routers
+# 4. GZip Response Compression Middleware (70-85% payload reduction)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# 5. Include Clean Architecture API Routers
 app.include_router(api_router)
 app.include_router(auth_router)
 app.include_router(lesson_router)
@@ -127,13 +131,21 @@ if not os.path.exists(audio_dir):
         if os.path.exists(public_audio):
             audio_dir = public_audio
 
+class CachedStaticFiles(StaticFiles):
+    """StaticFiles that adds immutable caching headers for hashed assets."""
+    def file_response(self, *args, **kwargs) -> Response:
+        resp = super().file_response(*args, **kwargs)
+        resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return resp
+
+
 if os.path.exists(audio_dir):
     app.mount("/audio", StaticFiles(directory=audio_dir), name="audio")
 
 if os.path.exists(react_dist_dir):
     assets_dir = os.path.join(react_dist_dir, "assets")
     if os.path.exists(assets_dir):
-        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+        app.mount("/assets", CachedStaticFiles(directory=assets_dir), name="assets")
 
 
 @app.get("/tai-lieu", include_in_schema=False)
@@ -162,7 +174,7 @@ def serve_spa(full_path: str):
     # Primary: Serve React SPA index.html
     react_index = os.path.join(react_dist_dir, "index.html")
     if os.path.exists(react_index):
-        return FileResponse(react_index)
+        return FileResponse(react_index, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
     return {"message": "ShotLang API is running. Build frontend with 'npm run build' inside frontend/."}
 

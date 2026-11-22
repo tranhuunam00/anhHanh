@@ -3,6 +3,7 @@ import os
 import logging
 from typing import AsyncGenerator
 from dotenv import load_dotenv
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
@@ -13,6 +14,26 @@ logger = logging.getLogger(__name__)
 
 # Base Model
 Base = declarative_base()
+
+
+def configure_sqlite_pragmas(target_engine):
+    """Enables WAL journal mode, busy timeout, and memory cache for SQLite."""
+    if not target_engine or not hasattr(target_engine, "sync_engine"):
+        raise ValueError("target_engine must be a valid SQLAlchemy async engine with sync_engine attribute")
+
+    @event.listens_for(target_engine.sync_engine, "connect")
+    def _set_sqlite_pragmas(dbapi_connection, connection_record):
+        try:
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA journal_mode=WAL;")
+            cursor.execute("PRAGMA synchronous=NORMAL;")
+            cursor.execute("PRAGMA busy_timeout=5000;")
+            cursor.execute("PRAGMA cache_size=-64000;")
+            cursor.close()
+        except Exception as err:
+            logger.warning(f"Error applying SQLite pragmas: {err}")
+
+    return target_engine
 
 # Resolve Database URL
 DATABASE_URL = os.getenv("DATABASE_URL", "")
@@ -41,6 +62,8 @@ else:
     engine_kwargs["max_overflow"] = 20
 
 engine = create_async_engine(active_url, **engine_kwargs)
+if "sqlite" in active_url:
+    configure_sqlite_pragmas(engine)
 async_session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
@@ -117,6 +140,7 @@ async def init_db() -> None:
         logger.warning(f"Failed to connect to primary DB ({e}). Falling back to SQLite...")
         fallback_url = LOCAL_DATABASE_URL
         engine = create_async_engine(fallback_url, connect_args={"check_same_thread": False})
+        configure_sqlite_pragmas(engine)
         async_session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)

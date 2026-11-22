@@ -23,3 +23,7 @@ data/uploads/
 frontend/public/audio/cambridge19/IELTS 19 Audio/
 frontend/public/audio/cambridge20/剑桥20/
 
+*.db-wal
+*.db-shm
+data/*.db-wal
+data/*.db-shm
