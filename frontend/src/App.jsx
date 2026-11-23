@@ -1418,6 +1418,7 @@ export default function App() {
                 user={user}
                 token={token}
                 onOpenAuth={() => setIsAuthOpen(true)}
+                showToast={showToast}
               />
             </div>
           )}

@@ -9,6 +9,7 @@ import { IeltsFinalReportModal } from "../components/IeltsTest/IeltsFinalReportM
 import { IeltsAuthGate } from "../components/IeltsTest/IeltsAuthGate.jsx";
 import { IeltsStartConfirmModal } from "../components/IeltsTest/IeltsStartConfirmModal.jsx";
 import { IeltsTopHeader } from "../components/IeltsTest/IeltsTopHeader.jsx";
+import { IeltsReviewBanner } from "../components/IeltsTest/IeltsReviewBanner.jsx";
 import {
   gradeListeningTest,
   gradeReadingTest,
@@ -48,7 +49,8 @@ export const IeltsTestPage = ({
   isActive = true,
   user = null,
   token = null,
-  onOpenAuth
+  onOpenAuth,
+  showToast = null
 }) => {
   // Test selection (Defaults to Cambridge 21 Test 2)
   const [selectedTestId, setSelectedTestId] = useState(() => getDefaultIeltsTest().id);
@@ -380,19 +382,19 @@ export const IeltsTestPage = ({
         onOpenFinalReport={() => setIsFinalReportOpen(true)}
       />
 
-      {/* Locked Skill Warning Banner */}
-      {isCurrentSkillLocked && !isReviewMode && (
-        <div className="ielts-locked-skill-banner">
-          <span><Lock className="w-3.5 h-3.5 mr-1.5 inline text-amber-600" /> Kỹ năng <strong>{activeSkill.toUpperCase()}</strong> đã nộp bài. Theo quy chế thi thật, bạn không thể quay lại sửa đáp án.</span>
-        </div>
-      )}
-
-      {/* Review Mode Banner */}
-      {isReviewMode && (
-        <div className="ielts-locked-skill-banner review-mode">
-          <span><BookOpen className="w-3.5 h-3.5 mr-1.5 inline text-primary" /> Bạn đang ở chế độ <strong>Xem lại bài làm (Review Mode)</strong>. Bạn có thể tự do xem lại tất cả 4 kỹ năng.</span>
-        </div>
-      )}
+      {/* Locked Skill Warning or Review Mode Banner with Copy All button */}
+      <IeltsReviewBanner
+        isReviewMode={isReviewMode}
+        isCurrentSkillLocked={isCurrentSkillLocked}
+        activeSkill={activeSkill}
+        currentTestMeta={currentTestMeta}
+        testData={testData}
+        readingAnswers={readingAnswers}
+        readingEval={readingEval}
+        listeningAnswers={listeningAnswers}
+        listeningEval={listeningEval}
+        showToast={showToast}
+      />
 
       {/* Main Skill Module View */}
       <main className="ielts-test-content-area" key={`exam_body_${examResetKey}`}>
