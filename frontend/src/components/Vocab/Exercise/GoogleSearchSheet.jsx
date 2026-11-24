@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Google, ExternalLink, X } from "../../Icons";
-import { buildGoogleEmbedUrl, buildGoogleSearchUrl } from "../../../utils/googleAiWordModalUtils";
+import {
+  buildGoogleEmbedUrl,
+  buildGoogleSearchUrl,
+  stopLookupEventBubble,
+} from "../../../utils/googleAiWordModalUtils";
 import "./GoogleSearchSheet.css";
 
 /**
@@ -30,7 +34,14 @@ export const GoogleSearchSheet = ({ word, onClose }) => {
   if (!embedUrl) return null;
 
   return (
-    <div className="google-sheet-overlay" role="dialog" aria-modal="true" aria-label={`Google: ${word}`}>
+    <div
+      className="google-sheet-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Google: ${word}`}
+      // Clicks (incl. "Đóng") must not reach the exercise backdrop and end the session.
+      onClick={stopLookupEventBubble}
+    >
       <div className="google-sheet-header">
         <span className="google-sheet-title">
           <Google size={16} />

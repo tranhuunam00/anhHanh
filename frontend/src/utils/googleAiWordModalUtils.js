@@ -67,3 +67,14 @@ export const GOOGLE_LOOKUP_MODE_AI = "ai";
 export function resolveGoogleLookupMode(useAiOverview) {
   return useAiOverview === true ? GOOGLE_LOOKUP_MODE_AI : GOOGLE_LOOKUP_MODE_GOOGLE;
 }
+
+/**
+ * Keep a click inside a lookup overlay from bubbling to the exercise backdrop around it
+ * (whose onClick closes the whole practice session and loses the learner's progress).
+ * Returns true when the event was stopped, false for missing/odd events.
+ */
+export function stopLookupEventBubble(event) {
+  if (!event || typeof event.stopPropagation !== "function") return false;
+  event.stopPropagation();
+  return true;
+}

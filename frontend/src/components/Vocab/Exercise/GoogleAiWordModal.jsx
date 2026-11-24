@@ -14,6 +14,7 @@ import {
   cleanGoogleAiWord,
   shouldShowGoogleAiModal,
   resolveGoogleLookupMode,
+  stopLookupEventBubble,
   GOOGLE_LOOKUP_MODE_AI,
 } from "../../../utils/googleAiWordModalUtils";
 import { GoogleSearchSheet } from "./GoogleSearchSheet";
@@ -105,7 +106,14 @@ export const GoogleAiWordModal = ({
 
   return (
     <>
-    <div className="google-ai-modal-backdrop" onClick={onClose}>
+    <div
+      className="google-ai-modal-backdrop"
+      onClick={(e) => {
+        // Close only this lookup, never the exercise session rendered around it.
+        stopLookupEventBubble(e);
+        onClose();
+      }}
+    >
       <div
         className="google-ai-modal-window"
         onClick={(e) => e.stopPropagation()}

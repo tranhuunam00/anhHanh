@@ -155,3 +155,55 @@ describe("resolveGoogleLookupMode", () => {
     }
   });
 });
+
+import { stopLookupEventBubble } from "../src/utils/googleAiWordModalUtils.js";
+
+describe("stopLookupEventBubble", () => {
+  const makeEvent = () => {
+    const ev = { stopCount: 0 };
+    ev.stopPropagation = () => {
+      ev.stopCount += 1;
+    };
+    return ev;
+  };
+
+  test("stops propagation of a real click event and returns true (happy path)", () => {
+    const ev = makeEvent();
+    assert.equal(stopLookupEventBubble(ev), true);
+    assert.equal(ev.stopCount, 1);
+  });
+  test("calls stopPropagation exactly once per invocation", () => {
+    const ev = makeEvent();
+    stopLookupEventBubble(ev);
+    stopLookupEventBubble(ev);
+    assert.equal(ev.stopCount, 2);
+  });
+  test("does not call preventDefault (links like 'open in new tab' still work)", () => {
+    const ev = makeEvent();
+    let prevented = false;
+    ev.preventDefault = () => {
+      prevented = true;
+    };
+    stopLookupEventBubble(ev);
+    assert.equal(prevented, false);
+  });
+  test("missing event (undefined / null) returns false without throwing", () => {
+    assert.equal(stopLookupEventBubble(undefined), false);
+    assert.equal(stopLookupEventBubble(null), false);
+  });
+  test("objects without a stopPropagation function return false", () => {
+    assert.equal(stopLookupEventBubble({}), false);
+    assert.equal(stopLookupEventBubble({ stopPropagation: "nope" }), false);
+    assert.equal(stopLookupEventBubble("click"), false);
+    assert.equal(stopLookupEventBubble(0), false);
+  });
+  test("propagates errors thrown by the event's own stopPropagation", () => {
+    class RuntimeError extends Error {}
+    const ev = {
+      stopPropagation: () => {
+        throw new RuntimeError("boom");
+      },
+    };
+    assert.throws(() => stopLookupEventBubble(ev), RuntimeError);
+  });
+});

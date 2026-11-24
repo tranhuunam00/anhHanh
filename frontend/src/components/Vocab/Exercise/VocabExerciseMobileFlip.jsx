@@ -13,6 +13,12 @@ import {
   Sparkles,
 } from "../../Icons";
 import { getVoiceLang } from "../../../utils/languageVoices";
+import {
+  resolveFlipShortcut,
+  FLIP_SHORTCUT_TOGGLE,
+  FLIP_SHORTCUT_FORGOT,
+  FLIP_SHORTCUT_MASTERED,
+} from "../../../utils/vocabMobileFlipUtils";
 import { GoogleAiWordModal } from "./GoogleAiWordModal";
 import "./VocabExerciseMobileFlip.css";
 
@@ -60,16 +66,16 @@ export const VocabExerciseMobileFlip = ({
     }
   }, [currentIndex, currentItem, autoPronounce, playAudio]);
 
-  // Keyboard navigation shortcuts
+  // Keyboard navigation shortcuts (paused while the Google lookup is open)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-      if (e.code === "Space") {
+      const action = resolveFlipShortcut(e, isGoogleModalOpen);
+      if (action === FLIP_SHORTCUT_TOGGLE) {
         e.preventDefault();
         setIsFlipped((prev) => !prev);
-      } else if (e.key === "1") {
+      } else if (action === FLIP_SHORTCUT_FORGOT) {
         handleReview(false);
-      } else if (e.key === "2") {
+      } else if (action === FLIP_SHORTCUT_MASTERED) {
         handleReview(true);
       }
     };
