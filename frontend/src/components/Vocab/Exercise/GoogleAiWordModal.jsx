@@ -10,7 +10,12 @@ import {
 } from "../../Icons";
 import { fetchGoogleAiWordOverview } from "../../../services/authVocabService";
 import { getVoiceLang } from "../../../utils/languageVoices";
-import { cleanGoogleAiWord, shouldShowGoogleAiModal } from "../../../utils/googleAiWordModalUtils";
+import {
+  cleanGoogleAiWord,
+  shouldShowGoogleAiModal,
+  resolveGoogleLookupMode,
+  GOOGLE_LOOKUP_MODE_AI,
+} from "../../../utils/googleAiWordModalUtils";
 import { GoogleSearchSheet } from "./GoogleSearchSheet";
 import { GoogleAiKeyWords } from "./GoogleAiKeyWords";
 import "./GoogleAiWordModal.css";
@@ -21,6 +26,8 @@ export const GoogleAiWordModal = ({
   sourceLang = "en",
   targetLang = "vi",
   onClose,
+  // Default: open real Google directly (no API key). AI overview only when explicitly true.
+  useAiOverview = false,
 }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +37,7 @@ export const GoogleAiWordModal = ({
 
   const cleanWord = cleanGoogleAiWord(word);
   const isVisible = shouldShowGoogleAiModal(isOpen, word);
+  const isAiMode = resolveGoogleLookupMode(useAiOverview) === GOOGLE_LOOKUP_MODE_AI;
 
   const playAudio = useCallback(
     (textToSpeak, lang = "en") => {
@@ -52,7 +60,7 @@ export const GoogleAiWordModal = ({
 
   useEffect(() => {
     let isMounted = true;
-    if (!isVisible) return;
+    if (!isVisible || !isAiMode) return;
 
     setLoading(true);
     fetchGoogleAiWordOverview(cleanWord, sourceLang, targetLang).then((res) => {
@@ -65,11 +73,11 @@ export const GoogleAiWordModal = ({
     return () => {
       isMounted = false;
     };
-  }, [isVisible, cleanWord, sourceLang, targetLang]);
+  }, [isVisible, isAiMode, cleanWord, sourceLang, targetLang]);
 
-  // Keyboard shortcut: ESC to dismiss immediately
+  // Keyboard shortcut: ESC to dismiss immediately (Google mode: the sheet handles ESC)
   useEffect(() => {
-    if (!isVisible || isGoogleSheetOpen) return undefined;
+    if (!isVisible || !isAiMode || isGoogleSheetOpen) return undefined;
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         onClose();
@@ -77,7 +85,7 @@ export const GoogleAiWordModal = ({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isVisible, isGoogleSheetOpen, onClose]);
+  }, [isVisible, isAiMode, isGoogleSheetOpen, onClose]);
 
   const googleUrl =
     data?.google_search_url ||
@@ -91,6 +99,9 @@ export const GoogleAiWordModal = ({
   const closeGoogleSheet = useCallback(() => setGoogleSheetWord(""), []);
 
   if (!isVisible) return null;
+
+  // Default: straight to real Google inside ShotLang — no Gemini/API key request.
+  if (!isAiMode) return <GoogleSearchSheet word={cleanWord} onClose={onClose} />;
 
   return (
     <>

@@ -121,3 +121,37 @@ describe("normalizeOverviewKeyWords", () => {
     for (const bad of [undefined, null, "", "reward", 5, { word: "x" }]) assert.deepEqual(normalizeOverviewKeyWords(bad), []);
   });
 });
+
+import {
+  resolveGoogleLookupMode,
+  GOOGLE_LOOKUP_MODE_GOOGLE,
+  GOOGLE_LOOKUP_MODE_AI,
+} from "../src/utils/googleAiWordModalUtils.js";
+
+describe("resolveGoogleLookupMode", () => {
+  test("defaults to real Google when nothing is passed (no API key call)", () => {
+    assert.equal(resolveGoogleLookupMode(), GOOGLE_LOOKUP_MODE_GOOGLE);
+    assert.equal(resolveGoogleLookupMode(undefined), "google");
+  });
+  test("false / null stay on Google", () => {
+    assert.equal(resolveGoogleLookupMode(false), "google");
+    assert.equal(resolveGoogleLookupMode(null), "google");
+  });
+  test("only an explicit true opts into the AI overview", () => {
+    assert.equal(resolveGoogleLookupMode(true), GOOGLE_LOOKUP_MODE_AI);
+    assert.equal(resolveGoogleLookupMode(true), "ai");
+  });
+  test("truthy non-boolean values do not enable AI (strict opt-in)", () => {
+    assert.equal(resolveGoogleLookupMode("true"), "google");
+    assert.equal(resolveGoogleLookupMode(1), "google");
+    assert.equal(resolveGoogleLookupMode({}), "google");
+    assert.equal(resolveGoogleLookupMode([]), "google");
+  });
+  test("always returns one of the two known mode strings", () => {
+    for (const v of [true, false, null, undefined, 0, "", "ai", NaN]) {
+      const mode = resolveGoogleLookupMode(v);
+      assert.equal(typeof mode, "string");
+      assert.ok([GOOGLE_LOOKUP_MODE_GOOGLE, GOOGLE_LOOKUP_MODE_AI].includes(mode));
+    }
+  });
+});

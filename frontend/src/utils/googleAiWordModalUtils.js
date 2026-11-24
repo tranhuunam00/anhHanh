@@ -56,3 +56,14 @@ export function normalizeOverviewKeyWords(raw) {
   }
   return out;
 }
+
+export const GOOGLE_LOOKUP_MODE_GOOGLE = "google";
+export const GOOGLE_LOOKUP_MODE_AI = "ai";
+
+/**
+ * Lookup mode for the "Gốc từ" button. Default is real Google (no API key / Gemini call);
+ * the AI overview is opt-in and only when useAiOverview is exactly true.
+ */
+export function resolveGoogleLookupMode(useAiOverview) {
+  return useAiOverview === true ? GOOGLE_LOOKUP_MODE_AI : GOOGLE_LOOKUP_MODE_GOOGLE;
+}
