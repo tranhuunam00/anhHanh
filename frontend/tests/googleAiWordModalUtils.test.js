@@ -49,80 +49,46 @@ describe("shouldShowGoogleAiModal", () => {
   });
 });
 
-import {
-  buildGooglePopupFeatures,
-  openGoogleSidePopup,
-  GOOGLE_POPUP_NAME,
-  GOOGLE_POPUP_MIN_SCREEN_WIDTH,
-} from "../src/utils/googleAiWordModalUtils.js";
+import { buildGoogleSearchUrl, buildGoogleEmbedUrl, GOOGLE_QUERY_SUFFIX } from "../src/utils/googleAiWordModalUtils.js";
 
-describe("buildGooglePopupFeatures", () => {
-  test("docks a 42%-wide popup on the right edge (happy path)", () => {
-    const f = buildGooglePopupFeatures({ availWidth: 1600, availHeight: 900, availLeft: 0, availTop: 0 });
-    assert.equal(f, "popup=yes,width=672,height=900,left=928,top=0");
+const decodeQ = (url) => new URL(url).searchParams.get("q");
+
+describe("buildGoogleSearchUrl", () => {
+  test("builds a normal Google search for the word + Vietnamese suffix (happy path)", () => {
+    const url = buildGoogleSearchUrl("incredibly powerful");
+    assert.ok(url.startsWith("https://www.google.com/search?q="));
+    assert.equal(decodeQ(url), "incredibly powerful" + GOOGLE_QUERY_SUFFIX);
+    assert.equal(new URL(url).searchParams.has("igu"), false);
   });
-  test("clamps width to [480, 720]", () => {
-    assert.match(buildGooglePopupFeatures({ availWidth: 1000, availHeight: 800 }), /width=480,/);
-    assert.match(buildGooglePopupFeatures({ availWidth: 3000, availHeight: 800 }), /width=720,.*left=2280/);
+  test("cleans punctuation and encodes special characters", () => {
+    assert.equal(decodeQ(buildGoogleSearchUrl(' "rock & roll?" ')), "rock & roll" + GOOGLE_QUERY_SUFFIX);
+    assert.ok(!buildGoogleSearchUrl("a&b").includes("a&b"));
   });
-  test("respects multi-monitor offsets", () => {
-    const f = buildGooglePopupFeatures({ availWidth: 1920, availHeight: 1040, availLeft: 1920, availTop: 40 });
-    assert.equal(f, "popup=yes,width=720,height=1040,left=3120,top=40");
-  });
-  test("boundary: exactly min width allowed, one below is not", () => {
-    assert.notEqual(buildGooglePopupFeatures({ availWidth: GOOGLE_POPUP_MIN_SCREEN_WIDTH, availHeight: 700 }), null);
-    assert.equal(buildGooglePopupFeatures({ availWidth: GOOGLE_POPUP_MIN_SCREEN_WIDTH - 1, availHeight: 700 }), null);
-  });
-  test("phone-sized screen returns null", () => {
-    assert.equal(buildGooglePopupFeatures({ availWidth: 393, availHeight: 852 }), null);
-  });
-  test("bad input returns null", () => {
-    assert.equal(buildGooglePopupFeatures(null), null);
-    assert.equal(buildGooglePopupFeatures(undefined), null);
-    assert.equal(buildGooglePopupFeatures({}), null);
-    assert.equal(buildGooglePopupFeatures({ availWidth: "abc", availHeight: 800 }), null);
-    assert.equal(buildGooglePopupFeatures({ availWidth: 1600, availHeight: 0 }), null);
-  });
-  test("non-numeric offsets fall back to 0", () => {
-    assert.match(buildGooglePopupFeatures({ availWidth: 1600, availHeight: 900, availLeft: "x", availTop: null }), /left=928,top=0$/);
+  test("empty / bad input returns empty string", () => {
+    for (const bad of ["", "   ", "?!", null, undefined, 5]) assert.equal(buildGoogleSearchUrl(bad), "");
   });
 });
 
-describe("openGoogleSidePopup", () => {
-  const desktop = { availWidth: 1600, availHeight: 900 };
-  const makeWin = (screen, openImpl) => {
-    const calls = [];
-    return { calls, screen, open: (...args) => { calls.push(args); return openImpl ? openImpl(...args) : { focus() {} }; } };
-  };
-
-  test("opens the named, reusable popup on desktop and returns true", () => {
-    let focused = false;
-    const win = makeWin(desktop, () => ({ focus() { focused = true; } }));
-    assert.equal(openGoogleSidePopup("https://www.google.com/search?q=x", win), true);
-    assert.equal(win.calls.length, 1);
-    assert.equal(win.calls[0][1], GOOGLE_POPUP_NAME);
-    assert.match(win.calls[0][2], /^popup=yes/);
-    assert.equal(focused, true);
+describe("buildGoogleEmbedUrl", () => {
+  test("uses frame-embeddable igu=1 mode with Vietnamese UI by default", () => {
+    const u = new URL(buildGoogleEmbedUrl("burial ground"));
+    assert.equal(u.origin + u.pathname, "https://www.google.com/search");
+    assert.equal(u.searchParams.get("igu"), "1");
+    assert.equal(u.searchParams.get("hl"), "vi");
+    assert.equal(u.searchParams.get("q"), "burial ground" + GOOGLE_QUERY_SUFFIX);
   });
-  test("phone screen: does not call open, returns false (link falls back to new tab)", () => {
-    const win = makeWin({ availWidth: 393, availHeight: 852 });
-    assert.equal(openGoogleSidePopup("https://g", win), false);
-    assert.equal(win.calls.length, 0);
+  test("accepts valid language codes", () => {
+    assert.equal(new URL(buildGoogleEmbedUrl("x", "en")).searchParams.get("hl"), "en");
+    assert.equal(new URL(buildGoogleEmbedUrl("x", "zh-CN")).searchParams.get("hl"), "zh-CN");
   });
-  test("popup blocked (open returns null) returns false", () => {
-    assert.equal(openGoogleSidePopup("https://g", makeWin(desktop, () => null)), false);
+  test("invalid language codes fall back to vi (no parameter injection)", () => {
+    for (const bad of ["", "english", "vi&igu=0", null, 3, "e"]) {
+      const u = new URL(buildGoogleEmbedUrl("x", bad));
+      assert.equal(u.searchParams.get("hl"), "vi");
+      assert.equal(u.searchParams.getAll("igu").length, 1);
+    }
   });
-  test("open throwing returns false", () => {
-    assert.equal(openGoogleSidePopup("https://g", makeWin(desktop, () => { throw new Error("blocked"); })), false);
-  });
-  test("popup without focus method still returns true", () => {
-    assert.equal(openGoogleSidePopup("https://g", makeWin(desktop, () => ({}))), true);
-  });
-  test("bad url / window inputs return false", () => {
-    assert.equal(openGoogleSidePopup("", makeWin(desktop)), false);
-    assert.equal(openGoogleSidePopup(null, makeWin(desktop)), false);
-    assert.equal(openGoogleSidePopup(42, makeWin(desktop)), false);
-    assert.equal(openGoogleSidePopup("https://g", null), false);
-    assert.equal(openGoogleSidePopup("https://g", { screen: desktop }), false);
+  test("empty / bad word returns empty string", () => {
+    for (const bad of ["", "  ", "...", null, undefined, {}]) assert.equal(buildGoogleEmbedUrl(bad), "");
   });
 });

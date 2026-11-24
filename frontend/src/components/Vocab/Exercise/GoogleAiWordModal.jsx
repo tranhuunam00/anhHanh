@@ -10,7 +10,8 @@ import {
 } from "../../Icons";
 import { fetchGoogleAiWordOverview } from "../../../services/authVocabService";
 import { getVoiceLang } from "../../../utils/languageVoices";
-import { cleanGoogleAiWord, shouldShowGoogleAiModal, openGoogleSidePopup } from "../../../utils/googleAiWordModalUtils";
+import { cleanGoogleAiWord, shouldShowGoogleAiModal } from "../../../utils/googleAiWordModalUtils";
+import { GoogleSearchSheet } from "./GoogleSearchSheet";
 import "./GoogleAiWordModal.css";
 
 export const GoogleAiWordModal = ({
@@ -23,6 +24,7 @@ export const GoogleAiWordModal = ({
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSpeech, setActiveSpeech] = useState(null);
+  const [isGoogleSheetOpen, setIsGoogleSheetOpen] = useState(false);
 
   const cleanWord = cleanGoogleAiWord(word);
   const isVisible = shouldShowGoogleAiModal(isOpen, word);
@@ -65,7 +67,7 @@ export const GoogleAiWordModal = ({
 
   // Keyboard shortcut: ESC to dismiss immediately
   useEffect(() => {
-    if (!isVisible) return undefined;
+    if (!isVisible || isGoogleSheetOpen) return undefined;
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         onClose();
@@ -73,20 +75,23 @@ export const GoogleAiWordModal = ({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isVisible, onClose]);
+  }, [isVisible, isGoogleSheetOpen, onClose]);
 
   const googleUrl =
     data?.google_search_url ||
     `https://www.google.com/search?q=${encodeURIComponent(cleanWord + " là gì và gốc, họ của nó")}`;
 
-  // Desktop: dock Google in a reusable side window so the study tab stays in place.
+  // Show real Google inside the app (one-tap close) instead of switching tabs.
   const handleOpenGoogle = (e) => {
-    if (openGoogleSidePopup(googleUrl)) e.preventDefault();
+    e.preventDefault();
+    setIsGoogleSheetOpen(true);
   };
+  const closeGoogleSheet = useCallback(() => setIsGoogleSheetOpen(false), []);
 
   if (!isVisible) return null;
 
   return (
+    <>
     <div className="google-ai-modal-backdrop" onClick={onClose}>
       <div
         className="google-ai-modal-window"
@@ -113,7 +118,7 @@ export const GoogleAiWordModal = ({
               target="_blank"
               rel="noopener noreferrer"
               className="google-ai-btn-external"
-              title="Mở Google trong cửa sổ nhỏ bên phải (không chuyển tab)"
+              title="Xem Google ngay trong ShotLang"
             >
               <span>Mở Google</span>
               <ExternalLink size={13} />
@@ -285,5 +290,7 @@ export const GoogleAiWordModal = ({
         </div>
       </div>
     </div>
+    {isGoogleSheetOpen && <GoogleSearchSheet word={cleanWord} onClose={closeGoogleSheet} />}
+    </>
   );
 };
