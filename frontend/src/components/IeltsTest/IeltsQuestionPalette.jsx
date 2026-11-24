@@ -8,7 +8,6 @@ import {
   shouldPreventClickAfterDrag,
   calculateStepScroll
 } from "../../utils/ieltsPaletteUtils.js";
-import { scrollToEvidenceMark } from "../../utils/ieltsEvidenceHighlightUtils.js";
 
 export { isQuestionAnswered };
 
@@ -188,7 +187,6 @@ export const IeltsQuestionPalette = ({
       if (elem) {
         elem.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-      scrollToEvidenceMark(n);
     }, 50);
   };
 
