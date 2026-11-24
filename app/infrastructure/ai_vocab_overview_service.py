@@ -8,6 +8,7 @@ import os
 import re
 import json
 import logging
+import time
 import urllib.parse
 from typing import Dict, Any, Optional
 import httpx
@@ -17,6 +18,11 @@ from app.infrastructure.gemini_model_helper import get_candidate_gemini_models
 
 load_dotenv()
 logger = logging.getLogger(__name__)
+
+# Latency budget: the modal is interactive, so fail over to the fallback quickly.
+PER_MODEL_TIMEOUT_SECONDS = 15.0
+OVERALL_DEADLINE_SECONDS = 25.0
+MAX_MODEL_ATTEMPTS = 3
 
 # In-memory LRU-like cache: { word.lower(): overview_dict }
 _overview_cache: Dict[str, Dict[str, Any]] = {}
@@ -76,6 +82,15 @@ def build_fallback_word_overview(word: str, source_lang: str = "en") -> Dict[str
     }
 
 
+def build_generation_config(model_name: str) -> Dict[str, Any]:
+    """JSON generation config; disables 'thinking' on 2.5 Flash models, which otherwise adds seconds."""
+    config: Dict[str, Any] = {"responseMimeType": "application/json", "temperature": 0.3}
+    lower = (model_name or "").lower()
+    if "2.5" in lower and "flash" in lower:
+        config["thinkingConfig"] = {"thinkingBudget": 0}
+    return config
+
+
 async def fetch_google_ai_word_overview(
     word: str,
     source_lang: str = "en",
@@ -127,27 +142,32 @@ Trả về DUY NHẤT một chuỗi JSON chuẩn định dạng:
 }}
 """
 
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "responseMimeType": "application/json",
-            "temperature": 0.3
-        }
-    }
 
     should_close_client = False
     if client is None:
-        client = httpx.AsyncClient(timeout=30.0)
+        client = httpx.AsyncClient(timeout=PER_MODEL_TIMEOUT_SECONDS)
         should_close_client = True
 
     last_error = ""
     try:
-        models_to_try = await get_candidate_gemini_models(api_key, client)
+        models_to_try = (await get_candidate_gemini_models(api_key, client))[:MAX_MODEL_ATTEMPTS]
+        deadline = time.monotonic() + OVERALL_DEADLINE_SECONDS
         for model_name in models_to_try:
+            remaining = deadline - time.monotonic()
+            if remaining <= 1.0:
+                last_error = "overall deadline exceeded"
+                break
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
             headers = {"x-goog-api-key": api_key}
+            payload = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": build_generation_config(model_name),
+            }
             try:
-                response = await client.post(url, json=payload, headers=headers)
+                response = await client.post(
+                    url, json=payload, headers=headers,
+                    timeout=min(PER_MODEL_TIMEOUT_SECONDS, remaining),
+                )
                 if response.status_code == 200:
                     res_json = response.json()
                     candidates = res_json.get("candidates", [])

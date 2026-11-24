@@ -31,6 +31,21 @@ def clear_model_cache() -> None:
     _CACHED_MODELS.clear()
 
 
+# Specialised (non text-generation) variants that list generateContent but are slow
+# or reject plain-text prompts; trying them first wastes a full round trip each.
+NON_TEXT_MODEL_MARKERS: Tuple[str, ...] = (
+    "tts", "image", "audio", "live", "embedding", "imagen", "veo", "aqa", "computer-use", "robotics",
+)
+
+
+def is_text_generation_model(model_name: str) -> bool:
+    """True unless the model name marks a specialised (TTS/image/audio/embedding...) variant."""
+    if not isinstance(model_name, str) or not model_name.strip():
+        return False
+    lower = model_name.lower()
+    return not any(marker in lower for marker in NON_TEXT_MODEL_MARKERS)
+
+
 def filter_and_prioritize_models(raw_models: Optional[List[dict]]) -> List[str]:
     """
     Filter raw models from ModelService.ListModels for generateContent support
@@ -48,7 +63,7 @@ def filter_and_prioritize_models(raw_models: Optional[List[dict]]) -> List[str]:
             name = str(m.get("name", "")).strip()
             if name.startswith("models/"):
                 name = name[7:]
-            if name and name not in valid_models:
+            if name and name not in valid_models and is_text_generation_model(name):
                 valid_models.append(name)
 
     if not valid_models:
@@ -72,7 +87,9 @@ def filter_and_prioritize_models(raw_models: Optional[List[dict]]) -> List[str]:
             tier = 3
         else:
             tier = 4
-        return (tier, -len(model_name), model_name)
+        # Shorter names first: the stable base model ("gemini-2.5-flash") beats
+        # dated previews and specialised variants within the same tier.
+        return (tier, len(model_name), model_name)
 
     return sorted(valid_models, key=sort_key)
 
