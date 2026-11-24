@@ -29,8 +29,8 @@ export default function VocabExerciseHubModal({
   // Navigation View: "MENU" (Card selection) | "PRACTICE" (Interactive session) | "SUMMARY" (Results)
   const [viewMode, setViewMode] = useState("MENU");
 
-  // Selected format: D1 (Từ vựng -> Nghĩa VN), D2 (Nghĩa VN -> Từ vựng), D3 (Điền từ vào câu)
-  const [selectedFormat, setSelectedFormat] = useState(EXERCISE_FORMATS.D1);
+  // Selected format: Dạng 1 (Thẻ di động đi đường - mặc định), Dạng 2 (Từ vựng -> Nghĩa VN)...
+  const [selectedFormat, setSelectedFormat] = useState(EXERCISE_FORMATS.D5_FLIP);
 
   // Status Filter: "UNMASTERED" (Từ chưa thuộc - mặc định) | "MASTERED" (Từ đã thuộc) | "ALL" (Tất cả)
   const [statusFilter, setStatusFilter] = useState("UNMASTERED");

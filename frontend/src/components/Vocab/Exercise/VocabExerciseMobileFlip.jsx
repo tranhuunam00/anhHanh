@@ -158,7 +158,7 @@ export const VocabExerciseMobileFlip = ({
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <span className="ex-mode-tag">
               <Smartphone size={14} />
-              <span>Dạng 5: Thẻ di động đi đường</span>
+              <span>Dạng 1: Thẻ di động đi đường</span>
             </span>
           </div>
 

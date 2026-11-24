@@ -7,6 +7,7 @@ import {
   Pencil,
   ExternalLink,
   Mic,
+  Google,
 } from "../Icons";
 import { splitContextSentence } from "../../utils/textNormalizer";
 import { formatPosDisplay } from "../../utils/wordLookupUtils";
@@ -38,6 +39,7 @@ export const VocabCard = ({
   listeningWordId,
   pronounceResults = {},
   onStartPronouncePractice,
+  onOpenGoogleAi = null,
 }) => {
   const v = vocab;
   if (!v) return null;
@@ -123,6 +125,16 @@ export const VocabCard = ({
           >
             <RotateCw size={13} style={{ marginRight: 4 }} />
             {v.image_url ? "Đổi ảnh" : "Tìm ảnh"}
+          </button>
+          <button
+            type="button"
+            className="vocab-img-rotate-btn"
+            onClick={() => onOpenGoogleAi && onOpenGoogleAi(v.word)}
+            title="Tra cứu Google AI: Gốc từ & Họ từ"
+            style={{ background: "rgba(15, 23, 42, 0.82)", color: "#93c5fd" }}
+          >
+            <Google size={12} style={{ marginRight: 4 }} />
+            Gốc từ
           </button>
           <button
             type="button"
@@ -309,6 +321,16 @@ export const VocabCard = ({
               title="Phát âm từ này (Audio) - Phím tắt: Space hoặc Ctrl"
             >
               <Volume2 size={14} strokeWidth={2} />
+            </button>
+
+            <button
+              type="button"
+              className="vocab-audio-btn"
+              onClick={() => onOpenGoogleAi && onOpenGoogleAi(v.word)}
+              title={`Tra Google AI: Gốc & Họ từ cho "${v.word}"`}
+              style={{ color: "#2563eb" }}
+            >
+              <Google size={14} />
             </button>
 
             {(v.source_lang || "en").toLowerCase() === "en" ? (

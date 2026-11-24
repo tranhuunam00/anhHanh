@@ -5,11 +5,11 @@
  */
 
 export const EXERCISE_FORMATS = {
-  D1: "FORMAT_D1", // Dạng 1: Từ vựng -> Nghĩa tiếng Việt (Recognition)
-  D2: "FORMAT_D2", // Dạng 2: Nghĩa tiếng Việt -> Chọn Từ vựng (Active Recall)
-  D3: "FORMAT_D3", // Dạng 3: Điền từ vào câu ngữ cảnh (Context Cloze / Sentence Completion)
-  D4: "FORMAT_D4", // Dạng 4: Nghe phát âm -> Chọn từ vựng (Listening Recall)
-  D5_FLIP: "FORMAT_D5_FLIP", // Dạng 5: Thẻ Flashcard di động (Walking / Mobile 1-Tap)
+  D1: "FORMAT_D1", // Dạng 2: Từ vựng -> Nghĩa tiếng Việt (Recognition)
+  D2: "FORMAT_D2", // Dạng 3: Nghĩa tiếng Việt -> Chọn Từ vựng (Active Recall)
+  D3: "FORMAT_D3", // Dạng 4: Điền từ vào câu ngữ cảnh (Context Cloze / Sentence Completion)
+  D4: "FORMAT_D4", // Dạng 5: Gõ từ chính tả (Active Typing)
+  D5_FLIP: "FORMAT_D5_FLIP", // Dạng 1: Thẻ Flashcard di động (Walking / Mobile 1-Tap)
   D6_AI_STORY: "FORMAT_D6_AI_STORY", // Dạng 6: AI Kể chuyện nối từ (AI Storytelling Cloze)
   D7_STRESS: "FORMAT_D7_STRESS", // Dạng 7: Trọng âm từ vựng (Word Stress Quiz)
   D8_SHADOWING: "FORMAT_D8_SHADOWING", // Dạng 8: Luyện Shadowing chuẩn ngữ điệu (Shadowing Practice)

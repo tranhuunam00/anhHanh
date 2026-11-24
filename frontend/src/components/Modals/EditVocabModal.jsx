@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Pencil, X, Volume2, Check, Loader2, Zap } from "../Icons";
+import { Pencil, X, Volume2, Check, Loader2, Zap, Google } from "../Icons";
 import { useAuth } from "../../context/AuthContext";
 import {
   updateVocabWord,
@@ -12,6 +12,7 @@ import { cleanContextSentenceForSpeech, buildVocabPayload } from "../../utils/vo
 import { VocabImagePickerField } from "../Vocab/VocabImagePickerField";
 import { VocabPosPickerField } from "../Vocab/VocabPosPickerField";
 import { EditVocabModalHeader } from "./EditVocabModalHeader";
+import { GoogleAiWordModal } from "../Vocab/Exercise/GoogleAiWordModal";
 
 export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: initialSourceLang }) => {
   const { token, refreshStreak, refreshSavedVocab, showToast } = useAuth();
@@ -29,6 +30,7 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
   const [isAutoEnriching, setIsAutoEnriching] = useState(false);
   const [isSearchingImages, setIsSearchingImages] = useState(false);
   const [imgLoadError, setImgLoadError] = useState(false);
+  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
 
   // Sync form inputs when active vocab item changes
   useEffect(() => {
@@ -153,7 +155,11 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
     <div className={`modal-overlay ${isOpen ? "active" : ""}`} onClick={onClose}>
       <div className="settings-modal edit-vocab-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <EditVocabModalHeader onClose={onClose} />
+        <EditVocabModalHeader
+          onClose={onClose}
+          onOpenGoogleAi={() => setIsGoogleModalOpen(true)}
+          word={word}
+        />
 
         {/* Scrollable Form Body */}
         <form onSubmit={handleSubmit} className="edit-vocab-form">
@@ -174,6 +180,23 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
                   <Volume2 size={13} />
                   <span className="btn-label-desktop">Nghe từ</span>
                   <span className="btn-label-mobile">Nghe</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsGoogleModalOpen(true)}
+                  disabled={!word.trim()}
+                  className="edit-vocab-btn-action"
+                  style={{
+                    background: "rgba(66, 133, 244, 0.1)",
+                    color: "#2563eb",
+                    borderColor: "rgba(66, 133, 244, 0.3)",
+                    cursor: word.trim() ? "pointer" : "not-allowed",
+                  }}
+                  title="Tra cứu Google AI: Gốc & Họ từ"
+                >
+                  <Google size={13} />
+                  <span className="btn-label-desktop">Gốc &amp; Họ từ</span>
+                  <span className="btn-label-mobile">Gốc từ</span>
                 </button>
                 <button
                   type="button"
@@ -347,6 +370,13 @@ export const EditVocabModal = ({ isOpen, vocab, onClose, onSuccess, sourceLang: 
             </button>
           </div>
         </form>
+
+        {/* Google AI Word Overview Modal */}
+        <GoogleAiWordModal
+          isOpen={isGoogleModalOpen}
+          word={word}
+          onClose={() => setIsGoogleModalOpen(false)}
+        />
       </div>
     </div>
   );

@@ -19,127 +19,7 @@ export const VocabExerciseFormatGrid = ({
 }) => {
   return (
     <div className="ex-cards-grid">
-      {/* DẠNG 1: TỪ VỰNG -> NGHĨA TIẾNG VIỆT */}
-      <div
-        className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D1 ? "active" : ""}`}
-        onClick={() => onSelectFormat(EXERCISE_FORMATS.D1)}
-      >
-        <div className="ex-card-top">
-          <div className="ex-card-icon-wrap d1">
-            <Target size={18} />
-          </div>
-          <div className="ex-card-status">
-            {selectedFormat === EXERCISE_FORMATS.D1 ? (
-              <span className="ex-selected-chip">
-                <Check size={12} /> Đang chọn
-              </span>
-            ) : (
-              <span className="ex-format-code">Dạng 1</span>
-            )}
-          </div>
-        </div>
-        <div className="ex-card-main">
-          <h4 className="ex-card-title">Từ vựng ➔ Nghĩa TV</h4>
-          <p className="ex-card-desc">
-            Nhìn từ vựng &amp; phiên âm IPA, chọn nghĩa tiếng Việt chính xác.
-          </p>
-        </div>
-        <div className="ex-card-footer">
-          <span className="ex-card-tag">Gợi ý câu Esc</span>
-        </div>
-      </div>
-
-      {/* DẠNG 2: NGHĨA TIẾNG VIỆT -> CHỌN TỪ VỰNG (ACTIVE RECALL) */}
-      <div
-        className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D2 ? "active" : ""}`}
-        onClick={() => onSelectFormat(EXERCISE_FORMATS.D2)}
-      >
-        <div className="ex-card-top">
-          <div className="ex-card-icon-wrap d2">
-            <Sparkles size={18} />
-          </div>
-          <div className="ex-card-status">
-            {selectedFormat === EXERCISE_FORMATS.D2 ? (
-              <span className="ex-selected-chip">
-                <Check size={12} /> Đang chọn
-              </span>
-            ) : (
-              <span className="ex-format-code">Dạng 2</span>
-            )}
-          </div>
-        </div>
-        <div className="ex-card-main">
-          <h4 className="ex-card-title">Nghĩa TV ➔ Chọn Từ</h4>
-          <p className="ex-card-desc">
-            Gợi nhớ mặt chữ từ tiếng Việt, che từ trong câu ngữ cảnh.
-          </p>
-        </div>
-        <div className="ex-card-footer">
-          <span className="ex-card-tag">Active Recall</span>
-        </div>
-      </div>
-
-      {/* DẠNG 3: ĐIỀN TỪ VÀO CÂU NGỮ CẢNH (CONTEXT CLOZE) */}
-      <div
-        className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D3 ? "active" : ""}`}
-        onClick={() => onSelectFormat(EXERCISE_FORMATS.D3)}
-      >
-        <div className="ex-card-top">
-          <div className="ex-card-icon-wrap d3">
-            <Lightbulb size={18} />
-          </div>
-          <div className="ex-card-status">
-            {selectedFormat === EXERCISE_FORMATS.D3 ? (
-              <span className="ex-selected-chip">
-                <Check size={12} /> Đang chọn
-              </span>
-            ) : (
-              <span className="ex-format-code">Dạng 3</span>
-            )}
-          </div>
-        </div>
-        <div className="ex-card-main">
-          <h4 className="ex-card-title">Điền từ vào câu</h4>
-          <p className="ex-card-desc">
-            Quan sát câu ví dụ khuyết từ [ ___ ] &amp; gợi ý nghĩa để hoàn thiện câu.
-          </p>
-        </div>
-        <div className="ex-card-footer">
-          <span className="ex-card-tag">Context Cloze</span>
-        </div>
-      </div>
-
-      {/* DẠNG 4: GÕ TỪ CHÍNH TẢ (ACTIVE TYPING / SPELLER) */}
-      <div
-        className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D4 ? "active" : ""}`}
-        onClick={() => onSelectFormat(EXERCISE_FORMATS.D4)}
-      >
-        <div className="ex-card-top">
-          <div className="ex-card-icon-wrap d4">
-            <Keyboard size={18} />
-          </div>
-          <div className="ex-card-status">
-            {selectedFormat === EXERCISE_FORMATS.D4 ? (
-              <span className="ex-selected-chip">
-                <Check size={12} /> Đang chọn
-              </span>
-            ) : (
-              <span className="ex-format-code">Dạng 4</span>
-            )}
-          </div>
-        </div>
-        <div className="ex-card-main">
-          <h4 className="ex-card-title">Gõ từ chính tả</h4>
-          <p className="ex-card-desc">
-            Quan sát nghĩa tiếng Việt &amp; gợi ý ngữ cảnh, tự gõ chính xác mặt chữ.
-          </p>
-        </div>
-        <div className="ex-card-footer">
-          <span className="ex-card-tag">Active Typing</span>
-        </div>
-      </div>
-
-      {/* DẠNG 5: THẺ FLASHCARD DI ĐỘNG (WALKING / 1-TAP MOBILE FLIP) */}
+      {/* DẠNG 1: THẺ FLASHCARD DI ĐỘNG (WALKING / 1-TAP MOBILE FLIP) */}
       <div
         className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D5_FLIP ? "active" : ""}`}
         onClick={() => onSelectFormat(EXERCISE_FORMATS.D5_FLIP)}
@@ -154,7 +34,7 @@ export const VocabExerciseFormatGrid = ({
                 <Check size={12} /> Đang chọn
               </span>
             ) : (
-              <span className="ex-format-code">Dạng 5</span>
+              <span className="ex-format-code">Dạng 1</span>
             )}
           </div>
         </div>
@@ -166,6 +46,126 @@ export const VocabExerciseFormatGrid = ({
         </div>
         <div className="ex-card-footer">
           <span className="ex-card-tag" style={{ color: "#059669" }}>Đi đường / 1 Chạm</span>
+        </div>
+      </div>
+
+      {/* DẠNG 2: TỪ VỰNG -> NGHĨA TIẾNG VIỆT */}
+      <div
+        className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D1 ? "active" : ""}`}
+        onClick={() => onSelectFormat(EXERCISE_FORMATS.D1)}
+      >
+        <div className="ex-card-top">
+          <div className="ex-card-icon-wrap d1">
+            <Target size={18} />
+          </div>
+          <div className="ex-card-status">
+            {selectedFormat === EXERCISE_FORMATS.D1 ? (
+              <span className="ex-selected-chip">
+                <Check size={12} /> Đang chọn
+              </span>
+            ) : (
+              <span className="ex-format-code">Dạng 2</span>
+            )}
+          </div>
+        </div>
+        <div className="ex-card-main">
+          <h4 className="ex-card-title">Từ vựng ➔ Nghĩa TV</h4>
+          <p className="ex-card-desc">
+            Nhìn từ vựng &amp; phiên âm IPA, chọn nghĩa tiếng Việt chính xác.
+          </p>
+        </div>
+        <div className="ex-card-footer">
+          <span className="ex-card-tag">Gợi ý câu Esc</span>
+        </div>
+      </div>
+
+      {/* DẠNG 3: NGHĨA TIẾNG VIỆT -> CHỌN TỪ VỰNG (ACTIVE RECALL) */}
+      <div
+        className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D2 ? "active" : ""}`}
+        onClick={() => onSelectFormat(EXERCISE_FORMATS.D2)}
+      >
+        <div className="ex-card-top">
+          <div className="ex-card-icon-wrap d2">
+            <Sparkles size={18} />
+          </div>
+          <div className="ex-card-status">
+            {selectedFormat === EXERCISE_FORMATS.D2 ? (
+              <span className="ex-selected-chip">
+                <Check size={12} /> Đang chọn
+              </span>
+            ) : (
+              <span className="ex-format-code">Dạng 3</span>
+            )}
+          </div>
+        </div>
+        <div className="ex-card-main">
+          <h4 className="ex-card-title">Nghĩa TV ➔ Chọn Từ</h4>
+          <p className="ex-card-desc">
+            Gợi nhớ mặt chữ từ tiếng Việt, che từ trong câu ngữ cảnh.
+          </p>
+        </div>
+        <div className="ex-card-footer">
+          <span className="ex-card-tag">Active Recall</span>
+        </div>
+      </div>
+
+      {/* DẠNG 4: ĐIỀN TỪ VÀO CÂU NGỮ CẢNH (CONTEXT CLOZE) */}
+      <div
+        className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D3 ? "active" : ""}`}
+        onClick={() => onSelectFormat(EXERCISE_FORMATS.D3)}
+      >
+        <div className="ex-card-top">
+          <div className="ex-card-icon-wrap d3">
+            <Lightbulb size={18} />
+          </div>
+          <div className="ex-card-status">
+            {selectedFormat === EXERCISE_FORMATS.D3 ? (
+              <span className="ex-selected-chip">
+                <Check size={12} /> Đang chọn
+              </span>
+            ) : (
+              <span className="ex-format-code">Dạng 4</span>
+            )}
+          </div>
+        </div>
+        <div className="ex-card-main">
+          <h4 className="ex-card-title">Điền từ vào câu</h4>
+          <p className="ex-card-desc">
+            Quan sát câu ví dụ khuyết từ [ ___ ] &amp; gợi ý nghĩa để hoàn thiện câu.
+          </p>
+        </div>
+        <div className="ex-card-footer">
+          <span className="ex-card-tag">Context Cloze</span>
+        </div>
+      </div>
+
+      {/* DẠNG 5: GÕ TỪ CHÍNH TẢ (ACTIVE TYPING / SPELLER) */}
+      <div
+        className={`ex-format-card ${selectedFormat === EXERCISE_FORMATS.D4 ? "active" : ""}`}
+        onClick={() => onSelectFormat(EXERCISE_FORMATS.D4)}
+      >
+        <div className="ex-card-top">
+          <div className="ex-card-icon-wrap d4">
+            <Keyboard size={18} />
+          </div>
+          <div className="ex-card-status">
+            {selectedFormat === EXERCISE_FORMATS.D4 ? (
+              <span className="ex-selected-chip">
+                <Check size={12} /> Đang chọn
+              </span>
+            ) : (
+              <span className="ex-format-code">Dạng 5</span>
+            )}
+          </div>
+        </div>
+        <div className="ex-card-main">
+          <h4 className="ex-card-title">Gõ từ chính tả</h4>
+          <p className="ex-card-desc">
+            Quan sát nghĩa tiếng Việt &amp; gợi ý ngữ cảnh, tự gõ chính xác mặt chữ.
+          </p>
+        </div>
+        <div className="ex-card-footer">
+          <span className="ex-card-tag">Active Typing</span>
         </div>
       </div>
 

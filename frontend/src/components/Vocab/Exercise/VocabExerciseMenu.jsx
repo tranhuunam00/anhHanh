@@ -34,7 +34,7 @@ export const VocabExerciseMenu = ({
   masteredEndDate = "",
   onMasteredEndDateChange,
   masteredTimeCounts = {},
-  selectedFormat = EXERCISE_FORMATS.D1,
+  selectedFormat = EXERCISE_FORMATS.D5_FLIP,
   onSelectFormat,
   selectedLimit = 20,
   onSelectLimit,
@@ -60,16 +60,17 @@ export const VocabExerciseMenu = ({
         return "Dạng 7 (Trọng âm từ vựng)";
       case EXERCISE_FORMATS.D6_AI_STORY:
         return "Dạng 6 (AI Kể chuyện nối từ)";
-      case EXERCISE_FORMATS.D5_FLIP:
-        return "Dạng 5 (Thẻ di động đi đường)";
       case EXERCISE_FORMATS.D4:
-        return "Dạng 4 (Gõ từ chính tả)";
-      case EXERCISE_FORMATS.D2:
-        return "Dạng 2 (Nghĩa TV ➔ Từ vựng)";
+        return "Dạng 5 (Gõ từ chính tả)";
       case EXERCISE_FORMATS.D3:
-        return "Dạng 3 (Điền từ vào câu)";
+        return "Dạng 4 (Điền từ vào câu)";
+      case EXERCISE_FORMATS.D2:
+        return "Dạng 3 (Nghĩa TV ➔ Chọn Từ)";
+      case EXERCISE_FORMATS.D1:
+        return "Dạng 2 (Từ vựng ➔ Nghĩa TV)";
+      case EXERCISE_FORMATS.D5_FLIP:
       default:
-        return "Dạng 1 (Từ vựng ➔ Nghĩa TV)";
+        return "Dạng 1 (Thẻ di động đi đường)";
     }
   };
 

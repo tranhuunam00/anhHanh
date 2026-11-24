@@ -21,6 +21,7 @@ import { VocabToolbar } from "./VocabToolbar";
 import { VocabKeyboardShortcutsBar } from "./VocabKeyboardShortcutsBar";
 import { VocabCard } from "./VocabCard";
 import { VocabPagination } from "./VocabPagination";
+import { GoogleAiWordModal } from "./Exercise/GoogleAiWordModal";
 import { useVocabKeyboardNav } from "../../hooks/useVocabKeyboardNav";
 import { consumeUiIntent, UI_INTENTS } from "../../utils/uiIntents";
 
@@ -38,8 +39,15 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [isAIImportModalOpen, setIsAIImportModalOpen] = useState(false);
   const [isThemeExplorerOpen, setIsThemeExplorerOpen] = useState(false);
   const [editingVocab, setEditingVocab] = useState(null);
+  const [googleAiWord, setGoogleAiWord] = useState(null);
   const [listeningWordId, setListeningWordId] = useState(null);
   const [pronounceResults, setPronounceResults] = useState({});
+
+  const reloadAll = useCallback(() => {
+    loadWords();
+    if (refreshStreak) refreshStreak();
+    if (refreshSavedVocab) refreshSavedVocab();
+  }, [loadWords, refreshStreak, refreshSavedVocab]);
 
   // Pagination state for vocabulary list
   const [currentPage, setCurrentPage] = useState(1);
@@ -279,6 +287,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const isAnyModalOpen =
     isAddModalOpen ||
     Boolean(editingVocab) ||
+    Boolean(googleAiWord) ||
     isExerciseHubOpen ||
     isAIImportModalOpen ||
     isThemeExplorerOpen;
@@ -416,6 +425,7 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
                 listeningWordId={listeningWordId}
                 pronounceResults={pronounceResults}
                 onStartPronouncePractice={handleStartPronouncePractice}
+                onOpenGoogleAi={(w) => setGoogleAiWord(w)}
               />
             ))}
           </div>
@@ -451,33 +461,21 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
         isOpen={!!editingVocab}
         vocab={editingVocab}
         onClose={() => setEditingVocab(null)}
-        onSuccess={() => {
-          loadWords();
-          if (refreshStreak) refreshStreak();
-          if (refreshSavedVocab) refreshSavedVocab();
-        }}
+        onSuccess={reloadAll}
       />
 
       {/* AI Smart Vocabulary Import Modal */}
       <AIVocabImportModal
         isOpen={isAIImportModalOpen}
         onClose={() => setIsAIImportModalOpen(false)}
-        onSuccess={() => {
-          loadWords();
-          if (refreshStreak) refreshStreak();
-          if (refreshSavedVocab) refreshSavedVocab();
-        }}
+        onSuccess={reloadAll}
       />
 
       {/* Bulk / Batch Vocabulary Text Import Modal (Excel/TSV/Text) */}
       <BatchVocabTextImportModal
         isOpen={isBatchImportModalOpen}
         onClose={() => setIsBatchImportModalOpen(false)}
-        onSuccess={() => {
-          loadWords();
-          if (refreshStreak) refreshStreak();
-          if (refreshSavedVocab) refreshSavedVocab();
-        }}
+        onSuccess={reloadAll}
       />
 
       {/* 30 Topics System Vocab Bank Explorer Modal */}
@@ -486,11 +484,14 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
         onClose={() => setIsThemeExplorerOpen(false)}
         token={token}
         showToast={showToast}
-        onSuccessImport={() => {
-          loadWords();
-          if (refreshStreak) refreshStreak();
-          if (refreshSavedVocab) refreshSavedVocab();
-        }}
+        onSuccessImport={reloadAll}
+      />
+
+      {/* Google AI Word Overview Modal */}
+      <GoogleAiWordModal
+        isOpen={Boolean(googleAiWord)}
+        word={googleAiWord}
+        onClose={() => setGoogleAiWord(null)}
       />
     </div>
   );

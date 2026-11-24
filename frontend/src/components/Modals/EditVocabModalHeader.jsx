@@ -1,7 +1,7 @@
 import React from "react";
-import { Pencil, X } from "../Icons";
+import { Pencil, X, Google } from "../Icons";
 
-export const EditVocabModalHeader = ({ onClose }) => (
+export const EditVocabModalHeader = ({ onClose, onOpenGoogleAi = null, word = "" }) => (
   <div className="modal-header" style={{ padding: "16px 20px" }}>
     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
       <div
@@ -28,8 +28,31 @@ export const EditVocabModalHeader = ({ onClose }) => (
         </div>
       </div>
     </div>
-    <button className="btn btn-secondary btn-icon" onClick={onClose} aria-label="Đóng">
-      <X size={18} strokeWidth={2} />
-    </button>
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      {onOpenGoogleAi && word && (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={onOpenGoogleAi}
+          title={`Tra Google AI: Gốc & Họ từ cho "${word}"`}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "5px",
+            padding: "5px 10px",
+            fontSize: "0.78rem",
+            color: "#2563eb",
+            borderColor: "rgba(66, 133, 244, 0.3)",
+            background: "rgba(66, 133, 244, 0.08)",
+          }}
+        >
+          <Google size={14} />
+          <span>Gốc &amp; Họ từ</span>
+        </button>
+      )}
+      <button className="btn btn-secondary btn-icon" onClick={onClose} aria-label="Đóng">
+        <X size={18} strokeWidth={2} />
+      </button>
+    </div>
   </div>
 );
