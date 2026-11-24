@@ -10,7 +10,7 @@ import {
 } from "../../Icons";
 import { fetchGoogleAiWordOverview } from "../../../services/authVocabService";
 import { getVoiceLang } from "../../../utils/languageVoices";
-import { cleanGoogleAiWord, shouldShowGoogleAiModal } from "../../../utils/googleAiWordModalUtils";
+import { cleanGoogleAiWord, shouldShowGoogleAiModal, openGoogleSidePopup } from "../../../utils/googleAiWordModalUtils";
 import "./GoogleAiWordModal.css";
 
 export const GoogleAiWordModal = ({
@@ -79,6 +79,11 @@ export const GoogleAiWordModal = ({
     data?.google_search_url ||
     `https://www.google.com/search?q=${encodeURIComponent(cleanWord + " là gì và gốc, họ của nó")}`;
 
+  // Desktop: dock Google in a reusable side window so the study tab stays in place.
+  const handleOpenGoogle = (e) => {
+    if (openGoogleSidePopup(googleUrl)) e.preventDefault();
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -104,10 +109,11 @@ export const GoogleAiWordModal = ({
           <div className="google-ai-header-actions">
             <a
               href={googleUrl}
+              onClick={handleOpenGoogle}
               target="_blank"
               rel="noopener noreferrer"
               className="google-ai-btn-external"
-              title="Mở trực tiếp trên Google tìm kiếm trong tab mới"
+              title="Mở Google trong cửa sổ nhỏ bên phải (không chuyển tab)"
             >
               <span>Mở Google</span>
               <ExternalLink size={13} />
@@ -254,6 +260,7 @@ export const GoogleAiWordModal = ({
               <p>Chưa tải được thông tin tra cứu do lỗi kết nối.</p>
               <a
                 href={googleUrl}
+                onClick={handleOpenGoogle}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="google-ai-btn-external"
