@@ -49,17 +49,26 @@ def test_build_fallback_word_overview_inputs_and_outputs():
 
 @pytest.mark.asyncio
 async def test_fetch_google_ai_word_overview_cached():
-    """Verify caching logic avoids repeated API calls."""
+    """AI results are cached; fallbacks are NOT (a transient failure must not stick)."""
     clear_overview_cache()
-    # First call without API key returns fallback and caches it
     with patch("app.infrastructure.ai_vocab_overview_service.get_gemini_api_key", return_value=""):
         res1 = await fetch_google_ai_word_overview("dummy")
-        assert res1["word"] == "dummy"
-        assert res1["is_ai_generated"] is False
-
-        # Second call returns from cache
         res2 = await fetch_google_ai_word_overview("dummy")
-        assert res2 is res1
+        assert res1["is_ai_generated"] is False
+        assert res2 is not res1
+        assert res2 == res1
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {"candidates": [{"content": {"parts": [{"text": json.dumps({"word": "dummy", "overview": "ok"})}]}}]}
+    mock_client = AsyncMock()
+    mock_client.post.return_value = mock_resp
+    with patch("app.infrastructure.ai_vocab_overview_service.get_gemini_api_key", return_value="k"),          patch("app.infrastructure.ai_vocab_overview_service.get_candidate_gemini_models", return_value=["gemini-2.5-flash"]):
+        ai1 = await fetch_google_ai_word_overview("dummy", client=mock_client)
+        ai2 = await fetch_google_ai_word_overview("dummy", client=mock_client)
+    assert ai1["is_ai_generated"] is True
+    assert ai2 is ai1
+    assert mock_client.post.call_count == 1
 
 
 @pytest.mark.asyncio

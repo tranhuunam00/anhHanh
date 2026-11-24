@@ -1,0 +1,68 @@
+/* VocabCardMobile.css - overflow & phone fixes for VocabCard */
+
+/* Action buttons row on the card image. The base .vocab-img-rotate-btn rule is
+   position:absolute, which stacked all three buttons on the same spot. */
+.vocab-img-actions {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  left: 8px;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.vocab-img-actions .vocab-img-rotate-btn {
+  position: static;
+  white-space: nowrap;
+  line-height: 1;
+  pointer-events: auto;
+}
+
+/* Long IPA (phrases) stays on one line inside the card instead of running out of it */
+.vocab-pronunciation-row {
+  display: flex;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.vocab-pron-ipa-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vocab-word-text {
+  overflow-wrap: anywhere;
+}
+
+/* Phones: icon-only overlay buttons with thumb-sized targets (labels kept as tooltips/aria) */
+@media (max-width: 600px) {
+  .vocab-img-btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .vocab-img-actions {
+    bottom: 6px;
+    right: 6px;
+    left: 6px;
+  }
+
+  .vocab-img-actions .vocab-img-rotate-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 8px;
+  }
+}

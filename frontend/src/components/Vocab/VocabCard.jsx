@@ -11,6 +11,7 @@ import {
 } from "../Icons";
 import { splitContextSentence } from "../../utils/textNormalizer";
 import { formatPosDisplay } from "../../utils/wordLookupUtils";
+import "./VocabCardMobile.css";
 
 const formatCleanIpa = (raw) => {
   if (!raw) return "";
@@ -107,14 +108,7 @@ export const VocabCard = ({
           </div>
         )}
         <div
-          style={{
-            position: "absolute",
-            bottom: 8,
-            right: 8,
-            display: "flex",
-            gap: "6px",
-            zIndex: 2,
-          }}
+          className="vocab-img-actions"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -123,8 +117,8 @@ export const VocabCard = ({
             onClick={() => onRotateImage(v.id, v.word, v.image_url, v.context_sentence)}
             title="Tìm ảnh minh họa phù hợp ngữ cảnh"
           >
-            <RotateCw size={13} style={{ marginRight: 4 }} />
-            {v.image_url ? "Đổi ảnh" : "Tìm ảnh"}
+            <RotateCw size={13} />
+            <span className="vocab-img-btn-label">{v.image_url ? "Đổi ảnh" : "Tìm ảnh"}</span>
           </button>
           <button
             type="button"
@@ -133,8 +127,8 @@ export const VocabCard = ({
             title="Tra cứu Google AI: Gốc từ & Họ từ"
             style={{ background: "rgba(15, 23, 42, 0.82)", color: "#93c5fd" }}
           >
-            <Google size={12} style={{ marginRight: 4 }} />
-            Gốc từ
+            <Google size={12} />
+            <span className="vocab-img-btn-label">Gốc từ</span>
           </button>
           <button
             type="button"
@@ -143,8 +137,8 @@ export const VocabCard = ({
             title="Chỉnh sửa chi tiết từ vựng, link ảnh, phiên âm & nghĩa"
             style={{ background: "rgba(15, 23, 42, 0.82)" }}
           >
-            <Pencil size={12} style={{ marginRight: 4 }} />
-            Sửa
+            <Pencil size={12} />
+            <span className="vocab-img-btn-label">Sửa</span>
           </button>
         </div>
       </div>

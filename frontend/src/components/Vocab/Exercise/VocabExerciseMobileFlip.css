@@ -366,3 +366,30 @@
 }
 
 
+
+/* Long phrase IPA: wrap inside the card instead of overflowing its edges */
+.flip-phonetic-row {
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.flip-phonetic-text {
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .flip-word-title {
+    font-size: 1.7rem;
+  }
+
+  .flip-phonetic-text {
+    font-size: 0.95rem;
+  }
+}

@@ -12,6 +12,7 @@ import { fetchGoogleAiWordOverview } from "../../../services/authVocabService";
 import { getVoiceLang } from "../../../utils/languageVoices";
 import { cleanGoogleAiWord, shouldShowGoogleAiModal } from "../../../utils/googleAiWordModalUtils";
 import { GoogleSearchSheet } from "./GoogleSearchSheet";
+import { GoogleAiKeyWords } from "./GoogleAiKeyWords";
 import "./GoogleAiWordModal.css";
 
 export const GoogleAiWordModal = ({
@@ -24,7 +25,8 @@ export const GoogleAiWordModal = ({
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSpeech, setActiveSpeech] = useState(null);
-  const [isGoogleSheetOpen, setIsGoogleSheetOpen] = useState(false);
+  const [googleSheetWord, setGoogleSheetWord] = useState("");
+  const isGoogleSheetOpen = Boolean(googleSheetWord);
 
   const cleanWord = cleanGoogleAiWord(word);
   const isVisible = shouldShowGoogleAiModal(isOpen, word);
@@ -84,9 +86,9 @@ export const GoogleAiWordModal = ({
   // Show real Google inside the app (one-tap close) instead of switching tabs.
   const handleOpenGoogle = (e) => {
     e.preventDefault();
-    setIsGoogleSheetOpen(true);
+    setGoogleSheetWord(cleanWord);
   };
-  const closeGoogleSheet = useCallback(() => setIsGoogleSheetOpen(false), []);
+  const closeGoogleSheet = useCallback(() => setGoogleSheetWord(""), []);
 
   if (!isVisible) return null;
 
@@ -182,6 +184,14 @@ export const GoogleAiWordModal = ({
                   </div>
                 )}
               </div>
+
+              {/* Key words of a long phrase, each with its own example */}
+              <GoogleAiKeyWords
+                keyWords={data.key_words}
+                sourceLang={sourceLang}
+                onSpeak={playAudio}
+                onOpenGoogle={setGoogleSheetWord}
+              />
 
               {/* Examples */}
               {Array.isArray(data.examples) && data.examples.length > 0 && (
@@ -290,7 +300,7 @@ export const GoogleAiWordModal = ({
         </div>
       </div>
     </div>
-    {isGoogleSheetOpen && <GoogleSearchSheet word={cleanWord} onClose={closeGoogleSheet} />}
+    {isGoogleSheetOpen && <GoogleSearchSheet word={googleSheetWord} onClose={closeGoogleSheet} />}
     </>
   );
 };

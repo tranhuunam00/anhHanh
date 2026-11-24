@@ -32,3 +32,27 @@ export function buildGoogleEmbedUrl(word, lang = "vi") {
   const hl = typeof lang === "string" && /^[a-z]{2}(-[A-Za-z]{2})?$/.test(lang) ? lang : "vi";
   return `https://www.google.com/search?igu=1&hl=${hl}&q=${encodeURIComponent(clean + GOOGLE_QUERY_SUFFIX)}`;
 }
+
+const KEY_WORD_FIELDS = ["word", "pos", "phonetic", "meaning", "example_en", "example_vi"];
+export const MAX_OVERVIEW_KEY_WORDS = 4;
+
+/** Defensive cleanup of the API's key_words: string fields, non-empty unique words, max 4. */
+export function normalizeOverviewKeyWords(raw) {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object" || Array.isArray(item)) continue;
+    const entry = {};
+    for (const f of KEY_WORD_FIELDS) {
+      const v = item[f];
+      entry[f] = typeof v === "string" || typeof v === "number" ? String(v).trim() : "";
+    }
+    const key = entry.word.toLowerCase();
+    if (!entry.word || seen.has(key)) continue;
+    seen.add(key);
+    out.push(entry);
+    if (out.length >= MAX_OVERVIEW_KEY_WORDS) break;
+  }
+  return out;
+}

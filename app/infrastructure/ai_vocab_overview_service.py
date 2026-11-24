@@ -38,6 +38,105 @@ def get_gemini_api_key() -> str:
     return (os.getenv("GEMINI_API_KEY", "") or "").strip()
 
 
+# Function words never worth a "key word" slot when splitting a long phrase.
+PHRASE_STOPWORDS = frozenset("""
+a an the and or but nor so yet of to in on at by for with from into onto upon about as than
+that this these those it its is are was were be been being have has had do does did will would
+can could should may might must shall not no very much many more most such which who whom whose
+what when where why how if then there their them they he she his her we our you your i me my
+""".split())
+MAX_KEY_WORDS = 4
+
+
+def is_multi_word_phrase(text: str) -> bool:
+    """True when the entry has 2+ words (a phrase/collocation rather than a single word)."""
+    if not isinstance(text, str):
+        return False
+    return len(text.split()) >= 2
+
+
+def extract_phrase_key_words(text: str, limit: int = MAX_KEY_WORDS) -> list:
+    """Heuristic content words of a phrase (stopwords dropped, longest first, original order kept)."""
+    if not isinstance(text, str) or not is_multi_word_phrase(text) or limit <= 0:
+        return []
+    tokens = [re.sub(r"^[^\w]+|[^\w]+$", "", t) for t in text.split()]
+    seen, candidates = set(), []
+    for idx, tok in enumerate(tokens):
+        low = tok.lower()
+        if len(low) < 3 or low in PHRASE_STOPWORDS or low in seen or not low.isalpha():
+            continue
+        seen.add(low)
+        candidates.append((idx, tok))
+    top = sorted(candidates, key=lambda c: (-len(c[1]), c[0]))[:limit]
+    return [tok for _, tok in sorted(top)]
+
+
+def build_overview_prompt(word: str) -> str:
+    """Gemini prompt; phrases additionally get a "key_words" breakdown with examples."""
+    clean = (word or "").strip()
+    if not clean:
+        raise ValueError("Word cannot be empty")
+
+    phrase_rules = ""
+    phrase_schema = ""
+    if is_multi_word_phrase(clean):
+        phrase_rules = f"""
+ĐÂY LÀ MỘT CỤM TỪ (nhiều từ). Bắt buộc:
+- "overview": dịch nghĩa cả cụm sang tiếng Việt tự nhiên, nêu cụm thường gặp trong ngữ cảnh nào.
+- "key_words": chọn 2-{MAX_KEY_WORDS} từ/collocation QUAN TRỌNG NHẤT trong cụm mà người học cần nhớ
+  (bỏ qua từ chức năng như the, of, to, much, have...). Mỗi phần tử gồm từ, từ loại, IPA, nghĩa tiếng Việt
+  trong cụm này, và 1 câu ví dụ ngắn KHÁC với cụm gốc dùng chính từ đó (kèm bản dịch).
+- "etymology" và "word_family": phân tích cho các từ quan trọng trong "key_words" (không phải cả cụm).
+- "phonetic": IPA cả cụm, GIỮ KHOẢNG TRẮNG giữa các từ (ví dụ: /tɛnd tə hæv/).
+"""
+        phrase_schema = """,
+  "key_words": [
+    {"word": "...", "pos": "...", "phonetic": "/.../", "meaning": "...", "example_en": "...", "example_vi": "..."}
+  ]"""
+
+    return f"""Bạn là một chuyên gia ngôn ngữ học và từ điển tiếng Anh cao cấp.
+Hãy phân tích "{clean}" để tạo phần tóm tắt "Google AI Overview" (Tổng quan do AI tạo) chuẩn xác, chuyên sâu và thân thiện nhất cho người học:
+1. "overview": Đoạn văn tổng quan (1-2 câu) nêu rõ từ loại, nghĩa tiếng Việt chính xác và sắc thái nghĩa so với các từ đồng nghĩa.
+2. "phonetic": Phiên âm chuẩn quốc tế IPA (ví dụ: /ˌɪn.ədˈvɜː.tənt.li/).
+3. "part_of_speech": Từ loại tiếng Việt (trạng từ, danh từ, tính từ, động từ, cụm từ...).
+4. "examples": Mảng 1-2 câu ví dụ thực tế. Mỗi phần tử là object {{"en": "câu tiếng Anh", "vi": "bản dịch tiếng Việt"}}.
+5. "etymology": Mảng các gạch đầu dòng phân tích Nguồn gốc từ: tiền tố (prefix), gốc từ (Latin/Hy Lạp), hậu tố (suffix) và sự phát triển nghĩa.
+6. "word_family": Mảng các từ trong Họ từ (Word Family). Mỗi phần tử là object {{"word": "từ", "pos": "noun/verb/adj/adv", "meaning": "nghĩa tiếng Việt"}}.
+{phrase_rules}
+Trả về DUY NHẤT một chuỗi JSON chuẩn định dạng:
+{{
+  "word": "{clean}",
+  "phonetic": "...",
+  "part_of_speech": "...",
+  "overview": "...",
+  "examples": [{{"en": "...", "vi": "..."}}],
+  "etymology": ["..."],
+  "word_family": [{{"word": "...", "pos": "...", "meaning": "..."}}]{phrase_schema}
+}}
+"""
+
+
+def normalize_key_words(raw: Any, phrase: str) -> list:
+    """Clean AI key_words to a list of dicts with string fields; heuristic words if missing/invalid."""
+    fields = ("word", "pos", "phonetic", "meaning", "example_en", "example_vi")
+    result = []
+    if isinstance(raw, list):
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            word = str(item.get("word") or "").strip()
+            if not word:
+                continue
+            entry = {f: str(item.get(f) or "").strip() for f in fields}
+            entry["word"] = word
+            result.append(entry)
+            if len(result) >= MAX_KEY_WORDS:
+                break
+    if result or not is_multi_word_phrase(phrase or ""):
+        return result
+    return [{f: (kw if f == "word" else "") for f in fields} for kw in extract_phrase_key_words(phrase)]
+
+
 def build_fallback_word_overview(word: str, source_lang: str = "en") -> Dict[str, Any]:
     """Generate structured fallback overview when offline or Gemini API is unavailable."""
     clean = (word or "").strip()
@@ -48,6 +147,7 @@ def build_fallback_word_overview(word: str, source_lang: str = "en") -> Dict[str
     google_search_url = f"https://www.google.com/search?q={query_param}"
 
     lower = clean.lower()
+    key_words = normalize_key_words(None, clean)
     # Simple etymology heuristic
     etymology_points = []
     if lower.endswith("ly"):
@@ -77,6 +177,7 @@ def build_fallback_word_overview(word: str, source_lang: str = "en") -> Dict[str
         "word_family": [
             {"word": clean, "pos": "gốc từ", "meaning": f"Hình thái từ vựng chuẩn của {clean}"}
         ],
+        "key_words": key_words,
         "google_search_url": google_search_url,
         "is_ai_generated": False
     }
@@ -111,36 +212,9 @@ async def fetch_google_ai_word_overview(
 
     api_key = get_gemini_api_key()
     if not api_key:
-        fallback = build_fallback_word_overview(clean, source_lang)
-        _overview_cache[cache_key] = fallback
-        return fallback
+        return build_fallback_word_overview(clean, source_lang)
 
-    prompt = f"""Bạn là một chuyên gia ngôn ngữ học và từ điển tiếng Anh cao cấp.
-Hãy phân tích từ "{clean}" để tạo phần tóm tắt "Google AI Overview" (Tổng quan do AI tạo) chuẩn xác, chuyên sâu và thân thiện nhất cho người học:
-1. "overview": Đoạn văn tổng quan (1-2 câu) nêu rõ từ loại, phiên âm IPA, nghĩa tiếng Việt chính xác và sắc thái nghĩa so với các từ đồng nghĩa (như ảnh Google AI Overview).
-2. "phonetic": Phiên âm chuẩn quốc tế IPA (ví dụ: /ˌɪn.ədˈvɜː.tənt.li/).
-3. "part_of_speech": Từ loại tiếng Việt (trạng từ, danh từ, tính từ, động từ...).
-4. "examples": Mảng 1-2 câu ví dụ thực tế. Mỗi phần tử là object {{"en": "câu tiếng Anh", "vi": "bản dịch tiếng Việt"}}.
-5. "etymology": Mảng các gạch đầu dòng phân tích Nguồn gốc từ (Etymology) chi tiết: phân tích tiền tố (prefix), gốc từ (root từ tiếng Latin/Hy Lạp), hậu tố (suffix) và sự phát triển nghĩa gốc.
-6. "word_family": Mảng các từ trong Họ từ (Word Family) của nó. Mỗi phần tử là object {{"word": "từ", "pos": "noun/verb/adj/adv", "meaning": "nghĩa tiếng Việt"}}.
-
-Trả về DUY NHẤT một chuỗi JSON chuẩn định dạng:
-{{
-  "word": "{clean}",
-  "phonetic": "...",
-  "part_of_speech": "...",
-  "overview": "...",
-  "examples": [
-    {{"en": "...", "vi": "..."}}
-  ],
-  "etymology": [
-    "..."
-  ],
-  "word_family": [
-    {{"word": "...", "pos": "...", "meaning": "..."}}
-  ]
-}}
-"""
+    prompt = build_overview_prompt(clean)
 
 
     should_close_client = False
@@ -179,6 +253,7 @@ Trả về DUY NHẤT một chuỗi JSON chuẩn định dạng:
                             raw_text = re.sub(r"\s*```$", "", raw_text, flags=re.MULTILINE)
                             parsed = json.loads(raw_text)
                             if isinstance(parsed, dict) and "overview" in parsed:
+                                parsed["key_words"] = normalize_key_words(parsed.get("key_words"), clean)
                                 parsed["google_search_url"] = google_search_url
                                 parsed["is_ai_generated"] = True
                                 _overview_cache[cache_key] = parsed
@@ -193,6 +268,5 @@ Trả về DUY NHẤT một chuỗi JSON chuẩn định dạng:
             await client.aclose()
 
     logger.warning(f"Gemini API word overview fallback used ({last_error}).")
-    fallback = build_fallback_word_overview(clean, source_lang)
-    _overview_cache[cache_key] = fallback
-    return fallback
+    # Not cached: a transient Gemini failure must not pin the generic fallback until restart.
+    return build_fallback_word_overview(clean, source_lang)

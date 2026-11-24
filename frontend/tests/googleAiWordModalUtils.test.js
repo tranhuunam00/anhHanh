@@ -92,3 +92,32 @@ describe("buildGoogleEmbedUrl", () => {
     for (const bad of ["", "  ", "...", null, undefined, {}]) assert.equal(buildGoogleEmbedUrl(bad), "");
   });
 });
+
+import { normalizeOverviewKeyWords, MAX_OVERVIEW_KEY_WORDS } from "../src/utils/googleAiWordModalUtils.js";
+
+describe("normalizeOverviewKeyWords", () => {
+  test("keeps valid items with all six string fields (happy path)", () => {
+    const out = normalizeOverviewKeyWords([
+      { word: " reward ", pos: "noun", meaning: "phần thưởng", example_en: "A reward.", example_vi: "Một phần thưởng.", extra: 1 },
+    ]);
+    assert.deepEqual(out, [
+      { word: "reward", pos: "noun", phonetic: "", meaning: "phần thưởng", example_en: "A reward.", example_vi: "Một phần thưởng." },
+    ]);
+  });
+  test("non-string fields become empty strings; numbers are stringified", () => {
+    const [kw] = normalizeOverviewKeyWords([{ word: 42, pos: null, meaning: { a: 1 }, phonetic: ["x"] }]);
+    assert.deepEqual(kw, { word: "42", pos: "", phonetic: "", meaning: "", example_en: "", example_vi: "" });
+  });
+  test("skips non-objects, arrays, empty and duplicate (case-insensitive) words", () => {
+    const out = normalizeOverviewKeyWords([null, "str", 3, ["a"], { word: "" }, { word: "  " }, { word: "Defined" }, { word: "defined" }]);
+    assert.deepEqual(out.map((k) => k.word), ["Defined"]);
+  });
+  test("caps at MAX_OVERVIEW_KEY_WORDS", () => {
+    const out = normalizeOverviewKeyWords(Array.from({ length: 9 }, (_, i) => ({ word: `w${i}` })));
+    assert.equal(out.length, MAX_OVERVIEW_KEY_WORDS);
+    assert.equal(out[3].word, "w3");
+  });
+  test("non-array input returns empty array", () => {
+    for (const bad of [undefined, null, "", "reward", 5, { word: "x" }]) assert.deepEqual(normalizeOverviewKeyWords(bad), []);
+  });
+});

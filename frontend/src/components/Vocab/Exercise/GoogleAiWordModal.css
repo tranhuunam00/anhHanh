@@ -379,3 +379,82 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Key words of a long phrase */
+.google-ai-keyword-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.google-ai-keyword-card {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-left: 3px solid var(--primary, #2563eb);
+  background: var(--bg-secondary, #f8fafc);
+  min-width: 0;
+}
+
+.google-ai-keyword-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.google-ai-keyword-word {
+  font-size: 1rem;
+  color: var(--text-primary, #0f172a);
+  overflow-wrap: anywhere;
+}
+
+.google-ai-keyword-pos {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--primary, #2563eb);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.google-ai-keyword-ipa {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-muted, #64748b);
+  overflow-wrap: anywhere;
+}
+
+.google-ai-keyword-actions {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.google-ai-keyword-actions .google-ai-speak-btn {
+  min-width: 32px;
+  min-height: 32px;
+  justify-content: center;
+}
+
+.google-ai-keyword-meaning {
+  margin-top: 4px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text-primary, #0f172a);
+}
+
+.google-ai-keyword-example {
+  margin-top: 6px;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--text-secondary, #334155);
+  overflow-wrap: anywhere;
+}
+
+.google-ai-keyword-example-vi {
+  font-style: normal;
+  color: var(--text-muted, #64748b);
+  margin-top: 2px;
+}
