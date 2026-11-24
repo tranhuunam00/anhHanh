@@ -1,14 +1,9 @@
 import { useState, useCallback, useRef } from "react";
-import * as pdfjsLib from "pdfjs-dist";
 import {
   validatePageNumber,
   formatPdfPageToHtml,
 } from "../utils/pdfReaderUtils";
-
-// Ensure worker is configured on client
-if (typeof window !== "undefined" && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-}
+import { loadPdfjs } from "../utils/pdfjsLoader";
 
 /**
  * Extracts raw text with end-of-line markers from a specific PDF page
@@ -59,7 +54,7 @@ export function usePdfReader({ onPageLoaded = null, onError = null } = {}) {
       setPdfError(null);
 
       try {
-        const arrayBuffer = await file.arrayBuffer();
+        const [pdfjsLib, arrayBuffer] = await Promise.all([loadPdfjs(), file.arrayBuffer()]);
         const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
         const pdf = await loadingTask.promise;
 

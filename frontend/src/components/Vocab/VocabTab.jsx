@@ -22,6 +22,7 @@ import { VocabKeyboardShortcutsBar } from "./VocabKeyboardShortcutsBar";
 import { VocabCard } from "./VocabCard";
 import { VocabPagination } from "./VocabPagination";
 import { useVocabKeyboardNav } from "../../hooks/useVocabKeyboardNav";
+import { consumeUiIntent, UI_INTENTS } from "../../utils/uiIntents";
 
 export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const { token, isAuthenticated, user, refreshStreak, showToast, refreshSavedVocab } = useAuth();
@@ -100,16 +101,19 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   // Handle external open-exercise trigger
   useEffect(() => {
     const handleOpenHub = () => {
+      consumeUiIntent(UI_INTENTS.OPEN_EXERCISE_HUB);
       setIsExerciseHubOpen(true);
     };
-    window.addEventListener("open-exercise-hub-modal", handleOpenHub);
+    window.addEventListener(UI_INTENTS.OPEN_EXERCISE_HUB, handleOpenHub);
 
-    if (typeof window !== "undefined" && window.location.search.includes("openExercise=true")) {
+    // Intent queued before this lazily-loaded tab mounted (e.g. daily reminder click)
+    const queued = consumeUiIntent(UI_INTENTS.OPEN_EXERCISE_HUB);
+    if (queued || (typeof window !== "undefined" && window.location.search.includes("openExercise=true"))) {
       setIsExerciseHubOpen(true);
     }
 
     return () => {
-      window.removeEventListener("open-exercise-hub-modal", handleOpenHub);
+      window.removeEventListener(UI_INTENTS.OPEN_EXERCISE_HUB, handleOpenHub);
     };
   }, []);
 

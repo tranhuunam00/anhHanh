@@ -1,0 +1,121 @@
+/* Lazy tab loading / error states — theme-aware via system CSS variables */
+
+.lazy-tab-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 16px;
+  min-height: 260px;
+  color: var(--text-muted);
+  animation: lazy-tab-fade-in 0.2s ease-out 0.15s both;
+}
+
+.lazy-tab-fallback-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary);
+  animation: lazy-tab-spin 0.8s linear infinite;
+}
+
+.lazy-tab-fallback-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.lazy-tab-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(560px, 100%);
+  margin-top: 8px;
+}
+
+.lazy-tab-skeleton-line {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+  background-size: 200% 100%;
+  animation: lazy-tab-shimmer 1.4s ease-in-out infinite;
+}
+
+.lazy-tab-skeleton-line.w-60 { width: 60%; }
+.lazy-tab-skeleton-line.w-75 { width: 75%; }
+.lazy-tab-skeleton-line.w-90 { width: 90%; }
+
+.lazy-tab-error {
+  margin: 32px auto;
+  max-width: 520px;
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.lazy-tab-error-title {
+  display: block;
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+
+.lazy-tab-error-text {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.lazy-tab-error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lazy-tab-error-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--bg-card);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lazy-tab-error-btn.secondary {
+  background: transparent;
+  color: var(--primary);
+}
+
+.lazy-tab-error-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@keyframes lazy-tab-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes lazy-tab-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes lazy-tab-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lazy-tab-fallback,
+  .lazy-tab-fallback-spinner,
+  .lazy-tab-skeleton-line {
+    animation: none;
+  }
+}

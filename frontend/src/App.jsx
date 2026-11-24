@@ -1,42 +1,36 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Header } from "./components/Header/Header";
 import { PlayerCard } from "./components/Player/PlayerCard";
 import { DictationStudio } from "./components/Dictation/DictationStudio";
 import { IeltsSpotlightSection } from "./components/Presets/IeltsSpotlightSection";
 import { PresetsSection } from "./components/Presets/PresetsSection";
 import { QuestionsDrawer } from "./components/Drawer/QuestionsDrawer";
-import { SettingsModal } from "./components/Modals/SettingsModal";
-import { ShortcutsModal } from "./components/Modals/ShortcutsModal";
 import { AuthModal } from "./components/Modals/AuthModal";
 import { PreviewModal } from "./components/Modals/PreviewModal";
-import { FeedbackModal } from "./components/Modals/FeedbackModal";
-import { LessonCompleteModal } from "./components/Modals/LessonCompleteModal";
-import { MicrophonePermissionModal } from "./components/Modals/MicrophonePermissionModal";
-import { VideoErrorModal } from "./components/Modals/VideoErrorModal";
-import { VocabTab } from "./components/Vocab/VocabTab";
-import { HistoryTab } from "./components/History/HistoryTab";
 import { FloatingVocabSaver } from "./components/Vocab/FloatingVocabSaver";
 
 import { Footer } from "./components/Footer/Footer";
-import { GraduationCap } from "./constants/icons";
-import { Users, Radio } from "./components/Icons";
 import { AuthGateScreen } from "./components/Auth/AuthGateScreen";
+import { AppTabsNav } from "./components/Navigation/AppTabsNav";
+import { LazyTabPanel } from "./components/Navigation/LazyTabPanel";
+import { DeferredMount } from "./components/Navigation/DeferredMount";
+import { LazyPages, LazyModals, preloadTabPage, preloadDeferredModals } from "./pages/lazyRegistry";
 import { initDailyReminderScheduler } from "./utils/dailyReminderManager";
+import { getTabFromLocation, getPathFromTab, normalizeTabId } from "./utils/tabRouting";
+import { queueUiIntent, UI_INTENTS } from "./utils/uiIntents";
+import { scheduleIdleTask } from "./utils/lazyModule";
+import { loadIeltsAudioLesson } from "./utils/ieltsDictationDataLoader";
 import "./styles/admin-and-feedback.css";
 
-// Dynamic imports to achieve bundle splitting and instant initial page load
-const TranscriptPage = React.lazy(() => import("./pages/TranscriptPage").then(m => ({ default: m.TranscriptPage })));
-const AudioStudioPage = React.lazy(() => import("./pages/AudioStudioPage"));
-const SmartReaderPage = React.lazy(() => import("./pages/SmartReaderPage").then(m => ({ default: m.SmartReaderPage })));
-const WritingPage = React.lazy(() => import("./pages/WritingPage").then(m => ({ default: m.WritingPage })));
-const DestinationB2Page = React.lazy(() => import("./components/DestinationB2/DestinationB2Page").then(m => ({ default: m.DestinationB2Page })));
-const VisualVocabPage = React.lazy(() => import("./components/VisualVocab/VisualVocabPage").then(m => ({ default: m.VisualVocabPage })));
-const RootWordsPage = React.lazy(() => import("./components/RootWords/RootWordsPage").then(m => ({ default: m.RootWordsPage })));
-const IeltsTestPage = React.lazy(() => import("./pages/IeltsTestPage").then(m => ({ default: m.IeltsTestPage })));
-const PrimaryKidsPage = React.lazy(() => import("./components/PrimaryKids/PrimaryKidsPage").then(m => ({ default: m.PrimaryKidsPage })));
-const StudyBuddyView = React.lazy(() => import("./components/StudyBuddy/StudyBuddyView").then(m => ({ default: m.StudyBuddyView || m.default })));
-const TikTokLiveStudio = React.lazy(() => import("./components/TikTokLive/TikTokLiveStudio").then(m => ({ default: m.TikTokLiveStudio })));
-const AdminPortal = React.lazy(() => import("./components/Admin/AdminPortal").then(m => ({ default: m.AdminPortal })));
+const {
+  TranscriptPage, VocabTab, HistoryTab, AudioStudioPage, SmartReaderPage, WritingPage,
+  DestinationB2Page, VisualVocabPage, RootWordsPage, IeltsTestPage, PrimaryKidsPage,
+  StudyBuddyView, TikTokLiveStudio, AdminPortal,
+} = LazyPages;
+const {
+  SettingsModal, ShortcutsModal, FeedbackModal, LessonCompleteModal,
+  MicrophonePermissionModal, VideoErrorModal,
+} = LazyModals;
 
 import { useTheme } from "./hooks/useTheme";
 import { useSettings } from "./hooks/useSettings";
@@ -66,43 +60,7 @@ export default function App() {
   // Helper to map URL path to active tab
   const getTabFromPath = () => {
     if (typeof window === "undefined") return "tab-dictation";
-    const search = window.location.search;
-    if (search && (search.includes("buddy_invite=") || search.includes("invite="))) {
-      return "tab-buddy";
-    }
-    const path = window.location.pathname.toLowerCase();
-    if (path === "/admin" || path.startsWith("/admin/")) return "tab-admin";
-    if (path === "/vocab" || path.startsWith("/vocab/")) return "tab-vocab";
-    if (path === "/transcript" || path.startsWith("/transcript/")) return "tab-transcript";
-    if (path === "/reader" || path.startsWith("/reader/")) return "tab-reader";
-    if (path === "/writing" || path.startsWith("/writing/")) return "tab-writing";
-    if (path === "/destination-b2" || path.startsWith("/destination-b2/")) return "tab-destination-b2";
-    if (path === "/visual-vocab" || path.startsWith("/visual-vocab/")) return "tab-visual-vocab";
-    if (path === "/roots" || path.startsWith("/roots/") || path === "/root-words" || path.startsWith("/root-words/")) return "tab-root-words";
-    if (path === "/history" || path.startsWith("/history/")) return "tab-history";
-    if (path === "/audio-studio" || path.startsWith("/audio-studio/")) return "tab-audio-studio";
-    if (path === "/buddy" || path === "/ban-hoc" || path.startsWith("/buddy/")) return "tab-buddy";
-    if (path === "/ielts" || path.startsWith("/ielts/") || path === "/ielts-test" || path.startsWith("/ielts-test/")) return "tab-ielts-test";
-    if (path === "/kids" || path.startsWith("/kids/") || path === "/tieu-hoc" || path.startsWith("/tieu-hoc/") || path === "/primary" || path.startsWith("/primary/")) return "tab-primary";
-    return "tab-dictation";
-  };
-
-  const getPathFromTab = (tab) => {
-    switch (tab) {
-      case "tab-admin": return "/admin";
-      case "tab-vocab": return "/vocab";
-      case "tab-visual-vocab": return "/visual-vocab";
-      case "tab-root-words": return "/roots";
-      case "tab-reader": return "/reader";
-      case "tab-writing": return "/writing";
-      case "tab-destination-b2": return "/destination-b2";
-      case "tab-transcript": return "/transcript";
-      case "tab-history": return "/history";
-      case "tab-audio-studio": return "/audio-studio";
-      case "tab-buddy": return "/buddy";
-      case "tab-ielts-test": return "/ielts";
-      default: return "/";
-    }
+    return getTabFromLocation(window.location.pathname, window.location.search);
   };
 
   // Navigation & Modal State
@@ -126,7 +84,7 @@ export default function App() {
 
   const setActiveTab = useCallback((tabOrFn) => {
     setActiveTabState((prev) => {
-      const nextTab = typeof tabOrFn === "function" ? tabOrFn(prev) : tabOrFn;
+      const nextTab = normalizeTabId(typeof tabOrFn === "function" ? tabOrFn(prev) : tabOrFn);
       activeTabRef.current = nextTab;
       const targetPath = getPathFromTab(nextTab);
       if (typeof window !== "undefined" && window.location.pathname !== targetPath) {
@@ -150,17 +108,23 @@ export default function App() {
     const cleanupScheduler = initDailyReminderScheduler();
 
     const handleOpenExerciseHub = () => {
+      // VocabTab is lazy: queue a sticky intent it consumes on mount, and
+      // dispatch the event for the case where it is already mounted.
+      queueUiIntent(UI_INTENTS.OPEN_EXERCISE_HUB);
       setActiveTab("tab-vocab");
-      // Gửi event để VocabTab tự mở VocabExerciseHubModal
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("open-exercise-hub-modal"));
+        window.dispatchEvent(new CustomEvent(UI_INTENTS.OPEN_EXERCISE_HUB));
       }, 150);
     };
+
+    // Warm up small, frequently opened modal chunks once the app is idle
+    const cancelIdlePreload = scheduleIdleTask(() => preloadDeferredModals(), { timeout: 4000 });
 
     window.addEventListener("open-exercise-hub", handleOpenExerciseHub);
 
     return () => {
       if (cleanupScheduler) cleanupScheduler();
+      cancelIdlePreload();
       window.removeEventListener("open-exercise-hub", handleOpenExerciseHub);
     };
   }, [setActiveTab]);
@@ -531,10 +495,10 @@ export default function App() {
     setIsLoading(true);
     let lesson = null;
     try {
-      const { buildIeltsAudioLesson } = await import("./utils/ieltsDictationChallengeBuilder");
-      lesson = buildIeltsAudioLesson(preset);
+      lesson = await loadIeltsAudioLesson(preset);
     } catch (err) {
       console.error("Failed to build IELTS audio lesson:", err);
+      showToast("Không tải được dữ liệu bài nghe. Vui lòng kiểm tra mạng và thử lại.", "error");
     }
     if (!lesson) {
       setIsLoading(false);
@@ -968,220 +932,18 @@ export default function App() {
       ) : (
         <main className="main-container">
         {/* Navigation Tabs Header - Compact Single-Row Layout */}
-        <div className="tabs-header">
-          <div className="tabs-nav-group">
-            <button
-              className={`tab-btn ${activeTab === "tab-dictation" ? "active" : ""}`}
-              onClick={() => {
-                setActiveTab("tab-dictation");
-                if (currentLesson) cueChallengeAtIndex(currentLesson, currentIndex);
-              }}
-              title="Luyện chép chính tả (Dictation)"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-              <span>Chép chính tả</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-transcript" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-transcript")}
-              title="Toàn bộ bài nghe & Transcript"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-              </svg>
-              <span>Transcript</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-vocab" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-vocab")}
-              title="Sổ tay từ vựng cá nhân"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-              </svg>
-              <span>Sổ từ vựng</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-reader" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-reader")}
-              style={activeTab === "tab-reader" ? { borderColor: "#10b981" } : {}}
-              title="Đọc báo song ngữ & Ôn từ"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
-                <path d="M18 14h-8" />
-                <path d="M15 18h-5" />
-                <path d="M10 6h8v4h-8V6Z" />
-              </svg>
-              <span>Đọc báo</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-writing" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-writing")}
-              style={activeTab === "tab-writing" ? { borderColor: "#8b5cf6" } : {}}
-              title="Luyện viết tiếng Anh AI (Writing Studio - Chuẩn IELTS)"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 19l7-7 3 3-7 7-3-3z" />
-                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
-                <path d="M2 2l7.586 7.586" />
-                <circle cx="11" cy="11" r="2" />
-              </svg>
-              <span>Luyện viết AI</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-destination-b2" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-destination-b2")}
-              style={activeTab === "tab-destination-b2" ? { borderColor: "#6366f1" } : {}}
-              title="Destination B2: Grammar & Vocabulary (Unit 1 & 2)"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                <path d="M12 6v10" />
-              </svg>
-              <span>Destination B2</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-visual-vocab" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-visual-vocab")}
-              style={activeTab === "tab-visual-vocab" ? { borderColor: "#6366f1" } : {}}
-              title="Học từ vựng qua sơ đồ tranh minh họa trực quan (Visual Diagram)"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-              </svg>
-              <span>Sơ đồ từ vựng</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-ielts-test" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-ielts-test")}
-              style={activeTab === "tab-ielts-test" ? { borderColor: "#f59e0b" } : {}}
-              title="Đề Thi Thật IELTS (Cambridge IELTS 21 - Test 2)"
-            >
-              <GraduationCap className="tab-btn-icon" />
-              <span>Đề thi thật IELTS</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-buddy" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-buddy")}
-              style={activeTab === "tab-buddy" ? { borderColor: "#10b981" } : {}}
-              title="Tìm bạn học quanh đây (Định vị GPS thực tế)"
-            >
-              <Users size={16} />
-              <span>Bạn học quanh đây</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-tiktok-live" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-tiktok-live")}
-              style={activeTab === "tab-tiktok-live" ? { borderColor: "#ef4444" } : {}}
-              title="Phòng học tương tác TikTok LIVE (OBS & TikTok Live Studio)"
-            >
-              <Radio size={16} color="#ef4444" />
-              <span>TikTok Live</span>
-              <span style={{ background: "#ef4444", color: "#ffffff", fontSize: "0.68rem", fontWeight: 800, padding: "1px 5px", borderRadius: "4px", marginLeft: "4px" }}>HOT</span>
-            </button>
-
-
-            <button
-              className={`tab-btn ${activeTab === "tab-root-words" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-root-words")}
-              style={activeTab === "tab-root-words" ? { borderColor: "#2563eb" } : {}}
-              title="100 Gốc Từ Tiếng Anh (Word Roots & Morphemes)"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 3v6m0 6v6M3 12h6m6 0h6" />
-                <circle cx="12" cy="3" r="1" />
-                <circle cx="12" cy="21" r="1" />
-                <circle cx="3" cy="12" r="1" />
-                <circle cx="21" cy="12" r="1" />
-              </svg>
-              <span>100 Gốc từ</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-history" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-history")}
-              title="Lịch sử học tập & tiến độ"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-              <span>Lịch sử</span>
-            </button>
-
-            <button
-              className={`tab-btn ${activeTab === "tab-audio-studio" ? "active" : ""}`}
-              onClick={() => setActiveTab("tab-audio-studio")}
-              style={activeTab === "tab-audio-studio" ? { borderColor: "#0284c7" } : {}}
-              title="Audio & Phân tích nối âm AI"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
-                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
-              </svg>
-              <span>Audio AI</span>
-            </button>
-
-            {(user?.role === "ADMIN" || activeTab === "tab-admin") && (
-              <button
-                className={`tab-btn ${activeTab === "tab-admin" ? "active" : ""}`}
-                onClick={() => setActiveTab("tab-admin")}
-                style={{ borderColor: "#38bdf8" }}
-                title="Quản trị hệ thống"
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                </svg>
-                <span>Quản trị</span>
-              </button>
-            )}
-          </div>
-
-          <div className="tabs-actions-group">
-            <button
-              className="tab-action-btn"
-              onClick={() => setIsShortcutsOpen(true)}
-              title="Bảng phím tắt nhanh"
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="4" width="20" height="16" rx="2" />
-                <path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M6 16h12" />
-              </svg>
-              <span>Phím tắt</span>
-            </button>
-
-            <button
-              className="tab-action-btn"
-              onClick={() => setIsSettingsOpen(true)}
-              title="Cài đặt hệ thống & giao diện"
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-              <span>Cài đặt</span>
-            </button>
-          </div>
-        </div>
+        <AppTabsNav
+          activeTab={activeTab}
+          isAdmin={user?.role === "ADMIN"}
+          onSelectTab={setActiveTab}
+          onSelectDictation={() => {
+            setActiveTab("tab-dictation");
+            if (currentLesson) cueChallengeAtIndex(currentLesson, currentIndex);
+          }}
+          onOpenShortcuts={() => setIsShortcutsOpen(true)}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          onPreloadTab={preloadTabPage}
+        />
 
         {/* TAB 1: Dictation Practice */}
         <div style={{ display: activeTab === "tab-dictation" ? "block" : "none" }}>
@@ -1286,7 +1048,7 @@ export default function App() {
             onSelectPreset={(preset, mode = "dictation") => {
               handleSelectLocalAudioPreset(preset, mode);
             }}
-            onGoToIeltsExam={() => setActiveTab("tab-ielts")}
+            onGoToIeltsExam={() => setActiveTab("tab-ielts-test")}
           />
 
           <PresetsSection
@@ -1310,147 +1072,118 @@ export default function App() {
           />
         </div>
 
-        {/* TAB 2: Transcript & Full Audio */}
-        <div style={{ display: activeTab === "tab-transcript" ? "block" : "none" }}>
-          {activeTab === "tab-transcript" && (
-            <Suspense fallback={<div className="p-8 text-center" style={{ color: "var(--text-muted)" }}>Đang tải transcript...</div>}>
-              <TranscriptPage
-                lesson={currentLesson}
-                playerController={playerController}
-                isActive={activeTab === "tab-transcript"}
-                onGoToChallenge={(pos) => {
-                  activeTabRef.current = "tab-dictation";
-                  setActiveTab("tab-dictation");
-                  goToChallenge(pos - 1);
-                }}
-              />
-            </Suspense>
-          )}
-        </div>
+        {/* TAB 2: Transcript & Full Audio (unmounted when hidden: it drives the shared player) */}
+        <LazyTabPanel tabId="tab-transcript" activeTab={activeTab} keepMounted={false} loadingLabel="Đang tải transcript...">
+          <TranscriptPage
+            lesson={currentLesson}
+            playerController={playerController}
+            isActive={activeTab === "tab-transcript"}
+            onGoToChallenge={(pos) => {
+              activeTabRef.current = "tab-dictation";
+              setActiveTab("tab-dictation");
+              goToChallenge(pos - 1);
+            }}
+          />
+        </LazyTabPanel>
 
         {/* TAB 3: Smart Vocabulary Notebook */}
-        <div style={{ display: activeTab === "tab-vocab" ? "block" : "none" }}>
+        <LazyTabPanel tabId="tab-vocab" activeTab={activeTab} visited={visitedTabs.has("tab-vocab")} loadingLabel="Đang tải sổ từ vựng...">
           <VocabTab
             isActive={activeTab === "tab-vocab"}
             onOpenGuide={() => setIsShortcutsOpen(true)}
           />
-        </div>
+        </LazyTabPanel>
 
-        {/* Suspense wrapper for lazy-loaded tabs */}
-        <Suspense fallback={<div className="p-8 text-center" style={{ color: "var(--text-muted)" }}>Đang tải giao diện...</div>}>
-          {/* TAB: Smart News & Vocab Reader */}
-          {visitedTabs.has("tab-reader") && (
-            <div style={{ display: activeTab === "tab-reader" ? "block" : "none" }}>
-              <SmartReaderPage isActive={activeTab === "tab-reader"} />
-            </div>
-          )}
+        {/* TAB: Smart News & Vocab Reader */}
+        <LazyTabPanel tabId="tab-reader" activeTab={activeTab} visited={visitedTabs.has("tab-reader")}>
+          <SmartReaderPage isActive={activeTab === "tab-reader"} />
+        </LazyTabPanel>
 
-          {/* TAB 4: Study History */}
-          <div style={{ display: activeTab === "tab-history" ? "block" : "none" }}>
-            <HistoryTab
-              isActive={activeTab === "tab-history"}
-              onSelectLesson={(videoId, targetPos, srcLang, tgtLang) => {
-                setActiveTab("tab-dictation");
-                executeLoadLesson(videoId, srcLang, tgtLang, targetPos);
-              }}
-              onOpenAuth={() => setIsAuthOpen(true)}
-            />
-          </div>
+        {/* TAB 4: Study History */}
+        <LazyTabPanel tabId="tab-history" activeTab={activeTab} visited={visitedTabs.has("tab-history")} loadingLabel="Đang tải lịch sử học...">
+          <HistoryTab
+            isActive={activeTab === "tab-history"}
+            onSelectLesson={(videoId, targetPos, srcLang, tgtLang) => {
+              setActiveTab("tab-dictation");
+              executeLoadLesson(videoId, srcLang, tgtLang, targetPos);
+            }}
+            onOpenAuth={() => setIsAuthOpen(true)}
+          />
+        </LazyTabPanel>
 
-          {/* TAB 5: Admin Management Portal */}
-          {(user?.role === "ADMIN" || activeTab === "tab-admin") && activeTab === "tab-admin" && (
-            <div style={{ display: activeTab === "tab-admin" ? "block" : "none" }}>
-              <AdminPortal
-                user={user}
-                token={token}
-                showToast={showToast}
-                onOpenAuth={() => setIsAuthOpen(true)}
-              />
-            </div>
-          )}
+        {/* TAB 5: Admin Management Portal */}
+        <LazyTabPanel tabId="tab-admin" activeTab={activeTab} visited={visitedTabs.has("tab-admin")}>
+          <AdminPortal
+            user={user}
+            token={token}
+            showToast={showToast}
+            onOpenAuth={() => setIsAuthOpen(true)}
+          />
+        </LazyTabPanel>
 
-          {/* TAB 6: Audio & Phonology Studio (Isolated Screen) */}
-          {visitedTabs.has("tab-audio-studio") && (
-            <div style={{ display: activeTab === "tab-audio-studio" ? "block" : "none" }}>
-              <AudioStudioPage isActive={activeTab === "tab-audio-studio"} />
-            </div>
-          )}
+        {/* TAB 6: Audio & Phonology Studio (Isolated Screen) */}
+        <LazyTabPanel tabId="tab-audio-studio" activeTab={activeTab} visited={visitedTabs.has("tab-audio-studio")}>
+          <AudioStudioPage isActive={activeTab === "tab-audio-studio"} />
+        </LazyTabPanel>
 
-          {/* TAB 7: AI Writing Studio */}
-          {visitedTabs.has("tab-writing") && (
-            <div style={{ display: activeTab === "tab-writing" ? "block" : "none" }}>
-              <WritingPage isActive={activeTab === "tab-writing"} />
-            </div>
-          )}
+        {/* TAB 7: AI Writing Studio */}
+        <LazyTabPanel tabId="tab-writing" activeTab={activeTab} visited={visitedTabs.has("tab-writing")}>
+          <WritingPage isActive={activeTab === "tab-writing"} />
+        </LazyTabPanel>
 
-          {/* TAB 8: Destination B2 (Unit 1 & 2) */}
-          {visitedTabs.has("tab-destination-b2") && (
-            <div style={{ display: activeTab === "tab-destination-b2" ? "block" : "none" }}>
-              <DestinationB2Page isActive={activeTab === "tab-destination-b2"} token={token} />
-            </div>
-          )}
+        {/* TAB 8: Destination B2 (Unit 1 & 2) */}
+        <LazyTabPanel tabId="tab-destination-b2" activeTab={activeTab} visited={visitedTabs.has("tab-destination-b2")}>
+          <DestinationB2Page isActive={activeTab === "tab-destination-b2"} token={token} />
+        </LazyTabPanel>
 
-          {/* TAB 9: Visual Diagram Vocabulary (Mountain & University) */}
-          {visitedTabs.has("tab-visual-vocab") && (
-            <div style={{ display: activeTab === "tab-visual-vocab" ? "block" : "none" }}>
-              <VisualVocabPage isActive={activeTab === "tab-visual-vocab"} token={token} />
-            </div>
-          )}
+        {/* TAB 9: Visual Diagram Vocabulary (Mountain & University) */}
+        <LazyTabPanel tabId="tab-visual-vocab" activeTab={activeTab} visited={visitedTabs.has("tab-visual-vocab")}>
+          <VisualVocabPage isActive={activeTab === "tab-visual-vocab"} token={token} />
+        </LazyTabPanel>
 
-          {/* TAB 10: 100 Gốc Từ Tiếng Anh (Word Roots) */}
-          {visitedTabs.has("tab-root-words") && (
-            <div style={{ display: activeTab === "tab-root-words" ? "block" : "none" }}>
-              <RootWordsPage isActive={activeTab === "tab-root-words"} />
-            </div>
-          )}
+        {/* TAB 10: 100 Gốc Từ Tiếng Anh (Word Roots) */}
+        <LazyTabPanel tabId="tab-root-words" activeTab={activeTab} visited={visitedTabs.has("tab-root-words")}>
+          <RootWordsPage isActive={activeTab === "tab-root-words"} />
+        </LazyTabPanel>
 
-          {/* TAB 11: Đề thi thật IELTS (Cambridge Practice Tests) */}
-          {visitedTabs.has("tab-ielts-test") && (
-            <div
-              style={{
-                display: activeTab === "tab-ielts-test" ? "block" : "none",
-                height: activeTab === "tab-ielts-test" ? "calc(100vh - 56px)" : "auto",
-                overflow: "hidden"
-              }}
-            >
-              <IeltsTestPage
-                isActive={activeTab === "tab-ielts-test"}
-                user={user}
-                token={token}
-                onOpenAuth={() => setIsAuthOpen(true)}
-                showToast={showToast}
-              />
-            </div>
-          )}
+        {/* TAB 11: Đề thi thật IELTS (Cambridge Practice Tests) */}
+        <LazyTabPanel
+          tabId="tab-ielts-test"
+          activeTab={activeTab}
+          visited={visitedTabs.has("tab-ielts-test")}
+          loadingLabel="Đang tải đề thi IELTS..."
+          style={{ height: activeTab === "tab-ielts-test" ? "calc(100vh - 56px)" : "auto", overflow: "hidden" }}
+        >
+          <IeltsTestPage
+            isActive={activeTab === "tab-ielts-test"}
+            user={user}
+            token={token}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            showToast={showToast}
+          />
+        </LazyTabPanel>
 
-          {/* TAB 12: Tiểu Học - Global English 4 Gamified Safari */}
-          {visitedTabs.has("tab-primary") && (
-            <div style={{ display: activeTab === "tab-primary" ? "block" : "none" }}>
-              <PrimaryKidsPage isActive={activeTab === "tab-primary"} />
-            </div>
-          )}
+        {/* TAB 12: Tiểu Học - Global English 4 Gamified Safari */}
+        <LazyTabPanel tabId="tab-primary" activeTab={activeTab} visited={visitedTabs.has("tab-primary")}>
+          <PrimaryKidsPage isActive={activeTab === "tab-primary"} />
+        </LazyTabPanel>
 
-          {/* TAB 13: Bạn học quanh đây (GPS Study Buddies) */}
-          {visitedTabs.has("tab-buddy") && (
-            <div style={{ display: activeTab === "tab-buddy" ? "block" : "none" }}>
-              <StudyBuddyView
-                token={token}
-                currentUser={user}
-                showToast={showToast}
-              />
-            </div>
-          )}
+        {/* TAB 13: Bạn học quanh đây (GPS Study Buddies) */}
+        <LazyTabPanel tabId="tab-buddy" activeTab={activeTab} visited={visitedTabs.has("tab-buddy")}>
+          <StudyBuddyView
+            token={token}
+            currentUser={user}
+            showToast={showToast}
+          />
+        </LazyTabPanel>
 
-          {/* TAB 14: TikTok LIVE Interactive Classroom */}
-          <div style={{ display: activeTab === "tab-tiktok-live" ? "block" : "none" }}>
-            {activeTab === "tab-tiktok-live" && (
-              <TikTokLiveStudio
-                isActive={activeTab === "tab-tiktok-live"}
-                onBackToHome={() => setActiveTab("tab-dictation")}
-              />
-            )}
-          </div>
-        </Suspense>
+        {/* TAB 14: TikTok LIVE Interactive Classroom (unmounted when hidden) */}
+        <LazyTabPanel tabId="tab-tiktok-live" activeTab={activeTab} keepMounted={false}>
+          <TikTokLiveStudio
+            isActive={activeTab === "tab-tiktok-live"}
+            onBackToHome={() => setActiveTab("tab-dictation")}
+          />
+        </LazyTabPanel>
       </main>
       )}
 
@@ -1474,15 +1207,17 @@ export default function App() {
       )}
 
       {/* Feedback Modal */}
-      <FeedbackModal
-        isOpen={isFeedbackOpen}
-        onClose={() => setIsFeedbackOpen(false)}
-        user={user}
-        token={token}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onOpenAdminTab={() => setActiveTab("tab-admin")}
-        showToast={showToast}
-      />
+      <DeferredMount when={isFeedbackOpen}>
+        <FeedbackModal
+          isOpen={isFeedbackOpen}
+          onClose={() => setIsFeedbackOpen(false)}
+          user={user}
+          token={token}
+          onOpenAuth={() => setIsAuthOpen(true)}
+          onOpenAdminTab={() => setActiveTab("tab-admin")}
+          showToast={showToast}
+        />
+      </DeferredMount>
 
       {/* Auth Modal (Login / Register) */}
       <AuthModal
@@ -1514,64 +1249,74 @@ export default function App() {
       />
 
       {/* Settings Modal */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        settings={settings}
-        onUpdateSetting={updateSetting}
-        onResetSettings={resetSettings}
-      />
+      <DeferredMount when={isSettingsOpen}>
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          settings={settings}
+          onUpdateSetting={updateSetting}
+          onResetSettings={resetSettings}
+        />
+      </DeferredMount>
 
       {/* Shortcuts Modal */}
-      <ShortcutsModal
-        isOpen={isShortcutsOpen}
-        onClose={() => setIsShortcutsOpen(false)}
-      />
+      <DeferredMount when={isShortcutsOpen}>
+        <ShortcutsModal
+          isOpen={isShortcutsOpen}
+          onClose={() => setIsShortcutsOpen(false)}
+        />
+      </DeferredMount>
 
       {/* Lesson Complete Celebration Modal */}
-      <LessonCompleteModal
-        isOpen={isLessonCompleteModalOpen}
-        onClose={() => setIsLessonCompleteModalOpen(false)}
-        lesson={currentLesson}
-        streak={{ current_streak: streak }}
-        onRestartLesson={handleRestartLesson}
-        onViewTranscript={() => {
-          setIsLessonCompleteModalOpen(false);
-          setActiveTab("tab-transcript");
-        }}
-        onOpenVocab={() => {
-          setIsLessonCompleteModalOpen(false);
-          setActiveTab("tab-vocab");
-        }}
-      />
+      <DeferredMount when={isLessonCompleteModalOpen}>
+        <LessonCompleteModal
+          isOpen={isLessonCompleteModalOpen}
+          onClose={() => setIsLessonCompleteModalOpen(false)}
+          lesson={currentLesson}
+          streak={{ current_streak: streak }}
+          onRestartLesson={handleRestartLesson}
+          onViewTranscript={() => {
+            setIsLessonCompleteModalOpen(false);
+            setActiveTab("tab-transcript");
+          }}
+          onOpenVocab={() => {
+            setIsLessonCompleteModalOpen(false);
+            setActiveTab("tab-vocab");
+          }}
+        />
+      </DeferredMount>
 
       {/* Microphone Permission Guide Modal */}
-      <MicrophonePermissionModal
-        isOpen={isMicPermissionModalOpen}
-        onClose={() => setIsMicPermissionModalOpen(false)}
-        onRetry={() => {
-          setIsMicPermissionModalOpen(false);
-          handleToggleMic();
-        }}
-      />
+      <DeferredMount when={isMicPermissionModalOpen}>
+        <MicrophonePermissionModal
+          isOpen={isMicPermissionModalOpen}
+          onClose={() => setIsMicPermissionModalOpen(false)}
+          onRetry={() => {
+            setIsMicPermissionModalOpen(false);
+            handleToggleMic();
+          }}
+        />
+      </DeferredMount>
 
       {/* Video Load Error Modal */}
-      <VideoErrorModal
-        isOpen={Boolean(videoErrorData)}
-        onClose={() => setVideoErrorData(null)}
-        errorData={videoErrorData}
-        onSwitchToAudioStudio={() => {
-          setVideoErrorData(null);
-          setActiveTab("tab-audio-studio");
-        }}
-        onOpenPresets={() => {
-          setVideoErrorData(null);
-          const presetsEl = document.querySelector(".presets-section");
-          if (presetsEl) {
-            presetsEl.scrollIntoView({ behavior: "smooth" });
-          }
-        }}
-      />
+      <DeferredMount when={Boolean(videoErrorData)}>
+        <VideoErrorModal
+          isOpen={Boolean(videoErrorData)}
+          onClose={() => setVideoErrorData(null)}
+          errorData={videoErrorData}
+          onSwitchToAudioStudio={() => {
+            setVideoErrorData(null);
+            setActiveTab("tab-audio-studio");
+          }}
+          onOpenPresets={() => {
+            setVideoErrorData(null);
+            const presetsEl = document.querySelector(".presets-section");
+            if (presetsEl) {
+              presetsEl.scrollIntoView({ behavior: "smooth" });
+            }
+          }}
+        />
+      </DeferredMount>
     </div>
   );
 }

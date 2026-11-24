@@ -1,9 +1,4 @@
-import * as pdfjsLib from "pdfjs-dist";
-
-// Configure worker using CDN or local worker
-if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-}
+import { loadPdfjs } from "./pdfjsLoader";
 
 /**
  * Get total number of pages in a PDF file
@@ -12,7 +7,7 @@ if (typeof window !== "undefined") {
  */
 export const getPdfPageCount = async (file) => {
   try {
-    const arrayBuffer = await file.arrayBuffer();
+    const [pdfjsLib, arrayBuffer] = await Promise.all([loadPdfjs(), file.arrayBuffer()]);
     const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
     const pdf = await loadingTask.promise;
     return pdf.numPages;
@@ -30,7 +25,7 @@ export const getPdfPageCount = async (file) => {
  * @returns {Promise<{ text: string, totalPages: number, pageCount: number, wordCount: number }>}
  */
 export const extractPdfTextClient = async (file, startPage = 1, endPage = null) => {
-  const arrayBuffer = await file.arrayBuffer();
+  const [pdfjsLib, arrayBuffer] = await Promise.all([loadPdfjs(), file.arrayBuffer()]);
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   const pdf = await loadingTask.promise;
   const totalPages = pdf.numPages;

@@ -9,8 +9,11 @@ import {
   Eye,
   ArrowLeft,
   X,
+  Google,
+  Sparkles,
 } from "../../Icons";
 import { getVoiceLang } from "../../../utils/languageVoices";
+import { GoogleAiWordModal } from "./GoogleAiWordModal";
 import "./VocabExerciseMobileFlip.css";
 
 export const VocabExerciseMobileFlip = ({
@@ -23,6 +26,7 @@ export const VocabExerciseMobileFlip = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const [autoPronounce, setAutoPronounce] = useState(true);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
 
   const currentItem = items[currentIndex];
 
@@ -91,11 +95,11 @@ export const VocabExerciseMobileFlip = ({
     // If swipe horizontal distance is significant and greater than vertical movement
     if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY)) {
       if (deltaX < 0) {
-        // Swipe Left -> Next word
-        onProceed(false, null, 1);
-      } else if (currentIndex > 0) {
-        // Swipe Right -> Prev word
-        onProceed(false, null, -1);
+        // Swipe Left -> Chưa nhớ / Chưa thuộc
+        handleReview(false);
+      } else {
+        // Swipe Right -> Đã thuộc
+        handleReview(true);
       }
     }
   };
@@ -184,9 +188,23 @@ export const VocabExerciseMobileFlip = ({
                   <span className="flip-pos-pill">
                     {currentItem.part_of_speech || "Từ vựng"}
                   </span>
-                  <span className="flip-hint-tap">
-                    <Eye size={14} /> Chạm lật nghĩa
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <button
+                      type="button"
+                      className="flip-btn-google"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsGoogleModalOpen(true);
+                      }}
+                      title="Tra cứu Google AI: Gốc & Họ từ"
+                    >
+                      <Google size={14} />
+                      <span>Gốc & Họ từ</span>
+                    </button>
+                    <span className="flip-hint-tap">
+                      <Eye size={14} /> Chạm lật nghĩa
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flip-card-center">
@@ -220,9 +238,23 @@ export const VocabExerciseMobileFlip = ({
                   <span className="flip-pos-pill" style={{ background: "rgba(16, 185, 129, 0.1)", color: "#059669" }}>
                     Nghĩa Tiếng Việt
                   </span>
-                  <span className="flip-hint-tap">
-                    <RotateCcw size={14} /> Chạm lật lại
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <button
+                      type="button"
+                      className="flip-btn-google"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsGoogleModalOpen(true);
+                      }}
+                      title="Tra cứu Google AI: Gốc & Họ từ"
+                    >
+                      <Google size={14} />
+                      <span>Gốc & Họ từ</span>
+                    </button>
+                    <span className="flip-hint-tap">
+                      <RotateCcw size={14} /> Chạm lật lại
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flip-card-center">
@@ -274,6 +306,18 @@ export const VocabExerciseMobileFlip = ({
               </button>
             </div>
 
+            {/* Quick In-App Google AI Deep Dive Button */}
+            <button
+              type="button"
+              className="btn-flip-google-action"
+              onClick={() => setIsGoogleModalOpen(true)}
+              title="Tra cứu Google AI: Gốc & Họ từ"
+            >
+              <Google size={16} />
+              <span>Tra Google AI: Gốc & Họ từ</span>
+              <Sparkles size={14} style={{ color: "#2563eb" }} />
+            </button>
+
             <div className="mobile-nav-subrow">
               <button
                 type="button"
@@ -296,11 +340,20 @@ export const VocabExerciseMobileFlip = ({
             </div>
 
             <div className="flip-swipe-guide">
-              <span>👈 Vuốt sang trái để qua từ • Vuốt sang phải để lùi 👉</span>
+              <span>👈 Vuốt trái: Chưa nhớ (1) • Vuốt phải: Đã thuộc (2) 👉 (Ấn 'Từ trước' để lùi)</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* In-App Google AI Overview Modal */}
+      {isGoogleModalOpen && currentItem?.word && (
+        <GoogleAiWordModal
+          word={currentItem.word}
+          sourceLang={currentItem.source_lang || "en"}
+          onClose={() => setIsGoogleModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

@@ -2,10 +2,9 @@
 import os
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -15,6 +14,13 @@ import uvicorn
 from app.infrastructure.database.connection import init_db
 from app.infrastructure.minio_service import ensure_bucket_and_policy
 from app.presentation.security_middleware import limiter, SecurityHeadersMiddleware
+from app.presentation.static_serving import (
+    CachedStaticFiles,
+    IMMUTABLE_CACHE_CONTROL,
+    MEDIA_CACHE_CONTROL,
+    HTML_REVALIDATE_CACHE_CONTROL,
+    resolve_safe_static_path,
+)
 from app.presentation.api import api_router
 from app.presentation.auth_api import router as auth_router
 from app.presentation.lesson_api import router as lesson_router
@@ -131,21 +137,15 @@ if not os.path.exists(audio_dir):
         if os.path.exists(public_audio):
             audio_dir = public_audio
 
-class CachedStaticFiles(StaticFiles):
-    """StaticFiles that adds immutable caching headers for hashed assets."""
-    def file_response(self, *args, **kwargs) -> Response:
-        resp = super().file_response(*args, **kwargs)
-        resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
-        return resp
-
-
 if os.path.exists(audio_dir):
-    app.mount("/audio", StaticFiles(directory=audio_dir), name="audio")
+    # Large IELTS/lesson audio: browser caches for a week, then cheap ETag revalidation
+    app.mount("/audio", CachedStaticFiles(directory=audio_dir, cache_control=MEDIA_CACHE_CONTROL), name="audio")
 
 if os.path.exists(react_dist_dir):
     assets_dir = os.path.join(react_dist_dir, "assets")
     if os.path.exists(assets_dir):
-        app.mount("/assets", CachedStaticFiles(directory=assets_dir), name="assets")
+        # Content-hashed Vite chunks: cache forever
+        app.mount("/assets", CachedStaticFiles(directory=assets_dir, cache_control=IMMUTABLE_CACHE_CONTROL), name="assets")
 
 
 @app.get("/tai-lieu", include_in_schema=False)
@@ -164,17 +164,17 @@ def serve_spa(full_path: str):
     if full_path.startswith("api/"):
         return {"detail": "Not Found"}
 
-    # Check if specific static asset exists in dist (e.g. linguagun_logo.jpg, favicon.svg)
-    if full_path:
-        decoded_path = unquote(full_path)
-        file_path = os.path.join(react_dist_dir, decoded_path)
-        if os.path.exists(file_path) and os.path.isfile(file_path):
+    # Check if specific static asset exists in dist (e.g. linguagun_logo.jpg, favicon.svg).
+    # resolve_safe_static_path blocks "../" traversal outside frontend/dist.
+    if full_path and os.path.isdir(react_dist_dir):
+        file_path = resolve_safe_static_path(react_dist_dir, unquote(full_path))
+        if file_path:
             return FileResponse(file_path)
 
-    # Primary: Serve React SPA index.html
+    # Primary: Serve React SPA index.html (revalidated each load so new deploys appear immediately)
     react_index = os.path.join(react_dist_dir, "index.html")
     if os.path.exists(react_index):
-        return FileResponse(react_index, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
+        return FileResponse(react_index, headers={"Cache-Control": HTML_REVALIDATE_CACHE_CONTROL})
 
     return {"message": "ShotLang API is running. Build frontend with 'npm run build' inside frontend/."}
 

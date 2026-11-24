@@ -1,0 +1,381 @@
+/* GoogleAiWordModal.css - In-App Google AI Overview & Etymology Modal */
+
+.google-ai-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: googleModalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes googleModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.google-ai-modal-window {
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 20px;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  animation: googleModalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes googleModalSlideUp {
+  from {
+    transform: translateY(24px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Header bar */
+.google-ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+  gap: 12px;
+}
+
+.google-ai-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.google-ai-logo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+.google-ai-search-query {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.google-ai-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.google-ai-btn-external {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 10px;
+  color: #2563eb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s ease;
+  cursor: pointer;
+}
+
+.google-ai-btn-external:hover {
+  background: rgba(37, 99, 235, 0.15);
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.google-ai-btn-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-secondary, #64748b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.google-ai-btn-close:hover {
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+  transform: scale(1.05);
+}
+
+/* Modal Body */
+.google-ai-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  flex: 1;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-primary, #1e293b);
+  line-height: 1.65;
+}
+
+/* AI Sparkle Badge */
+.google-ai-sparkle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #1a73e8;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.google-ai-sparkle-icon {
+  color: #1a73e8;
+  animation: googleSparklePulse 2.5s infinite ease-in-out;
+}
+
+@keyframes googleSparklePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+}
+
+/* AI Overview Paragraph */
+.google-ai-overview-text {
+  font-size: 1rem;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: rgba(37, 99, 235, 0.04);
+  border-left: 3px solid #2563eb;
+  border-radius: 0 12px 12px 0;
+  color: var(--text-primary, #0f172a);
+}
+
+.google-ai-overview-text strong {
+  color: #1e3a8a;
+  font-weight: 700;
+}
+
+/* Audio Pronunciation Pill */
+.google-ai-phonetic-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  margin-left: 4px;
+  border-radius: 6px;
+  background: var(--bg-secondary, #f1f5f9);
+  font-size: 0.9rem;
+  font-family: monospace;
+}
+
+.google-ai-speak-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #2563eb;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.15s;
+}
+
+.google-ai-speak-btn:hover {
+  transform: scale(1.15);
+}
+
+/* Headings */
+.google-ai-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 20px 0 10px 0;
+  color: var(--text-primary, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Lists */
+.google-ai-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.google-ai-list li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 9px;
+  font-size: 0.93rem;
+  color: var(--text-secondary, #334155);
+}
+
+.google-ai-list li::before {
+  content: "•";
+  position: absolute;
+  left: 6px;
+  top: 0;
+  color: #2563eb;
+  font-size: 1.1rem;
+}
+
+/* Word Family Card Grid */
+.google-ai-family-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.google-ai-family-card {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-secondary, #f8fafc);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.google-ai-family-card:hover {
+  border-color: #93c5fd;
+  background: var(--bg-card, #ffffff);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.08);
+}
+
+.family-word-name {
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  font-size: 0.95rem;
+}
+
+.family-word-pos {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+.family-word-meaning {
+  font-size: 0.85rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 4px;
+}
+
+/* Skeleton Loading */
+.google-ai-skeleton-wrap {
+  padding: 10px 0;
+}
+
+.google-ai-skeleton-line {
+  height: 16px;
+  background: linear-gradient(90deg, var(--bg-secondary, #f1f5f9) 25%, var(--border-color, #e2e8f0) 50%, var(--bg-secondary, #f1f5f9) 75%);
+  background-size: 200% 100%;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  animation: googleSkeletonShimmer 1.5s infinite;
+}
+
+@keyframes googleSkeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Footer Close Button for Walking/One-Hand Mode */
+.google-ai-footer-bar {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.google-ai-btn-dismiss {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 12px;
+  border: none;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.google-ai-btn-dismiss:hover {
+  background: var(--border-color, #e2e8f0);
+}
+
+@media (max-width: 640px) {
+  .google-ai-modal-window {
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0;
+    margin-top: auto;
+  }
+  .google-ai-modal-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .google-ai-family-grid {
+    grid-template-columns: 1fr;
+  }
+}

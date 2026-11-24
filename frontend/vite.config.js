@@ -11,21 +11,29 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // Vite's dynamic-import preload helper is needed by the entry; pin it to the
+          // shared vendor chunk so it never drags a lazy library chunk into first load.
+          if (id.includes('vite/preload-helper') || id.includes('vite/modulepreload-polyfill')) {
+            return 'vendor';
+          }
           if (id.includes('node_modules')) {
             if (id.includes('three')) {
               return 'vendor-three';
             }
-            if (id.includes('pdfjs-dist') || id.includes('pdf-lib')) {
-              return 'vendor-pdf';
+            // Separate chunks: pdf.js (parsing) and pdf-lib (slicing) load independently, on demand
+            if (id.includes('pdfjs-dist')) {
+              return 'vendor-pdfjs';
+            }
+            if (id.includes('pdf-lib') || id.includes('@pdf-lib')) {
+              return 'vendor-pdflib';
             }
             if (id.includes('react') || id.includes('react-dom')) {
               return 'vendor-react';
             }
             return 'vendor';
           }
-          if (id.includes('/data/ielts/')) {
-            return 'data-ielts';
-          }
+          // IELTS data is intentionally NOT forced into one chunk: each
+          // Cambridge book / test is code-split and downloaded on demand.
         }
       }
     }

@@ -433,3 +433,22 @@ export const playPronunciationAudio = (word, ttsLang = "us", customAudioUrl = nu
   });
 };
 
+export const fetchGoogleAiWordOverview = async (word, sourceLang = "en", targetLang = "vi") => {
+  if (!word || typeof word !== "string" || !word.trim()) return null;
+  try {
+    const params = new URLSearchParams({
+      word: word.trim(),
+      source_lang: sourceLang || "en",
+      target_lang: targetLang || "vi",
+    });
+    const res = await fetch(`/api/vocab/google-overview?${params.toString()}`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.error("Error fetching Google AI Word Overview:", err);
+  }
+  return null;
+};
+
+

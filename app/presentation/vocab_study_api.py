@@ -225,3 +225,23 @@ async def submit_vocab_review_result(
     await db.commit()
     await db.refresh(vocab)
     return {'message': 'Đã cập nhật tiến độ học', 'vocab': vocab.to_dict()}
+
+
+@router.get('/google-overview')
+async def get_google_word_overview(
+    word: str = Query(..., min_length=1),
+    source_lang: Optional[str] = Query('en'),
+    target_lang: Optional[str] = Query('vi'),
+):
+    """Fetch AI-generated Google Overview with definition, etymology, and word family."""
+    clean_word = word.strip()
+    if not clean_word:
+        raise HTTPException(status_code=400, detail="Từ vựng không được để trống")
+
+    from app.infrastructure.ai_vocab_overview_service import fetch_google_ai_word_overview
+    overview = await fetch_google_ai_word_overview(
+        word=clean_word,
+        source_lang=source_lang or 'en',
+        target_lang=target_lang or 'vi'
+    )
+    return overview
