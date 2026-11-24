@@ -43,12 +43,6 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
   const [listeningWordId, setListeningWordId] = useState(null);
   const [pronounceResults, setPronounceResults] = useState({});
 
-  const reloadAll = useCallback(() => {
-    loadWords();
-    if (refreshStreak) refreshStreak();
-    if (refreshSavedVocab) refreshSavedVocab();
-  }, [loadWords, refreshStreak, refreshSavedVocab]);
-
   // Pagination state for vocabulary list
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(18);
@@ -95,6 +89,13 @@ export const VocabTab = ({ isActive = false, onOpenGuide }) => {
       setIsLoading(false);
     }
   }, [filterStatus, searchQuery, token]);
+
+  // Must be declared after loadWords: its deps array reads loadWords during render (TDZ otherwise)
+  const reloadAll = useCallback(() => {
+    loadWords();
+    if (refreshStreak) refreshStreak();
+    if (refreshSavedVocab) refreshSavedVocab();
+  }, [loadWords, refreshStreak, refreshSavedVocab]);
 
   useEffect(() => {
     loadWords();
