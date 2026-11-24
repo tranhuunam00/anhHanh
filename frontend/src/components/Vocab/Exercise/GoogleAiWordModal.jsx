@@ -10,9 +10,11 @@ import {
 } from "../../Icons";
 import { fetchGoogleAiWordOverview } from "../../../services/authVocabService";
 import { getVoiceLang } from "../../../utils/languageVoices";
+import { cleanGoogleAiWord, shouldShowGoogleAiModal } from "../../../utils/googleAiWordModalUtils";
 import "./GoogleAiWordModal.css";
 
 export const GoogleAiWordModal = ({
+  isOpen = true,
   word,
   sourceLang = "en",
   targetLang = "vi",
@@ -22,7 +24,8 @@ export const GoogleAiWordModal = ({
   const [loading, setLoading] = useState(true);
   const [activeSpeech, setActiveSpeech] = useState(null);
 
-  const cleanWord = (word || "").trim().replace(/^[’'".:,;!?-]+|[’'".:,;!?-]+$/g, "");
+  const cleanWord = cleanGoogleAiWord(word);
+  const isVisible = shouldShowGoogleAiModal(isOpen, word);
 
   const playAudio = useCallback(
     (textToSpeak, lang = "en") => {
@@ -45,7 +48,7 @@ export const GoogleAiWordModal = ({
 
   useEffect(() => {
     let isMounted = true;
-    if (!cleanWord) return;
+    if (!isVisible) return;
 
     setLoading(true);
     fetchGoogleAiWordOverview(cleanWord, sourceLang, targetLang).then((res) => {
@@ -58,10 +61,11 @@ export const GoogleAiWordModal = ({
     return () => {
       isMounted = false;
     };
-  }, [cleanWord, sourceLang, targetLang]);
+  }, [isVisible, cleanWord, sourceLang, targetLang]);
 
   // Keyboard shortcut: ESC to dismiss immediately
   useEffect(() => {
+    if (!isVisible) return undefined;
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         onClose();
@@ -69,11 +73,13 @@ export const GoogleAiWordModal = ({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [isVisible, onClose]);
 
   const googleUrl =
     data?.google_search_url ||
     `https://www.google.com/search?q=${encodeURIComponent(cleanWord + " là gì và gốc, họ của nó")}`;
+
+  if (!isVisible) return null;
 
   return (
     <div className="google-ai-modal-backdrop" onClick={onClose}>
