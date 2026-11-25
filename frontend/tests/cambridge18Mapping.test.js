@@ -49,12 +49,19 @@ describe("Cambridge 18 audio / preset / exam-data mapping", () => {
 
   test("transcript length matches the audio file length for every preset", () => {
     const refBytesPerSec = statSync(publicPath("/audio/Cambridge 18 - Test 1.mp3")).size / 1757;
+    // A part ends with "You now have one minute / 30 seconds to check your answers" followed by
+    // that much silence, which has no transcript line (it used to hold invented "Thank you." lines).
+    const announcedPauseSec = (text) =>
+      /one minute/i.test(text) ? 60 : /(30|thirty) seconds|half a minute/i.test(text) ? 30 : 0;
     for (const p of [...CAMBRIDGE_18_LESSONS, ...CAMBRIDGE_18_FULL_LESSONS]) {
       const data = cambridge18DictationData[p.id];
       assert.ok(data && data.challenges.length > 0, `${p.id} has no transcript`);
-      const end = data.challenges.at(-1).time_end;
+      const last = data.challenges.at(-1);
       const audioSec = statSync(publicPath(p.audioUrl)).size / refBytesPerSec;
-      assert.ok(Math.abs(audioSec - end) < 40, `${p.id}: audio ${Math.round(audioSec)}s vs transcript ${Math.round(end)}s`);
+      const tail = audioSec - last.time_end;
+      const label = `${p.id}: audio ${Math.round(audioSec)}s vs transcript ${Math.round(last.time_end)}s`;
+      assert.ok(tail > -40, label);
+      assert.ok(tail < 40 + announcedPauseSec(last.text), label);
     }
   });
 
