@@ -50,7 +50,7 @@ export const cambridge19Test4ReadingPassage3 = {
   groups: [
     {
       groupType: "multiple_choice",
-      instructions: "Questions 27–30: Choose the correct letter, A, B, C or D.\nWrite the correct letter in boxes 27–30 on your answer sheet.",
+      instructions: "Choose the correct letter, A, B, C or D.\nWrite the correct letter in boxes 27–30 on your answer sheet.",
       numbers: [27, 28, 29, 30],
       items: [
         {
@@ -101,7 +101,7 @@ export const cambridge19Test4ReadingPassage3 = {
     },
     {
       groupType: "fill_summary",
-      instructions: "Questions 31–35: Complete the summary below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 31–35 on your answer sheet.",
+      instructions: "Complete the summary below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 31–35 on your answer sheet.",
       title: "Contemporary hunter-gatherer societies",
       numbers: [31, 32, 33, 34, 35],
       items: [
@@ -139,7 +139,7 @@ export const cambridge19Test4ReadingPassage3 = {
     },
     {
       groupType: "yes_no_not_given",
-      instructions: "Questions 36–40: Do the following statements agree with the views of the writer in Reading Passage 3?\nIn boxes 36–40 on your answer sheet, write:\nYES if the statement agrees with the views of the writer\nNO if the statement contradicts the views of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
+      instructions: "Do the following statements agree with the views of the writer in Reading Passage 3?\nIn boxes 36–40 on your answer sheet, write\nYES if the statement agrees with the views of the writer\nNO if the statement contradicts the views of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
       numbers: [36, 37, 38, 39, 40],
       items: [
         {

@@ -108,6 +108,20 @@
   line-height: 1.85;
   color: var(--text-primary);
   margin-bottom: 12px;
+  white-space: pre-line;
+}
+
+.ielts-passage-footnotes {
+  margin-top: 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.ielts-passage-footnotes p {
+  margin: 0 0 4px;
 }
 
 .ielts-paragraph-block .ielts-paragraph-text {

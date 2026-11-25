@@ -1,25 +1,15 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { getReadingExplanation } from "../src/utils/ieltsReadingExplanations.js";
-import { cam18Test1ReadingExplanations } from "../src/data/ielts/explanations/cam18Test1ReadingExplanations.js";
 import { cam18Test2ReadingExplanations } from "../src/data/ielts/explanations/cam18Test2ReadingExplanations.js";
 import { cam18Test3ReadingExplanations } from "../src/data/ielts/explanations/cam18Test3ReadingExplanations.js";
 import { cam18Test4ReadingExplanations } from "../src/data/ielts/explanations/cam18Test4ReadingExplanations.js";
-import { cam17Test1ReadingExplanations } from "../src/data/ielts/explanations/cam17Test1ReadingExplanations.js";
-import { cam17Test2ReadingExplanations } from "../src/data/ielts/explanations/cam17Test2ReadingExplanations.js";
-import { cam17Test3ReadingExplanations } from "../src/data/ielts/explanations/cam17Test3ReadingExplanations.js";
-import { cam17Test4ReadingExplanations } from "../src/data/ielts/explanations/cam17Test4ReadingExplanations.js";
 
-describe("Cambridge 18 & 17 Reading Explanations & Evidence - Unit Tests", () => {
+describe("Cambridge 18 Tests 2-4 curated Reading Explanations - Unit Tests", () => {
   const tests = [
-    { id: "cambridge-18-test-1", data: cam18Test1ReadingExplanations },
     { id: "cambridge-18-test-2", data: cam18Test2ReadingExplanations },
     { id: "cambridge-18-test-3", data: cam18Test3ReadingExplanations },
     { id: "cambridge-18-test-4", data: cam18Test4ReadingExplanations },
-    { id: "cambridge-17-test-1", data: cam17Test1ReadingExplanations },
-    { id: "cambridge-17-test-2", data: cam17Test2ReadingExplanations },
-    { id: "cambridge-17-test-3", data: cam17Test3ReadingExplanations },
-    { id: "cambridge-17-test-4", data: cam17Test4ReadingExplanations },
   ];
 
   for (const t of tests) {

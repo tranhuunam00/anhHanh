@@ -5,10 +5,6 @@
  * Adheres to <= 500 lines rule.
  */
 
-import { cam16Test4ReadingExplanations } from "../data/ielts/explanations/cam16Test4ReadingExplanations.js";
-import { cam16Test3ReadingExplanations } from "../data/ielts/explanations/cam16Test3ReadingExplanations.js";
-import { cam16Test2ReadingExplanations } from "../data/ielts/explanations/cam16Test2ReadingExplanations.js";
-import { cam16Test1ReadingExplanations } from "../data/ielts/explanations/cam16Test1ReadingExplanations.js";
 import { cam21Test4ReadingExplanations } from "../data/ielts/explanations/cam21Test4ReadingExplanations.js";
 import { cam21Test3ReadingExplanations } from "../data/ielts/explanations/cam21Test3ReadingExplanations.js";
 import { cam21Test2ReadingExplanations } from "../data/ielts/explanations/cam21Test2ReadingExplanations.js";
@@ -21,16 +17,13 @@ import { cam19Test1ReadingExplanations } from "../data/ielts/explanations/cam19T
 import { cam19Test2ReadingExplanations } from "../data/ielts/explanations/cam19Test2ReadingExplanations.js";
 import { cam19Test3ReadingExplanations } from "../data/ielts/explanations/cam19Test3ReadingExplanations.js";
 import { cam19Test4ReadingExplanations } from "../data/ielts/explanations/cam19Test4ReadingExplanations.js";
-import { cam18Test1ReadingExplanations } from "../data/ielts/explanations/cam18Test1ReadingExplanations.js";
 import { cam18Test2ReadingExplanations } from "../data/ielts/explanations/cam18Test2ReadingExplanations.js";
 import { cam18Test3ReadingExplanations } from "../data/ielts/explanations/cam18Test3ReadingExplanations.js";
 import { cam18Test4ReadingExplanations } from "../data/ielts/explanations/cam18Test4ReadingExplanations.js";
-import { cam17Test1ReadingExplanations } from "../data/ielts/explanations/cam17Test1ReadingExplanations.js";
-import { cam17Test2ReadingExplanations } from "../data/ielts/explanations/cam17Test2ReadingExplanations.js";
-import { cam17Test3ReadingExplanations } from "../data/ielts/explanations/cam17Test3ReadingExplanations.js";
-import { cam17Test4ReadingExplanations } from "../data/ielts/explanations/cam17Test4ReadingExplanations.js";
 
-// Test-specific curated explanation registries
+// Test-specific curated explanation registries.
+// Cambridge 16, 17 and 18 Test 1 have no curated set: their reading data was re-digitised
+// from the books, so explanations are derived from the real passage text (fallback below).
 const EXPLANATION_REGISTRIES = {
   "cambridge-21-test-4": cam21Test4ReadingExplanations,
   "cambridge-21-test-3": cam21Test3ReadingExplanations,
@@ -44,18 +37,9 @@ const EXPLANATION_REGISTRIES = {
   "cambridge-19-test-2": cam19Test2ReadingExplanations,
   "cambridge-19-test-3": cam19Test3ReadingExplanations,
   "cambridge-19-test-4": cam19Test4ReadingExplanations,
-  "cambridge-18-test-1": cam18Test1ReadingExplanations,
   "cambridge-18-test-2": cam18Test2ReadingExplanations,
   "cambridge-18-test-3": cam18Test3ReadingExplanations,
   "cambridge-18-test-4": cam18Test4ReadingExplanations,
-  "cambridge-17-test-1": cam17Test1ReadingExplanations,
-  "cambridge-17-test-2": cam17Test2ReadingExplanations,
-  "cambridge-17-test-3": cam17Test3ReadingExplanations,
-  "cambridge-17-test-4": cam17Test4ReadingExplanations,
-  "cambridge-16-test-4": cam16Test4ReadingExplanations,
-  "cambridge-16-test-3": cam16Test3ReadingExplanations,
-  "cambridge-16-test-2": cam16Test2ReadingExplanations,
-  "cambridge-16-test-1": cam16Test1ReadingExplanations,
 };
 
 /**

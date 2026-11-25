@@ -107,7 +107,7 @@ export const cambridge18Test2ReadingPassage2 = {
     },
     {
       groupType: "yes_no_not_given",
-      instructions: "Do the following statements agree with the claims of the writer in Reading Passage 2?\nIn boxes 20–23 on your answer sheet, write:\nYES if the statement agrees with the claims of the writer\nNO if the statement contradicts the claims of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
+      instructions: "Do the following statements agree with the claims of the writer in Reading Passage 2?\nIn boxes 20–23 on your answer sheet, write\nYES if the statement agrees with the claims of the writer\nNO if the statement contradicts the claims of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
       numbers: [20, 21, 22, 23],
       items: [
         {

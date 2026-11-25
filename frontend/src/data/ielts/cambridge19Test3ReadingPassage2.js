@@ -41,7 +41,7 @@ export const cambridge19Test3ReadingPassage2 = {
   groups: [
     {
       groupType: "matching_information",
-      instructions: "Questions 14–17: Reading Passage 2 has eight paragraphs, A–H.\nWhich paragraph contains the following information?\nWrite the correct letter, A–H, in boxes 14–17 on your answer sheet.",
+      instructions: "Reading Passage 2 has eight paragraphs, A–H.\nWhich paragraph contains the following information?\nWrite the correct letter, A–H, in boxes 14–17 on your answer sheet.",
       options: ["A", "B", "C", "D", "E", "F", "G", "H"],
       numbers: [14, 15, 16, 17],
       items: [
@@ -69,7 +69,7 @@ export const cambridge19Test3ReadingPassage2 = {
     },
     {
       groupType: "fill_summary",
-      instructions: "Questions 18–22: Complete the sentences below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 18–22 on your answer sheet.",
+      instructions: "Complete the sentences below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 18–22 on your answer sheet.",
       numbers: [18, 19, 20, 21, 22],
       items: [
         {
@@ -106,7 +106,7 @@ export const cambridge19Test3ReadingPassage2 = {
     },
     {
       groupType: "matching_people",
-      instructions: "Questions 23–26: Look at the following statements (Questions 23–26) and the list of experts below.\nMatch each statement with the correct expert, A–D.\nWrite the correct letter, A–D, in boxes 23–26 on your answer sheet.\n\nList of Experts:\nA. Matthew McCartney\nB. Pieter van Eijk\nC. Marcel Silvius\nD. Dave Tickner",
+      instructions: "Look at the following statements (Questions 23–26) and the list of experts below.\nMatch each statement with the correct expert, A–D.\nWrite the correct letter, A–D, in boxes 23–26 on your answer sheet.\n\nList of Experts:\nA. Matthew McCartney\nB. Pieter van Eijk\nC. Marcel Silvius\nD. Dave Tickner",
       options: [
         "A. Matthew McCartney",
         "B. Pieter van Eijk",

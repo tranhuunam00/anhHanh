@@ -76,7 +76,7 @@ export const cambridge19Test1ReadingPassage2 = {
     },
     {
       groupType: "choose_two",
-      instructions: "Questions 20 and 21: Choose TWO letters, A–E.\nWrite the correct letters in boxes 20 and 21 on your answer sheet.\nWhich TWO of the following statements does the writer make about inhabitants of the Mediterranean region in the ancient world?",
+      instructions: "Choose TWO letters, A–E.\nWrite the correct letters in boxes 20 and 21 on your answer sheet.\nWhich TWO of the following statements does the writer make about inhabitants of the Mediterranean region in the ancient world?",
       numbers: [20, 21],
       answers: ["B", "D"],
       items: [
@@ -110,7 +110,7 @@ export const cambridge19Test1ReadingPassage2 = {
     },
     {
       groupType: "choose_two",
-      instructions: "Questions 22 and 23: Choose TWO letters, A–E.\nWrite the correct letters in boxes 22 and 23 on your answer sheet.\nWhich TWO of the following statements does the writer make about piracy and ancient Greece?",
+      instructions: "Choose TWO letters, A–E.\nWrite the correct letters in boxes 22 and 23 on your answer sheet.\nWhich TWO of the following statements does the writer make about piracy and ancient Greece?",
       numbers: [22, 23],
       answers: ["C", "E"],
       items: [

@@ -45,6 +45,7 @@ import {
   renderCam20Test4Passage3Questions
 } from "./IeltsReadingCam20Test4QuestionsViews.jsx";
 import { renderCam19ReadingPassageQuestions } from "./IeltsReadingCam19QuestionsView.jsx";
+import { usesDataDrivenReadingRenderer } from "../../utils/ieltsReadingRendererRouting.js";
 
 /**
  * IELTS Academic Reading Test Module
@@ -172,6 +173,13 @@ export const IeltsReadingModule = ({
                 </p>
               ))
             )}
+            {Array.isArray(currentLeftPassage.footnotes) && currentLeftPassage.footnotes.length > 0 && (
+              <div className="ielts-passage-footnotes">
+                {currentLeftPassage.footnotes.map((note, idx) => (
+                  <p key={idx}>{note}</p>
+                ))}
+              </div>
+            )}
           </div>
         </article>
       )}
@@ -182,9 +190,7 @@ export const IeltsReadingModule = ({
   const rightPaneContent = (
     <div className="ielts-right-scroll-pane ielts-reading-questions-pane">
       <div className="ielts-questions-body">
-        {readingData?.testId?.startsWith("cambridge-17-") ||
-        readingData?.testId?.startsWith("cambridge-18-") ||
-        readingData?.testId?.startsWith("cambridge-19-") ? (
+        {usesDataDrivenReadingRenderer(readingData?.testId) ? (
           renderCam19ReadingPassageQuestions(
             currentRightPassage.groups,
             answers,

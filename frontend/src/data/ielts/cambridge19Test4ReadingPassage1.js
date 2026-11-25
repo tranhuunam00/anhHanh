@@ -33,7 +33,7 @@ export const cambridge19Test4ReadingPassage1 = {
   groups: [
     {
       groupType: "true_false_not_given",
-      instructions: "Questions 1–6: Do the following statements agree with the information given in Reading Passage 1?\nIn boxes 1–6 on your answer sheet, write:\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
+      instructions: "Do the following statements agree with the information given in Reading Passage 1?\nIn boxes 1–6 on your answer sheet, write\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
       numbers: [1, 2, 3, 4, 5, 6],
       items: [
         {
@@ -70,7 +70,7 @@ export const cambridge19Test4ReadingPassage1 = {
     },
     {
       groupType: "fill_notes",
-      instructions: "Questions 7–13: Complete the notes below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 7–13 on your answer sheet.",
+      instructions: "Complete the notes below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 7–13 on your answer sheet.",
       title: "Butterflies in the UK",
       numbers: [7, 8, 9, 10, 11, 12, 13],
       items: [

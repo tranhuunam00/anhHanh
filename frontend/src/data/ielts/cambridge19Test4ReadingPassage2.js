@@ -34,7 +34,7 @@ export const cambridge19Test4ReadingPassage2 = {
   groups: [
     {
       groupType: "matching_information",
-      instructions: "Questions 14–17: Reading Passage 2 has six paragraphs, A–F.\nWhich paragraph contains the following information?\nWrite the correct letter, A–F, in boxes 14–17 on your answer sheet.",
+      instructions: "Reading Passage 2 has six paragraphs, A–F.\nWhich paragraph contains the following information?\nWrite the correct letter, A–F, in boxes 14–17 on your answer sheet.",
       options: ["A", "B", "C", "D", "E", "F"],
       numbers: [14, 15, 16, 17],
       items: [
@@ -62,7 +62,7 @@ export const cambridge19Test4ReadingPassage2 = {
     },
     {
       groupType: "matching_people",
-      instructions: "Questions 18–23: Look at the following statements (Questions 18–23) and the list of people below.\nMatch each statement with the correct person or people, A–E.\nWrite the correct letter, A–E, in boxes 18–23 on your answer sheet.\nNB You may use any letter more than once.\n\nList of People:\nA. Professor Mat Upton\nB. Julie Hunter, Julian Aguon and Pradeep Singh\nC. Dr Jon Copley\nD. Mike Johnston\nE. Verena Tunnicliffe",
+      instructions: "Look at the following statements (Questions 18–23) and the list of people below.\nMatch each statement with the correct person or people, A–E.\nWrite the correct letter, A–E, in boxes 18–23 on your answer sheet.\nNB You may use any letter more than once.\n\nList of People:\nA. Professor Mat Upton\nB. Julie Hunter, Julian Aguon and Pradeep Singh\nC. Dr Jon Copley\nD. Mike Johnston\nE. Verena Tunnicliffe",
       options: [
         "A. Professor Mat Upton",
         "B. Julie Hunter, Julian Aguon and Pradeep Singh",
@@ -106,7 +106,7 @@ export const cambridge19Test4ReadingPassage2 = {
     },
     {
       groupType: "fill_summary",
-      instructions: "Questions 24–26: Complete the summary below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 24–26 on your answer sheet.",
+      instructions: "Complete the summary below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 24–26 on your answer sheet.",
       title: "Mining the sea floor",
       numbers: [24, 25, 26],
       items: [

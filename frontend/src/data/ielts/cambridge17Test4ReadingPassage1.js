@@ -1,120 +1,62 @@
-// Cambridge IELTS 17 Test 4 - Reading Passage 1 Data
+// Cambridge IELTS 17 Test 4 - Reading Passage 1
+// Text, questions and answers checked against Cambridge 17.pdf (pages 81–84).
+
 export const cambridge17Test4ReadingPassage1 = {
   passageNumber: 1,
   title: "Bats to the rescue",
-  subtitle: "How Madagascar's bats are helping farmers combat agricultural pests...",
+  subtitle: "How Madagascar's bats are helping to save the rainforest",
   paragraphs: [
-    {
-      id: "P1",
-      text: "Across the southwestern region of Madagascar, smallholder farmers depend on irrigated rice paddies for their staple sustenance. Yet their fragile yields face perpetual threats from destructive insect pests, particularly the white stem borer moth, whose voracious larvae bore into young rice stalks and devastate entire harvests. Traditionally, resource-poor farmers had little choice but to apply expensive, toxic synthetic chemical pesticides."
-    },
-    {
-      id: "P2",
-      text: "Now, pioneering ecological research conducted by Dr Ricardo Rocha and his international research team suggests a formidable, chemical-free ally has been flying overhead all along: insectivorous bats. Armed with sensitive ultrasonic recording equipment and DNA metabarcoding of bat droppings, researchers spent seasons monitoring bat activity across rural villages."
-    },
-    {
-      id: "P3",
-      text: "The molecular findings were striking. Several common bat species—including the endemic Malagasy mouse-eared bat and the common pipistrelle—consume prodigious quantities of destructive agricultural pests. A single bat colony can vacuum up millions of adult stem borer moths every single evening, alongside major coffee plantation pests like the coffee berry borer beetle and disease-carrying mosquitoes."
-    },
-    {
-      id: "P4",
-      text: "Beyond pest control, bats provide an essential dietary lifeline for rural Malagasy families. In impoverished areas suffering from chronic protein malnutrition, larger frugivorous bats are traditionally hunted as a prized source of high-quality wild meat."
-    },
-    {
-      id: "P5",
-      text: "However, deep-seated cultural taboos, or fady, complicate conservation. In certain local traditions, insectivorous bats are regarded as unclean omens associated with darkness and witchcraft. Moreover, roosting bats frequently colonialise the thatched roofs of rural houses, creating noise and unpleasant odour that lead villagers to smoke them out or seal roof gaps."
-    },
-    {
-      id: "P6",
-      text: "To bridge this divide, conservationists are building dedicated artificial bat roosting boxes on the fringes of rice paddies. When placed near crops, these boxes keep bats safely outside domestic dwellings while maximising natural pest eradication in the fields."
-    }
+    { id: "P1", text: "There are few places in the world where relations between agriculture and conservation are more strained. Madagascar's forests are being converted to agricultural land at a rate of one percent every year. Much of this destruction is fuelled by the cultivation of the country's main staple crop: rice. And a key reason for this destruction is that insect pests are destroying vast quantities of what is grown by local subsistence farmers, leading them to clear forest to create new paddy fields. The result is devastating habitat and biodiversity loss on the island, but not all species are suffering. In fact, some of the island's insectivorous bats are currently thriving and this has important implications for farmers and conservationists alike." },
+    { id: "P2", text: "Enter University of Cambridge zoologist Ricardo Rocha. He's passionate about conservation, and bats. More specifically, he's interested in how bats are responding to human activity and deforestation in particular. Rocha's new study shows that several species of bats are giving Madagascar's rice farmers a vital pest control service by feasting on plagues of insects. And this, he believes, can ease the financial pressure on farmers to turn forest into fields." },
+    { id: "P3", text: "Bats comprise roughly one-fifth of all mammal species in Madagascar and thirty-six recorded bat species are native to the island, making it one of the most important regions for conservation of this animal group anywhere in the world." },
+    { id: "P4", text: "Co-leading an international team of scientists, Rocha found that several species of indigenous bats are taking advantage of habitat modification to hunt insects swarming above the country's rice fields. They include the Malagasy mouse-eared bat, Major's long-fingered bat, the Malagasy white-bellied free-tailed bat and Peters' wrinkle-lipped bat." },
+    { id: "P5", text: "'These winner species are providing a valuable free service to Madagascar as biological pest suppressors,' says Rocha. 'We found that six species of bat are preying on rice pests, including the paddy swarming caterpillar and grass webworm. The damage which these insects cause puts the island's farmers under huge financial pressure and that encourages deforestation.'" },
+    { id: "P6", text: "The study, now published in the journal Agriculture, Ecosystems and Environment, set out to investigate the feeding activity of insectivorous bats in the farmland bordering the Ranomafana National Park in the southeast of the country." },
+    { id: "P7", text: "Rocha and his team used state-of-the-art ultrasonic recorders to record over a thousand bat 'feeding buzzes' (echolocation sequences used by bats to target their prey) at 54 sites, in order to identify the favourite feeding spots of the bats. They next used DNA barcoding techniques to analyse droppings collected from bats at the different sites." },
+    { id: "P8", text: "The recordings revealed that bat activity over rice fields was much higher than it was in continuous forest – seven times higher over rice fields which were on flat ground, and sixteen times higher over fields on the sides of hills – leaving no doubt that the animals are preferentially foraging in these man-made ecosystems. The researchers suggest that the bats favour these fields because lack of water and nutrient run-off make these crops more susceptible to insect pest infestations. DNA analysis showed that all six species of bat had fed on economically important insect pests. While the findings indicated that rice farming benefits most from the bats, the scientists also found indications that the bats were consuming pests of other crops, including the black twig borer (which infests coffee plants), the sugarcane cicada, the macadamia nut-borer, and the sober tabby (a pest of citrus fruits)." },
+    { id: "P9", text: "'The effectiveness of bats as pest controllers has already been proven in the USA and Catalonia,' said co-author James Kemp, from the University of Lisbon. 'But our study is the first to show this happening in Madagascar, where the stakes for both farmers and conservationists are so high.'" },
+    { id: "P10", text: "Local people may have a further reason to be grateful to their bats. While the animal is often associated with spreading disease, Rocha and his team found evidence that Malagasy bats feed not just on crop pests but also on mosquitoes – carriers of malaria, Rift Valley fever virus and elephantiasis – as well as blackflies, which spread river blindness." },
+    { id: "P11", text: "Rocha points out that the relationship is complicated. When food is scarce, bats become a crucial source of protein for local people. Even the children will hunt them. And as well as roosting in trees, the bats sometimes roost in buildings, but are not welcomed there because they make them unclean. At the same time, however, they are associated with sacred caves and the ancestors, so they can be viewed as beings between worlds, which makes them very significant in the culture of the people. And one potential problem is that while these bats are benefiting from farming, at the same time deforestation is reducing the places where they can roost, which could have long-term effects on their numbers. Rocha says, 'With the right help, we hope that farmers can promote this mutually beneficial relationship by installing bat houses.'" },
+    { id: "P12", text: "Rocha and his colleagues believe that maximising bat populations can help to boost crop yields and promote sustainable livelihoods. The team is now calling for further research to quantify this contribution. 'I'm very optimistic,' says Rocha. 'If we give nature a hand, we can speed up the process of regeneration.'" }
   ],
   groups: [
     {
       groupType: "true_false_not_given",
-      instructions: "Do the following statements agree with the information given in Reading Passage 1?\nIn boxes 1–6 on your answer sheet, write:\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
+      instructions: "Do the following statements agree with the information given in Reading Passage 1?\nIn boxes 1–6 on your answer sheet, write\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
       numbers: [1, 2, 3, 4, 5, 6],
       items: [
-        {
-          number: 1,
-          statement: "The white stem borer moth attacks mature rice plants rather than young stalks.",
-          answers: ["FALSE"]
-        },
-        {
-          number: 2,
-          statement: "Local farmers prefer chemical sprays because synthetic pesticides are very cheap in Madagascar.",
-          answers: ["FALSE"]
-        },
-        {
-          number: 3,
-          statement: "Dr Rocha's team used trained falcons to catch bats for study.",
-          answers: ["NOT GIVEN"]
-        },
-        {
-          number: 4,
-          statement: "DNA analysis of bat guano confirmed that bats hunt major agricultural pests.",
-          answers: ["TRUE"]
-        },
-        {
-          number: 5,
-          statement: "Malagasy bats consume more coffee pests than rice pests.",
-          answers: ["NOT GIVEN"]
-        },
-        {
-          number: 6,
-          statement: "Artificial roosting boxes help prevent bats from inhabiting human residences.",
-          answers: ["TRUE"]
-        }
+        { number: 1, statement: "Many Madagascan forests are being destroyed by attacks from insects.", answers: ["FALSE"] },
+        { number: 2, statement: "Loss of habitat has badly affected insectivorous bats in Madagascar.", answers: ["FALSE"] },
+        { number: 3, statement: "Ricardo Rocha has carried out studies of bats in different parts of the world.", answers: ["NOT GIVEN"] },
+        { number: 4, statement: "Habitat modification has resulted in indigenous bats in Madagascar becoming useful to farmers.", answers: ["TRUE"] },
+        { number: 5, statement: "The Malagasy mouse-eared bat is more common than other indigenous bat species in Madagascar.", answers: ["NOT GIVEN"] },
+        { number: 6, statement: "Bats may feed on paddy swarming caterpillars and grass webworms.", answers: ["TRUE"] }
       ]
     },
     {
-      groupType: "fill_notes",
-      instructions: "Complete the notes below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 7–13 on your answer sheet.",
-      title: "Ecological and Social Roles of Malagasy Bats",
+      groupType: "table_completion",
+      instructions: "Complete the table below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 7–13 on your answer sheet.",
       numbers: [7, 8, 9, 10, 11, 12, 13],
+      table: {
+        title: "The study carried out by Rocha's team",
+        rows: [
+          ["Aim", "• to investigate the feeding habits of bats in farmland near the Ranomafana National Park"],
+          ["Method", "• ultrasonic recording to identify favourite feeding spots\n• DNA analysis of bat {7}"],
+          [
+            "Findings",
+            "• the bats\n– were most active in rice fields located on hills\n– ate pests of rice, {8}, sugarcane, nuts and fruit\n– prevent the spread of disease by eating {9} and blackflies\n• local attitudes to bats are mixed:\n– they provide food rich in {10}\n– the buildings where they roost become {11}\n– they play an important role in local {12}"
+          ],
+          ["Recommendation", "• farmers should provide special {13} to support the bat population"]
+        ]
+      },
       items: [
-        {
-          number: 7,
-          prefix: "Researchers gathered bat ",
-          suffix: " to perform genetic dietary metabarcoding.",
-          answers: ["droppings"]
-        },
-        {
-          number: 8,
-          prefix: "Bats protect valuable cash crops by feeding on harmful ",
-          suffix: " pests.",
-          answers: ["coffee"]
-        },
-        {
-          number: 9,
-          prefix: "In addition to crop destroyers, bats consume dangerous disease vectors such as ",
-          suffix: ".",
-          answers: ["mosquitoes"]
-        },
-        {
-          number: 10,
-          prefix: "For local human communities, larger bats provide an important supplementary source of dietary ",
-          suffix: ".",
-          answers: ["protein"]
-        },
-        {
-          number: 11,
-          prefix: "In some rural areas, traditional beliefs regard bats as morally ",
-          suffix: " or unlucky.",
-          answers: ["unclean"]
-        },
-        {
-          number: 12,
-          prefix: "Conservation strategies must take account of local ",
-          suffix: " and traditional taboos.",
-          answers: ["culture"]
-        },
-        {
-          number: 13,
-          prefix: "Villagers often object when bats establish roosts in the roofs of private ",
-          suffix: ".",
-          answers: ["houses"]
-        }
+        { number: 7, answers: ["droppings"] },
+        { number: 8, answers: ["coffee"] },
+        { number: 9, answers: ["mosquitoes"] },
+        { number: 10, answers: ["protein"] },
+        { number: 11, answers: ["unclean"] },
+        { number: 12, answers: ["culture"] },
+        { number: 13, answers: ["houses"] }
       ]
     }
   ]

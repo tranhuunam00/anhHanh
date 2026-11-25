@@ -45,7 +45,7 @@ export const cambridge19Test2ReadingPassage3 = {
   groups: [
     {
       groupType: "summary_with_options",
-      instructions: "Questions 27–32: Complete the summary using the list of phrases, A–K, below.\nWrite the correct letter, A–K, in boxes 27–32 on your answer sheet.\n\nList of Phrases:\nA. appeal\nB. determined\nC. intrigued\nD. single\nE. achievement\nF. devoted\nG. involved\nH. unique\nI. innovative\nJ. satisfaction\nK. intent",
+      instructions: "Complete the summary using the list of phrases, A–K, below.\nWrite the correct letter, A–K, in boxes 27–32 on your answer sheet.\n\nList of Phrases:\nA. appeal\nB. determined\nC. intrigued\nD. single\nE. achievement\nF. devoted\nG. involved\nH. unique\nI. innovative\nJ. satisfaction\nK. intent",
       options: [
         "A. appeal",
         "B. determined",
@@ -102,7 +102,7 @@ export const cambridge19Test2ReadingPassage3 = {
     },
     {
       groupType: "yes_no_not_given",
-      instructions: "Questions 33–37: Do the following statements agree with the claims of the writer in Reading Passage 3?\nIn boxes 33–37 on your answer sheet, write:\nYES if the statement agrees with the claims of the writer\nNO if the statement contradicts the claims of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
+      instructions: "Do the following statements agree with the claims of the writer in Reading Passage 3?\nIn boxes 33–37 on your answer sheet, write\nYES if the statement agrees with the claims of the writer\nNO if the statement contradicts the claims of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
       numbers: [33, 34, 35, 36, 37],
       items: [
         {
@@ -134,7 +134,7 @@ export const cambridge19Test2ReadingPassage3 = {
     },
     {
       groupType: "multiple_choice",
-      instructions: "Questions 38–40: Choose the correct letter, A, B, C or D.\nWrite the correct letter in boxes 38–40 on your answer sheet.",
+      instructions: "Choose the correct letter, A, B, C or D.\nWrite the correct letter in boxes 38–40 on your answer sheet.",
       numbers: [38, 39, 40],
       items: [
         {

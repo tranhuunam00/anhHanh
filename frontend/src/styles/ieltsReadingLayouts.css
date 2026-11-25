@@ -1,0 +1,156 @@
+/* ==========================================================================
+   IELTS Reading - Cambridge layouts for completion tasks
+   (summary box, notes with headings, table, group title, word box)
+   Light & Dark Mode Compatible via System CSS Variables
+   ========================================================================== */
+
+.ielts-layout-title {
+  text-align: center;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 4px 0 12px;
+}
+
+/* Summary: framed box like the book */
+.ielts-summary-layout {
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+
+.ielts-layout-paragraph {
+  font-size: 1.02rem;
+  line-height: 2.2;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+}
+
+.ielts-layout-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* Notes: headings + bullet lines */
+.ielts-notes-layout {
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+
+.ielts-notes-section + .ielts-notes-section {
+  margin-top: 10px;
+}
+
+.ielts-notes-heading {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+  line-height: 2;
+}
+
+.ielts-notes-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ielts-notes-line {
+  position: relative;
+  font-size: 1rem;
+  line-height: 2.15;
+  color: var(--text-primary);
+}
+
+.ielts-notes-line.has-bullet {
+  padding-left: 18px;
+}
+
+.ielts-notes-line.has-bullet::before {
+  content: "•";
+  position: absolute;
+  left: 3px;
+  color: var(--text-secondary);
+}
+
+.ielts-notes-line.has-dash {
+  padding-left: 36px;
+}
+
+.ielts-notes-line.has-dash::before {
+  content: "–";
+  position: absolute;
+  left: 20px;
+  color: var(--text-secondary);
+}
+
+/* Table */
+.ielts-layout-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+
+.ielts-layout-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+}
+
+.ielts-layout-table th,
+.ielts-layout-table td {
+  border: 1px solid var(--border-color);
+  padding: 8px 10px;
+  vertical-align: top;
+  text-align: left;
+  font-size: 0.94rem;
+  color: var(--text-primary);
+}
+
+.ielts-layout-table th {
+  font-weight: 700;
+  text-align: center;
+  background: var(--bg-secondary);
+}
+
+.ielts-layout-table .ielts-layout-table-title {
+  font-weight: 800;
+  font-size: 0.98rem;
+}
+
+.ielts-layout-table td.ielts-layout-table-rowhead {
+  font-weight: 700;
+}
+
+.ielts-table-cell-line {
+  line-height: 2.1;
+}
+
+.ielts-layout-table .ielts-notes-line {
+  font-size: 0.94rem;
+  line-height: 2.1;
+}
+
+/* Letter select inside a gap (summary with a word box) */
+.ielts-inline-input-wrapper .ielts-gap-select {
+  min-width: 52px;
+  cursor: pointer;
+}
+
+.ielts-gap-select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* Diagram image */
+.ielts-group-diagram {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}

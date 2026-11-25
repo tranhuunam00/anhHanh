@@ -86,7 +86,7 @@ export const cambridge18Test2ReadingPassage1 = {
     },
     {
       groupType: "true_false_not_given",
-      instructions: "Do the following statements agree with the information given in Reading Passage 1?\nIn boxes 9–13 on your answer sheet, write:\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
+      instructions: "Do the following statements agree with the information given in Reading Passage 1?\nIn boxes 9–13 on your answer sheet, write\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
       numbers: [9, 10, 11, 12, 13],
       items: [
         {

@@ -41,7 +41,7 @@ export const cambridge19Test2ReadingPassage1 = {
   groups: [
     {
       groupType: "fill_notes",
-      instructions: "Questions 1–7: Complete the notes below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 1–7 on your answer sheet.",
+      instructions: "Complete the notes below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 1–7 on your answer sheet.",
       title: "Britain's Industrial Revolution",
       numbers: [1, 2, 3, 4, 5, 6, 7],
       items: [
@@ -91,7 +91,7 @@ export const cambridge19Test2ReadingPassage1 = {
     },
     {
       groupType: "true_false_not_given",
-      instructions: "Questions 8–13: Do the following statements agree with the information given in Reading Passage 1?\nIn boxes 8–13 on your answer sheet, write:\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
+      instructions: "Do the following statements agree with the information given in Reading Passage 1?\nIn boxes 8–13 on your answer sheet, write\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
       numbers: [8, 9, 10, 11, 12, 13],
       items: [
         {

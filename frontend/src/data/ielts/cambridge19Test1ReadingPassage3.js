@@ -46,7 +46,7 @@ export const cambridge19Test1ReadingPassage3 = {
   groups: [
     {
       groupType: "multiple_choice",
-      instructions: "Questions 27–30: Choose the correct letter, A, B, C or D.\nWrite the correct letter in boxes 27–30 on your answer sheet.",
+      instructions: "Choose the correct letter, A, B, C or D.\nWrite the correct letter in boxes 27–30 on your answer sheet.",
       numbers: [27, 28, 29, 30],
       items: [
         {
@@ -97,7 +97,7 @@ export const cambridge19Test1ReadingPassage3 = {
     },
     {
       groupType: "summary_with_options",
-      instructions: "Questions 31–36: Complete the summary using the list of phrases, A–J, below.\nWrite the correct letter, A–J, in boxes 31–36 on your answer sheet.\n\nList of Phrases:\nA. constant conflict\nB. additional evidence\nC. different locations\nD. dubious reason\nE. short period\nF. extreme distrust\nG. frequent exposure\nH. mental operation\nI. dubious reason\nJ. different ideas",
+      instructions: "Complete the summary using the list of phrases, A–J, below.\nWrite the correct letter, A–J, in boxes 31–36 on your answer sheet.\n\nList of Phrases:\nA. constant conflict\nB. additional evidence\nC. different locations\nD. dubious reason\nE. short period\nF. extreme distrust\nG. frequent exposure\nH. mental operation\nI. dubious reason\nJ. different ideas",
       title: "What happens when people encounter misinformation?",
       numbers: [31, 32, 33, 34, 35, 36],
       items: [
@@ -141,7 +141,7 @@ export const cambridge19Test1ReadingPassage3 = {
     },
     {
       groupType: "yes_no_not_given",
-      instructions: "Questions 37–40: Do the following statements agree with the claims of the writer in Reading Passage 3?\nIn boxes 37–40 on your answer sheet, write:\nYES if the statement agrees with the claims of the writer\nNO if the statement contradicts the claims of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
+      instructions: "Do the following statements agree with the claims of the writer in Reading Passage 3?\nIn boxes 37–40 on your answer sheet, write\nYES if the statement agrees with the claims of the writer\nNO if the statement contradicts the claims of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
       numbers: [37, 38, 39, 40],
       items: [
         {

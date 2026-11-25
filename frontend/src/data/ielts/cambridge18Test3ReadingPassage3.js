@@ -135,7 +135,7 @@ export const cambridge18Test3ReadingPassage3 = {
     },
     {
       groupType: "yes_no_not_given",
-      instructions: "Do the following statements agree with the views of the writer in Reading Passage 3?\nIn boxes 36–40 on your answer sheet, write:\nYES if the statement agrees with the views of the writer\nNO if the statement contradicts the views of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
+      instructions: "Do the following statements agree with the views of the writer in Reading Passage 3?\nIn boxes 36–40 on your answer sheet, write\nYES if the statement agrees with the views of the writer\nNO if the statement contradicts the views of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
       numbers: [36, 37, 38, 39, 40],
       items: [
         {

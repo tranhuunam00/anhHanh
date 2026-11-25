@@ -34,7 +34,7 @@ export const cambridge19Test2ReadingPassage2 = {
   groups: [
     {
       groupType: "matching_information",
-      instructions: "Questions 14–18: Reading Passage 2 has six paragraphs, A–F.\nWhich paragraph contains the following information?\nWrite the correct letter, A–F, in boxes 14–18 on your answer sheet.\nNB You may use any letter more than once.",
+      instructions: "Reading Passage 2 has six paragraphs, A–F.\nWhich paragraph contains the following information?\nWrite the correct letter, A–F, in boxes 14–18 on your answer sheet.\nNB You may use any letter more than once.",
       options: ["A", "B", "C", "D", "E", "F"],
       numbers: [14, 15, 16, 17, 18],
       items: [
@@ -67,7 +67,7 @@ export const cambridge19Test2ReadingPassage2 = {
     },
     {
       groupType: "fill_summary",
-      instructions: "Questions 19–22: Complete the sentences below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 19–22 on your answer sheet.",
+      instructions: "Complete the sentences below.\nChoose ONE WORD ONLY from the passage for each answer.\nWrite your answers in boxes 19–22 on your answer sheet.",
       numbers: [19, 20, 21, 22],
       items: [
         {
@@ -98,7 +98,7 @@ export const cambridge19Test2ReadingPassage2 = {
     },
     {
       groupType: "choose_two",
-      instructions: "Questions 23 and 24: Choose TWO letters, A–E.\nWrite the correct letters in boxes 23 and 24 on your answer sheet.\nWhich TWO facts about Emma Raducanu's withdrawal from the Wimbledon tournament are mentioned in the text?",
+      instructions: "Choose TWO letters, A–E.\nWrite the correct letters in boxes 23 and 24 on your answer sheet.\nWhich TWO facts about Emma Raducanu's withdrawal from the Wimbledon tournament are mentioned in the text?",
       numbers: [23, 24],
       answers: ["B", "D"],
       items: [
@@ -132,7 +132,7 @@ export const cambridge19Test2ReadingPassage2 = {
     },
     {
       groupType: "choose_two",
-      instructions: "Questions 25 and 26: Choose TWO letters, A–E.\nWrite the correct letters in boxes 25 and 26 on your answer sheet.\nWhich TWO facts about anxiety are mentioned in Paragraph E of the text?",
+      instructions: "Choose TWO letters, A–E.\nWrite the correct letters in boxes 25 and 26 on your answer sheet.\nWhich TWO facts about anxiety are mentioned in Paragraph E of the text?",
       numbers: [25, 26],
       answers: ["A", "E"],
       items: [

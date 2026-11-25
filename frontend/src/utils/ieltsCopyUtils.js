@@ -4,6 +4,8 @@
  * for copying to clipboard to paste elsewhere.
  */
 
+import { formatGroupLayoutText } from "./ieltsReadingLayoutUtils.js";
+
 /**
  * Format Reading skill into clean plaintext for clipboard
  */
@@ -47,11 +49,15 @@ export function formatReadingTestForCopy(readingData, testTitle = "IELTS Reading
       p.groups.forEach((g, gIdx) => {
         lines.push(`\n--- Nhóm câu hỏi ${g.numbers ? `(${g.numbers.join(", ")})` : gIdx + 1} ---`);
         if (g.instructions) lines.push(g.instructions.trim());
+        const layoutText = formatGroupLayoutText(g);
+        if (layoutText) lines.push(layoutText);
 
         if (Array.isArray(g.items)) {
           g.items.forEach((item) => {
             const qNum = item.number;
-            const qText = item.statement || item.question || item.text || `${item.prefix || ""} [ ${qNum} ] ${item.suffix || ""}`.trim();
+            const qText = layoutText
+              ? `[ ${qNum} ]`
+              : item.statement || item.question || item.text || `${item.prefix || ""} [ ${qNum} ] ${item.suffix || ""}`.trim();
             const officialAns = item.answer || (item.answers && item.answers.join(" / ")) || evaluation?.[qNum]?.accepted?.join(" / ") || "N/A";
             const userAns = userAnswers?.[qNum];
 

@@ -46,7 +46,7 @@ export const cambridge19Test3ReadingPassage3 = {
   groups: [
     {
       groupType: "multiple_choice",
-      instructions: "Questions 27–30: Choose the correct letter, A, B, C or D.\nWrite the correct letter in boxes 27–30 on your answer sheet.",
+      instructions: "Choose the correct letter, A, B, C or D.\nWrite the correct letter in boxes 27–30 on your answer sheet.",
       numbers: [27, 28, 29, 30],
       items: [
         {
@@ -97,7 +97,7 @@ export const cambridge19Test3ReadingPassage3 = {
     },
     {
       groupType: "sentence_completion_endings",
-      instructions: "Questions 31–34: Complete each sentence with the correct ending, A–F, below.\nWrite the correct letter, A–F, in boxes 31–34 on your answer sheet.\n\nList of Endings:\nA. but there are concerns about this.\nB. as systems do not need to conform to standard practices.\nC. but they are far from perfect.\nD. despite the noise issues.\nE. because translation is immediate.\nF. and have an awareness of good manners.",
+      instructions: "Complete each sentence with the correct ending, A–F, below.\nWrite the correct letter, A–F, in boxes 31–34 on your answer sheet.\n\nList of Endings:\nA. but there are concerns about this.\nB. as systems do not need to conform to standard practices.\nC. but they are far from perfect.\nD. despite the noise issues.\nE. because translation is immediate.\nF. and have an awareness of good manners.",
       options: [
         "A. but there are concerns about this.",
         "B. as systems do not need to conform to standard practices.",
@@ -132,7 +132,7 @@ export const cambridge19Test3ReadingPassage3 = {
     },
     {
       groupType: "yes_no_not_given",
-      instructions: "Questions 35–40: Do the following statements agree with the views of the writer in Reading Passage 3?\nIn boxes 35–40 on your answer sheet, write:\nYES if the statement agrees with the views of the writer\nNO if the statement contradicts the views of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
+      instructions: "Do the following statements agree with the views of the writer in Reading Passage 3?\nIn boxes 35–40 on your answer sheet, write\nYES if the statement agrees with the views of the writer\nNO if the statement contradicts the views of the writer\nNOT GIVEN if it is impossible to say what the writer thinks about this",
       numbers: [35, 36, 37, 38, 39, 40],
       items: [
         {
