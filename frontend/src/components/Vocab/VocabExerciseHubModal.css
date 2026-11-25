@@ -1,7 +1,15 @@
 /* VocabExerciseHubModal.css - Dạng 1: Từ tiếng Anh -> Nghĩa tiếng Việt
    Theo tông màu hệ thống giao diện (Theme CSS variables), không fix cứng màu đen */
 
+/* While a practice session is open, a downward swipe must not trigger the browser's
+   pull-to-refresh: it reloads the page and throws the learner out of the session. */
+html:has(.exercise-modal-backdrop),
+body:has(.exercise-modal-backdrop) {
+  overscroll-behavior-y: none;
+}
+
 .exercise-modal-backdrop {
+  overscroll-behavior: contain;
   position: fixed;
   inset: 0;
   background-color: rgba(15, 23, 42, 0.65);

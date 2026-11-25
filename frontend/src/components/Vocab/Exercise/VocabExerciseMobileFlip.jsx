@@ -126,7 +126,8 @@ export const VocabExerciseMobileFlip = ({
   const progressPercent = items.length > 0 ? Math.round(((currentIndex + 1) / items.length) * 100) : 0;
 
   return (
-    <div className="exercise-modal-backdrop" onClick={onClose}>
+    // No close-on-backdrop here: a stray tap while walking must not end the session (use X / Menu).
+    <div className="exercise-modal-backdrop">
       <div
         className="exercise-modal-window"
         style={{ maxWidth: "620px" }}

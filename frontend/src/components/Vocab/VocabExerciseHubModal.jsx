@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { submitVocabReviewResult, updateVocabStatus, fetchPracticeSession } from "../../services/authVocabService";
 import { fetchSystemDistractors } from "../../services/systemVocabService";
 import { EXERCISE_FORMATS } from "../../utils/vocabExerciseGenerators";
@@ -9,6 +9,12 @@ import {
   countVocabByMasteredTimeRanges,
   resolveMasteredAtClient,
 } from "../../utils/vocabTimeFilterUtils";
+import {
+  buildFlipSessionSnapshot,
+  saveFlipSession,
+  loadFlipSession,
+  clearFlipSession,
+} from "../../utils/vocabFlipSessionStore";
 import { VocabExerciseMenu } from "./Exercise/VocabExerciseMenu";
 import { VocabExercisePractice } from "./Exercise/VocabExercisePractice";
 import { VocabExerciseSummary } from "./Exercise/VocabExerciseSummary";
@@ -26,8 +32,12 @@ export default function VocabExerciseHubModal({
   onFinished,
   onUpdateWordStatus,
 }) {
+  // Flip-card session interrupted by a page reload (pull-to-refresh, tab discarded while locked)
+  const userKey = user?.id ?? null;
+  const [resumed] = useState(() => loadFlipSession(userKey));
+
   // Navigation View: "MENU" (Card selection) | "PRACTICE" (Interactive session) | "SUMMARY" (Results)
-  const [viewMode, setViewMode] = useState("MENU");
+  const [viewMode, setViewMode] = useState(resumed ? "PRACTICE" : "MENU");
 
   // Selected format: Dạng 1 (Thẻ di động đi đường - mặc định), Dạng 2 (Từ vựng -> Nghĩa VN)...
   const [selectedFormat, setSelectedFormat] = useState(EXERCISE_FORMATS.D5_FLIP);
@@ -126,15 +136,33 @@ export default function VocabExerciseHubModal({
   ]);
 
   // Active practice session words, bank distractors and score tracking
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(() => resumed?.items || []);
   const [bankDistractors, setBankDistractors] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [maxCombo, setMaxCombo] = useState(0);
-  const [resultsHistory, setResultsHistory] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(() => resumed?.currentIndex || 0);
+  const [score, setScore] = useState(() => resumed?.score || 0);
+  const [combo, setCombo] = useState(() => resumed?.combo || 0);
+  const [maxCombo, setMaxCombo] = useState(() => resumed?.maxCombo || 0);
+  const [resultsHistory, setResultsHistory] = useState(() => resumed?.resultsHistory || []);
 
   const currentItem = items[currentIndex];
+
+  // Keep the running flip session saved so a reload resumes at the same card; drop it otherwise.
+  useEffect(() => {
+    if (viewMode === "PRACTICE" && selectedFormat === EXERCISE_FORMATS.D5_FLIP) {
+      const snapshot = buildFlipSessionSnapshot({
+        userId: userKey, items, currentIndex, score, combo, maxCombo, resultsHistory,
+      });
+      if (snapshot) saveFlipSession(snapshot);
+    } else {
+      clearFlipSession();
+    }
+  }, [viewMode, selectedFormat, items, currentIndex, score, combo, maxCombo, resultsHistory, userKey]);
+
+  // Leaving on purpose (X / Thoát) must not resume next time.
+  const handleClose = useCallback(() => {
+    clearFlipSession();
+    if (onClose) onClose();
+  }, [onClose]);
 
   // Start practice session with selected format, status filter & quantity
   const handleStartPractice = async () => {
@@ -336,7 +364,7 @@ export default function VocabExerciseHubModal({
         onSelectLimit={setSelectedLimit}
         onStart={handleStartPractice}
         isLoading={isLoadingSession}
-        onClose={onClose}
+        onClose={handleClose}
         user={user}
       />
     );
@@ -352,7 +380,7 @@ export default function VocabExerciseHubModal({
         resultsHistory={resultsHistory}
         onBackToMenu={handleBackToMenu}
         onRestart={handleRestart}
-        onClose={onClose}
+        onClose={handleClose}
       />
     );
   }
@@ -365,7 +393,7 @@ export default function VocabExerciseHubModal({
         currentIndex={currentIndex}
         onProceed={handleProceed}
         onBackToMenu={handleBackToMenu}
-        onClose={onClose}
+        onClose={handleClose}
       />
     );
   }
@@ -377,7 +405,7 @@ export default function VocabExerciseHubModal({
         token={token}
         user={user}
         onBackToMenu={handleBackToMenu}
-        onClose={onClose}
+        onClose={handleClose}
         onFinishExercise={() => setViewMode("SUMMARY")}
       />
     );
@@ -392,7 +420,7 @@ export default function VocabExerciseHubModal({
         combo={combo}
         onProceed={handleProceed}
         onBackToMenu={handleBackToMenu}
-        onClose={onClose}
+        onClose={handleClose}
       />
     );
   }
@@ -406,7 +434,7 @@ export default function VocabExerciseHubModal({
         combo={combo}
         onProceed={handleProceed}
         onBackToMenu={handleBackToMenu}
-        onClose={onClose}
+        onClose={handleClose}
       />
     );
   }
@@ -421,7 +449,7 @@ export default function VocabExerciseHubModal({
       combo={combo}
       onProceed={handleProceed}
       onBackToMenu={handleBackToMenu}
-      onClose={onClose}
+      onClose={handleClose}
     />
   );
 }
