@@ -53,10 +53,15 @@ async def test_generate_vocab_story_empty_words_raises_value_error():
 @pytest.mark.asyncio
 async def test_generate_vocab_story_no_api_key_uses_fallback(monkeypatch):
     """Verify generate_vocab_story falls back cleanly if GEMINI_API_KEY is not set."""
+    # get_gemini_api_key() reloads .env with override=True, so clearing the env var alone
+    # would let the real key back in and send a live Gemini request from the test.
     monkeypatch.setenv("GEMINI_API_KEY", "")
     words = [{"word": "perseverance", "meaning": "sự kiên trì"}]
 
-    result = await AIVocabExerciseService.generate_vocab_story(words)
+    with patch("app.infrastructure.ai_vocab_exercise_service.get_gemini_api_key", return_value=""), \
+         patch("app.infrastructure.ai_vocab_exercise_service.httpx.AsyncClient",
+               side_effect=AssertionError("no network call expected without an API key")):
+        result = await AIVocabExerciseService.generate_vocab_story(words)
     assert isinstance(result, dict)
     assert "title" in result
     assert "story_en" in result
